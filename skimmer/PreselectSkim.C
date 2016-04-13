@@ -80,9 +80,7 @@ void PreselectSkim::LoopOverInputTree(bool isMC)
         //if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoHoverE->at(i)<0.05 && _TREE.treeLeaf.phoSigmaIEtaIEta->at(i)<0.0102 && _TREE.treeLeaf.phoPFChIso->at(i)<3.32 && _TREE.treeLeaf.phoPFNeuIso->at(i)<(1.92+_TREE.treeLeaf.phoEt->at(i)*0.014+pow(_TREE.treeLeaf.phoEt->at(i),2)*0.000019) && _TREE.treeLeaf.phoPFPhoIso->at(i)<(0.81+_TREE.treeLeaf.phoEt->at(i)*0.0053)) gWrite=true; //not correct
         
         //MVA based photon selection
-        else {
-          if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoIDMVA->at(i)>0.374) gWrite=true;
-        }
+        else if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoIDMVA->at(i)>0.374) gWrite=true;
       }
     }
 
