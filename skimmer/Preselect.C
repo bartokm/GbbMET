@@ -7,7 +7,7 @@
 
 void Preselect()
 {
-  int nS=4; // 0:test, 1,2,3:singlephoton, 4:TTJets, 5:WJetsToLNu, 6-9:ZJetsToNuNu, 10-16:QCD, 17:GJet
+  int nS=9; // 0:test, 1,2,3:singlephoton, 4:TTJets, 5:WJetsToLNu, 6-9:ZJetsToNuNu, 10-16:QCD, 17:GJet
   TString fileToSkimName(ggFile[nS]);
 
   bool isMC=false;

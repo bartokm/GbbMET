@@ -52,8 +52,8 @@ void PreselectSkim::LoopOverInputTree(bool isMC)
   _h_cuts->SetBinContent(1,_sigma);
   if (!isMC) _h_cuts->SetBinContent(2,nentries);
   int temp=-1;
-  //for (Long64_t entry=0; entry<nentries; entry++) {
-  for (Long64_t entry=0; entry<100; entry++) {
+  for (Long64_t entry=0; entry<nentries; entry++) {
+  //for (Long64_t entry=0; entry<100; entry++) {
     gWrite=false; // tells us what events to print to skim.
     if (entry < 0) break;
     //progress bar
