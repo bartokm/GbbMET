@@ -238,20 +238,22 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   treeLeaf.eleBCSipip=0;
   treeLeaf.eleFiredTrgs=0;
   treeLeaf.eleIDbit=0;
-  treeLeaf.eleESEnP1Raw=0;
-  treeLeaf.eleESEnP2Raw=0;
-  treeLeaf.nGSFTrk=0;
-  treeLeaf.gsfPt=0;
-  treeLeaf.gsfEta=0;
-  treeLeaf.gsfPhi=0;
-  treeLeaf.npfHF=0;
-  treeLeaf.pfHFEn=0;
-  treeLeaf.pfHFECALEn=0;
-  treeLeaf.pfHFHCALEn=0;
-  treeLeaf.pfHFPt=0;
-  treeLeaf.pfHFEta=0;
-  treeLeaf.pfHFPhi=0;
-  treeLeaf.pfHFIso=0;
+  if (!isMC){
+    treeLeaf.eleESEnP1Raw=0;
+    treeLeaf.eleESEnP2Raw=0;
+    treeLeaf.nGSFTrk=0;
+    treeLeaf.gsfPt=0;
+    treeLeaf.gsfEta=0;
+    treeLeaf.gsfPhi=0;
+    treeLeaf.npfHF=0;
+    treeLeaf.pfHFEn=0;
+    treeLeaf.pfHFECALEn=0;
+    treeLeaf.pfHFHCALEn=0;
+    treeLeaf.pfHFPt=0;
+    treeLeaf.pfHFEta=0;
+    treeLeaf.pfHFPhi=0;
+    treeLeaf.pfHFIso=0;
+  }
   treeLeaf.nMu=0;
   treeLeaf.muPt=0;
   treeLeaf.muEn=0;
@@ -302,14 +304,16 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   treeLeaf.jetPUidFullDiscriminant=0;
   treeLeaf.jetJECUnc=0;
   treeLeaf.jetFiredTrgs=0;
-  treeLeaf.jetCHF=0;
-  treeLeaf.jetNHF=0;
-  treeLeaf.jetCEF=0;
-  treeLeaf.jetNEF=0;
-  treeLeaf.jetNCH=0;
-  treeLeaf.jetHFHAE=0;
-  treeLeaf.jetHFEME=0;
-  treeLeaf.jetNConstituents=0;
+  if (!isMC){
+    treeLeaf.jetCHF=0;
+    treeLeaf.jetNHF=0;
+    treeLeaf.jetCEF=0;
+    treeLeaf.jetNEF=0;
+    treeLeaf.jetNCH=0;
+    treeLeaf.jetHFHAE=0;
+    treeLeaf.jetHFEME=0;
+    treeLeaf.jetNConstituents=0;
+  }
   if (isMC){
     treeLeaf.jetPartonID = 0;
     treeLeaf.jetGenJetIndex = 0;
@@ -601,20 +605,22 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   fChain->SetBranchAddress("eleBCSipip", &treeLeaf.eleBCSipip, &b_eleBCSipip);
   fChain->SetBranchAddress("eleFiredTrgs", &treeLeaf.eleFiredTrgs, &b_eleFiredTrgs);
   fChain->SetBranchAddress("eleIDbit", &treeLeaf.eleIDbit, &b_eleIDbit);
-  fChain->SetBranchAddress("eleESEnP1Raw", &treeLeaf.eleESEnP1Raw, &b_eleESEnP1Raw);
-  fChain->SetBranchAddress("eleESEnP2Raw", &treeLeaf.eleESEnP2Raw, &b_eleESEnP2Raw);
-  fChain->SetBranchAddress("nGSFTrk", &treeLeaf.nGSFTrk, &b_nGSFTrk);
-  fChain->SetBranchAddress("gsfPt", &treeLeaf.gsfPt, &b_gsfPt);
-  fChain->SetBranchAddress("gsfEta", &treeLeaf.gsfEta, &b_gsfEta);
-  fChain->SetBranchAddress("gsfPhi", &treeLeaf.gsfPhi, &b_gsfPhi);
-  fChain->SetBranchAddress("npfHF", &treeLeaf.npfHF, &b_npfHF);
-  fChain->SetBranchAddress("pfHFEn", &treeLeaf.pfHFEn, &b_pfHFEn);
-  fChain->SetBranchAddress("pfHFECALEn", &treeLeaf.pfHFECALEn, &b_pfHFECALEn);
-  fChain->SetBranchAddress("pfHFHCALEn", &treeLeaf.pfHFHCALEn, &b_pfHFHCALEn);
-  fChain->SetBranchAddress("pfHFPt", &treeLeaf.pfHFPt, &b_pfHFPt);
-  fChain->SetBranchAddress("pfHFEta", &treeLeaf.pfHFEta, &b_pfHFEta);
-  fChain->SetBranchAddress("pfHFPhi", &treeLeaf.pfHFPhi, &b_pfHFPhi);
-  fChain->SetBranchAddress("pfHFIso", &treeLeaf.pfHFIso, &b_pfHFIso);
+  if (!isMC){
+    fChain->SetBranchAddress("eleESEnP1Raw", &treeLeaf.eleESEnP1Raw, &b_eleESEnP1Raw);
+    fChain->SetBranchAddress("eleESEnP2Raw", &treeLeaf.eleESEnP2Raw, &b_eleESEnP2Raw);
+    fChain->SetBranchAddress("nGSFTrk", &treeLeaf.nGSFTrk, &b_nGSFTrk);
+    fChain->SetBranchAddress("gsfPt", &treeLeaf.gsfPt, &b_gsfPt);
+    fChain->SetBranchAddress("gsfEta", &treeLeaf.gsfEta, &b_gsfEta);
+    fChain->SetBranchAddress("gsfPhi", &treeLeaf.gsfPhi, &b_gsfPhi);
+    fChain->SetBranchAddress("npfHF", &treeLeaf.npfHF, &b_npfHF);
+    fChain->SetBranchAddress("pfHFEn", &treeLeaf.pfHFEn, &b_pfHFEn);
+    fChain->SetBranchAddress("pfHFECALEn", &treeLeaf.pfHFECALEn, &b_pfHFECALEn);
+    fChain->SetBranchAddress("pfHFHCALEn", &treeLeaf.pfHFHCALEn, &b_pfHFHCALEn);
+    fChain->SetBranchAddress("pfHFPt", &treeLeaf.pfHFPt, &b_pfHFPt);
+    fChain->SetBranchAddress("pfHFEta", &treeLeaf.pfHFEta, &b_pfHFEta);
+    fChain->SetBranchAddress("pfHFPhi", &treeLeaf.pfHFPhi, &b_pfHFPhi);
+    fChain->SetBranchAddress("pfHFIso", &treeLeaf.pfHFIso, &b_pfHFIso);
+  }
   fChain->SetBranchAddress("nMu", &treeLeaf.nMu, &b_nMu);
   fChain->SetBranchAddress("muPt", &treeLeaf.muPt, &b_muPt);
   fChain->SetBranchAddress("muEn", &treeLeaf.muEn, &b_muEn);
@@ -665,14 +671,16 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   fChain->SetBranchAddress("jetPUidFullDiscriminant", &treeLeaf.jetPUidFullDiscriminant, &b_jetPUidFullDiscriminant);
   fChain->SetBranchAddress("jetJECUnc", &treeLeaf.jetJECUnc, &b_jetJECUnc);
   fChain->SetBranchAddress("jetFiredTrgs", &treeLeaf.jetFiredTrgs, &b_jetFiredTrgs);
-  fChain->SetBranchAddress("jetCHF", &treeLeaf.jetCHF, &b_jetCHF);
-  fChain->SetBranchAddress("jetNHF", &treeLeaf.jetNHF, &b_jetNHF);
-  fChain->SetBranchAddress("jetCEF", &treeLeaf.jetCEF, &b_jetCEF);
-  fChain->SetBranchAddress("jetNEF", &treeLeaf.jetNEF, &b_jetNEF);
-  fChain->SetBranchAddress("jetNCH", &treeLeaf.jetNCH, &b_jetNCH);
-  fChain->SetBranchAddress("jetHFHAE", &treeLeaf.jetHFHAE, &b_jetHFHAE);
-  fChain->SetBranchAddress("jetHFEME", &treeLeaf.jetHFEME, &b_jetHFEME);
-  fChain->SetBranchAddress("jetNConstituents", &treeLeaf.jetNConstituents, &b_jetNConstituents);
+  if (!isMC){
+    fChain->SetBranchAddress("jetCHF", &treeLeaf.jetCHF, &b_jetCHF);
+    fChain->SetBranchAddress("jetNHF", &treeLeaf.jetNHF, &b_jetNHF);
+    fChain->SetBranchAddress("jetCEF", &treeLeaf.jetCEF, &b_jetCEF);
+    fChain->SetBranchAddress("jetNEF", &treeLeaf.jetNEF, &b_jetNEF);
+    fChain->SetBranchAddress("jetNCH", &treeLeaf.jetNCH, &b_jetNCH);
+    fChain->SetBranchAddress("jetHFHAE", &treeLeaf.jetHFHAE, &b_jetHFHAE);
+    fChain->SetBranchAddress("jetHFEME", &treeLeaf.jetHFEME, &b_jetHFEME);
+    fChain->SetBranchAddress("jetNConstituents", &treeLeaf.jetNConstituents, &b_jetNConstituents);
+  }
   if (isMC){
    fChain->SetBranchAddress("jetPartonID", &treeLeaf.jetPartonID, &b_jetPartonID);
    fChain->SetBranchAddress("jetGenJetIndex", &treeLeaf.jetGenJetIndex, &b_jetGenJetIndex);
@@ -1016,14 +1024,16 @@ void TInputOutputTree::InitOutput(TTree* outputTree,bool isMC)
   outputTree->Branch("jetPUidFullDiscriminant",&treeLeaf.jetPUidFullDiscriminant);
   outputTree->Branch("jetJECUnc",	     &treeLeaf.jetJECUnc);	           
   outputTree->Branch("jetFiredTrgs",    &treeLeaf.jetFiredTrgs);    
-  outputTree->Branch("jetCHF",&treeLeaf.jetCHF);
-  outputTree->Branch("jetNHF",&treeLeaf.jetNHF);
-  outputTree->Branch("jetCEF",&treeLeaf.jetCEF);
-  outputTree->Branch("jetNEF",&treeLeaf.jetNEF);
-  outputTree->Branch("jetNCH",&treeLeaf.jetNCH);
-  outputTree->Branch("jetHFHAE",&treeLeaf.jetHFHAE);
-  outputTree->Branch("jetHFEME",&treeLeaf.jetHFEME);
-  outputTree->Branch("jetNConstituents",&treeLeaf.jetNConstituents);
+  if (!isMC){
+    outputTree->Branch("jetCHF",&treeLeaf.jetCHF);
+    outputTree->Branch("jetNHF",&treeLeaf.jetNHF);
+    outputTree->Branch("jetCEF",&treeLeaf.jetCEF);
+    outputTree->Branch("jetNEF",&treeLeaf.jetNEF);
+    outputTree->Branch("jetNCH",&treeLeaf.jetNCH);
+    outputTree->Branch("jetHFHAE",&treeLeaf.jetHFHAE);
+    outputTree->Branch("jetHFEME",&treeLeaf.jetHFEME);
+    outputTree->Branch("jetNConstituents",&treeLeaf.jetNConstituents);
+  }
   if(isMC){
     outputTree->Branch("jetPartonID",  &treeLeaf.jetPartonID);  
     outputTree->Branch("jetGenJetIndex",  &treeLeaf.jetGenJetIndex);  
