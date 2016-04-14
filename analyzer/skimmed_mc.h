@@ -2,7 +2,7 @@
 // This class has been automatically generated on
 // Sun Mar 20 10:40:38 2016 by ROOT version 6.02/05
 // from TTree EventTree/EventTree
-// found on file: /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD_cutbased.root
+// found on file: /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD.root
 //////////////////////////////////////////////////////////
 
 #ifndef skimmed_mc_h
@@ -235,6 +235,7 @@ public :
    vector<float>   *jetPUidFullDiscriminant;
    vector<float>   *jetJECUnc;
    vector<int>     *jetFiredTrgs;
+   /*
    vector<float>   *jetCHF;
    vector<float>   *jetNHF;
    vector<float>   *jetCEF;
@@ -243,6 +244,7 @@ public :
    vector<float>   *jetHFHAE;
    vector<float>   *jetHFEME;
    vector<int>     *jetNConstituents;
+   */
    vector<int>     *jetPartonID;
    vector<int>     *jetGenJetIndex;
    vector<float>   *jetGenJetEn;
@@ -506,6 +508,7 @@ public :
    TBranch        *b_jetPUidFullDiscriminant;   //!
    TBranch        *b_jetJECUnc;   //!
    TBranch        *b_jetFiredTrgs;   //!
+   /*
    TBranch        *b_jetCHF;   //!
    TBranch        *b_jetNHF;   //!
    TBranch        *b_jetCEF;   //!
@@ -514,6 +517,7 @@ public :
    TBranch        *b_jetHFHAE;   //!
    TBranch        *b_jetHFEME;   //!
    TBranch        *b_jetNConstituents;   //!
+   */
    TBranch        *b_jetPartonID;   //!
    TBranch        *b_jetGenJetIndex;   //!
    TBranch        *b_jetGenJetEn;   //!
@@ -570,7 +574,7 @@ public :
    TBranch        *b_AK8softdropSubjetCSV;   //!
 
    //histograms
-   static const int nfile=14;
+   static const int nfile=12;
    std::string mc_input_file[nfile] = {
    "TTJets",
    "WJetsToLNu",
@@ -580,13 +584,13 @@ public :
    "ZJetsToNuNu_HT_600ToInf",
    //qcd_HT_100To200
    "qcd_HT_200To300",
-   "qcd_HT_300To500",
+   //"qcd_HT_300To500",
    "qcd_HT_500To700",
    "qcd_HT_700To1000",
    "qcd_HT_1000To1500",
    "qcd_HT_1500To2000",
-   "qcd_HT_2000ToInf",
-   "GJet"};
+   "qcd_HT_2000ToInf"};
+   //"GJet"};
 
    /* not needed, they're in the skimmed datasets
    float sigma[nfile] = {
@@ -667,21 +671,21 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-   const char* fTTJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD_cutbased.root/EventTree";//sigma=670.3 N=42784971
-   const char* fWJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_WJetsToLNu_amcatnlo_pythia8_25ns_miniAOD_cutbased.root/EventTree"; //sigma=60290 N=24184766
-   const char* fZJets1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-100To200_13TeV-madgraph_cutbased.root/EventTree"; //sigma=93.49 N=5154824
-   const char* fZJets2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-200To400_13TeV-madgraph_cutbased.root/EventTree"; //sigma=26.12 N=4998316
-   const char* fZJets3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-400To600_13TeV-madgraph_cutbased.root/EventTree"; //sigma=3.648 N=1018882
-   const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-600ToInf_13TeV-madgraph_cutbased.root/EventTree"; //sigma=1.401 N=1008333
-   //const char* fqcd1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT100To200_25ns_cutbased.root/EventTree"; //sigma=27500000 N=81906377
-   const char* fqcd2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT200To300_25ns_cutbased.root/EventTree"; //sigma=1740000 N=18718905
-   const char* fqcd3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT300To500_25ns_cutbased.root/EventTree"; //sigma=367000 N=19826197  (das=20278243)
-   const char* fqcd4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT500To700_25ns_cutbased.root/EventTree"; //sigma=29400 N=19664159  (das=44370193)
-   const char* fqcd5 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT700To1000_25ns_cutbased.root/EventTree"; //sigma=6524 N=15356448
-   const char* fqcd6 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT1000To1500_25ns_cutbased.root/EventTree"; //sigma=1206 N=4963895
-   const char* fqcd7 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT1500To2000_25ns_cutbased.root/EventTree"; //sigma=120.04 N=3868886  (das=3962712)
-   const char* fqcd8 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT2000ToInf_25ns_cutbased.root/EventTree"; //sigma=25.25 N=1912529  (das=1984407)
-   const char* fgjet = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_gjet_pt15to6000_25ns_cutbased.root/EventTree"; //sigma=365896 N=9891424 (das=9896992)
+   const char* fTTJets = "/data/bartokm/Analysis/ntuples/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD.root/EventTree";//sigma=670.3 N=42784971
+   const char* fWJets = "/data/bartokm/Analysis/ntuples/job_spring15_ggNtuple_WJetsToLNu_amcatnlo_pythia8_25ns_miniAOD.root/EventTree"; //sigma=60290 N=24184766
+   const char* fZJets1 = "/data/bartokm/Analysis/ntuples/job_spring15_ZJetsToNuNu_HT-100To200_13TeV-madgraph.root/EventTree"; //sigma=93.49 N=5154824
+   const char* fZJets2 = "/data/bartokm/Analysis/ntuples/job_spring15_ZJetsToNuNu_HT-200To400_13TeV-madgraph.root/EventTree"; //sigma=26.12 N=4998316
+   const char* fZJets3 = "/data/bartokm/Analysis/ntuples/job_spring15_ZJetsToNuNu_HT-400To600_13TeV-madgraph.root/EventTree"; //sigma=3.648 N=1018882
+   const char* fZJets4 = "/data/bartokm/Analysis/ntuples/job_spring15_ZJetsToNuNu_HT-600ToInf_13TeV-madgraph.root/EventTree"; //sigma=1.401 N=1008333
+   //const char* fqcd1 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT100To200_25ns.root/EventTree"; //sigma=27500000 N=81906377
+   const char* fqcd2 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT200To300_25ns.root/EventTree"; //sigma=1740000 N=18718905
+   //const char* fqcd3 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT300To500_25ns.root/EventTree"; //sigma=367000 N=19826197  (das=20278243)
+   const char* fqcd4 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT500To700_25ns.root/EventTree"; //sigma=29400 N=19664159  (das=44370193)
+   const char* fqcd5 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT700To1000_25ns.root/EventTree"; //sigma=6524 N=15356448
+   const char* fqcd6 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT1000To1500_25ns.root/EventTree"; //sigma=1206 N=4963895
+   const char* fqcd7 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT1500To2000_25ns.root/EventTree"; //sigma=120.04 N=3868886  (das=3962712)
+   const char* fqcd8 = "/data/bartokm/Analysis/ntuples/job_spring15_qcd_HT2000ToInf_25ns.root/EventTree"; //sigma=25.25 N=1912529  (das=1984407)
+   //const char* fgjet = "/data/bartokm/Analysis/ntuples/job_spring15_gjet_pt15to6000_25ns.root/EventTree"; //sigma=365896 N=9891424 (das=9896992)
 
    if (tree == 0) {
      TChain * ch_mc = new TChain("EventTree","");
@@ -693,13 +697,13 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
      ch_mc->Add(fZJets4);
      //ch_mc->Add(fqcd1);
      ch_mc->Add(fqcd2);
-     ch_mc->Add(fqcd3);
+     //ch_mc->Add(fqcd3);
      ch_mc->Add(fqcd4);
      ch_mc->Add(fqcd5);
      ch_mc->Add(fqcd6);
      ch_mc->Add(fqcd7);
      ch_mc->Add(fqcd8);
-     ch_mc->Add(fgjet);
+     //ch_mc->Add(fgjet);
      tree = ch_mc;
    }
    Init(tree);
@@ -913,6 +917,7 @@ void skimmed_mc::Init(TTree *tree)
    jetPUidFullDiscriminant = 0;
    jetJECUnc = 0;
    jetFiredTrgs = 0;
+   /*
    jetCHF = 0;
    jetNHF = 0;
    jetCEF = 0;
@@ -921,6 +926,7 @@ void skimmed_mc::Init(TTree *tree)
    jetHFHAE = 0;
    jetHFEME = 0;
    jetNConstituents = 0;
+   */
    jetPartonID = 0;
    jetGenJetIndex = 0;
    jetGenJetEn = 0;
@@ -1187,6 +1193,7 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("jetPUidFullDiscriminant", &jetPUidFullDiscriminant, &b_jetPUidFullDiscriminant);
    fChain->SetBranchAddress("jetJECUnc", &jetJECUnc, &b_jetJECUnc);
    fChain->SetBranchAddress("jetFiredTrgs", &jetFiredTrgs, &b_jetFiredTrgs);
+   /*
    fChain->SetBranchAddress("jetCHF", &jetCHF, &b_jetCHF);
    fChain->SetBranchAddress("jetNHF", &jetNHF, &b_jetNHF);
    fChain->SetBranchAddress("jetCEF", &jetCEF, &b_jetCEF);
@@ -1195,6 +1202,7 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("jetHFHAE", &jetHFHAE, &b_jetHFHAE);
    fChain->SetBranchAddress("jetHFEME", &jetHFEME, &b_jetHFEME);
    fChain->SetBranchAddress("jetNConstituents", &jetNConstituents, &b_jetNConstituents);
+   */
    fChain->SetBranchAddress("jetPartonID", &jetPartonID, &b_jetPartonID);
    fChain->SetBranchAddress("jetGenJetIndex", &jetGenJetIndex, &b_jetGenJetIndex);
    fChain->SetBranchAddress("jetGenJetEn", &jetGenJetEn, &b_jetGenJetEn);
