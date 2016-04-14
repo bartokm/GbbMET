@@ -214,7 +214,6 @@ void skimmed_mc::Loop()
      if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amcatnlo
      else w=weight*pu_weight*genWeight; //0-1 for madgraph
     
-     bool phoid=false;
      //object definitions
      int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
      std::vector<int> passPho, passJet, passAK8Jet, passEle, passMu;
@@ -222,6 +221,7 @@ void skimmed_mc::Loop()
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
      double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
      //photon
+     bool phoid=false;
      for (int i=0;i<nPho;i++){
        if (abs((*phoEta)[i])<1.4442 && (*phoIDbit)[i]>>0&1) {
          phoid=true; 
