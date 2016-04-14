@@ -65,6 +65,7 @@ void skimmed_data::Loop()
    fChain->SetBranchStatus("phoPFPhoIso",1);
    fChain->SetBranchStatus("phoPFNeuIso",1);
    fChain->SetBranchStatus("phoIDMVA",1);
+   fChain->SetBranchStatus("phoIDbit",1);
    fChain->SetBranchStatus("nJet",1);
    fChain->SetBranchStatus("jetPt",1);
    fChain->SetBranchStatus("jetPhi",1);
@@ -149,8 +150,6 @@ void skimmed_data::Loop()
        //cutflow
        hdata_cuts->SetBinContent(1,hdata_cuts->GetBinContent(1)+h_cuts->GetBinContent(2));
        hdata_cuts->SetBinContent(2,hdata_cuts->GetBinContent(2)+h_cuts->GetBinContent(3));
-       hdata_cuts->SetBinContent(3,hdata_cuts->GetBinContent(3)+h_cuts->GetBinContent(4));
-       hdata_cuts->SetBinContent(4,hdata_cuts->GetBinContent(4)+h_cuts->GetBinContent(5));
      }
      //object definitions
      int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
@@ -159,13 +158,16 @@ void skimmed_data::Loop()
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
      double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
      //photon
+     bool phoid=false;
      for (int i=0;i<nPho;i++){
-       if (abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoHoverE)[i]<0.05 && (*phoSigmaIEtaIEta)[i]<0.0102 && (*phoPFChIso)[i]<3.32 && (*phoPFNeuIso)[i]<(1.92+(*phoEt)[i]*0.014+pow((*phoEt)[i],2)*0.000019) && (*phoPFPhoIso)[i]<(0.81+(*phoEt)[i]*0.0053)){
-         passPho.push_back(i);
+       if (abs((*phoEta)[i])<1.4442 && (*phoIDbit)[i]>>0&1) {
+         phoid=true; 
+         if ((*phohasPixelSeed)[i]==0) passPho.push_back(i);
        }
        //to study pho by pho
        //if (file_counter==2) std::cout<<"Eta<1.4442 "<<abs((*phoEta)[i])<<" PixelSeed "<<(*phohasPixelSeed)[i]<<" HoverE<0.05 "<<(*phoHoverE)[i]<<" IEtaIEta<0.0102 "<<(*phoSigmaIEtaIEta)[i]<<" ChIso<3.32 "<<(*phoPFChIso)[i]<<" NeuIso<"<<1.92+(*phoEt)[i]*0.014+pow((*phoEt)[i],2)*0.000019<<" "<<(*phoPFNeuIso)[i]<<" PhoIso<"<<0.81+(*phoEt)[i]*0.0053<<" "<<(*phoPFPhoIso)[i]<<std::endl;
      }
+     if (phoid) hdata_cuts->Fill(2);
      for (int i=0;i<passPho.size();i++) {
        if ((*phoEt)[passPho.at(i)]>(*phoEt)[nleadPho]) nleadPho=passPho.at(i);
        EMHT_before+=(*phoEt)[passPho.at(i)];
@@ -228,6 +230,7 @@ void skimmed_data::Loop()
      AK8EMHT_after+=HT_after;
      //cuts
      if (passPho.size()>0){
+       hdata_cuts->Fill(3);
        if ((*phoEt)[nleadPho]>=175){
          hdata_cuts->Fill(4);
          if (pfMET<150){
@@ -288,7 +291,7 @@ void skimmed_data::Loop()
          if (dR_pho_AK8!=-1) hdata_dRphoAK8jet->Fill(dR_pho_AK8);
          }//pfMET cut
        }//offline HLT cut
-     } else std::cout<<"passPho<1 this should never happen..."<<std::endl;
+     }//phoid cut 
    }
    hdata_nPU->Write();
    f.Write();

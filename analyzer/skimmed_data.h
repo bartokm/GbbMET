@@ -467,9 +467,9 @@ skimmed_data::skimmed_data(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-  const char* fAOD1 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015C_PR_25ns_cutbased.root/EventTree";
-  const char* fAOD2 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015D_PR_v3_25ns_cutbased.root/EventTree";
-  const char* fAOD3 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015D_PR_v4_25ns_cutbased.root/EventTree";
+  const char* fAOD1 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015C_PR_25ns.root/EventTree";
+  const char* fAOD2 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015D_PR_v3_25ns.root/EventTree";
+  const char* fAOD3 = "/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/SinglePho_Run2015D_PR_v4_25ns.root/EventTree";
    if (tree == 0) {
      TChain * ch_data = new TChain("EventTree","");
      ch_data->Add(fAOD1);
