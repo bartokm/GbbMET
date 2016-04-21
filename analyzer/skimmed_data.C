@@ -93,7 +93,7 @@ void skimmed_data::Loop()
 
    TFile f("skimmed_data_histos.root","recreate");
 
-   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET",10,0,10);
+   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET,HT",10,0,10);
    TH1D *hdata_nVtx = new TH1D("hdata_nVtx",";nVtx",50,0,50);
 
    TH1D *hdata_phoEt = new TH1D("hdata_phoEt",";phoEt",30,0,1000);

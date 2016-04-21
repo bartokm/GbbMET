@@ -118,7 +118,7 @@ void skimmed_mc::Loop()
      h_PUweight[i] = (TH1D*)h_dataPU->Clone(Form("h_PUweight[%i]",i));
      h_PUweight[i]->SetDirectory(0);
      
-     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET").c_str(),10,0,10);
+     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET,HT").c_str(),10,0,10);
      hbkg_nVtx[i] = new TH1D(Form("hbkg_nVtx[%i]",i),std::string(mc_input_file[i]+";nVtx").c_str(),50,0,50);
      hbkg_nPU[i] = new TH1D(Form("hbkg_nPU[%i]",i),std::string(mc_input_file[i]+";nPU").c_str(),50,0,50);
 
