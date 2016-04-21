@@ -574,7 +574,7 @@ public :
    TBranch        *b_AK8softdropSubjetCSV;   //!
 
    //histograms
-   static const int nfile=13;
+   static const int nfile=14;
    std::string mc_input_file[nfile] = {
    "TTJets",
    "WJetsToLNu",
@@ -584,7 +584,7 @@ public :
    "ZJetsToNuNu_HT_600ToInf",
    //qcd_HT_100To200
    "qcd_HT_200To300",
-   //"qcd_HT_300To500",
+   "qcd_HT_300To500",
    "qcd_HT_500To700",
    "qcd_HT_700To1000",
    "qcd_HT_1000To1500",
@@ -679,7 +679,7 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
    const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-600ToInf_13TeV-madgraph.root/EventTree"; //sigma=1.401 N=1008333
    //const char* fqcd1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT100To200_25ns.root/EventTree"; //sigma=27500000 N=81906377
    const char* fqcd2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT200To300_25ns.root/EventTree"; //sigma=1740000 N=18718905
-   //const char* fqcd3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT300To500_25ns.root/EventTree"; //sigma=367000 N=19826197  (das=20278243)
+   const char* fqcd3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT300To500_25ns.root/EventTree"; //sigma=367000 N=19826197  (das=20278243)
    const char* fqcd4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT500To700_25ns.root/EventTree"; //sigma=29400 N=19664159  (das=44370193)
    const char* fqcd5 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT700To1000_25ns.root/EventTree"; //sigma=6524 N=15356448
    const char* fqcd6 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT1000To1500_25ns.root/EventTree"; //sigma=1206 N=4963895
@@ -697,7 +697,7 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
      ch_mc->Add(fZJets4);
      //ch_mc->Add(fqcd1);
      ch_mc->Add(fqcd2);
-     //ch_mc->Add(fqcd3);
+     ch_mc->Add(fqcd3);
      ch_mc->Add(fqcd4);
      ch_mc->Add(fqcd5);
      ch_mc->Add(fqcd6);

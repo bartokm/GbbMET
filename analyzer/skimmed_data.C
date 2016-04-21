@@ -235,6 +235,8 @@ void skimmed_data::Loop()
          hdata_cuts->Fill(4);
          if (pfMET<150){
          hdata_cuts->Fill(5);
+         if (HT_after>200){
+         hdata_cuts->Fill(6);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
          for (int i=0;i<passJet.size();i++){
@@ -289,6 +291,7 @@ void skimmed_data::Loop()
          if (leadpt_ak8!=-1) hdata_AK8jetpt->Fill((*AK8JetPt)[leadpt_ak8]);
          if (leadpt_ak8!=-1) hdata_AK8ljetmass->Fill((*AK8JetMass)[leadpt_ak8]);
          if (dR_pho_AK8!=-1) hdata_dRphoAK8jet->Fill(dR_pho_AK8);
+         }//HT cut
          }//pfMET cut
        }//offline HLT cut
      }//phoid cut 

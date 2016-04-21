@@ -126,30 +126,27 @@ void plotter_skimmed(){
   TLegend *leg = new TLegend(0.65,0.55,0.9,0.85,"");
 
   TCanvas *c1 = new TCanvas("c1", "c1",1200,600);
-  c1->Divide(2,1);
+  c1->Divide(3,1);
   c1->cd(1);
   gPad->SetLogy();
-  sbkg_cuts->Draw("histtext");
   sbkg_cuts->Print("all");
-  //drawthings(hdata_cuts, sbkg_cuts);
+  hdata_cuts->Print("all");
+  hdata_cuts->SetMinimum(10);
+  drawthings(hdata_cuts, sbkg_cuts);
   leg->AddEntry("hdata_cuts",   "Data", "P");
-  leg->AddEntry("hbkg_cuts[6]",   "Multijet", "f");
   leg->AddEntry("hbkg_cuts[13]",   "#gammaJet", "f");
+  leg->AddEntry("hbkg_cuts[6]",   "Multijet", "f");
   leg->AddEntry("hbkg_cuts[1]",   "WJetsToL#nu", "f");
   leg->AddEntry("hbkg_cuts[0]",   "TTJets", "f");
   leg->AddEntry("hbkg_cuts[2]",   "ZJetsTo#nu#nu", "f");
   leg->Draw("same");
-  c1->cd(2);
-  hdata_cuts->SetMarkerStyle(21);
-  hdata_cuts->Draw("textP");
-  hdata_cuts->Print("all");
-  /*
   c1->cd(2);
   gPad->SetLogy();
   drawthings(hdata_nVtx, sbkg_nVtx);
   leg->Draw("same");
   c1->cd(3);
   gPad->SetLogy();
+  hdata_pfMET->SetMinimum(10);
   drawthings(hdata_pfMET, sbkg_pfMET);
   leg->Draw("same");
 
@@ -165,6 +162,7 @@ void plotter_skimmed(){
   leg->Draw("same");
   c2->cd(3);
   gPad->SetLogy();
+  hdata_phoEta->SetMinimum(10);
   drawthings(hdata_phoEta, sbkg_phoEta);
   leg->Draw("same");
 
@@ -182,5 +180,5 @@ void plotter_skimmed(){
   gPad->SetLogy();
   drawthings(hdata_njets, sbkg_njets);
   leg->Draw("same");
-  */
+  
 }

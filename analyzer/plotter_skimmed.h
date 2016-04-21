@@ -40,23 +40,27 @@ TH1D* getonebkg(TString fname, std::string hname, std::vector<int> iter) {
 
 void addallMC(THStack* stack, TString fname, std::string hname){
   std::vector<int> iter_qcd {6,7,8,9,10,11,12};
-  int iter_rest[3]={0,1,13};
+  int iter_rest[3]={0,1};
   std::vector<int> iter_zjet {2,3,4,5};
 
   stack->Add(getonebkg(fname,hname,iter_zjet));
-  for (int i=0;i<3;i++){
+  for (int i=0;i<2;i++){
     TH1D *h = new TH1D();
     h = getplot(fname,Form((hname+"[%i]").c_str(),iter_rest[i]));
     h->SetFillColor(color(iter_rest[i]));
     stack->Add(h);
   }
   stack->Add(getonebkg(fname,hname,iter_qcd));
+  TH1D *hgjets = new TH1D();
+  hgjets = getplot(fname,(hname+"[13]").c_str());
+  hgjets->SetFillColor(color(13));
+  stack->Add(hgjets);
   return 0;
 }
 
 void drawthings(TH1D* hdata, THStack* stack){
   hdata->SetMarkerStyle(21);
-  stack->Draw("htext");
-  hdata->Draw("sametextP");
+  hdata->Draw("P");
+  stack->Draw("sameh");
   return 0;
 }

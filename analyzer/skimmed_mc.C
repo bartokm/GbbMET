@@ -162,8 +162,8 @@ void skimmed_mc::Loop()
 
    fChain->ls();
    int file_counter=-1; std::string temp_f="";
-   //for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   for (Long64_t jentry=0; jentry<10000;jentry++) {
+   for (Long64_t jentry=0; jentry<nentries;jentry++) {
+   //for (Long64_t jentry=0; jentry<10000;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -298,6 +298,8 @@ void skimmed_mc::Loop()
          hbkg_cuts[file_counter]->Fill(4,w);
          if (pfMET<150){
          hbkg_cuts[file_counter]->Fill(5,w);
+         if (HT_after>200){
+         hbkg_cuts[file_counter]->Fill(6,w);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
          for (int i=0;i<passJet.size();i++){
@@ -353,6 +355,7 @@ void skimmed_mc::Loop()
          if (leadpt_ak8!=-1) hbkg_AK8jetpt[file_counter]->Fill((*AK8JetPt)[leadpt_ak8],w);
          if (leadpt_ak8!=-1) hbkg_AK8ljetmass[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],w);
          if (dR_pho_AK8!=-1) hbkg_dRphoAK8jet[file_counter]->Fill(dR_pho_AK8,w);
+         }//HT cut
          }//pfMET cut
        }//offline HLT cut
      }//phoid cut 
