@@ -78,6 +78,7 @@ void skimmed_mc::Loop()
    fChain->SetBranchStatus("mcVtx",1);
    fChain->SetBranchStatus("mcVty",1);
    fChain->SetBranchStatus("mcVtz",1);
+   fChain->SetBranchStatus("mcPt",1);
    fChain->SetBranchStatus("mcE",1);
    fChain->SetBranchStatus("mcEt",1);
    fChain->SetBranchStatus("mcPhi",1);
@@ -202,6 +203,9 @@ void skimmed_mc::Loop()
      for (int i=0;i<(*puBX).size();i++) if ((*puBX)[i]==0) zbx=i;
      double pu_weight=h_PUweight[file_counter]->GetBinContent(h_PUweight[file_counter]->FindBin((*puTrue)[zbx]));
      double weight=L_data*h_cuts->GetBinContent(1)/h_cuts->GetBinContent(2);
+     double w=0;
+     if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amcatnlo
+     else w=weight*pu_weight*genWeight; //0-1 for madgraph
      
      //cutflow
      if (newfile){
@@ -209,11 +213,6 @@ void skimmed_mc::Loop()
        hbkg_cuts[file_counter]->SetBinContent(2,h_cuts->GetBinContent(3)*weight);
      }
      
-     //weights
-     double w=0;
-     if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amcatnlo
-     else w=weight*pu_weight*genWeight; //0-1 for madgraph
-    
      //object definitions
      int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
      std::vector<int> passPho, passJet, passAK8Jet, passEle, passMu;
