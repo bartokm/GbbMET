@@ -19,7 +19,7 @@ PreselectSkim::PreselectSkim(TString inputFileName, TString outDir, TString name
   }
   inpTemp.ReplaceAll(".root","");
   TString skimPartOfName=skimName[config]; //expand this!
-  if (isMC) _sigma=_Asigma[config-4];
+  if (isMC) _sigma=_Asigma[config-3];
 
   _skimmedFileName=outDir+skimPartOfName;
   if (gSystem->AccessPathName(_skimmedFileName+".root")) _fileOut = new TFile(_skimmedFileName+".root","new");
@@ -27,7 +27,7 @@ PreselectSkim::PreselectSkim(TString inputFileName, TString outDir, TString name
   _outputTree = new TTree(_nameTree,_nameTree);
   _TREE.InitOutput(_outputTree,isMC);      //method of TInputOutputTree
   //_hStats= new TH1F("hStats","hStats",20,0,20);    
-  if (isMC) { std::cout<< " this is simulation " <<std::endl;}
+  if (isMC) { std::cout<< " this is simulation. Cross section = "<<_sigma <<std::endl;}
 }
 
 PreselectSkim::~PreselectSkim()
