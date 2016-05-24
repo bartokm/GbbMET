@@ -40,20 +40,6 @@ class PreselectSkim{
     TH1D *_h_cuts;
     TH1D *_hPUTrue;
     //mc cross sections
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT200to300_25ns.root", //sigma=1717000
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT300to500_25ns.root", //sigma=351300
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT500to700_25ns.root", //sigma=31630
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT700to1000_25ns.root", //sigma=6802
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT1000to1500_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT1500to2000_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT2000toInf_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-100To200_25ns.root", //sigma=280.35
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-200To400_25ns.root", //sigma=313.2
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-400To600_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTGJets_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToQQ_HT600toInf_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root" //sigma=? N=?
     float _Asigma[17] = {
       365896,  //gjet
       60290,   //WjetsToLNu
