@@ -7,14 +7,14 @@
 
 void Preselect()
 {
-  int nS=1; // 0:test, 1,2:data singlephoton, 3:GJets, 4:WJetsToLNu, 5:ZG,7-13:QCD, 14-17:ZJetsToNuNu, 18:TTGJets, 19:ZJetsToQQ, 20:WGJets
+  int nS=3; // 0:test, 1,2:data singlephoton, 3:GJets, 4:WJetsToLNu, 5:ZG,7-13:QCD, 14-17:ZJetsToNuNu, 18:TTGJets, 19:ZJetsToQQ, 20:WGJets
   TString fileToSkimName(ggFile[nS]);
 
   bool isMC=false;
   if (nS>3) isMC= true;
   TString outDir;
-  if (isMC) outDir="/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/";
-  else outDir="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/";
+  if (isMC) outDir="/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00";
+  else outDir="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/V07-06-03-00";
   TString nameDir("ggNtuplizer");
   TString nameTree("EventTree");
   TBenchmark time;
