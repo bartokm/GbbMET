@@ -40,22 +40,40 @@ class PreselectSkim{
     TH1D *_h_cuts;
     TH1D *_hPUTrue;
     //mc cross sections
-    float _Asigma[14] = {
-      670.3,   //ttjets
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT200to300_25ns.root", //sigma=1717000
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT300to500_25ns.root", //sigma=351300
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT500to700_25ns.root", //sigma=31630
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT700to1000_25ns.root", //sigma=6802
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT1000to1500_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT1500to2000_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT2000toInf_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-100To200_25ns.root", //sigma=280.35
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-200To400_25ns.root", //sigma=313.2
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-400To600_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTGJets_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToQQ_HT600toInf_25ns.root", //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root" //sigma=? N=?
+    float _Asigma[17] = {
+      365896,  //gjet
       60290,   //WjetsToLNu
-      93.49,   //ZJetsToNuNu_HT_100To200
-      26.12,   //ZJetsToNuNu_HT_200To400
-      3.648,   //ZJetsToNuNu_HT_400To600
-      1.401,   //ZJetsToNuNu_HT_600ToInf
-      //27500000,//qcd_HT_100To200
-      1740000, //qcd_HT_200To300
-      367000,  //qcd_HT_300To500
-      29400,   //qcd_HT_500To700
-      6524,    //qcd_HT_700To1000
+      0,       //ZG
+      1717000, //qcd_HT_200To300
+      351300,  //qcd_HT_300To500
+      31630,   //qcd_HT_500To700
+      6802,    //qcd_HT_700To1000
       1206,    //qcd_HT_1000To1500
       120.04,  //qcd_HT_1500To2000
       25.25,   //qcd_HT_2000ToInf
-      365896}; //gjet
+      280.35,   //ZJetsToNuNu_HT_100To200
+      313.2,   //ZJetsToNuNu_HT_200To400
+      3.648,   //ZJetsToNuNu_HT_400To600
+      1.401,   //ZJetsToNuNu_HT_600ToInf
+      0,       //TTGjets
+      0,       //ZJetsToQQ
+      0       //WGJets
+      //670.3,   //TTjets
+    };
     float _sigma=0;
 
     bool gWrite ;
