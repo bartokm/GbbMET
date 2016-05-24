@@ -30,6 +30,8 @@ class TInputOutputTree{
       Bool_t          isData;
       Int_t           nVtx;
       Int_t           nTrksPV;
+      Bool_t          isPVGood;
+      Bool_t          hasGoodVtx;
       Float_t         vtx;
       Float_t         vty;
       Float_t         vtz;
@@ -105,6 +107,8 @@ class TInputOutputTree{
       vector<float>   *phoEt;
       vector<float>   *phoEta;
       vector<float>   *phoPhi;
+      vector<float>   *phoCalibE;
+      vector<float>   *phoCalibEt;
       vector<float>   *phoSCE;
       vector<float>   *phoSCRawE;
       vector<float>   *phoESEn;
@@ -170,6 +174,7 @@ class TInputOutputTree{
       vector<float>   *phohcalDepth2TowerSumEtConeDR03;
       vector<float>   *phohcalTowerSumEtConeDR03;
       vector<float>   *photrkSumPtHollowConeDR03;
+      vector<float>   *photrkSumPtSolidConeDR03;
       vector<float>   *phoIDMVA;
       vector<int>     *phoFiredSingleTrgs;
       vector<int>     *phoFiredDoubleTrgs;
@@ -189,6 +194,8 @@ class TInputOutputTree{
       vector<float>   *eleEta;
       vector<float>   *elePhi;
       vector<float>   *eleR9;
+      vector<float>   *eleCalibPt;
+      vector<float>   *eleCalibEn;
       vector<float>   *eleSCEta;
       vector<float>   *eleSCPhi;
       vector<float>   *eleSCRawEn;
@@ -214,6 +221,9 @@ class TInputOutputTree{
       vector<float>   *elePFPhoIso;
       vector<float>   *elePFNeuIso;
       vector<float>   *elePFPUIso;
+      vector<float>   *elePFClusEcalIso;
+      vector<float>   *elePFClusHcalIso;
+      vector<float>   *elePFMiniIso;
       vector<float>   *eleIDMVANonTrg;
       vector<float>   *eleIDMVATrg;
       vector<float>   *eledEtaseedAtVtx;
@@ -291,12 +301,14 @@ class TInputOutputTree{
       vector<int>     *muPixelHits;
       vector<int>     *muMuonHits;
       vector<int>     *muStations;
+      vector<int>     *muMatches;
       vector<int>     *muTrkQuality;
       vector<float>   *muIsoTrk;
       vector<float>   *muPFChIso;
       vector<float>   *muPFPhoIso;
       vector<float>   *muPFNeuIso;
       vector<float>   *muPFPUIso;
+      vector<float>   *muPFMiniIso;
       vector<int>     *muFiredTrgs;
       vector<float>   *muInnervalidFraction;
       vector<float>   *musegmentCompatibility;
@@ -312,7 +324,15 @@ class TInputOutputTree{
       vector<float>   *jetPhi;
       vector<float>   *jetRawPt;
       vector<float>   *jetRawEn;
+      vector<float>   *jetMt;
       vector<float>   *jetArea;
+      vector<float>   *jetLeadTrackPt;
+      vector<float>   *jetLeadTrackEta;
+      vector<float>   *jetLeadTrackPhi;
+      vector<int>     *jetLepTrackPID;
+      vector<float>   *jetLepTrackPt;
+      vector<float>   *jetLepTrackEta;
+      vector<float>   *jetLepTrackPhi;
       vector<float>   *jetpfCombinedInclusiveSecondaryVertexV2BJetTags;
       vector<float>   *jetJetProbabilityBJetTags;
       vector<float>   *jetpfCombinedMVABJetTags;
@@ -325,9 +345,11 @@ class TInputOutputTree{
       vector<float>   *jetCEF;
       vector<float>   *jetNEF;
       vector<int>     *jetNCH;
-      vector<float>   *jetHFHAE;
-      vector<float>   *jetHFEME;
-      vector<int>     *jetNConstituents;
+      vector<float>   *jetVtxPt;
+      vector<float>   *jetVtxMass;
+      vector<float>   *jetVtxNtrks;
+      vector<float>   *jetVtx3DVal;
+      vector<float>   *jetVtx3DSig;
       vector<int>     *jetPartonID;
       vector<int>     *jetGenJetIndex;
       vector<float>   *jetGenJetEn;
@@ -359,10 +381,16 @@ class TInputOutputTree{
       vector<float>   *AK8JetNEF;
       vector<int>     *AK8JetNCH;
       vector<int>     *AK8Jetnconstituents;
+      vector<float>   *AK8JetMUF;
       vector<bool>    *AK8JetPFLooseId;
+      vector<bool>    *AK8JetPFTightLepVetoId;
       vector<float>   *AK8CHSSoftDropJetMass;
+      vector<float>   *AK8CHSSoftDropJetMassCorr;
+      vector<float>   *AK8CHSPrunedJetMass;
+      vector<float>   *AK8CHSPrunedJetMassCorr;
       vector<float>   *AK8JetpfBoostedDSVBTag;
       vector<float>   *AK8JetJECUnc;
+      vector<float>   *AK8JetL2L3corr;
       vector<int>     *AK8JetPartonID;
       vector<int>     *AK8JetGenJetIndex;
       vector<float>   *AK8JetGenJetEn;
@@ -404,6 +432,8 @@ class TInputOutputTree{
     TBranch        *b_isData;   //!
     TBranch        *b_nVtx;   //!
     TBranch        *b_nTrksPV;   //!
+    TBranch        *b_isPVGood;///////////////////////////
+    TBranch        *b_hasGoodVtx;//////////////////////666
     TBranch        *b_vtx;   //!
     TBranch        *b_vty;   //!
     TBranch        *b_vtz;   //!
@@ -478,6 +508,8 @@ class TInputOutputTree{
     TBranch        *b_phoEt;   //!
     TBranch        *b_phoEta;   //!
     TBranch        *b_phoPhi;   //!
+    TBranch        *b_phoCalibE;//6666666666666666666666666666666666666
+    TBranch        *b_phoCalibEt;//66666666666666666666666666666666666666666
     TBranch        *b_phoSCE;   //!
     TBranch        *b_phoSCRawE;   //!
     TBranch        *b_phoESEn;   //!
@@ -543,6 +575,7 @@ class TInputOutputTree{
     TBranch        *b_phohcalDepth2TowerSumEtConeDR03;   //!
     TBranch        *b_phohcalTowerSumEtConeDR03;   //!
     TBranch        *b_photrkSumPtHollowConeDR03;   //!
+    TBranch        *b_photrkSumPtSolidConeDR03;//6666666666666666666666666666666
     TBranch        *b_phoIDMVA;   //!
     TBranch        *b_phoFiredSingleTrgs;   //!
     TBranch        *b_phoFiredDoubleTrgs;   //!
@@ -562,6 +595,8 @@ class TInputOutputTree{
     TBranch        *b_eleEta;   //!
     TBranch        *b_elePhi;   //!
     TBranch        *b_eleR9;   //!
+    TBranch        *b_eleCalibPt;//66666666666666666666666666
+    TBranch        *b_eleCalibEn;//6666666666666666666666666
     TBranch        *b_eleSCEta;   //!
     TBranch        *b_eleSCPhi;   //!
     TBranch        *b_eleSCRawEn;   //!
@@ -587,6 +622,9 @@ class TInputOutputTree{
     TBranch        *b_elePFPhoIso;   //!
     TBranch        *b_elePFNeuIso;   //!
     TBranch        *b_elePFPUIso;   //!
+    TBranch        *b_elePFClusEcalIso;//6666666666666666
+    TBranch        *b_elePFClusHcalIso;//66666666666666666666
+    TBranch        *b_elePFMiniIso;//6666666666666666666666666
     TBranch        *b_eleIDMVANonTrg;   //!
     TBranch        *b_eleIDMVATrg;   //!
     TBranch        *b_eledEtaseedAtVtx;   //!
@@ -664,6 +702,7 @@ class TInputOutputTree{
     TBranch        *b_muPixelHits;   //!
     TBranch        *b_muMuonHits;   //!
     TBranch        *b_muStations;   //!
+    TBranch        *b_muMatches;//666666666666666666666666666
     TBranch        *b_muTrkQuality;   //!
     TBranch        *b_muIsoTrk;   //!
     TBranch        *b_muPFChIso;   //!
@@ -685,7 +724,15 @@ class TInputOutputTree{
     TBranch        *b_jetPhi;   //!
     TBranch        *b_jetRawPt;   //!
     TBranch        *b_jetRawEn;   //!
+    TBranch        *b_jetMt;//666666666666666666666666
     TBranch        *b_jetArea;   //!
+    TBranch        *b_jetLeadTrackPt;//66666666666666666666666
+    TBranch        *b_jetLeadTrackEta;//66666666666666666666666
+    TBranch        *b_jetLeadTrackPhi;//66666666666666666666666
+    TBranch        *b_jetLepTrackPID;//66666666666666666666666
+    TBranch        *b_jetLepTrackPt;//66666666666666666666666
+    TBranch        *b_jetLepTrackEta;//66666666666666666666666
+    TBranch        *b_jetLepTrackPhi;//66666666666666666666666
     TBranch        *b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags;   //!
     TBranch        *b_jetJetProbabilityBJetTags;   //!
     TBranch        *b_jetpfCombinedMVABJetTags;   //!
@@ -698,9 +745,11 @@ class TInputOutputTree{
     TBranch        *b_jetCEF;   //!
     TBranch        *b_jetNEF;   //!
     TBranch        *b_jetNCH;   //!
-    TBranch        *b_jetHFHAE;   //!
-    TBranch        *b_jetHFEME;   //!
-    TBranch        *b_jetNConstituents;   //!
+    TBranch        *b_jetVtxPt;//666666666666666666666
+    TBranch        *b_jetVtxMass;//666666666666666666666
+    TBranch        *b_jetVtxNtrks;//666666666666666666666
+    TBranch        *b_jetVtx3DVal;//666666666666666666666
+    TBranch        *b_jetVtx3DSig;//666666666666666666666
     TBranch        *b_jetPartonID;   //!
     TBranch        *b_jetGenJetIndex;   //!
     TBranch        *b_jetGenJetEn;   //!
@@ -732,10 +781,16 @@ class TInputOutputTree{
     TBranch        *b_AK8JetNEF;   //!
     TBranch        *b_AK8JetNCH;   //!
     TBranch        *b_AK8Jetnconstituents;   //!
+    TBranch        *b_AK8JetMUF;//666666666666666
     TBranch        *b_AK8JetPFLooseId;   //!
+    TBranch        *b_AK8JetPFTightLepVetoId;//666666666666666666666
     TBranch        *b_AK8CHSSoftDropJetMass;   //!
+    TBranch        *b_AK8CHSSoftDropJetMassCorr;   //666666666666666666666!
+    TBranch        *b_AK8CHSPrunedJetMass;//66666666666666666
+    TBranch        *b_AK8CHSPrunedJetMassCorr;//6666666666666666666
     TBranch        *b_AK8JetpfBoostedDSVBTag;   //!
     TBranch        *b_AK8JetJECUnc;   //!
+    TBranch        *b_AK8JetL2L3corr;//6666666666666666666
     TBranch        *b_AK8JetPartonID;   //!
     TBranch        *b_AK8JetGenJetIndex;   //!
     TBranch        *b_AK8JetGenJetEn;   //!
