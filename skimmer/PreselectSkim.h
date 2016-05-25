@@ -49,13 +49,13 @@ class PreselectSkim{
       31630,   //qcd_HT_500To700
       6802,    //qcd_HT_700To1000
       1206,    //qcd_HT_1000To1500
-      120.04,  //qcd_HT_1500To2000
+      120.4,  //qcd_HT_1500To2000
       25.25,   //qcd_HT_2000ToInf
       280.35,   //ZJetsToNuNu_HT_100To200
       313.2,   //ZJetsToNuNu_HT_200To400
       3.648,   //ZJetsToNuNu_HT_400To600
       1.401,   //ZJetsToNuNu_HT_600ToInf
-      0,       //TTGjets
+      3.697,   //TTGjets
       0,       //ZJetsToQQ
       0       //WGJets
       //670.3,   //TTjets
