@@ -13,8 +13,8 @@ void Preselect()
   bool isMC=false;
   if (nS>2) isMC= true;
   TString outDir;
-  if (isMC) outDir="/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00";
-  else outDir="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/V07-06-03-00";
+  if (isMC) outDir="/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/";
+  else outDir="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/skimmed/V07-06-03-00/";
   TString nameDir("ggNtuplizer");
   TString nameTree("EventTree");
   TBenchmark time;
