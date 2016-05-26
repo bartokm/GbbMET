@@ -22,8 +22,8 @@ std::string ggFile[21]={
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-400To600_25ns.root", //sigma=10.73
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root", //sigma=4.116
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTGJets_25ns.root", //sigma=3.697
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToQQ_HT600toInf_25ns.root", //sigma=? N=?
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root" //sigma=? N=?
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToQQ_HT600toInf_25ns.root", //sigma=5.67
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root" //sigma=0.834
 }; 
 
 TString skimName[21]={
@@ -33,19 +33,19 @@ TString skimName[21]={
   "job_fall15_gjet_pt15to6000_miniAOD",
   "job_fall15_WJetsToLNu_aMCatNLO_miniAOD",
   "job_fall15_Zg_aMCatNLO_miniAOD",
-  "job_fall15_QCD_HT200to300_25ns.root",
-  "job_fall15_QCD_HT300to500_25ns.root",
-  "job_fall15_QCD_HT500to700_25ns.root",
-  "job_fall15_QCD_HT700to1000_25ns.root",
-  "job_fall15_QCD_HT1000to1500_25ns.root",
-  "job_fall15_QCD_HT1500to2000_25ns.root",
-  "job_fall15_QCD_HT2000toInf_25ns.root",
-  "job_fall15_ZJetsToNuNu_HT-100To200_25ns.root",
-  "job_fall15_ZJetsToNuNu_HT-200To400_25ns.root",
-  "job_fall15_ZJetsToNuNu_HT-400To600_25ns.root",
-  "job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root",
-  "job_fall15_TTGJets_25ns.root",
-  "job_fall15_ZJetsToQQ_HT600toInf_25ns.root",
-  "job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root"
+  "job_fall15_QCD_HT200to300_25ns",
+  "job_fall15_QCD_HT300to500_25ns",
+  "job_fall15_QCD_HT500to700_25ns",
+  "job_fall15_QCD_HT700to1000_25ns",
+  "job_fall15_QCD_HT1000to1500_25ns",
+  "job_fall15_QCD_HT1500to2000_25ns",
+  "job_fall15_QCD_HT2000toInf_25ns",
+  "job_fall15_ZJetsToNuNu_HT-100To200_25ns",
+  "job_fall15_ZJetsToNuNu_HT-200To400_25ns",
+  "job_fall15_ZJetsToNuNu_HT-400To600_25ns",
+  "job_fall15_ZJetsToNuNu_HT-600ToInf_25ns",
+  "job_fall15_TTGJets_25ns",
+  "job_fall15_ZJetsToQQ_HT600toInf_25ns",
+  "job_fall15_WGJets_MonoPhoton_PtG-130_25ns"
 };
 #endif
