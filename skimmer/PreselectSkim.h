@@ -57,8 +57,8 @@ class PreselectSkim{
       4.116,   //ZJetsToNuNu_HT_600ToInf
       3.697,   //TTGjets
       5.67,    //ZJetsToQQ
-      0.834    //WGJets
-      831.76,  //TTjets
+      0.834,   //WGJets
+      831.76   //TTjets
     };
     float _sigma=0;
 
