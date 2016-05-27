@@ -40,9 +40,9 @@ class PreselectSkim{
     TH1D *_h_cuts;
     TH1D *_hPUTrue;
     //mc cross sections
-    float _Asigma[17] = {
+    float _Asigma[18] = {
       365896,  //gjet
-      60290,   //WjetsToLNu
+      61526.7, //WjetsToLNu
       117.864, //ZG
       1717000, //qcd_HT_200To300
       351300,  //qcd_HT_300To500
@@ -52,13 +52,13 @@ class PreselectSkim{
       120.04,  //qcd_HT_1500To2000
       25.25,   //qcd_HT_2000ToInf
       280.35,  //ZJetsToNuNu_HT_100To200
-      313.2,   //ZJetsToNuNu_HT_200To400
+      77.67,   //ZJetsToNuNu_HT_200To400
       10.73,   //ZJetsToNuNu_HT_400To600
       4.116,   //ZJetsToNuNu_HT_600ToInf
       3.697,   //TTGjets
       5.67,    //ZJetsToQQ
       0.834    //WGJets
-      //670.3,   //TTjets
+      831.76,  //TTjets
     };
     float _sigma=0;
 
