@@ -23,8 +23,8 @@ std::string ggFile[21]={
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root", //sigma=4.116
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTGJets_25ns.root", //sigma=3.697
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_ZJetsToQQ_HT600toInf_25ns.root", //sigma=5.67
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root" //sigma=0.834
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTJets_25ns.root", //sigma=831.76
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root", //sigma=0.834
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_TTJets_25ns.root" //sigma=831.76
 }; 
 
 TString skimName[21]={
@@ -47,7 +47,7 @@ TString skimName[21]={
   "job_fall15_ZJetsToNuNu_HT-600ToInf_25ns",
   "job_fall15_TTGJets_25ns",
   "job_fall15_ZJetsToQQ_HT600toInf_25ns",
-  "job_fall15_WGJets_MonoPhoton_PtG-130_25ns"
-  "job_fall15_TTJets_25ns",
+  "job_fall15_WGJets_MonoPhoton_PtG-130_25ns",
+  "job_fall15_TTJets_25ns"
 };
 #endif
