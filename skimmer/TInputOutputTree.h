@@ -335,7 +335,7 @@ class TInputOutputTree{
       vector<float>   *jetLepTrackPhi;
       vector<float>   *jetpfCombinedInclusiveSecondaryVertexV2BJetTags;
       vector<float>   *jetJetProbabilityBJetTags;
-      vector<float>   *jetpfCombinedMVABJetTags;
+      vector<float>   *jetpfCombinedMVAV2BJetTags;
       vector<bool>    *jetPFLooseId;
       vector<float>   *jetPUidFullDiscriminant;
       vector<float>   *jetJECUnc;
@@ -735,7 +735,7 @@ class TInputOutputTree{
     TBranch        *b_jetLepTrackPhi;//66666666666666666666666
     TBranch        *b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags;   //!
     TBranch        *b_jetJetProbabilityBJetTags;   //!
-    TBranch        *b_jetpfCombinedMVABJetTags;   //!
+    TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
     TBranch        *b_jetPFLooseId;   //!
     TBranch        *b_jetPUidFullDiscriminant;   //!
     TBranch        *b_jetJECUnc;   //!

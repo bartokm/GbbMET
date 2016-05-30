@@ -319,7 +319,7 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   treeLeaf.jetLepTrackPhi=0;//
   treeLeaf.jetpfCombinedInclusiveSecondaryVertexV2BJetTags=0;
   treeLeaf.jetJetProbabilityBJetTags=0;
-  treeLeaf.jetpfCombinedMVABJetTags=0;
+  treeLeaf.jetpfCombinedMVAV2BJetTags=0;
   treeLeaf.jetPFLooseId=0;
   treeLeaf.jetPUidFullDiscriminant=0;
   treeLeaf.jetJECUnc=0;
@@ -713,7 +713,7 @@ void TInputOutputTree::InitInput(TTree *tree, bool isMC){
   fChain->SetBranchAddress("jetLepTrackPhi", &treeLeaf.jetLepTrackPhi, &b_jetLepTrackPhi);
   fChain->SetBranchAddress("jetpfCombinedInclusiveSecondaryVertexV2BJetTags", &treeLeaf.jetpfCombinedInclusiveSecondaryVertexV2BJetTags, &b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags);
   fChain->SetBranchAddress("jetJetProbabilityBJetTags", &treeLeaf.jetJetProbabilityBJetTags, &b_jetJetProbabilityBJetTags);
-  fChain->SetBranchAddress("jetpfCombinedMVABJetTags", &treeLeaf.jetpfCombinedMVABJetTags, &b_jetpfCombinedMVABJetTags);
+  fChain->SetBranchAddress("jetpfCombinedMVAV2BJetTags", &treeLeaf.jetpfCombinedMVAV2BJetTags, &b_jetpfCombinedMVAV2BJetTags);
   fChain->SetBranchAddress("jetPFLooseId", &treeLeaf.jetPFLooseId, &b_jetPFLooseId);
   fChain->SetBranchAddress("jetPUidFullDiscriminant", &treeLeaf.jetPUidFullDiscriminant, &b_jetPUidFullDiscriminant);
   fChain->SetBranchAddress("jetJECUnc", &treeLeaf.jetJECUnc, &b_jetJECUnc);
@@ -1091,7 +1091,7 @@ void TInputOutputTree::InitOutput(TTree* outputTree,bool isMC)
   outputTree->Branch("jetLepTrackPhi",	     &treeLeaf.jetLepTrackPhi); 
   outputTree->Branch("jetpfCombinedInclusiveSecondaryVertexV2BJetTags",&treeLeaf.jetpfCombinedInclusiveSecondaryVertexV2BJetTags);
   outputTree->Branch("jetJetProbabilityBJetTags",&treeLeaf.jetJetProbabilityBJetTags);
-  outputTree->Branch("jetpfCombinedMVABJetTags",&treeLeaf.jetpfCombinedMVABJetTags);
+  outputTree->Branch("jetpfCombinedMVAV2BJetTags",&treeLeaf.jetpfCombinedMVAV2BJetTags);
   outputTree->Branch("jetPFLooseId",&treeLeaf.jetPFLooseId);
   outputTree->Branch("jetPUidFullDiscriminant",&treeLeaf.jetPUidFullDiscriminant);
   outputTree->Branch("jetJECUnc",	     &treeLeaf.jetJECUnc);	           
