@@ -93,7 +93,7 @@ void skimmed_data::Loop()
 
    TFile f("skimmed_data_histos.root","recreate");
 
-   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET,HT",10,0,10);
+   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,pfMET",10,0,10);
    TH1D *hdata_nVtx = new TH1D("hdata_nVtx",";nVtx",50,0,50);
 
    TH1D *hdata_phoEt = new TH1D("hdata_phoEt",";phoEt",30,0,1000);
@@ -152,7 +152,7 @@ void skimmed_data::Loop()
        hdata_cuts->SetBinContent(2,hdata_cuts->GetBinContent(2)+h_cuts->GetBinContent(3));
      }
      //object definitions
-     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
+     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1, leadbtag=-1;
      std::vector<int> passPho, passJet, passAK8Jet, passEle, passMu;
      passPho.clear(); passJet.clear(); passAK8Jet.clear(); passEle.clear(); passMu.clear();
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
@@ -225,6 +225,7 @@ void skimmed_data::Loop()
      for (int i=0;i<passAK8Jet.size();i++) {
        if ((*AK8JetPt)[passAK8Jet.at(i)]>(*AK8JetPt)[leadpt_ak8]) leadpt_ak8=passAK8Jet.at(i);
        AK8HT_after+=(*AK8JetPt)[passAK8Jet.at(i)];
+       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>(*AK8JetpfBoostedDSVBTag)[leadbtag]) leadbtag=passAK8Jet.at(i);
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
@@ -233,9 +234,9 @@ void skimmed_data::Loop()
        hdata_cuts->Fill(3);
        if ((*phoEt)[nleadPho]>=175){
          hdata_cuts->Fill(4);
-         if (pfMET<150){
+         if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
          hdata_cuts->Fill(5);
-         if (HT_after>200){
+         if (pfMET<150){
          hdata_cuts->Fill(6);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
@@ -252,8 +253,9 @@ void skimmed_data::Loop()
          for (int i=0;i<passAK8Jet.size();i++) {
            double i_jetpt=(*AK8JetPt)[passAK8Jet.at(i)], i_jetdB=(*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)], h_jetdB;
            if (highdB_ak8==-1) h_jetdB=-10; else h_jetdB=(*AK8JetpfBoostedDSVBTag)[highdB_ak8];
-           if (i_jetdB>h_jetdB) highdB_ak8=i;
+           if (i_jetdB>h_jetdB) highdB_ak8=passAK8Jet.at(i);
          }
+         if (highdB_ak8!=leadbtag) std::cout<<"baj van: highdB_ak8, leadbtag "<<highdB_ak8<<", "<<leadbtag<<std::endl;
          double dR_pho_AK8=-1;
          if (abs((*AK8JetEta)[leadpt_ak8])<1.4442){
            dR_pho_AK8=deltaR((*AK8JetPhi)[leadpt_ak8],(*phoPhi)[nleadPho],(*AK8JetEta)[leadpt_ak8],(*phoEta)[nleadPho]);
@@ -291,8 +293,8 @@ void skimmed_data::Loop()
          if (leadpt_ak8!=-1) hdata_AK8jetpt->Fill((*AK8JetPt)[leadpt_ak8]);
          if (leadpt_ak8!=-1) hdata_AK8ljetmass->Fill((*AK8JetMass)[leadpt_ak8]);
          if (dR_pho_AK8!=-1) hdata_dRphoAK8jet->Fill(dR_pho_AK8);
-         }//HT cut
          }//pfMET cut
+         }//btag cut
        }//offline HLT cut
      }//phoid cut 
    }

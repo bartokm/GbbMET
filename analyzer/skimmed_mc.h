@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Sun Mar 20 10:40:38 2016 by ROOT version 6.02/05
+// Mon May 30 10:28:51 2016 by ROOT version 6.02/13
 // from TTree EventTree/EventTree
-// found on file: /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD.root
+// found on file: /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT200to300_25ns.root
 //////////////////////////////////////////////////////////
 
 #ifndef skimmed_mc_h
@@ -34,6 +34,8 @@ public :
    Bool_t          isData;
    Int_t           nVtx;
    Int_t           nTrksPV;
+   Bool_t          isPVGood;
+   Bool_t          hasGoodVtx;
    Float_t         vtx;
    Float_t         vty;
    Float_t         vtz;
@@ -92,6 +94,8 @@ public :
    vector<float>   *phoEt;
    vector<float>   *phoEta;
    vector<float>   *phoPhi;
+   vector<float>   *phoCalibE;
+   vector<float>   *phoCalibEt;
    vector<float>   *phoSCE;
    vector<float>   *phoSCRawE;
    vector<float>   *phoESEn;
@@ -157,6 +161,7 @@ public :
    vector<float>   *phohcalDepth2TowerSumEtConeDR03;
    vector<float>   *phohcalTowerSumEtConeDR03;
    vector<float>   *photrkSumPtHollowConeDR03;
+   vector<float>   *photrkSumPtSolidConeDR03;
    vector<float>   *phoIDMVA;
    vector<int>     *phoFiredSingleTrgs;
    vector<int>     *phoFiredDoubleTrgs;
@@ -172,6 +177,8 @@ public :
    vector<float>   *eleEta;
    vector<float>   *elePhi;
    vector<float>   *eleR9;
+   vector<float>   *eleCalibPt;
+   vector<float>   *eleCalibEn;
    vector<float>   *eleSCEta;
    vector<float>   *eleSCPhi;
    vector<float>   *eleSCRawEn;
@@ -192,6 +199,9 @@ public :
    vector<float>   *elePFPhoIso;
    vector<float>   *elePFNeuIso;
    vector<float>   *elePFPUIso;
+   vector<float>   *elePFClusEcalIso;
+   vector<float>   *elePFClusHcalIso;
+   vector<float>   *elePFMiniIso;
    vector<float>   *eleIDMVANonTrg;
    vector<float>   *eleIDMVATrg;
    vector<float>   *eleDr03TkSumPt;
@@ -215,6 +225,7 @@ public :
    vector<int>     *muTrkLayers;
    vector<int>     *muPixelHits;
    vector<int>     *muStations;
+   vector<int>     *muMatches;
    vector<float>   *muPFChIso;
    vector<float>   *muPFPhoIso;
    vector<float>   *muPFNeuIso;
@@ -227,24 +238,27 @@ public :
    vector<float>   *jetPhi;
    vector<float>   *jetRawPt;
    vector<float>   *jetRawEn;
+   vector<float>   *jetMt;
    vector<float>   *jetArea;
+   vector<float>   *jetLeadTrackPt;
+   vector<float>   *jetLeadTrackEta;
+   vector<float>   *jetLeadTrackPhi;
+   vector<int>     *jetLepTrackPID;
+   vector<float>   *jetLepTrackPt;
+   vector<float>   *jetLepTrackEta;
+   vector<float>   *jetLepTrackPhi;
    vector<float>   *jetpfCombinedInclusiveSecondaryVertexV2BJetTags;
    vector<float>   *jetJetProbabilityBJetTags;
-   vector<float>   *jetpfCombinedMVABJetTags;
+   vector<float>   *jetpfCombinedMVAV2BJetTags;
    vector<bool>    *jetPFLooseId;
    vector<float>   *jetPUidFullDiscriminant;
    vector<float>   *jetJECUnc;
    vector<int>     *jetFiredTrgs;
-   /*
-   vector<float>   *jetCHF;
-   vector<float>   *jetNHF;
-   vector<float>   *jetCEF;
-   vector<float>   *jetNEF;
-   vector<int>     *jetNCH;
-   vector<float>   *jetHFHAE;
-   vector<float>   *jetHFEME;
-   vector<int>     *jetNConstituents;
-   */
+   vector<float>   *jetVtxPt;
+   vector<float>   *jetVtxMass;
+   vector<float>   *jetVtxNtrks;
+   vector<float>   *jetVtx3DVal;
+   vector<float>   *jetVtx3DSig;
    vector<int>     *jetPartonID;
    vector<int>     *jetGenJetIndex;
    vector<float>   *jetGenJetEn;
@@ -274,10 +288,16 @@ public :
    vector<float>   *AK8JetNEF;
    vector<int>     *AK8JetNCH;
    vector<int>     *AK8Jetnconstituents;
+   vector<float>   *AK8JetMUF;
    vector<bool>    *AK8JetPFLooseId;
+   vector<bool>    *AK8JetPFTightLepVetoId;
    vector<float>   *AK8CHSSoftDropJetMass;
+   vector<float>   *AK8CHSSoftDropJetMassCorr;
+   vector<float>   *AK8CHSPrunedJetMass;
+   vector<float>   *AK8CHSPrunedJetMassCorr;
    vector<float>   *AK8JetpfBoostedDSVBTag;
    vector<float>   *AK8JetJECUnc;
+   vector<float>   *AK8JetL2L3corr;
    vector<int>     *AK8JetPartonID;
    vector<int>     *AK8JetGenJetIndex;
    vector<float>   *AK8JetGenJetEn;
@@ -307,6 +327,8 @@ public :
    TBranch        *b_isData;   //!
    TBranch        *b_nVtx;   //!
    TBranch        *b_nVtxPV;   //!
+   TBranch        *b_isPVGood;   //!
+   TBranch        *b_hasGoodVtx;   //!
    TBranch        *b_vtx;   //!
    TBranch        *b_vty;   //!
    TBranch        *b_vtz;   //!
@@ -365,6 +387,8 @@ public :
    TBranch        *b_phoEt;   //!
    TBranch        *b_phoEta;   //!
    TBranch        *b_phoPhi;   //!
+   TBranch        *b_phoCalibE;   //!
+   TBranch        *b_phoCalibEt;   //!
    TBranch        *b_phoSCE;   //!
    TBranch        *b_phoSCRawE;   //!
    TBranch        *b_phoESEn;   //!
@@ -430,6 +454,7 @@ public :
    TBranch        *b_phohcalDepth2TowerSumEtConeDR03;   //!
    TBranch        *b_phohcalTowerSumEtConeDR03;   //!
    TBranch        *b_photrkSumPtHollowConeDR03;   //!
+   TBranch        *b_photrkSumPtSolidConeDR03;   //!
    TBranch        *b_phoIDMVA;   //!
    TBranch        *b_phoFiredSingleTrgs;   //!
    TBranch        *b_phoFiredDoubleTrgs;   //!
@@ -445,6 +470,8 @@ public :
    TBranch        *b_eleEta;   //!
    TBranch        *b_elePhi;   //!
    TBranch        *b_eleR9;   //!
+   TBranch        *b_eleCalibPt;   //!
+   TBranch        *b_eleCalibEn;   //!
    TBranch        *b_eleSCEta;   //!
    TBranch        *b_eleSCPhi;   //!
    TBranch        *b_eleSCRawEn;   //!
@@ -465,6 +492,9 @@ public :
    TBranch        *b_elePFPhoIso;   //!
    TBranch        *b_elePFNeuIso;   //!
    TBranch        *b_elePFPUIso;   //!
+   TBranch        *b_elePFClusEcalIso;   //!
+   TBranch        *b_elePFClusHcalIso;   //!
+   TBranch        *b_elePFMiniIso;   //!
    TBranch        *b_eleIDMVANonTrg;   //!
    TBranch        *b_eleIDMVATrg;   //!
    TBranch        *b_eleDr03TkSumPt;   //!
@@ -488,6 +518,7 @@ public :
    TBranch        *b_muTrkLayers;   //!
    TBranch        *b_muPixelHits;   //!
    TBranch        *b_muStations;   //!
+   TBranch        *b_muMatches;   //!
    TBranch        *b_muPFChIso;   //!
    TBranch        *b_muPFPhoIso;   //!
    TBranch        *b_muPFNeuIso;   //!
@@ -500,24 +531,27 @@ public :
    TBranch        *b_jetPhi;   //!
    TBranch        *b_jetRawPt;   //!
    TBranch        *b_jetRawEn;   //!
+   TBranch        *b_jetMt;   //!
    TBranch        *b_jetArea;   //!
+   TBranch        *b_jetLeadTrackPt;   //!
+   TBranch        *b_jetLeadTrackEta;   //!
+   TBranch        *b_jetLeadTrackPhi;   //!
+   TBranch        *b_jetLepTrackPID;   //!
+   TBranch        *b_jetLepTrackPt;   //!
+   TBranch        *b_jetLepTrackEta;   //!
+   TBranch        *b_jetLepTrackPhi;   //!
    TBranch        *b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags;   //!
    TBranch        *b_jetJetProbabilityBJetTags;   //!
-   TBranch        *b_jetpfCombinedMVABJetTags;   //!
+   TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
    TBranch        *b_jetPFLooseId;   //!
    TBranch        *b_jetPUidFullDiscriminant;   //!
    TBranch        *b_jetJECUnc;   //!
    TBranch        *b_jetFiredTrgs;   //!
-   /*
-   TBranch        *b_jetCHF;   //!
-   TBranch        *b_jetNHF;   //!
-   TBranch        *b_jetCEF;   //!
-   TBranch        *b_jetNEF;   //!
-   TBranch        *b_jetNCH;   //!
-   TBranch        *b_jetHFHAE;   //!
-   TBranch        *b_jetHFEME;   //!
-   TBranch        *b_jetNConstituents;   //!
-   */
+   TBranch        *b_jetVtxPt;   //!
+   TBranch        *b_jetVtxMass;   //!
+   TBranch        *b_jetVtxNtrks;   //!
+   TBranch        *b_jetVtx3DVal;   //!
+   TBranch        *b_jetVtx3DSig;   //!
    TBranch        *b_jetPartonID;   //!
    TBranch        *b_jetGenJetIndex;   //!
    TBranch        *b_jetGenJetEn;   //!
@@ -547,10 +581,16 @@ public :
    TBranch        *b_AK8JetNEF;   //!
    TBranch        *b_AK8JetNCH;   //!
    TBranch        *b_AK8Jetnconstituents;   //!
+   TBranch        *b_AK8JetMUF;   //!
    TBranch        *b_AK8JetPFLooseId;   //!
+   TBranch        *b_AK8JetPFTightLepVetoId;   //!
    TBranch        *b_AK8CHSSoftDropJetMass;   //!
+   TBranch        *b_AK8CHSSoftDropJetMassCorr;   //!
+   TBranch        *b_AK8CHSPrunedJetMass;   //!
+   TBranch        *b_AK8CHSPrunedJetMassCorr;   //!
    TBranch        *b_AK8JetpfBoostedDSVBTag;   //!
    TBranch        *b_AK8JetJECUnc;   //!
+   TBranch        *b_AK8JetL2L3corr;   //!
    TBranch        *b_AK8JetPartonID;   //!
    TBranch        *b_AK8JetGenJetIndex;   //!
    TBranch        *b_AK8JetGenJetEn;   //!
@@ -574,42 +614,26 @@ public :
    TBranch        *b_AK8softdropSubjetCSV;   //!
 
    //histograms
-   static const int nfile=14;
+   static const int nfile=18;
    std::string mc_input_file[nfile] = {
-   "TTJets",
+   "GJet",
    "WJetsToLNu",
+   "Zg",
+   "QCD_HT_200To300",
+   "QCD_HT_300To500",
+   "QCD_HT_500To700",
+   "QCD_HT_700To1000",
+   "QCD_HT_1000To1500",
+   "QCD_HT_1500To2000",
+   "QCD_HT_2000ToInf",
    "ZJetsToNuNu_HT_100To200",
    "ZJetsToNuNu_HT_200To400",
    "ZJetsToNuNu_HT_400To600",
    "ZJetsToNuNu_HT_600ToInf",
-   //qcd_HT_100To200
-   "qcd_HT_200To300",
-   "qcd_HT_300To500",
-   "qcd_HT_500To700",
-   "qcd_HT_700To1000",
-   "qcd_HT_1000To1500",
-   "qcd_HT_1500To2000",
-   "qcd_HT_2000ToInf",
-   "GJet"};
-
-   /* not needed, they're in the skimmed datasets
-   float sigma[nfile] = {
-     670.3,   //ttjets
-     60290,   //WjetsToLNu
-     93.49,   //ZJetsToNuNu_HT_100To200
-     26.12,   //ZJetsToNuNu_HT_200To400
-     3.648,   //ZJetsToNuNu_HT_400To600
-     1.401,   //ZJetsToNuNu_HT_600ToInf
-     //27500000,//qcd_HT_100To200
-     1740000, //qcd_HT_200To300
-     367000,  //qcd_HT_300To500
-     29400,   //qcd_HT_500To700
-     6524,    //qcd_HT_700To1000
-     1206,    //qcd_HT_1000To1500
-     120.04,  //qcd_HT_1500To2000
-     25.25,   //qcd_HT_2000ToInf
-     365896}; //gjet
-   */
+   "TTGJets",
+   "ZJetsToQQ_HT_600ToInf",
+   "WGJets",
+   "TTJets"};
 
    TH1D *h_PUweight[nfile];
    TH1D *hbkg_nVtx[nfile];
@@ -671,39 +695,45 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-   const char* fTTJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_TTJets_amcatnlo_pythia8_25ns_miniAOD.root/EventTree";//sigma=670.3 N=42784971
-   const char* fWJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ggNtuple_WJetsToLNu_amcatnlo_pythia8_25ns_miniAOD.root/EventTree"; //sigma=60290 N=24184766
-   const char* fZJets1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-100To200_13TeV-madgraph.root/EventTree"; //sigma=93.49 N=5154824
-   const char* fZJets2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-200To400_13TeV-madgraph.root/EventTree"; //sigma=26.12 N=4998316
-   const char* fZJets3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-400To600_13TeV-madgraph.root/EventTree"; //sigma=3.648 N=1018882
-   const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_ZJetsToNuNu_HT-600ToInf_13TeV-madgraph.root/EventTree"; //sigma=1.401 N=1008333
-   //const char* fqcd1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT100To200_25ns.root/EventTree"; //sigma=27500000 N=81906377
-   const char* fqcd2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT200To300_25ns.root/EventTree"; //sigma=1740000 N=18718905
-   const char* fqcd3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT300To500_25ns.root/EventTree"; //sigma=367000 N=19826197  (das=20278243)
-   const char* fqcd4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT500To700_25ns.root/EventTree"; //sigma=29400 N=19664159  (das=44370193)
-   const char* fqcd5 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT700To1000_25ns.root/EventTree"; //sigma=6524 N=15356448
-   const char* fqcd6 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT1000To1500_25ns.root/EventTree"; //sigma=1206 N=4963895
-   const char* fqcd7 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT1500To2000_25ns.root/EventTree"; //sigma=120.04 N=3868886  (das=3962712)
-   const char* fqcd8 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT2000ToInf_25ns.root/EventTree"; //sigma=25.25 N=1912529  (das=1984407)
-   const char* fgjet = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_gjet_pt15to6000_25ns.root/EventTree"; //sigma=365896 N=9891424 (das=9896992)
+   const char* fgjet = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_gjet_pt15to6000_miniAOD.root/EventTree";
+   const char* fWJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_WJetsToLNu_aMCatNLO_miniAOD.root/EventTree";
+   const char* fZg = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_Zg_aMCatNLO_miniAOD.root/EventTree";
+   const char* fQCD2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT200to300_25ns.root/EventTree";
+   const char* fQCD3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT300to500_25ns.root/EventTree";
+   const char* fQCD4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT500to700_25ns.root/EventTree";
+   const char* fQCD5 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT700to1000_25ns.root/EventTree";
+   const char* fQCD6 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT1000to1500_25ns.root/EventTree";
+   const char* fQCD7 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT1500to2000_25ns.root/EventTree";
+   const char* fQCD8 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT2000toInf_25ns.root/EventTree";
+   const char* fZJets1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-100To200_13TeV_25ns.root/EventTree";
+   const char* fZJets2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-200To400_13TeV_25ns.root/EventTree";
+   const char* fZJets3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-400To600_13TeV_25ns.root/EventTree";
+   const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-600ToInf_13TeV_25ns.root/EventTree";
+   const char* fTTGJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_TTGJets_25ns.root/EventTree";
+   const char* fZJetsQQ = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToQQ_HT600toInf_25ns.root/EventTree";
+   const char* fWGJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root/EventTree";
+   const char* fTTJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_TTJets_25ns.root/EventTree";
 
    if (tree == 0) {
      TChain * ch_mc = new TChain("EventTree","");
-     ch_mc->Add(fTTJets);
+     ch_mc->Add(fgjet);
      ch_mc->Add(fWJets);
+     ch_mc->Add(fZg);
+     ch_mc->Add(fQCD2);
+     ch_mc->Add(fQCD3);
+     ch_mc->Add(fQCD4);
+     ch_mc->Add(fQCD5);
+     ch_mc->Add(fQCD6);
+     ch_mc->Add(fQCD7);
+     ch_mc->Add(fQCD8);
      ch_mc->Add(fZJets1);
      ch_mc->Add(fZJets2);
      ch_mc->Add(fZJets3);
      ch_mc->Add(fZJets4);
-     //ch_mc->Add(fqcd1);
-     ch_mc->Add(fqcd2);
-     ch_mc->Add(fqcd3);
-     ch_mc->Add(fqcd4);
-     ch_mc->Add(fqcd5);
-     ch_mc->Add(fqcd6);
-     ch_mc->Add(fqcd7);
-     ch_mc->Add(fqcd8);
-     ch_mc->Add(fgjet);
+     ch_mc->Add(fTTGJets);
+     ch_mc->Add(fZJetsQQ);
+     ch_mc->Add(fWGJets);
+     ch_mc->Add(fTTJets);
      tree = ch_mc;
    }
    Init(tree);
@@ -777,6 +807,8 @@ void skimmed_mc::Init(TTree *tree)
    phoEt = 0;
    phoEta = 0;
    phoPhi = 0;
+   phoCalibE = 0;
+   phoCalibEt = 0;
    phoSCE = 0;
    phoSCRawE = 0;
    phoESEn = 0;
@@ -842,6 +874,7 @@ void skimmed_mc::Init(TTree *tree)
    phohcalDepth2TowerSumEtConeDR03 = 0;
    phohcalTowerSumEtConeDR03 = 0;
    photrkSumPtHollowConeDR03 = 0;
+   photrkSumPtSolidConeDR03 = 0;
    phoIDMVA = 0;
    phoFiredSingleTrgs = 0;
    phoFiredDoubleTrgs = 0;
@@ -856,6 +889,8 @@ void skimmed_mc::Init(TTree *tree)
    eleEta = 0;
    elePhi = 0;
    eleR9 = 0;
+   eleCalibPt = 0;
+   eleCalibEn = 0;
    eleSCEta = 0;
    eleSCPhi = 0;
    eleSCRawEn = 0;
@@ -876,6 +911,9 @@ void skimmed_mc::Init(TTree *tree)
    elePFPhoIso = 0;
    elePFNeuIso = 0;
    elePFPUIso = 0;
+   elePFClusEcalIso = 0;
+   elePFClusHcalIso = 0;
+   elePFMiniIso = 0;
    eleIDMVANonTrg = 0;
    eleIDMVATrg = 0;
    eleDr03TkSumPt = 0;
@@ -898,6 +936,7 @@ void skimmed_mc::Init(TTree *tree)
    muTrkLayers = 0;
    muPixelHits = 0;
    muStations = 0;
+   muMatches = 0;
    muPFChIso = 0;
    muPFPhoIso = 0;
    muPFNeuIso = 0;
@@ -909,24 +948,27 @@ void skimmed_mc::Init(TTree *tree)
    jetPhi = 0;
    jetRawPt = 0;
    jetRawEn = 0;
+   jetMt = 0;
    jetArea = 0;
+   jetLeadTrackPt = 0;
+   jetLeadTrackEta = 0;
+   jetLeadTrackPhi = 0;
+   jetLepTrackPID = 0;
+   jetLepTrackPt = 0;
+   jetLepTrackEta = 0;
+   jetLepTrackPhi = 0;
    jetpfCombinedInclusiveSecondaryVertexV2BJetTags = 0;
    jetJetProbabilityBJetTags = 0;
-   jetpfCombinedMVABJetTags = 0;
+   jetpfCombinedMVAV2BJetTags = 0;
    jetPFLooseId = 0;
    jetPUidFullDiscriminant = 0;
    jetJECUnc = 0;
    jetFiredTrgs = 0;
-   /*
-   jetCHF = 0;
-   jetNHF = 0;
-   jetCEF = 0;
-   jetNEF = 0;
-   jetNCH = 0;
-   jetHFHAE = 0;
-   jetHFEME = 0;
-   jetNConstituents = 0;
-   */
+   jetVtxPt = 0;
+   jetVtxMass = 0;
+   jetVtxNtrks = 0;
+   jetVtx3DVal = 0;
+   jetVtx3DSig = 0;
    jetPartonID = 0;
    jetGenJetIndex = 0;
    jetGenJetEn = 0;
@@ -955,10 +997,16 @@ void skimmed_mc::Init(TTree *tree)
    AK8JetNEF = 0;
    AK8JetNCH = 0;
    AK8Jetnconstituents = 0;
+   AK8JetMUF = 0;
    AK8JetPFLooseId = 0;
+   AK8JetPFTightLepVetoId = 0;
    AK8CHSSoftDropJetMass = 0;
+   AK8CHSSoftDropJetMassCorr = 0;
+   AK8CHSPrunedJetMass = 0;
+   AK8CHSPrunedJetMassCorr = 0;
    AK8JetpfBoostedDSVBTag = 0;
    AK8JetJECUnc = 0;
+   AK8JetL2L3corr = 0;
    AK8JetPartonID = 0;
    AK8JetGenJetIndex = 0;
    AK8JetGenJetEn = 0;
@@ -992,6 +1040,8 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("isData", &isData, &b_isData);
    fChain->SetBranchAddress("nVtx", &nVtx, &b_nVtx);
    fChain->SetBranchAddress("nTrksPV", &nTrksPV, &b_nVtxPV);
+   fChain->SetBranchAddress("isPVGood", &isPVGood, &b_isPVGood);
+   fChain->SetBranchAddress("hasGoodVtx", &hasGoodVtx, &b_hasGoodVtx);
    fChain->SetBranchAddress("vtx", &vtx, &b_vtx);
    fChain->SetBranchAddress("vty", &vty, &b_vty);
    fChain->SetBranchAddress("vtz", &vtz, &b_vtz);
@@ -1050,6 +1100,8 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("phoEt", &phoEt, &b_phoEt);
    fChain->SetBranchAddress("phoEta", &phoEta, &b_phoEta);
    fChain->SetBranchAddress("phoPhi", &phoPhi, &b_phoPhi);
+   fChain->SetBranchAddress("phoCalibE", &phoCalibE, &b_phoCalibE);
+   fChain->SetBranchAddress("phoCalibEt", &phoCalibEt, &b_phoCalibEt);
    fChain->SetBranchAddress("phoSCE", &phoSCE, &b_phoSCE);
    fChain->SetBranchAddress("phoSCRawE", &phoSCRawE, &b_phoSCRawE);
    fChain->SetBranchAddress("phoESEn", &phoESEn, &b_phoESEn);
@@ -1115,6 +1167,7 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("phohcalDepth2TowerSumEtConeDR03", &phohcalDepth2TowerSumEtConeDR03, &b_phohcalDepth2TowerSumEtConeDR03);
    fChain->SetBranchAddress("phohcalTowerSumEtConeDR03", &phohcalTowerSumEtConeDR03, &b_phohcalTowerSumEtConeDR03);
    fChain->SetBranchAddress("photrkSumPtHollowConeDR03", &photrkSumPtHollowConeDR03, &b_photrkSumPtHollowConeDR03);
+   fChain->SetBranchAddress("photrkSumPtSolidConeDR03", &photrkSumPtSolidConeDR03, &b_photrkSumPtSolidConeDR03);
    fChain->SetBranchAddress("phoIDMVA", &phoIDMVA, &b_phoIDMVA);
    fChain->SetBranchAddress("phoFiredSingleTrgs", &phoFiredSingleTrgs, &b_phoFiredSingleTrgs);
    fChain->SetBranchAddress("phoFiredDoubleTrgs", &phoFiredDoubleTrgs, &b_phoFiredDoubleTrgs);
@@ -1130,6 +1183,8 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("eleEta", &eleEta, &b_eleEta);
    fChain->SetBranchAddress("elePhi", &elePhi, &b_elePhi);
    fChain->SetBranchAddress("eleR9", &eleR9, &b_eleR9);
+   fChain->SetBranchAddress("eleCalibPt", &eleCalibPt, &b_eleCalibPt);
+   fChain->SetBranchAddress("eleCalibEn", &eleCalibEn, &b_eleCalibEn);
    fChain->SetBranchAddress("eleSCEta", &eleSCEta, &b_eleSCEta);
    fChain->SetBranchAddress("eleSCPhi", &eleSCPhi, &b_eleSCPhi);
    fChain->SetBranchAddress("eleSCRawEn", &eleSCRawEn, &b_eleSCRawEn);
@@ -1150,6 +1205,9 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("elePFPhoIso", &elePFPhoIso, &b_elePFPhoIso);
    fChain->SetBranchAddress("elePFNeuIso", &elePFNeuIso, &b_elePFNeuIso);
    fChain->SetBranchAddress("elePFPUIso", &elePFPUIso, &b_elePFPUIso);
+   fChain->SetBranchAddress("elePFClusEcalIso", &elePFClusEcalIso, &b_elePFClusEcalIso);
+   fChain->SetBranchAddress("elePFClusHcalIso", &elePFClusHcalIso, &b_elePFClusHcalIso);
+   fChain->SetBranchAddress("elePFMiniIso", &elePFMiniIso, &b_elePFMiniIso);
    fChain->SetBranchAddress("eleIDMVANonTrg", &eleIDMVANonTrg, &b_eleIDMVANonTrg);
    fChain->SetBranchAddress("eleIDMVATrg", &eleIDMVATrg, &b_eleIDMVATrg);
    fChain->SetBranchAddress("eleDr03TkSumPt", &eleDr03TkSumPt, &b_eleDr03TkSumPt);
@@ -1173,6 +1231,7 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("muTrkLayers", &muTrkLayers, &b_muTrkLayers);
    fChain->SetBranchAddress("muPixelHits", &muPixelHits, &b_muPixelHits);
    fChain->SetBranchAddress("muStations", &muStations, &b_muStations);
+   fChain->SetBranchAddress("muMatches", &muMatches, &b_muMatches);
    fChain->SetBranchAddress("muPFChIso", &muPFChIso, &b_muPFChIso);
    fChain->SetBranchAddress("muPFPhoIso", &muPFPhoIso, &b_muPFPhoIso);
    fChain->SetBranchAddress("muPFNeuIso", &muPFNeuIso, &b_muPFNeuIso);
@@ -1185,24 +1244,27 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("jetPhi", &jetPhi, &b_jetPhi);
    fChain->SetBranchAddress("jetRawPt", &jetRawPt, &b_jetRawPt);
    fChain->SetBranchAddress("jetRawEn", &jetRawEn, &b_jetRawEn);
+   fChain->SetBranchAddress("jetMt", &jetMt, &b_jetMt);
    fChain->SetBranchAddress("jetArea", &jetArea, &b_jetArea);
+   fChain->SetBranchAddress("jetLeadTrackPt", &jetLeadTrackPt, &b_jetLeadTrackPt);
+   fChain->SetBranchAddress("jetLeadTrackEta", &jetLeadTrackEta, &b_jetLeadTrackEta);
+   fChain->SetBranchAddress("jetLeadTrackPhi", &jetLeadTrackPhi, &b_jetLeadTrackPhi);
+   fChain->SetBranchAddress("jetLepTrackPID", &jetLepTrackPID, &b_jetLepTrackPID);
+   fChain->SetBranchAddress("jetLepTrackPt", &jetLepTrackPt, &b_jetLepTrackPt);
+   fChain->SetBranchAddress("jetLepTrackEta", &jetLepTrackEta, &b_jetLepTrackEta);
+   fChain->SetBranchAddress("jetLepTrackPhi", &jetLepTrackPhi, &b_jetLepTrackPhi);
    fChain->SetBranchAddress("jetpfCombinedInclusiveSecondaryVertexV2BJetTags", &jetpfCombinedInclusiveSecondaryVertexV2BJetTags, &b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags);
    fChain->SetBranchAddress("jetJetProbabilityBJetTags", &jetJetProbabilityBJetTags, &b_jetJetProbabilityBJetTags);
-   fChain->SetBranchAddress("jetpfCombinedMVABJetTags", &jetpfCombinedMVABJetTags, &b_jetpfCombinedMVABJetTags);
+   fChain->SetBranchAddress("jetpfCombinedMVAV2BJetTags", &jetpfCombinedMVAV2BJetTags, &b_jetpfCombinedMVAV2BJetTags);
    fChain->SetBranchAddress("jetPFLooseId", &jetPFLooseId, &b_jetPFLooseId);
    fChain->SetBranchAddress("jetPUidFullDiscriminant", &jetPUidFullDiscriminant, &b_jetPUidFullDiscriminant);
    fChain->SetBranchAddress("jetJECUnc", &jetJECUnc, &b_jetJECUnc);
    fChain->SetBranchAddress("jetFiredTrgs", &jetFiredTrgs, &b_jetFiredTrgs);
-   /*
-   fChain->SetBranchAddress("jetCHF", &jetCHF, &b_jetCHF);
-   fChain->SetBranchAddress("jetNHF", &jetNHF, &b_jetNHF);
-   fChain->SetBranchAddress("jetCEF", &jetCEF, &b_jetCEF);
-   fChain->SetBranchAddress("jetNEF", &jetNEF, &b_jetNEF);
-   fChain->SetBranchAddress("jetNCH", &jetNCH, &b_jetNCH);
-   fChain->SetBranchAddress("jetHFHAE", &jetHFHAE, &b_jetHFHAE);
-   fChain->SetBranchAddress("jetHFEME", &jetHFEME, &b_jetHFEME);
-   fChain->SetBranchAddress("jetNConstituents", &jetNConstituents, &b_jetNConstituents);
-   */
+   fChain->SetBranchAddress("jetVtxPt", &jetVtxPt, &b_jetVtxPt);
+   fChain->SetBranchAddress("jetVtxMass", &jetVtxMass, &b_jetVtxMass);
+   fChain->SetBranchAddress("jetVtxNtrks", &jetVtxNtrks, &b_jetVtxNtrks);
+   fChain->SetBranchAddress("jetVtx3DVal", &jetVtx3DVal, &b_jetVtx3DVal);
+   fChain->SetBranchAddress("jetVtx3DSig", &jetVtx3DSig, &b_jetVtx3DSig);
    fChain->SetBranchAddress("jetPartonID", &jetPartonID, &b_jetPartonID);
    fChain->SetBranchAddress("jetGenJetIndex", &jetGenJetIndex, &b_jetGenJetIndex);
    fChain->SetBranchAddress("jetGenJetEn", &jetGenJetEn, &b_jetGenJetEn);
@@ -1232,10 +1294,16 @@ void skimmed_mc::Init(TTree *tree)
    fChain->SetBranchAddress("AK8JetNEF", &AK8JetNEF, &b_AK8JetNEF);
    fChain->SetBranchAddress("AK8JetNCH", &AK8JetNCH, &b_AK8JetNCH);
    fChain->SetBranchAddress("AK8Jetnconstituents", &AK8Jetnconstituents, &b_AK8Jetnconstituents);
+   fChain->SetBranchAddress("AK8JetMUF", &AK8JetMUF, &b_AK8JetMUF);
    fChain->SetBranchAddress("AK8JetPFLooseId", &AK8JetPFLooseId, &b_AK8JetPFLooseId);
+   fChain->SetBranchAddress("AK8JetPFTightLepVetoId", &AK8JetPFTightLepVetoId, &b_AK8JetPFTightLepVetoId);
    fChain->SetBranchAddress("AK8CHSSoftDropJetMass", &AK8CHSSoftDropJetMass, &b_AK8CHSSoftDropJetMass);
+   fChain->SetBranchAddress("AK8CHSSoftDropJetMassCorr", &AK8CHSSoftDropJetMassCorr, &b_AK8CHSSoftDropJetMassCorr);
+   fChain->SetBranchAddress("AK8CHSPrunedJetMass", &AK8CHSPrunedJetMass, &b_AK8CHSPrunedJetMass);
+   fChain->SetBranchAddress("AK8CHSPrunedJetMassCorr", &AK8CHSPrunedJetMassCorr, &b_AK8CHSPrunedJetMassCorr);
    fChain->SetBranchAddress("AK8JetpfBoostedDSVBTag", &AK8JetpfBoostedDSVBTag, &b_AK8JetpfBoostedDSVBTag);
    fChain->SetBranchAddress("AK8JetJECUnc", &AK8JetJECUnc, &b_AK8JetJECUnc);
+   fChain->SetBranchAddress("AK8JetL2L3corr", &AK8JetL2L3corr, &b_AK8JetL2L3corr);
    fChain->SetBranchAddress("AK8JetPartonID", &AK8JetPartonID, &b_AK8JetPartonID);
    fChain->SetBranchAddress("AK8JetGenJetIndex", &AK8JetGenJetIndex, &b_AK8JetGenJetIndex);
    fChain->SetBranchAddress("AK8JetGenJetEn", &AK8JetGenJetEn, &b_AK8JetGenJetEn);

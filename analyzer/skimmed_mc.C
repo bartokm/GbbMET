@@ -92,7 +92,7 @@ void skimmed_mc::Loop()
    fChain->SetBranchStatus("jetEta",1);
    fChain->SetBranchStatus("jetJetProbabilityBJetTags",1);
    fChain->SetBranchStatus("jetpfCombinedInclusiveSecondaryVertexV2BJetTags",1);
-   fChain->SetBranchStatus("jetpfCombinedMVABJetTags",1);
+   fChain->SetBranchStatus("jetpfCombinedMVAV2BJetTags",1);
    fChain->SetBranchStatus("jetPFLooseId",1);
    fChain->SetBranchStatus("nAK8Jet",1);
    fChain->SetBranchStatus("AK8JetPt",1);
@@ -105,11 +105,10 @@ void skimmed_mc::Loop()
    Long64_t nentries = fChain->GetEntriesFast();
 
    Long64_t nbytes = 0, nb = 0;
-   //double L_data=2202.14;
-   double L_data=1280.22;
+   double L_data=2689.38644;
 
    //pu reweight
-   TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/ggNtuple_AOD_PU_norm.root","read");
+   TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/ggNtuple_dec16_PU_norm.root","read");
    TH1D *h_dataPU = (TH1D*)f_dataPU.Get("pileup");
    h_dataPU->SetDirectory(0);
    f_dataPU.Close();
@@ -119,7 +118,7 @@ void skimmed_mc::Loop()
      h_PUweight[i] = (TH1D*)h_dataPU->Clone(Form("h_PUweight[%i]",i));
      h_PUweight[i]->SetDirectory(0);
      
-     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET,HT").c_str(),10,0,10);
+     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,pfMET").c_str(),10,0,10);
      hbkg_nVtx[i] = new TH1D(Form("hbkg_nVtx[%i]",i),std::string(mc_input_file[i]+";nVtx").c_str(),50,0,50);
      hbkg_nPU[i] = new TH1D(Form("hbkg_nPU[%i]",i),std::string(mc_input_file[i]+";nPU").c_str(),50,0,50);
 
@@ -147,8 +146,8 @@ void skimmed_mc::Loop()
      hbkg_bjetprob2[i] = new TH1D(Form("hbkg_bjetprob2[%i]",i),std::string(mc_input_file[i]+" 2nd Highest prob;JetProbabilityBJetTags").c_str(),30,0,1);
      hbkg_bjetCSV[i]= new TH1D(Form("hbkg_bjetCSV[%i]",i),std::string(mc_input_file[i]+" Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags").c_str(),30,0,1);
      hbkg_bjetCSV2[i]= new TH1D(Form("hbkg_bjetCSV2[%i]",i),std::string(mc_input_file[i]+" 2nd Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags").c_str(),30,0,1);
-     hbkg_bjetcMVA[i] = new TH1D(Form("hbkg_bjetcMVA[%i]",i),std::string(mc_input_file[i]+" Highest cMVA;CombinedMVABJetTags").c_str(),30,0,1);
-     hbkg_bjetcMVA2[i] = new TH1D(Form("hbkg_bjetcMVA2[%i]",i),std::string(mc_input_file[i]+" 2nd Highest cMVA;CombinedMVABJetTags").c_str(),30,0,1);
+     hbkg_bjetcMVA[i] = new TH1D(Form("hbkg_bjetcMVA[%i]",i),std::string(mc_input_file[i]+" Highest cMVA;CombinedMVAV2BJetTags").c_str(),30,0,1);
+     hbkg_bjetcMVA2[i] = new TH1D(Form("hbkg_bjetcMVA2[%i]",i),std::string(mc_input_file[i]+" 2nd Highest cMVA;CombinedMVAV2BJetTags").c_str(),30,0,1);
      
      hbkg_HT_before[i] = new TH1D(Form("hbkg_HT_before[%i]",i),std::string(mc_input_file[i]+" HT before cuts;HT").c_str(),50,0,2500);
      hbkg_EMHT_before[i] = new TH1D(Form("hbkg_EMHT_before[%i]",i),std::string(mc_input_file[i]+" EMHT before cuts;EMHT").c_str(),50,0,2500);
@@ -174,7 +173,7 @@ void skimmed_mc::Loop()
      if (temp_f != fChain->GetCurrentFile()->GetName()) {
        temp_f=fChain->GetCurrentFile()->GetName();
        file_counter++;
-       if (file_counter==6) {file_counter++; std::cout<<"file 6 /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT200To300_25ns_cutbased.root has 0 Events"<<std::endl;}
+       //if (file_counter==6) {file_counter++; std::cout<<"file 6 /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/job_spring15_qcd_HT200To300_25ns_cutbased.root has 0 Events"<<std::endl;}
        std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
        newfile=true;
      }
@@ -214,7 +213,7 @@ void skimmed_mc::Loop()
      }
      
      //object definitions
-     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
+     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1, leadbtag=-1;
      std::vector<int> passPho, passJet, passAK8Jet, passEle, passMu;
      passPho.clear(); passJet.clear(); passAK8Jet.clear(); passEle.clear(); passMu.clear();
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
@@ -287,6 +286,7 @@ void skimmed_mc::Loop()
      for (int i=0;i<passAK8Jet.size();i++) {
        if ((*AK8JetPt)[passAK8Jet.at(i)]>(*AK8JetPt)[leadpt_ak8]) leadpt_ak8=passAK8Jet.at(i);
        AK8HT_after+=(*AK8JetPt)[passAK8Jet.at(i)];
+       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>(*AK8JetpfBoostedDSVBTag)[leadbtag]) leadbtag=passAK8Jet.at(i);
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
@@ -295,9 +295,9 @@ void skimmed_mc::Loop()
        hbkg_cuts[file_counter]->Fill(3,w);
        if ((*phoEt)[nleadPho]>=175){
          hbkg_cuts[file_counter]->Fill(4,w);
-         if (pfMET<150){
+         if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
          hbkg_cuts[file_counter]->Fill(5,w);
-         if (HT_after>200){
+         if (pfMET<150){
          hbkg_cuts[file_counter]->Fill(6,w);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
@@ -307,15 +307,18 @@ void skimmed_mc::Loop()
            else if (highjetprob2!=-1) if ((*jetJetProbabilityBJetTags)[passJet.at(i)]>(*jetJetProbabilityBJetTags)[highjetprob2]) highjetprob2=passJet.at(i);
            if ((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[passJet.at(i)]>(*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV1]) {highCSV2=highCSV1;highCSV1=passJet.at(i);}
            else if (highCSV2!=-1) if ((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[passJet.at(i)]>(*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV2]) highCSV2=passJet.at(i);
-           if ((*jetpfCombinedMVABJetTags)[passJet.at(i)]>(*jetpfCombinedMVABJetTags)[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=passJet.at(i);}
-           else if (highcMVA2!=-1) if ((*jetpfCombinedMVABJetTags)[passJet.at(i)]>(*jetpfCombinedMVABJetTags)[highcMVA2]) highcMVA2=passJet.at(i);
+           if (file_counter>2){
+             if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>(*jetpfCombinedMVAV2BJetTags)[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=passJet.at(i);}
+             else if (highcMVA2!=-1) if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>(*jetpfCombinedMVAV2BJetTags)[highcMVA2]) highcMVA2=passJet.at(i);
+           }
          }
          int highdB_ak8=-1;
          for (int i=0;i<passAK8Jet.size();i++) {
            double i_jetpt=(*AK8JetPt)[passAK8Jet.at(i)], i_jetdB=(*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)], h_jetdB;
            if (highdB_ak8==-1) h_jetdB=-10; else h_jetdB=(*AK8JetpfBoostedDSVBTag)[highdB_ak8];
-           if (i_jetdB>h_jetdB) highdB_ak8=i;
+           if (i_jetdB>h_jetdB) highdB_ak8=passAK8Jet.at(i);
          }
+         if (highdB_ak8!=leadbtag) std::cout<<"baj van: highdB_ak8, leadbtag "<<highdB_ak8<<", "<<leadbtag<<std::endl;
          double dR_pho_AK8=-1;
          if (abs((*AK8JetEta)[leadpt_ak8])<1.4442){
            dR_pho_AK8=deltaR((*AK8JetPhi)[leadpt_ak8],(*phoPhi)[nleadPho],(*AK8JetEta)[leadpt_ak8],(*phoEta)[nleadPho]);
@@ -343,8 +346,8 @@ void skimmed_mc::Loop()
          if (highjetprob2!=-1) hbkg_bjetprob2[file_counter]->Fill((*jetJetProbabilityBJetTags)[highjetprob2],w);
          if (highCSV1!=-1) hbkg_bjetCSV[file_counter]->Fill((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV1],w);
          if (highCSV2!=-1) hbkg_bjetCSV2[file_counter]->Fill((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV2],w);
-         if (highcMVA1!=-1) hbkg_bjetcMVA[file_counter]->Fill((*jetpfCombinedMVABJetTags)[highcMVA1],w);
-         if (highcMVA2!=-1) hbkg_bjetcMVA2[file_counter]->Fill((*jetpfCombinedMVABJetTags)[highcMVA2],w);
+         if (highcMVA1!=-1) hbkg_bjetcMVA[file_counter]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA1],w);
+         if (highcMVA2!=-1) hbkg_bjetcMVA2[file_counter]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA2],w);
          if (leadpt_ak8!=-1) hbkg_doubleB[file_counter]->Fill((*AK8JetpfBoostedDSVBTag)[leadpt_ak8],w);
          if (highdB_ak8!=-1) hbkg_doubleB_highdB[file_counter]->Fill((*AK8JetpfBoostedDSVBTag)[highdB_ak8],w);
          for (int i=0;i<passAK8Jet.size();i++) hbkg_AK8jetmass[file_counter]->Fill((*AK8JetMass)[passAK8Jet.at(i)],w);
@@ -354,8 +357,8 @@ void skimmed_mc::Loop()
          if (leadpt_ak8!=-1) hbkg_AK8jetpt[file_counter]->Fill((*AK8JetPt)[leadpt_ak8],w);
          if (leadpt_ak8!=-1) hbkg_AK8ljetmass[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],w);
          if (dR_pho_AK8!=-1) hbkg_dRphoAK8jet[file_counter]->Fill(dR_pho_AK8,w);
-         }//HT cut
          }//pfMET cut
+         }//btag cut
        }//offline HLT cut
      }//phoid cut 
    }
