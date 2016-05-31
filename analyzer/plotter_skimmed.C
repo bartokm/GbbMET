@@ -10,7 +10,7 @@ void plotter_skimmed(){
   //setTDRStyle();
   std::string fdata = "skimmed_data_histos.root";
   std::string fbkg = "skimmed_mc_histos.root";
-  std::string fsignal = "mc_signal_histos_newcuts.root";
+  std::string fsignal = "mc_signal_histos.root";
 
   TH1D *hdata_nPU = getplot(fdata,"pileup");
   TH1D *hdata_cuts = getplot(fdata,"hdata_cuts");
@@ -123,7 +123,109 @@ void plotter_skimmed(){
   addallMC(sbkg_AK8HT_after, fbkg, "hbkg_AK8HT_after");
   addallMC(sbkg_AK8EMHT_after, fbkg, "hbkg_AK8EMHT_after");
 
-  TLegend *leg = new TLegend(0.65,0.55,0.9,0.85,"");
+//signal
+  nsignal=2;
+  TH1D *h_PUweight[nsignal];
+  TH1D *hsignal_nVtx[nsignal];
+  TH1D *hsignal_nPU[nsignal];
+  TH1D *hsignal_cuts[nsignal];
+  TH1D *hsignal_phoEt[nsignal];
+  TH1D *hsignal_phoEta[nsignal];
+  TH1D *hsignal_pfMET[nsignal];
+  TH1D *hsignal_nPho[nsignal];
+  TH1D *hsignal_nTrksPV[nsignal];
+  TH1D *hsignal_nEle[nsignal];
+  TH1D *hsignal_nMu[nsignal];
+  TH1D *hsignal_njets[nsignal];
+  TH1D *hsignal_jetpt[nsignal];
+  TH1D *hsignal_nAK8jets[nsignal];
+  TH1D *hsignal_AK8jetpt[nsignal];
+  TH1D *hsignal_AK8ljetmass[nsignal];
+  TH1D *hsignal_AK8jetmass[nsignal];
+  TH1D *hsignal_dRphoAK8jet[nsignal];
+  TH1D *hsignal_bjets[nsignal];
+  TH1D *hsignal_doubleB[nsignal];
+  TH1D *hsignal_doubleB_highdB[nsignal];
+  TH1D *hsignal_bjetprob[nsignal];
+  TH1D *hsignal_bjetprob2[nsignal];
+  TH1D *hsignal_bjetCSV[nsignal];
+  TH1D *hsignal_bjetCSV2[nsignal];
+  TH1D *hsignal_bjetcMVA[nsignal];
+  TH1D *hsignal_bjetcMVA2[nsignal];
+  TH1D *hsignal_HT_before[nsignal];
+  TH1D *hsignal_EMHT_before[nsignal];
+  TH1D *hsignal_HT_after[nsignal];
+  TH1D *hsignal_EMHT_after[nsignal];
+  TH1D *hsignal_AK8HT_before[nsignal];
+  TH1D *hsignal_AK8EMHT_before[nsignal];
+  TH1D *hsignal_AK8HT_after[nsignal];
+  TH1D *hsignal_AK8EMHT_after[nsignal];
+  //mc truth histograms
+  TH1D *hsignal_Hjetpt[nsignal];
+  TH1D *hsignal_AK8Hjetpt[nsignal];
+  TH1D *hsignal_AK8Hjetmass[nsignal];
+  TH1D *hsignal_dRphoH[nsignal];
+  TH1D *hsignal_dRTphoH[nsignal];
+  TH2D *hsignal_AK8ptHpt[nsignal];
+  TH2D *hsignal_AK8massHpt[nsignal];
+  TH1D *hsignal_Hpt[nsignal];
+  for (Int_t i=0;i<nsignal;i++){
+    hsignal_cuts[i] = getplot(fsignal,Form("hsignal_cuts[%i]",i));
+    hsignal_nVtx[i] = getplot(fsignal,Form("hsignal_nVtx[%i]",i));
+    hsignal_nPU[i] = getplot(fsignal,Form("hsignal_nPU[%i]",i));
+    
+    hsignal_phoEt[i] = getplot(fsignal,Form("hsignal_phoEt[%i]",i));
+    hsignal_phoEta[i]= getplot(fsignal,Form("hsignal_phoEta[%i]",i));
+    hsignal_pfMET[i]= getplot(fsignal,Form("hsignal_pfMET[%i]",i));
+    hsignal_nPho[i]= getplot(fsignal,Form("hsignal_nPho[%i]",i));
+    hsignal_nTrksPV[i]= getplot(fsignal,Form("hsignal_nTrksPV[%i]",i));
+    hsignal_nEle[i]= getplot(fsignal,Form("hsignal_nEle[%i]",i));
+    hsignal_nMu[i]= getplot(fsignal,Form("hsignal_nMu[%i]",i));
+    
+    hsignal_njets[i] = getplot(fsignal,Form("hsignal_njets[%i]",i));
+    hsignal_jetpt[i] = getplot(fsignal,Form("hsignal_jetpt[%i]",i));
+    hsignal_nAK8jets[i] = getplot(fsignal,Form("hsignal_nAK8jets[%i]",i));
+    hsignal_AK8jetpt[i] = getplot(fsignal,Form("hsignal_AK8jetpt[%i]",i));
+    hsignal_AK8ljetmass[i] = getplot(fsignal,Form("hsignal_AK8ljetmass[%i]",i));
+    hsignal_AK8jetmass[i] = getplot(fsignal,Form("hsignal_AK8jetmass[%i]",i));
+   
+    hsignal_dRphoAK8jet[i]= getplot(fsignal,Form("hsignal_dRphoAK8jet[%i]",i));
+  
+    hsignal_bjets[i] = getplot(fsignal,Form("hsignal_bjets[%i]",i));
+    hsignal_doubleB[i] = getplot(fsignal,Form("hsignal_doubleB[%i]",i));
+    hsignal_doubleB_highdB[i] = getplot(fsignal,Form("hsignal_doubleB_highdB[%i]",i));
+    hsignal_bjetprob[i] = getplot(fsignal,Form("hsignal_bjetprob[%i]",i));
+    hsignal_bjetprob2[i] = getplot(fsignal,Form("hsignal_bjetprob2[%i]",i));
+    hsignal_bjetCSV[i]= getplot(fsignal,Form("hsignal_bjetCSV[%i]",i));
+    hsignal_bjetCSV2[i]= getplot(fsignal,Form("hsignal_bjetCSV2[%i]",i));
+    hsignal_bjetcMVA[i] = getplot(fsignal,Form("hsignal_bjetcMVA[%i]",i));
+    hsignal_bjetcMVA2[i] = getplot(fsignal,Form("hsignal_bjetcMVA2[%i]",i));
+ 
+    hsignal_HT_before[i] = getplot(fsignal,Form("hsignal_HT_before[%i]",i));
+    hsignal_EMHT_before[i] = getplot(fsignal,Form("hsignal_EMHT_before[%i]",i));
+    hsignal_HT_after[i] = getplot(fsignal,Form("hsignal_HT_after[%i]",i));
+    hsignal_EMHT_after[i] = getplot(fsignal,Form("hsignal_EMHT_after[%i]",i));
+    
+    hsignal_AK8HT_before[i] = getplot(fsignal,Form("hsignal_AK8HT_before[%i]",i));
+    hsignal_AK8EMHT_before[i] = getplot(fsignal,Form("hsignal_AK8EMHT_before[%i]",i));
+    hsignal_AK8HT_after[i] = getplot(fsignal,Form("hsignal_AK8HT_after[%i]",i));
+    hsignal_AK8EMHT_after[i] = getplot(fsignal,Form("hsignal_AK8EMHT_after[%i]",i));
+
+    //truth histograms
+    hsignal_Hjetpt[i] = getplot(fsignal,Form("hsignal_Hjetpt[%i]",i));
+    hsignal_AK8Hjetpt[i] = getplot(fsignal,Form("hsignal_AK8Hjetpt[%i]",i));
+    hsignal_AK8Hjetmass[i] = getplot(fsignal,Form("hsignal_AK8Hjetmass[%i]",i));
+    
+    hsignal_dRphoH[i]= getplot(fsignal,Form("hsignal_dRphoH[%i]",i));
+    hsignal_dRTphoH[i]= getplot(fsignal,Form("hsignal_dRTphoH[%i]",i));
+    
+    hsignal_AK8ptHpt[i]= getplot2d(fsignal,Form("hsignal_AK8ptHpt[%i]",i));
+    hsignal_AK8massHpt[i]= getplot2d(fsignal,Form("hsignal_AK8massHpt[%i]",i));
+   
+    hsignal_Hpt[i] = getplot(fsignal,Form("hsignal_Hpt[%i]",i));
+  }
+
+  TLegend *leg = new TLegend(0.55,0.55,0.9,1,"");
 
   TCanvas *c1 = new TCanvas("c1", "c1",1200,600);
   c1->Divide(3,1);
@@ -132,53 +234,55 @@ void plotter_skimmed(){
   sbkg_cuts->Print("all");
   hdata_cuts->Print("all");
   hdata_cuts->SetMinimum(10);
-  drawthings(hdata_cuts, sbkg_cuts);
+  drawthings(hdata_cuts, sbkg_cuts, hsignal_cuts[0], hsignal_cuts[1]);
   leg->AddEntry("hdata_cuts",   "Data", "P");
   leg->AddEntry("hbkg_cuts[13]",   "#gammaJet", "f");
   leg->AddEntry("hbkg_cuts[6]",   "Multijet", "f");
   leg->AddEntry("hbkg_cuts[1]",   "WJetsToL#nu", "f");
   leg->AddEntry("hbkg_cuts[0]",   "TTJets", "f");
   leg->AddEntry("hbkg_cuts[2]",   "ZJetsTo#nu#nu", "f");
+  leg->AddEntry("hsignal_cuts[0]","m_{#Chi^{+}}=1400 m_{#Chi^{0}}=200 *10000", "pl");
+  leg->AddEntry("hsignal_cuts[1]","m_{#Chi^{+}}=1200 m_{#Chi^{0}}=1000 *10000", "pl");
   leg->Draw("same");
   c1->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_nVtx, sbkg_nVtx);
+  drawthings(hdata_nVtx, sbkg_nVtx, hsignal_nVtx[0], hsignal_nVtx[1]);
   leg->Draw("same");
   c1->cd(3);
   gPad->SetLogy();
-  hdata_pfMET->SetMinimum(10);
-  drawthings(hdata_pfMET, sbkg_pfMET);
+  hdata_pfMET->SetMinimum(1);
+  drawthings(hdata_pfMET, sbkg_pfMET, hsignal_pfMET[0], hsignal_pfMET[1]);
   leg->Draw("same");
 
   TCanvas *c2 = new TCanvas("c2", "c2",1200,600);
   c2->Divide(3,1);
   c2->cd(1);
   gPad->SetLogy();
-  drawthings(hdata_nPho, sbkg_nPho);
+  drawthings(hdata_nPho, sbkg_nPho, hsignal_nPho[0], hsignal_nPho[1]);
   leg->Draw("same");
   c2->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_phoEt, sbkg_phoEt);
+  drawthings(hdata_phoEt, sbkg_phoEt, hsignal_phoEt[0], hsignal_phoEt[1]);
   leg->Draw("same");
   c2->cd(3);
   gPad->SetLogy();
   hdata_phoEta->SetMinimum(10);
-  drawthings(hdata_phoEta, sbkg_phoEta);
+  drawthings(hdata_phoEta, sbkg_phoEta, hsignal_phoEta[0], hsignal_phoEta[1]);
   leg->Draw("same");
 
   TCanvas *c3 = new TCanvas("c3", "c3",1200,600);
   c3->Divide(3,1);
   c3->cd(1);
   gPad->SetLogy();
-  drawthings(hdata_nEle, sbkg_nEle);
+  drawthings(hdata_nEle, sbkg_nEle, hsignal_nEle[0], hsignal_nEle[1]);
   leg->Draw("same");
   c3->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_nMu, sbkg_nMu);
+  drawthings(hdata_nMu, sbkg_nMu, hsignal_nMu[0], hsignal_nMu[1]);
   leg->Draw("same");
   c3->cd(3);
   gPad->SetLogy();
-  drawthings(hdata_njets, sbkg_njets);
+  drawthings(hdata_njets, sbkg_njets, hsignal_njets[0], hsignal_njets[1]);
   leg->Draw("same");
   
 }

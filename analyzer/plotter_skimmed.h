@@ -11,6 +11,14 @@ TH1D* getplot(TString fname, TString hname) {
   return c;
 }
 
+TH2D* getplot2d(TString fname, TString hname) {
+  TFile f(fname.Data(), "READ");
+  TH2D *h= (TH2D*)f.Get(hname.Data());
+  TH2D *c=(TH2D*)h->Clone();
+  c->SetDirectory(0);
+  return c;
+}
+
 int color(unsigned int id) {
 
   int color = kBlack;
@@ -34,7 +42,7 @@ TH1D* getonebkg(TString fname, std::string hname, std::vector<int> iter) {
       h->Add(getplot(fname,Form((hname+"[%i]").c_str(),iter.at(i))));
     }
   }
-  h->SetFillColor(iter.size());
+  h->SetFillColor(color(iter.size()));
   return h;
 }
 
@@ -58,9 +66,19 @@ void addallMC(THStack* stack, TString fname, std::string hname){
   return 0;
 }
 
-void drawthings(TH1D* hdata, THStack* stack){
+void drawthings(TH1D* hdata, THStack* stack, TH1D* hsignal1, TH1D* hsignal2){
   hdata->SetMarkerStyle(21);
   hdata->Draw("P");
   stack->Draw("sameh");
+  hsignal1->SetLineColor(4);
+  hsignal1->SetMarkerColor(4);
+  hsignal1->SetMarkerStyle(22);
+  hsignal1->Scale(10000);
+  hsignal1->Draw("same");
+  hsignal2->SetLineColor(7);
+  hsignal2->SetMarkerColor(7);
+  hsignal2->SetMarkerStyle(23);
+  hsignal2->Scale(10000);
+  hsignal2->Draw("same");
   return 0;
 }
