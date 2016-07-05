@@ -303,7 +303,7 @@ for (int i=0;i<passAK8Jet.size();i++) {
   }
 }
            if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
-             hsignal_cuts[file_counter]->Fill(5);
+             hsignal_cuts[file_counter]->Fill(5,w);
            if (pfMET<150){
              hsignal_cuts[file_counter]->Fill(6,w);
            }
@@ -325,7 +325,7 @@ for (int i=0;i<passAK8Jet.size();i++) {
         for (int i=0;i<passAK8Jet.size();i++) {
           double i_jetpt=(*AK8JetPt)[passAK8Jet.at(i)], i_jetdB=(*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)], h_jetdB;
           if (highdB_ak8==-1) h_jetdB=-10; else h_jetdB=(*AK8JetpfBoostedDSVBTag)[highdB_ak8];
-          if (i_jetdB>h_jetdB) highdB_ak8=i;
+          if (i_jetdB>h_jetdB) highdB_ak8=passAK8Jet.at(i);
         //mc truth histos
           if ((*AK8JetGenPartonMomID)[passAK8Jet.at(i)]==25) {
             hsignal_AK8Hjetpt[file_counter]->Fill((*AK8JetPt)[passAK8Jet.at(i)],w);

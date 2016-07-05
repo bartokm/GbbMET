@@ -35,6 +35,7 @@ void plotter_skimmed(){
   TH1D *hdata_jetpt = getplot(fdata,"hdata_jetpt");
   TH1D *hdata_AK8jetpt = getplot(fdata,"hdata_AK8jetpt");
   TH1D *hdata_AK8ljetmass = getplot(fdata,"hdata_AK8ljetmass");
+  TH1D *hdata_AK8bjetmass = getplot(fdata,"hdata_AK8bjetmass");
   TH1D *hdata_AK8jetmass = getplot(fdata,"hdata_AK8jetmass");
   TH1D *hdata_dRphoAK8jet= getplot(fdata,"hdata_dRphoAK8jet");
   TH1D *hdata_nAK8jets = getplot(fdata,"hdata_nAK8jets");
@@ -64,6 +65,7 @@ void plotter_skimmed(){
   THStack *sbkg_nAK8jets = new THStack("sbkg_nAK8jets","");
   THStack *sbkg_AK8jetpt = new THStack("sbkg_AK8jetpt","");
   THStack *sbkg_AK8ljetmass = new THStack("sbkg_AK8ljetmass","");
+  THStack *sbkg_AK8bjetmass = new THStack("sbkg_AK8bjetmass","");
   THStack *sbkg_AK8jetmass = new THStack("sbkg_AK8jetmass","");
   
   THStack *sbkg_dRphoAK8jet = new THStack("sbkg_dRphoAK8jet","");
@@ -103,6 +105,7 @@ void plotter_skimmed(){
   addallMC(sbkg_nAK8jets, fbkg, "hbkg_nAK8jets");
   addallMC(sbkg_AK8jetpt, fbkg, "hbkg_AK8jetpt");
   addallMC(sbkg_AK8ljetmass, fbkg, "hbkg_AK8ljetmass");
+  addallMC(sbkg_AK8bjetmass, fbkg, "hbkg_AK8bjetmass");
   addallMC(sbkg_AK8jetmass, fbkg, "hbkg_AK8jetmass");
   addallMC(sbkg_dRphoAK8jet, fbkg, "hbkg_dRphoAK8jet");
   addallMC(sbkg_bjets, fbkg, "hbkg_bjets");
@@ -141,6 +144,7 @@ void plotter_skimmed(){
   TH1D *hsignal_nAK8jets[nsignal];
   TH1D *hsignal_AK8jetpt[nsignal];
   TH1D *hsignal_AK8ljetmass[nsignal];
+  TH1D *hsignal_AK8bjetmass[nsignal];
   TH1D *hsignal_AK8jetmass[nsignal];
   TH1D *hsignal_dRphoAK8jet[nsignal];
   TH1D *hsignal_bjets[nsignal];
@@ -187,6 +191,7 @@ void plotter_skimmed(){
     hsignal_nAK8jets[i] = getplot(fsignal,Form("hsignal_nAK8jets[%i]",i));
     hsignal_AK8jetpt[i] = getplot(fsignal,Form("hsignal_AK8jetpt[%i]",i));
     hsignal_AK8ljetmass[i] = getplot(fsignal,Form("hsignal_AK8ljetmass[%i]",i));
+    hsignal_AK8bjetmass[i] = getplot(fsignal,Form("hsignal_AK8bjetmass[%i]",i));
     hsignal_AK8jetmass[i] = getplot(fsignal,Form("hsignal_AK8jetmass[%i]",i));
    
     hsignal_dRphoAK8jet[i]= getplot(fsignal,Form("hsignal_dRphoAK8jet[%i]",i));
@@ -233,6 +238,8 @@ void plotter_skimmed(){
   gPad->SetLogy();
   sbkg_cuts->Print("all");
   hdata_cuts->Print("all");
+  hsignal_cuts[0]->Print("all");
+  hsignal_cuts[1]->Print("all");
   hdata_cuts->SetMinimum(10);
   drawthings(hdata_cuts, sbkg_cuts, hsignal_cuts[0], hsignal_cuts[1]);
   leg->AddEntry("hdata_cuts",   "Data", "P");
@@ -305,6 +312,24 @@ void plotter_skimmed(){
   gPad->SetLogy();
   hdata_bjetcMVA->SetMinimum(1);
   drawthings(hdata_bjetcMVA, sbkg_bjetcMVA, hsignal_bjetcMVA[0], hsignal_bjetcMVA[1]);
+  leg->Draw("same");
+
+  TCanvas *c5 = new TCanvas("c5", "c5",1200,600);
+  c5->Divide(3,1);
+  c5->cd(1);
+  gPad->SetLogy();
+  //hdata_->SetMinimum(1);
+  drawthings(hdata_AK8HT_before, sbkg_AK8HT_before, hsignal_AK8HT_before[0], hsignal_AK8HT_before[1]);
+  leg->Draw("same");
+  c5->cd(2);
+  gPad->SetLogy();
+  //hdata_->SetMinimum(1);
+  drawthings(hdata_AK8EMHT_before, sbkg_AK8EMHT_before, hsignal_AK8EMHT_before[0], hsignal_AK8EMHT_before[1]);
+  leg->Draw("same");
+  c5->cd(3);
+  gPad->SetLogy();
+  //hdata_->SetMinimum(1);
+  drawthings(hdata_AK8bjetmass, sbkg_AK8bjetmass, hsignal_AK8bjetmass[0], hsignal_AK8bjetmass[1]);
   leg->Draw("same");
   
 }

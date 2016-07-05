@@ -76,13 +76,13 @@ void drawthings(TH1D* hdata, THStack* stack, TH1D* hsignal1, TH1D* hsignal2){
   hdata->SetMarkerStyle(21);
   hdata->Draw("P");
   stack->Draw("sameh");
-  hsignal1->SetLineColor(4);
-  hsignal1->SetMarkerColor(4);
+  hsignal1->SetLineColor(kOrange);
+  hsignal1->SetMarkerColor(kOrange);
   hsignal1->SetMarkerStyle(22);
   hsignal1->Scale(1000000);
   hsignal1->Draw("same");
-  hsignal2->SetLineColor(7);
-  hsignal2->SetMarkerColor(7);
+  hsignal2->SetLineColor(kGray);
+  hsignal2->SetMarkerColor(kGray);
   hsignal2->SetMarkerStyle(23);
   hsignal2->Scale(1000000);
   hsignal2->Draw("same");
