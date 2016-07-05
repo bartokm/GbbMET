@@ -135,6 +135,7 @@ void skimmed_mc::Loop()
      hbkg_nAK8jets[i] = new TH1D(Form("hbkg_nAK8jets[%i]",i),std::string(mc_input_file[i]+";# of AK8jets").c_str(),10,0,10);
      hbkg_AK8jetpt[i] = new TH1D(Form("hbkg_AK8jetpt[%i]",i),std::string(mc_input_file[i]+" Leading AK8jetpt;AK8jetpt").c_str(),50,0,2000);
      hbkg_AK8ljetmass[i] = new TH1D(Form("hbkg_AK8ljetmass[%i]",i),std::string(mc_input_file[i]+" Leading AK8jetmass;AK8jetmass").c_str(),30,0,700);
+     hbkg_AK8bjetmass[i] = new TH1D(Form("hbkg_AK8bjetmass[%i]",i),std::string(mc_input_file[i]+" Btagged AK8jetmass;AK8jetmass").c_str(),30,0,700);
      hbkg_AK8jetmass[i] = new TH1D(Form("hbkg_AK8jetmass[%i]",i),std::string(mc_input_file[i]+" AK8jetmass;AK8jetmass").c_str(),30,0,700);
      
      hbkg_dRphoAK8jet[i]= new TH1D(Form("hbkg_dRphoAK8jet[%i]",i),std::string(mc_input_file[i]+" Distance between leading photon and leading AK8jet;dR").c_str(),30,0,8);
@@ -356,6 +357,7 @@ void skimmed_mc::Loop()
          if (leadpt_ak4!=-1) hbkg_jetpt[file_counter]->Fill((*jetPt)[leadpt_ak4],w);
          if (leadpt_ak8!=-1) hbkg_AK8jetpt[file_counter]->Fill((*AK8JetPt)[leadpt_ak8],w);
          if (leadpt_ak8!=-1) hbkg_AK8ljetmass[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],w);
+         if (leadpt_ak8!=-1) hbkg_AK8bjetmass[file_counter]->Fill((*AK8JetMass)[highdB_ak8],w);
          if (dR_pho_AK8!=-1) hbkg_dRphoAK8jet[file_counter]->Fill(dR_pho_AK8,w);
          }//pfMET cut
          }//btag cut

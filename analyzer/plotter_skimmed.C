@@ -88,9 +88,9 @@ void plotter_skimmed(){
   THStack *sbkg_AK8HT_after = new THStack("sbkg_AK8HT_after","");
   THStack *sbkg_AK8EMHT_after = new THStack("sbkg_AK8EMHT_after","");
 
+  addallMC(sbkg_cuts, fbkg, "hbkg_cuts");
   addallMC(sbkg_nVtx, fbkg, "hbkg_nVtx");
   addallMC(sbkg_nPU, fbkg, "hbkg_nPU");
-  addallMC(sbkg_cuts, fbkg, "hbkg_cuts");
   addallMC(sbkg_phoEt, fbkg, "hbkg_phoEt");
   addallMC(sbkg_phoEta, fbkg, "hbkg_phoEta");
   addallMC(sbkg_pfMET, fbkg, "hbkg_pfMET");
@@ -236,11 +236,15 @@ void plotter_skimmed(){
   hdata_cuts->SetMinimum(10);
   drawthings(hdata_cuts, sbkg_cuts, hsignal_cuts[0], hsignal_cuts[1]);
   leg->AddEntry("hdata_cuts",   "Data", "P");
-  leg->AddEntry("hbkg_cuts[13]",   "#gammaJet", "f");
-  leg->AddEntry("hbkg_cuts[6]",   "Multijet", "f");
+  leg->AddEntry("hbkg_cuts[0]",   "#gammaJet", "f");
   leg->AddEntry("hbkg_cuts[1]",   "WJetsToL#nu", "f");
-  leg->AddEntry("hbkg_cuts[0]",   "TTJets", "f");
-  leg->AddEntry("hbkg_cuts[2]",   "ZJetsTo#nu#nu", "f");
+  leg->AddEntry("hbkg_cuts[2]",   "Z#gammaJet", "f");
+  leg->AddEntry("hbkg_cuts[3]",   "Multijet", "f");
+  leg->AddEntry("hbkg_cuts[10]",   "ZJetsTo#nu#nu", "f");
+  leg->AddEntry("hbkg_cuts[14]",   "TT#gammaJets", "f");
+  leg->AddEntry("hbkg_cuts[15]",   "ZJetsToQQ", "f");
+  leg->AddEntry("hbkg_cuts[16]",   "W#gammaJets", "f");
+  leg->AddEntry("hbkg_cuts[17]",   "TTJets", "f");
   leg->AddEntry("hsignal_cuts[0]","m_{#Chi^{+}}=1400 m_{#Chi^{0}}=200 *10000", "pl");
   leg->AddEntry("hsignal_cuts[1]","m_{#Chi^{+}}=1200 m_{#Chi^{0}}=1000 *10000", "pl");
   leg->Draw("same");
@@ -283,6 +287,24 @@ void plotter_skimmed(){
   c3->cd(3);
   gPad->SetLogy();
   drawthings(hdata_njets, sbkg_njets, hsignal_njets[0], hsignal_njets[1]);
+  leg->Draw("same");
+
+  TCanvas *c4 = new TCanvas("c4", "c4",1200,600);
+  c4->Divide(3,1);
+  c4->cd(1);
+  gPad->SetLogy();
+  hdata_doubleB_highdB->SetMinimum(1);
+  drawthings(hdata_doubleB_highdB, sbkg_doubleB_highdB, hsignal_doubleB_highdB[0], hsignal_doubleB_highdB[1]);
+  leg->Draw("same");
+  c4->cd(2);
+  gPad->SetLogy();
+  hdata_bjetprob->SetMinimum(1);
+  drawthings(hdata_bjetprob, sbkg_bjetprob, hsignal_bjetprob[0], hsignal_bjetprob[1]);
+  leg->Draw("same");
+  c4->cd(3);
+  gPad->SetLogy();
+  hdata_bjetcMVA->SetMinimum(1);
+  drawthings(hdata_bjetcMVA, sbkg_bjetcMVA, hsignal_bjetcMVA[0], hsignal_bjetcMVA[1]);
   leg->Draw("same");
   
 }

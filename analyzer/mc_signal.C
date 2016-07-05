@@ -92,7 +92,7 @@ void mc_signal::Loop()
    fChain->SetBranchStatus("jetEta",1);
    fChain->SetBranchStatus("jetJetProbabilityBJetTags",1);
    fChain->SetBranchStatus("jetpfCombinedInclusiveSecondaryVertexV2BJetTags",1);
-   fChain->SetBranchStatus("jetpfCombinedMVABJetTags",1);
+   fChain->SetBranchStatus("jetpfCombinedMVAV2BJetTags",1);
    fChain->SetBranchStatus("jetGenPartonMomID",1);
    fChain->SetBranchStatus("jetPFLooseId",1);
    fChain->SetBranchStatus("nAK8Jet",1);
@@ -138,6 +138,7 @@ void mc_signal::Loop()
      hsignal_nAK8jets[i] = new TH1D(Form("hsignal_nAK8jets[%i]",i),std::string(mc_input_file[i]+";# of AK8jets").c_str(),10,0,10);
      hsignal_AK8jetpt[i] = new TH1D(Form("hsignal_AK8jetpt[%i]",i),std::string(mc_input_file[i]+" Leading AK8jetpt;AK8jetpt").c_str(),50,0,2000);
      hsignal_AK8ljetmass[i] = new TH1D(Form("hsignal_AK8ljetmass[%i]",i),std::string(mc_input_file[i]+" Leading AK8jetmass;AK8jetmass").c_str(),30,0,700);
+     hsignal_AK8bjetmass[i] = new TH1D(Form("hsignal_AK8bjetmass[%i]",i),std::string(mc_input_file[i]+" Btagged AK8jetmass;AK8jetmass").c_str(),30,0,700);
      hsignal_AK8jetmass[i] = new TH1D(Form("hsignal_AK8jetmass[%i]",i),std::string(mc_input_file[i]+" AK8jetmass;AK8jetmass").c_str(),30,0,700);
      
      hsignal_dRphoAK8jet[i]= new TH1D(Form("hsignal_dRphoAK8jet[%i]",i),std::string(mc_input_file[i]+" Distance between leading photon and leading AK8jet;dR").c_str(),30,0,8);
@@ -174,6 +175,9 @@ void mc_signal::Loop()
      hsignal_AK8massHpt[i]= new TH2D(Form("hsignal_AK8massHpt[%i]",i),std::string(mc_input_file[i]+" ;leading AK8mass;Higgs pt").c_str(),30,0,700,30,0,2000);
     
      hsignal_Hpt[i] = new TH1D(Form("hsignal_Hpt[%i]",i),std::string(mc_input_file[i]+" Higgs pt;pt").c_str(),50,0,2000);
+     
+     hsignal_btag_ak8pt[i] = new TH1D(Form("hsignal_btag_ak8pt[%i]",i),std::string(mc_input_file[i]+" tagged jet pt;pt").c_str(),50,0,2000);
+     hsignal_nobtag_ak8pt[i] = new TH1D(Form("hsignal_nobtag_ak8pt[%i]",i),std::string(mc_input_file[i]+" no tagged jet pt;pt").c_str(),50,0,2000);
    }
    
    fChain->ls();
@@ -207,7 +211,7 @@ void mc_signal::Loop()
        hsignal_cuts[file_counter]->Fill(1,w);
 
      //object definitions
-     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1;
+     int nleadPho=-1, leadpt_ak4=-1, leadpt_ak8=-1, leadbtag=-1;
      std::vector<int> passPho, passJet, passAK8Jet, passEle, passMu;
      passPho.clear(); passJet.clear(); passAK8Jet.clear(); passEle.clear(); passMu.clear();
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
@@ -280,6 +284,7 @@ void mc_signal::Loop()
      for (int i=0;i<passAK8Jet.size();i++) {
        if ((*AK8JetPt)[passAK8Jet.at(i)]>(*AK8JetPt)[leadpt_ak8]) leadpt_ak8=passAK8Jet.at(i);
        AK8HT_after+=(*AK8JetPt)[passAK8Jet.at(i)];
+       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>(*AK8JetpfBoostedDSVBTag)[leadbtag]) leadbtag=passAK8Jet.at(i);
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
@@ -288,8 +293,19 @@ void mc_signal::Loop()
          hsignal_cuts[file_counter]->Fill(3,w);
          if ((*phoEt)[nleadPho]>175){
            hsignal_cuts[file_counter]->Fill(4,w);
+           //if (HT_after>200){
+           //  hsignal_cuts[file_counter]->Fill(5,w);
+//specko btag eff
+for (int i=0;i<passAK8Jet.size();i++) {
+  if ((*AK8JetGenPartonMomID)[passAK8Jet.at(i)]==25) {
+    if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>0.4) hsignal_btag_ak8pt[file_counter]->Fill((*AK8JetPt)[passAK8Jet.at(i)],w);
+    else hsignal_nobtag_ak8pt[file_counter]->Fill((*AK8JetPt)[passAK8Jet.at(i)],w);
+  }
+}
+           if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
+             hsignal_cuts[file_counter]->Fill(5);
            if (pfMET<150){
-             hsignal_cuts[file_counter]->Fill(5,w);
+             hsignal_cuts[file_counter]->Fill(6,w);
            }
 
         int bcounter=0;
@@ -300,10 +316,10 @@ void mc_signal::Loop()
           else if (highjetprob2!=-1) if ((*jetJetProbabilityBJetTags)[passJet.at(i)]>(*jetJetProbabilityBJetTags)[highjetprob2]) highjetprob2=passJet.at(i);
           if ((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[passJet.at(i)]>(*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV1]) {highCSV2=highCSV1;highCSV1=passJet.at(i);}
           else if (highCSV2!=-1) if ((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[passJet.at(i)]>(*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV2]) highCSV2=passJet.at(i);
-          if ((*jetpfCombinedMVABJetTags)[passJet.at(i)]>(*jetpfCombinedMVABJetTags)[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=passJet.at(i);}
-          else if (highcMVA2!=-1) if ((*jetpfCombinedMVABJetTags)[passJet.at(i)]>(*jetpfCombinedMVABJetTags)[highcMVA2]) highcMVA2=passJet.at(i);
+          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>(*jetpfCombinedMVAV2BJetTags)[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=passJet.at(i);}
+          else if (highcMVA2!=-1) if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>(*jetpfCombinedMVAV2BJetTags)[highcMVA2]) highcMVA2=passJet.at(i);
         //mc truth histos
-          if ((*jetGenPartonMomID)[i]==25) hsignal_Hjetpt[file_counter]->Fill((*jetPt)[i],w);
+          if ((*jetGenPartonMomID)[passJet.at(i)]==25) hsignal_Hjetpt[file_counter]->Fill((*jetPt)[passJet.at(i)],w);
         }
         int highdB_ak8=-1;
         for (int i=0;i<passAK8Jet.size();i++) {
@@ -311,9 +327,9 @@ void mc_signal::Loop()
           if (highdB_ak8==-1) h_jetdB=-10; else h_jetdB=(*AK8JetpfBoostedDSVBTag)[highdB_ak8];
           if (i_jetdB>h_jetdB) highdB_ak8=i;
         //mc truth histos
-          if ((*AK8JetGenPartonMomID)[i]==25) {
-            hsignal_AK8Hjetpt[file_counter]->Fill((*AK8JetPt)[i],w);
-            hsignal_AK8Hjetmass[file_counter]->Fill((*AK8JetMass)[i],w);
+          if ((*AK8JetGenPartonMomID)[passAK8Jet.at(i)]==25) {
+            hsignal_AK8Hjetpt[file_counter]->Fill((*AK8JetPt)[passAK8Jet.at(i)],w);
+            hsignal_AK8Hjetmass[file_counter]->Fill((*AK8JetMass)[passAK8Jet.at(i)],w);
           }
         }
         double dR_pho_AK8=-1;
@@ -370,8 +386,8 @@ void mc_signal::Loop()
          if (highjetprob2!=-1) hsignal_bjetprob2[file_counter]->Fill((*jetJetProbabilityBJetTags)[highjetprob2],w);
          if (highCSV1!=-1) hsignal_bjetCSV[file_counter]->Fill((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV1],w);
          if (highCSV2!=-1) hsignal_bjetCSV2[file_counter]->Fill((*jetpfCombinedInclusiveSecondaryVertexV2BJetTags)[highCSV2],w);
-         if (highcMVA1!=-1) hsignal_bjetcMVA[file_counter]->Fill((*jetpfCombinedMVABJetTags)[highcMVA1],w);
-         if (highcMVA2!=-1) hsignal_bjetcMVA2[file_counter]->Fill((*jetpfCombinedMVABJetTags)[highcMVA2],w);
+         if (highcMVA1!=-1) hsignal_bjetcMVA[file_counter]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA1],w);
+         if (highcMVA2!=-1) hsignal_bjetcMVA2[file_counter]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA2],w);
          if (leadpt_ak8!=-1) hsignal_doubleB[file_counter]->Fill((*AK8JetpfBoostedDSVBTag)[leadpt_ak8],w);
          if (highdB_ak8!=-1) hsignal_doubleB_highdB[file_counter]->Fill((*AK8JetpfBoostedDSVBTag)[highdB_ak8],w);
          for (int i=0;i<passAK8Jet.size();i++) hsignal_AK8jetmass[file_counter]->Fill((*AK8JetMass)[passAK8Jet.at(i)],w);
@@ -380,12 +396,14 @@ void mc_signal::Loop()
          if (leadpt_ak4!=-1) hsignal_jetpt[file_counter]->Fill((*jetPt)[leadpt_ak4],w);
          if (leadpt_ak8!=-1) hsignal_AK8jetpt[file_counter]->Fill((*AK8JetPt)[leadpt_ak8],w);
          if (leadpt_ak8!=-1) hsignal_AK8ljetmass[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],w);
+         if (leadpt_ak8!=-1) hsignal_AK8bjetmass[file_counter]->Fill((*AK8JetMass)[highdB_ak8],w);
          if (dR_pho_AK8!=-1) hsignal_dRphoAK8jet[file_counter]->Fill(dR_pho_AK8,w);
          //mctruth
          if (leadpt_ak8!=-1 && iHiggs!=-1) hsignal_AK8ptHpt[file_counter]->Fill((*AK8JetPt)[leadpt_ak8],(*mcPt)[iHiggs],w);
          if (leadpt_ak8!=-1 && iHiggs!=-1) hsignal_AK8massHpt[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],(*mcPt)[iHiggs],w);
          if (dR_pho_H!=-1) hsignal_dRphoH[file_counter]->Fill(dR_pho_H,w);
          if (dR_Tpho_H!=-1) hsignal_dRTphoH[file_counter]->Fill(dR_Tpho_H,w);
+           }//btag cut
          }//offline HLT
         }//phoID
       }//HLT

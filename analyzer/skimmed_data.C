@@ -109,6 +109,7 @@ void skimmed_data::Loop()
    TH1D *hdata_nAK8jets = new TH1D("hdata_nAK8jets",";# of AK8jets",10,0,10);
    TH1D *hdata_AK8jetpt = new TH1D("hdata_AK8jetpt","Leading AK8jetpt;AK8jetpt",50,0,2000);
    TH1D *hdata_AK8ljetmass = new TH1D("hdata_AK8ljetmass","Leading AK8jetmass;AK8jetmass",30,0,700);
+   TH1D *hdata_AK8bjetmass = new TH1D("hdata_AK8bjetmass","Btagged AK8jetmass;AK8jetmass",30,0,700);
    TH1D *hdata_AK8jetmass = new TH1D("hdata_AK8jetmass","AK8jetmass;AK8jetmass",30,0,700);
     
    TH1D *hdata_dRphoAK8jet= new TH1D("hdata_dRphoAK8jet","Distance between leading photon and leading AK8jet;dR",30,0,8);
@@ -292,6 +293,7 @@ void skimmed_data::Loop()
          if (leadpt_ak4!=-1) hdata_jetpt->Fill((*jetPt)[leadpt_ak4]);
          if (leadpt_ak8!=-1) hdata_AK8jetpt->Fill((*AK8JetPt)[leadpt_ak8]);
          if (leadpt_ak8!=-1) hdata_AK8ljetmass->Fill((*AK8JetMass)[leadpt_ak8]);
+         if (leadpt_ak8!=-1) hdata_AK8bjetmass->Fill((*AK8JetMass)[highdB_ak8]);
          if (dR_pho_AK8!=-1) hdata_dRphoAK8jet->Fill(dR_pho_AK8);
          }//pfMET cut
          }//btag cut

@@ -653,6 +653,7 @@ public :
    TH1D *hbkg_nAK8jets[nfile];
    TH1D *hbkg_AK8jetpt[nfile];
    TH1D *hbkg_AK8ljetmass[nfile];
+   TH1D *hbkg_AK8bjetmass[nfile];
    TH1D *hbkg_AK8jetmass[nfile];
    
    TH1D *hbkg_dRphoAK8jet[nfile];
