@@ -93,7 +93,7 @@ void skimmed_data::Loop()
 
    TFile f("skimmed_data_histos.root","recreate");
 
-   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,pfMET",10,0,10);
+   TH1D *hdata_cuts = new TH1D("hdata_cuts","cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,Hmass,pfMET",10,0,10);
    TH1D *hdata_nVtx = new TH1D("hdata_nVtx",";nVtx",50,0,50);
 
    TH1D *hdata_phoEt = new TH1D("hdata_phoEt",";phoEt",30,0,1000);
@@ -237,8 +237,10 @@ void skimmed_data::Loop()
          hdata_cuts->Fill(4);
          if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
          hdata_cuts->Fill(5);
-         if (pfMET<150){
+         if ((*AK8JetMass)[leadbtag]>70 && (*AK8JetMass)[leadbtag]<200){
          hdata_cuts->Fill(6);
+         if (pfMET<150){
+         hdata_cuts->Fill(7);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
          for (int i=0;i<passJet.size();i++){
@@ -296,6 +298,7 @@ void skimmed_data::Loop()
          if (leadpt_ak8!=-1) hdata_AK8bjetmass->Fill((*AK8JetMass)[highdB_ak8]);
          if (dR_pho_AK8!=-1) hdata_dRphoAK8jet->Fill(dR_pho_AK8);
          }//pfMET cut
+         }//higgs mass cut
          }//btag cut
        }//offline HLT cut
      }//phoid cut 

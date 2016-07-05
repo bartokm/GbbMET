@@ -118,7 +118,7 @@ void skimmed_mc::Loop()
      h_PUweight[i] = (TH1D*)h_dataPU->Clone(Form("h_PUweight[%i]",i));
      h_PUweight[i]->SetDirectory(0);
      
-     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,pfMET").c_str(),10,0,10);
+     hbkg_cuts[i] = new TH1D(Form("hbkg_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,Hmass,pfMET").c_str(),10,0,10);
      hbkg_nVtx[i] = new TH1D(Form("hbkg_nVtx[%i]",i),std::string(mc_input_file[i]+";nVtx").c_str(),50,0,50);
      hbkg_nPU[i] = new TH1D(Form("hbkg_nPU[%i]",i),std::string(mc_input_file[i]+";nPU").c_str(),50,0,50);
 
@@ -298,8 +298,10 @@ void skimmed_mc::Loop()
          hbkg_cuts[file_counter]->Fill(4,w);
          if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
          hbkg_cuts[file_counter]->Fill(5,w);
-         if (pfMET<150){
+         if ((*AK8JetMass)[leadbtag]>70 && (*AK8JetMass)[leadbtag]<200){
          hbkg_cuts[file_counter]->Fill(6,w);
+         if (pfMET<150){
+         hbkg_cuts[file_counter]->Fill(7,w);
          int bcounter=0;
          int highjetprob1=-1, highjetprob2=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
          for (int i=0;i<passJet.size();i++){
@@ -360,6 +362,7 @@ void skimmed_mc::Loop()
          if (leadpt_ak8!=-1) hbkg_AK8bjetmass[file_counter]->Fill((*AK8JetMass)[highdB_ak8],w);
          if (dR_pho_AK8!=-1) hbkg_dRphoAK8jet[file_counter]->Fill(dR_pho_AK8,w);
          }//pfMET cut
+         }//Hmass
          }//btag cut
        }//offline HLT cut
      }//phoid cut 
