@@ -121,7 +121,7 @@ void mc_signal::Loop()
      h_PUweight[i] = (TH1D*)h_dataPU->Clone(Form("h_PUweight[%i]",i));
      h_PUweight[i]->SetDirectory(0);
      
-     hsignal_cuts[i] = new TH1D(Form("hsignal_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,pfMET,HT").c_str(),10,0,10);
+     hsignal_cuts[i] = new TH1D(Form("hsignal_cuts[%i]",i),std::string(mc_input_file[i]+" cuts;Full,HLT,PhoID,noPixel,PhoEt,btag,hmass,pfMET").c_str(),10,0,10);
      hsignal_nVtx[i] = new TH1D(Form("hsignal_nVtx[%i]",i),std::string(mc_input_file[i]+";nVtx").c_str(),50,0,50);
      hsignal_nPU[i] = new TH1D(Form("hsignal_nPU[%i]",i),std::string(mc_input_file[i]+";nPU").c_str(),50,0,50);
 
@@ -304,8 +304,10 @@ for (int i=0;i<passAK8Jet.size();i++) {
 }
            if ((*AK8JetpfBoostedDSVBTag)[leadbtag]>0.4){
              hsignal_cuts[file_counter]->Fill(5,w);
-           if (pfMET<150){
+           if ((*AK8JetMass)[leadbtag]>70 && (*AK8JetMass)[leadbtag]<200){
              hsignal_cuts[file_counter]->Fill(6,w);
+           if (pfMET<150){
+             hsignal_cuts[file_counter]->Fill(7,w);
            }
 
         int bcounter=0;
@@ -403,6 +405,7 @@ for (int i=0;i<passAK8Jet.size();i++) {
          if (leadpt_ak8!=-1 && iHiggs!=-1) hsignal_AK8massHpt[file_counter]->Fill((*AK8JetMass)[leadpt_ak8],(*mcPt)[iHiggs],w);
          if (dR_pho_H!=-1) hsignal_dRphoH[file_counter]->Fill(dR_pho_H,w);
          if (dR_Tpho_H!=-1) hsignal_dRTphoH[file_counter]->Fill(dR_Tpho_H,w);
+           }//Hmass
            }//btag cut
          }//offline HLT
         }//phoID
