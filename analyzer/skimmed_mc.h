@@ -706,10 +706,10 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
    const char* fQCD6 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT1000to1500_25ns.root/EventTree";
    const char* fQCD7 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT1500to2000_25ns.root/EventTree";
    const char* fQCD8 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT2000toInf_25ns.root/EventTree";
-   const char* fZJets1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-100To200_13TeV_25ns.root/EventTree";
-   const char* fZJets2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-200To400_13TeV_25ns.root/EventTree";
-   const char* fZJets3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-400To600_13TeV_25ns.root/EventTree";
-   const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-600ToInf_13TeV_25ns.root/EventTree";
+   const char* fZJets1 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-100To200_25ns.root/EventTree";
+   const char* fZJets2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-200To400_25ns.root/EventTree";
+   const char* fZJets3 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-400To600_25ns.root/EventTree";
+   const char* fZJets4 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToNuNu_HT-600ToInf_25ns.root/EventTree";
    const char* fTTGJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_TTGJets_25ns.root/EventTree";
    const char* fZJetsQQ = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_ZJetsToQQ_HT600toInf_25ns.root/EventTree";
    const char* fWGJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_WGJets_MonoPhoton_PtG-130_25ns.root/EventTree";
