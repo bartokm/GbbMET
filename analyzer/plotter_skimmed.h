@@ -72,19 +72,19 @@ void addallMC(THStack* stack, TString fname, std::string hname){
   return 0;
 }
 
-void drawthings(TH1D* hdata, THStack* stack, TH1D* hsignal1, TH1D* hsignal2){
+void drawthings(int nsignal, TString fsignal, TH1D* hdata, THStack* stack, std::string hsignal){
   hdata->SetMarkerStyle(21);
   hdata->Draw("P");
   stack->Draw("sameh");
-  hsignal1->SetLineColor(kOrange);
-  hsignal1->SetMarkerColor(kOrange);
-  hsignal1->SetMarkerStyle(22);
-  hsignal1->Scale(1000000);
-  hsignal1->Draw("same");
-  hsignal2->SetLineColor(kGray);
-  hsignal2->SetMarkerColor(kGray);
-  hsignal2->SetMarkerStyle(23);
-  hsignal2->Scale(1000000);
-  hsignal2->Draw("same");
+  int signalscale=100;
+  for (int i=0;i<nsignal;i++){
+    TH1D *h = new TH1D();
+    h = getplot(fsignal,Form((hsignal+"[%i]").c_str(),i));
+    h->SetLineColor(kOrange+i);
+    h->SetMarkerColor(kOrange+i);
+    h->SetMarkerStyle(22+i);
+    h->Scale(signalscale);
+    h->Draw("same");
+  }
   return 0;
 }

@@ -127,7 +127,7 @@ void plotter_skimmed(){
   addallMC(sbkg_AK8EMHT_after, fbkg, "hbkg_AK8EMHT_after");
 
 //signal
-  nsignal=2;
+  nsignal=5;
   TH1D *h_PUweight[nsignal];
   TH1D *hsignal_nVtx[nsignal];
   TH1D *hsignal_nPU[nsignal];
@@ -241,7 +241,7 @@ void plotter_skimmed(){
   hsignal_cuts[0]->Print("all");
   hsignal_cuts[1]->Print("all");
   hdata_cuts->SetMinimum(10);
-  drawthings(hdata_cuts, sbkg_cuts, hsignal_cuts[0], hsignal_cuts[1]);
+  drawthings(nsignal, fsignal, hdata_cuts, sbkg_cuts, "hsignal_cuts");
   leg->AddEntry("hdata_cuts",   "Data", "P");
   leg->AddEntry("hbkg_cuts[0]",   "#gammaJet", "f");
   leg->AddEntry("hbkg_cuts[1]",   "WJetsToL#nu", "f");
@@ -257,43 +257,43 @@ void plotter_skimmed(){
   leg->Draw("same");
   c1->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_nVtx, sbkg_nVtx, hsignal_nVtx[0], hsignal_nVtx[1]);
+  drawthings(nsignal, fsignal, hdata_nVtx, sbkg_nVtx, "hsignal_nVtx");
   leg->Draw("same");
   c1->cd(3);
   gPad->SetLogy();
   hdata_pfMET->SetMinimum(1);
-  drawthings(hdata_pfMET, sbkg_pfMET, hsignal_pfMET[0], hsignal_pfMET[1]);
+  drawthings(nsignal, fsignal, hdata_pfMET, sbkg_pfMET, "hsignal_pfMET");
   leg->Draw("same");
 
   TCanvas *c2 = new TCanvas("c2", "c2",1200,600);
   c2->Divide(3,1);
   c2->cd(1);
   gPad->SetLogy();
-  drawthings(hdata_nPho, sbkg_nPho, hsignal_nPho[0], hsignal_nPho[1]);
+  drawthings(nsignal, fsignal, hdata_nPho, sbkg_nPho, "hsignal_nPho");
   leg->Draw("same");
   c2->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_phoEt, sbkg_phoEt, hsignal_phoEt[0], hsignal_phoEt[1]);
+  drawthings(nsignal, fsignal, hdata_phoEt, sbkg_phoEt, "hsignal_phoEt");
   leg->Draw("same");
   c2->cd(3);
   gPad->SetLogy();
   hdata_phoEta->SetMinimum(10);
-  drawthings(hdata_phoEta, sbkg_phoEta, hsignal_phoEta[0], hsignal_phoEta[1]);
+  drawthings(nsignal, fsignal, hdata_phoEta, sbkg_phoEta, "hsignal_phoEta");
   leg->Draw("same");
 
   TCanvas *c3 = new TCanvas("c3", "c3",1200,600);
   c3->Divide(3,1);
   c3->cd(1);
   gPad->SetLogy();
-  drawthings(hdata_nEle, sbkg_nEle, hsignal_nEle[0], hsignal_nEle[1]);
+  drawthings(nsignal, fsignal, hdata_nEle, sbkg_nEle, "hsignal_nEle");
   leg->Draw("same");
   c3->cd(2);
   gPad->SetLogy();
-  drawthings(hdata_nMu, sbkg_nMu, hsignal_nMu[0], hsignal_nMu[1]);
+  drawthings(nsignal, fsignal, hdata_nMu, sbkg_nMu, "hsignal_nMu");
   leg->Draw("same");
   c3->cd(3);
   gPad->SetLogy();
-  drawthings(hdata_njets, sbkg_njets, hsignal_njets[0], hsignal_njets[1]);
+  drawthings(nsignal, fsignal, hdata_njets, sbkg_njets, "hsignal_njets");
   leg->Draw("same");
 
   TCanvas *c4 = new TCanvas("c4", "c4",1200,600);
@@ -301,17 +301,17 @@ void plotter_skimmed(){
   c4->cd(1);
   gPad->SetLogy();
   hdata_doubleB_highdB->SetMinimum(1);
-  drawthings(hdata_doubleB_highdB, sbkg_doubleB_highdB, hsignal_doubleB_highdB[0], hsignal_doubleB_highdB[1]);
+  drawthings(nsignal, fsignal, hdata_doubleB_highdB, sbkg_doubleB_highdB, "hsignal_doubleB_highdB");
   leg->Draw("same");
   c4->cd(2);
   gPad->SetLogy();
   hdata_bjetprob->SetMinimum(1);
-  drawthings(hdata_bjetprob, sbkg_bjetprob, hsignal_bjetprob[0], hsignal_bjetprob[1]);
+  drawthings(nsignal, fsignal, hdata_bjetprob, sbkg_bjetprob, "hsignal_bjetprob");
   leg->Draw("same");
   c4->cd(3);
   gPad->SetLogy();
   hdata_bjetcMVA->SetMinimum(1);
-  drawthings(hdata_bjetcMVA, sbkg_bjetcMVA, hsignal_bjetcMVA[0], hsignal_bjetcMVA[1]);
+  drawthings(nsignal, fsignal, hdata_bjetcMVA, sbkg_bjetcMVA, "hsignal_bjetcMVA");
   leg->Draw("same");
 
   TCanvas *c5 = new TCanvas("c5", "c5",1200,600);
@@ -319,17 +319,17 @@ void plotter_skimmed(){
   c5->cd(1);
   gPad->SetLogy();
   //hdata_->SetMinimum(1);
-  drawthings(hdata_AK8HT_before, sbkg_AK8HT_before, hsignal_AK8HT_before[0], hsignal_AK8HT_before[1]);
+  drawthings(nsignal, fsignal, hdata_AK8HT_before, sbkg_AK8HT_before, "hsignal_AK8HT_before");
   leg->Draw("same");
   c5->cd(2);
   gPad->SetLogy();
   //hdata_->SetMinimum(1);
-  drawthings(hdata_AK8EMHT_before, sbkg_AK8EMHT_before, hsignal_AK8EMHT_before[0], hsignal_AK8EMHT_before[1]);
+  drawthings(nsignal, fsignal, hdata_AK8EMHT_before, sbkg_AK8EMHT_before, "hsignal_AK8EMHT_before");
   leg->Draw("same");
   c5->cd(3);
   gPad->SetLogy();
   //hdata_->SetMinimum(1);
-  drawthings(hdata_AK8bjetmass, sbkg_AK8bjetmass, hsignal_AK8bjetmass[0], hsignal_AK8bjetmass[1]);
+  drawthings(nsignal, fsignal, hdata_AK8bjetmass, sbkg_AK8bjetmass, "hsignal_AK8bjetmass");
   leg->Draw("same");
   
 }

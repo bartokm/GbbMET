@@ -197,12 +197,12 @@ void mc_signal::Loop()
        newfile=true;
      }
      //weights
-     /*
+     
      int zbx=0;//get zero bunchcrossing (puTrue always the same for every bx, just in case...)
      for (int i=0;i<(*puBX).size();i++) if ((*puBX)[i]==0) zbx=i;
      double pu_weight=h_PUweight[file_counter]->GetBinContent(h_PUweight[file_counter]->FindBin((*puTrue)[zbx]));
-     */
-     double pu_weight=1;//currently no puinfo in signal mc :(
+     
+     //double pu_weight=1;//currently no puinfo in signal mc :(
      double weight=L_data*sigma[file_counter]/nmax[file_counter];
      double w=0;
      w=weight*pu_weight*genWeight;
@@ -367,7 +367,7 @@ for (int i=0;i<passAK8Jet.size();i++) {
           }
          //Filling histograms
          hsignal_nVtx[file_counter]->Fill(nVtx,w);
-         //hsignal_nPU[file_counter]->Fill((*puTrue)[zbx],w);
+         hsignal_nPU[file_counter]->Fill((*puTrue)[zbx],w);
          hsignal_HT_before[file_counter]->Fill(HT_before,w);
          hsignal_EMHT_before[file_counter]->Fill(EMHT_before,w);
          hsignal_HT_after[file_counter]->Fill(HT_after,w);

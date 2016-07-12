@@ -770,10 +770,13 @@ public :
    TBranch        *b_AK8softdropSubjetCSV;   //!
 
    //histograms
-   static const int nfile=2;
+   static const int nfile=5;
    std::string mc_input_file[nfile] = {
      "mCh1400_mN200",
-     "mCh1200_mN1000"};
+     "mCh1200_mN1000",
+     "mG1000_mN200",
+     "mG1000_mN400",
+     "mG1000_mN600"};
 
    //float sigma[nfile] = {
    //  12.437305,  //m_average=600 higgsino like: 4.73741 wino like: 20.1372   !!!fb!!!!!
@@ -781,11 +784,17 @@ public :
 
    float sigma[nfile] = {
      1.062e-05,//mCh1400 mN200 1.062e-05
-     2.332e-05};//mCh1200 mN1000 2.332e-05
+     2.332e-05,//mCh1200 mN1000 2.332e-05
+     2.0121e-01,//mG1000 mN200
+     2.0121e-01,//mG1000 mN400
+     2.0121e-01};//mG1000 mN600
 
    unsigned long long nmax[nfile]={
      93500,
-     89500};
+     89500,
+     19920,
+     19520,
+     19920};
 
    TH1D *h_PUweight[nfile];
    TH1D *hsignal_nVtx[nfile];
@@ -866,10 +875,16 @@ mc_signal::mc_signal(TTree *tree) : fChain(0)
 // used to generate this class and read the Tree.
    const char* fmCh1400_mN200 = "mChargino-1400_mNeutralino-200_76Xggtree_mc.root/ggNtuplizer/EventTree";
    const char* fmCh1200_mN1000 = "mChargino-1200_mNeutralino-1000_76Xggtree_mc.root/ggNtuplizer/EventTree";
+   const char* fmG1000_mN200 = "mGluino-1000_mNeutralino-200_76Xggtree_mc.root/ggNtuplizer/EventTree";
+   const char* fmG1000_mN400 = "mGluino-1000_mNeutralino-400_76Xggtree_mc.root/ggNtuplizer/EventTree";
+   const char* fmG1000_mN600 = "mGluino-1000_mNeutralino-600_76Xggtree_mc.root/ggNtuplizer/EventTree";
    if (tree == 0) {
      TChain * ch_mc = new TChain("EventTree","");
      ch_mc->Add(fmCh1400_mN200);
      ch_mc->Add(fmCh1200_mN1000);
+     ch_mc->Add(fmG1000_mN200);
+     ch_mc->Add(fmG1000_mN400);
+     ch_mc->Add(fmG1000_mN600);
      tree = ch_mc;
    }
    Init(tree);
