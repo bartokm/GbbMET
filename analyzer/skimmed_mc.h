@@ -614,6 +614,9 @@ public :
    TBranch        *b_AK8softdropSubjetCSV;   //!
 
    //histograms
+   double BtagBDSVWP[3]={0.3,0.6,0.9};
+   double BtagCSVWP[3]={0.46,0.8,0.935};
+   double BtagcMVAWP[3]={-0.715,0.285,0.875};
    static const int nfile=18;
    std::string mc_input_file[nfile] = {
    "GJet",
@@ -640,20 +643,40 @@ public :
    TH1D *hbkg_nPU[nfile];
    TH1D *hbkg_cuts[nfile];
 
-   TH1D *hbkg_phoEt[nfile];
-   TH1D *hbkg_phoEta[nfile];
+   TH1D *hbkg_phoEtL[nfile];
+   TH1D *hbkg_phoEtM[nfile];
+   TH1D *hbkg_phoEtT[nfile];
+   TH1D *hbkg_phoEtaL[nfile];
+   TH1D *hbkg_phoEtaM[nfile];
+   TH1D *hbkg_phoEtaT[nfile];
    TH1D *hbkg_pfMET[nfile];
    TH1D *hbkg_nPho[nfile];
    TH1D *hbkg_nTrksPV[nfile];
    TH1D *hbkg_nEle[nfile];
+   TH1D *hbkg_nEleM[nfile];
+   TH1D *hbkg_nEleT[nfile];
    TH1D *hbkg_nMu[nfile];
+   TH1D *hbkg_nMuM[nfile];
+   TH1D *hbkg_nMuT[nfile];
    
    TH1D *hbkg_njets[nfile];
+   TH1D *hbkg_CSVbjetsL[nfile];
+   TH1D *hbkg_CSVbjetsM[nfile];
+   TH1D *hbkg_CSVbjetsT[nfile];
+   TH1D *hbkg_cMVAbjetsL[nfile];
+   TH1D *hbkg_cMVAbjetsM[nfile];
+   TH1D *hbkg_cMVAbjetsT[nfile];
+   TH1D *hbkg_BDSVbjetsL[nfile];
+   TH1D *hbkg_BDSVbjetsM[nfile];
+   TH1D *hbkg_BDSVbjetsT[nfile];
    TH1D *hbkg_jetpt[nfile];
    TH1D *hbkg_nAK8jets[nfile];
    TH1D *hbkg_AK8jetpt[nfile];
+   TH1D *hbkg_AK8bjetpt[nfile];
    TH1D *hbkg_AK8ljetmass[nfile];
    TH1D *hbkg_AK8bjetmass[nfile];
+   TH1D *hbkg_AK8bPrunedjetmass[nfile];
+   TH1D *hbkg_AK8bPrunedCorrjetmass[nfile];
    TH1D *hbkg_AK8jetmass[nfile];
    
    TH1D *hbkg_dRphoAK8jet[nfile];
@@ -696,7 +719,8 @@ skimmed_mc::skimmed_mc(TTree *tree) : fChain(0)
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
-   const char* fgjet = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_gjet_pt15to6000_miniAOD.root/EventTree";
+   //const char* fgjet = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_gjet_pt15to6000_miniAOD.root/EventTree";
+   const char* fgjet = "/data/bartokm/Analysis/ntuples/job_fall15_gjet_pt15to6000_miniAOD.root/EventTree";
    const char* fWJets = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_WJetsToLNu_aMCatNLO_miniAOD.root/EventTree";
    const char* fZg = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_Zg_aMCatNLO_miniAOD.root/EventTree";
    const char* fQCD2 = "/afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT200to300_25ns.root/EventTree";

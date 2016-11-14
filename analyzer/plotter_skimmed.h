@@ -19,6 +19,25 @@ TH2D* getplot2d(TString fname, TString hname) {
   return c;
 }
 
+void MCintegral(int nsignal, TString fsignal, THStack* stack, std::string hsignal, int b1, int b2){
+  for (int i=0;i<nsignal;i++){
+    TH1D *h = new TH1D();
+    h = getplot(fsignal,Form((hsignal+"[%i]").c_str(),i));
+    double I_signal[nsignal], I_bkg=0;
+    
+    if (b1==0 && b2==0) {
+      I_signal[i]=h->Integral();
+      I_bkg=((TH1*)(stack->GetStack()->Last()))->Integral();
+    }
+    else {
+      I_bkg=((TH1*)(stack->GetStack()->Last()))->Integral(b1,b2);
+      I_signal[i]=h->Integral(b1,b2);
+    }
+    std::cout<<hsignal<<" I_signal"<<i<<": "<<I_signal[i]<<" I_bkg "<<I_bkg<<" I_signal/I_bkg="<<I_signal[i]/I_bkg<<std::endl;
+  }
+  return 0;
+}
+
 int color(unsigned int id) {
 
   int color = kBlack;
@@ -53,6 +72,7 @@ void addallMC(THStack* stack, TString fname, std::string hname){
   std::vector<int> iter_zjet {10,11,12,13};
   //int iter_rest[7]={0,1,2,14,15,16,17};
   int iter_rest[7]={1,15,2,16,17,14,0};
+  //int iter_rest[6]={15,2,16,17,14,0}; //wjetslnu off
   std::vector<int> iter_qcd {3,4,5,6,7,8,9};
 
   //stack->Add(getonebkg(fname,hname,iter_zjet));
@@ -73,18 +93,29 @@ void addallMC(THStack* stack, TString fname, std::string hname){
 }
 
 void drawthings(int nsignal, TString fsignal, TH1D* hdata, THStack* stack, std::string hsignal){
+  int maximum=0;
+  maximum=((TH1*)(stack->GetStack()->Last()))->GetMaximum();
+  maximum+=0.1*maximum;
   hdata->SetMarkerStyle(21);
+  hdata->SetMarkerColor(0);
   hdata->Draw("P");
+  hdata->SetMaximum(maximum);
   stack->Draw("sameh");
-  int signalscale=100;
-  for (int i=0;i<nsignal;i++){
+  //hdata->Draw("sameP");
+  double I_mc=((TH1*)(stack->GetStack()->Last()))->Integral();
+  double I_data=hdata->Integral();
+  //std::cout<<"Data integral: "<<I_data<<" mc integral "<<I_mc<< " I_data/I_mc="<<I_data/I_mc<<std::endl;
+  int signalscale=1;
+  for (int i=nsignal-1;i>-1;i--){
     TH1D *h = new TH1D();
     h = getplot(fsignal,Form((hsignal+"[%i]").c_str(),i));
-    h->SetLineColor(kOrange+i);
-    h->SetMarkerColor(kOrange+i);
+    h->SetLineColor(i+1);
+    h->SetMarkerColor(i+1);
     h->SetMarkerStyle(22+i);
-    h->Scale(signalscale);
+    if (i!=1) h->Scale(signalscale);
     h->Draw("same");
+    //if (i==nsignal-1) h->Draw();
+    //else h->Draw("same");
   }
   return 0;
 }
