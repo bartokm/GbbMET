@@ -4,13 +4,13 @@
 using namespace std;
 
 std::string ggFile[21]={
-   "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/data/V07_04_14_00/GoldenJSON/job_SinglePho_Run2015C_PR_25ns.root",//data L=16.34
+   "/data/gridout/mbartok/Analysis/Data/CMSSW8024p1/Run2016F_SinglePhoton_filtered/SinglePhoton/ggNtuple_V08_00_24_00/161215_092700/0000/*.root",
    "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/data/V07_06_03_00/job_SinglePho_Run2015C_Dec16_miniAOD.root", //data L=16.345
    "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/data/V07_06_03_00/job_SinglePho_Run2015D_Dec16_miniAOD.root", //data L=2516.978
    "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/mc/V07_06_03_00/job_fall15_gjet_pt15to6000_miniAOD.root", //sigma=365896
    "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/mc/V07_06_03_00/job_fall15_WJetsToLNu_aMCatNLO_miniAOD.root", //sigma=61526.7
    "/afs/cern.ch/user/m/mbartok/eos/cms/store/group/phys_smp/ggNtuples/13TeV/mc/V07_06_03_00/job_fall15_Zg_aMCatNLO_miniAOD.root", //sigma=117.864
-   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT200to300_25ns.root", //sigma=1717000
+   "/data/gridout/mbartok/Analysis/BkgMC/CMSSW8024p1/job_summer16_GJet/GJet_Pt-15To6000_TuneCUETP8M1-Flat_13TeV_pythia8_20M/ggNtuple_V08_00_24_00/161216_111111/0000/*.root",
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT300to500_25ns.root", //sigma=351300
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT500to700_25ns.root", //sigma=31630
    "/data/gridout/mbartok/Analysis/BkgMC/CMSSW763p2/job_fall15_QCD_HT700to1000_25ns.root", //sigma=6802

@@ -22,16 +22,27 @@ class TInputOutputTree{
     TObjArray*      listOfBranches;
 
     virtual Int_t   GetEntry(Long64_t entry, Int_t getall = 0) { return fChain ? fChain->GetTree()->GetEntry(entry, getall) : 0; } 
+    Long64_t        LoadTree(Long64_t entry)
+    {
+      // Set the environment to read one entry
+      if (!fChain) return -5;
+      Long64_t centry = fChain->LoadTree(entry);
+      if (centry < 0) return centry;
+      if (fChain->GetTreeNumber() != fCurrent) {
+        fCurrent = fChain->GetTreeNumber();
+        //Notify();
+      }
+      return centry;
+    }
     struct InputTreeLeaves{
-      //global event
       Int_t           run;
       Long64_t        event;
       Int_t           lumis;
       Bool_t          isData;
       Int_t           nVtx;
+      Int_t           nGoodVtx;
       Int_t           nTrksPV;
       Bool_t          isPVGood;
-      Bool_t          hasGoodVtx;
       Float_t         vtx;
       Float_t         vty;
       Float_t         vtz;
@@ -43,12 +54,12 @@ class TInputOutputTree{
       ULong64_t       HLTEleMuXIsPrescaled;
       ULong64_t       HLTPhoIsPrescaled;
       ULong64_t       HLTJetIsPrescaled;
-        
       vector<float>   *pdf;
       Float_t         pthat;
       Float_t         processID;
       Float_t         genWeight;
       Float_t         genHT;
+      TString         *EventTag;
       Int_t           nPUInfo;
       vector<int>     *nPU;
       vector<int>     *puBX;
@@ -80,7 +91,6 @@ class TInputOutputTree{
       vector<float>   *mcTrkIsoDR04;
       Float_t         genMET;
       Float_t         genMETPhi;
-      
       Int_t           metFilters;
       Float_t         pfMET;
       Float_t         pfMETPhi;
@@ -91,17 +101,12 @@ class TInputOutputTree{
       Float_t         pfMET_T1JERDo;
       Float_t         pfMET_T1JESUp;
       Float_t         pfMET_T1JESDo;
-      Float_t         pfMET_T1MESUp;
-      Float_t         pfMET_T1MESDo;
-      Float_t         pfMET_T1EESUp;
-      Float_t         pfMET_T1EESDo;
-      Float_t         pfMET_T1PESUp;
-      Float_t         pfMET_T1PESDo;
-      Float_t         pfMET_T1TESUp;
-      Float_t         pfMET_T1TESDo;
       Float_t         pfMET_T1UESUp;
       Float_t         pfMET_T1UESDo;
-      //photon
+      Float_t         pfMETPhi_T1JESUp;
+      Float_t         pfMETPhi_T1JESDo;
+      Float_t         pfMETPhi_T1UESUp;
+      Float_t         pfMETPhi_T1UESDo;
       Int_t           nPho;
       vector<float>   *phoE;
       vector<float>   *phoEt;
@@ -127,6 +132,7 @@ class TInputOutputTree{
       vector<float>   *phoSigmaIEtaIPhi;
       vector<float>   *phoSigmaIPhiIPhi;
       vector<float>   *phoE1x3;
+      vector<float>   *phoE1x5;
       vector<float>   *phoE2x2;
       vector<float>   *phoE2x5Max;
       vector<float>   *phoE5x5;
@@ -135,6 +141,7 @@ class TInputOutputTree{
       vector<float>   *phoSigmaIEtaIPhiFull5x5;
       vector<float>   *phoSigmaIPhiIPhiFull5x5;
       vector<float>   *phoE1x3Full5x5;
+      vector<float>   *phoE1x5Full5x5;
       vector<float>   *phoE2x2Full5x5;
       vector<float>   *phoE2x5MaxFull5x5;
       vector<float>   *phoE5x5Full5x5;
@@ -169,6 +176,9 @@ class TInputOutputTree{
       vector<float>   *phoPFNeuIsoFrix6;
       vector<float>   *phoPFNeuIsoFrix7;
       vector<float>   *phoPFNeuIsoFrix8;
+      vector<float>   *phoCITKChIso;
+      vector<float>   *phoCITKPhoIso;
+      vector<float>   *phoCITKNeuIso;
       vector<float>   *phoEcalRecHitSumEtConeDR03;
       vector<float>   *phohcalDepth1TowerSumEtConeDR03;
       vector<float>   *phohcalDepth2TowerSumEtConeDR03;
@@ -176,10 +186,11 @@ class TInputOutputTree{
       vector<float>   *photrkSumPtHollowConeDR03;
       vector<float>   *photrkSumPtSolidConeDR03;
       vector<float>   *phoIDMVA;
-      vector<int>     *phoFiredSingleTrgs;
-      vector<int>     *phoFiredDoubleTrgs;
+      vector<unsigned int> *phoFiredSingleTrgs;
+      vector<unsigned int> *phoFiredDoubleTrgs;
+      vector<unsigned int> *phoFiredL1Trgs;
+      vector<unsigned short> *phoxtalBits;
       vector<unsigned short> *phoIDbit;
-      //electron
       Int_t           nEle;
       vector<int>     *eleCharge;
       vector<int>     *eleChargeConsistent;
@@ -190,6 +201,7 @@ class TInputOutputTree{
       vector<float>   *eleESEnP2;
       vector<float>   *eleD0;
       vector<float>   *eleDz;
+      vector<float>   *eleSIP;
       vector<float>   *elePt;
       vector<float>   *eleEta;
       vector<float>   *elePhi;
@@ -224,8 +236,8 @@ class TInputOutputTree{
       vector<float>   *elePFClusEcalIso;
       vector<float>   *elePFClusHcalIso;
       vector<float>   *elePFMiniIso;
-      vector<float>   *eleIDMVANonTrg;
-      vector<float>   *eleIDMVATrg;
+      vector<float>   *eleIDMVA;
+      vector<float>   *eleIDMVAHZZ;
       vector<float>   *eledEtaseedAtVtx;
       vector<float>   *eleE1x5;
       vector<float>   *eleE2x5;
@@ -244,6 +256,7 @@ class TInputOutputTree{
       vector<float>   *eleTrkdxy;
       vector<float>   *eleKFHits;
       vector<float>   *eleKFChi2;
+      vector<float>   *eleGSFChi2;
       vector<vector<float> > *eleGSFPt;
       vector<vector<float> > *eleGSFEta;
       vector<vector<float> > *eleGSFPhi;
@@ -262,14 +275,10 @@ class TInputOutputTree{
       vector<vector<float> > *eleBCSieie;
       vector<vector<float> > *eleBCSieip;
       vector<vector<float> > *eleBCSipip;
-      vector<int>     *eleFiredTrgs;
+      vector<unsigned int> *eleFiredSingleTrgs;
+      vector<unsigned int> *eleFiredDoubleTrgs;
+      vector<unsigned int> *eleFiredL1Trgs;
       vector<unsigned short> *eleIDbit;
-      vector<float>   *eleESEnP1Raw;
-      vector<float>   *eleESEnP2Raw;
-      Int_t           nGSFTrk;
-      vector<float>   *gsfPt;
-      vector<float>   *gsfEta;
-      vector<float>   *gsfPhi;
       Int_t           npfHF;
       vector<float>   *pfHFEn;
       vector<float>   *pfHFECALEn;
@@ -278,7 +287,6 @@ class TInputOutputTree{
       vector<float>   *pfHFEta;
       vector<float>   *pfHFPhi;
       vector<float>   *pfHFIso;
-      //muon
       Int_t           nMu;
       vector<float>   *muPt;
       vector<float>   *muEn;
@@ -286,13 +294,10 @@ class TInputOutputTree{
       vector<float>   *muPhi;
       vector<int>     *muCharge;
       vector<int>     *muType;
-      vector<bool>    *muIsLooseID;
-      vector<bool>    *muIsMediumID;
-      vector<bool>    *muIsTightID;
-      vector<bool>    *muIsSoftID;
-      vector<bool>    *muIsHighPtID;
+      vector<unsigned short> *muIDbit;
       vector<float>   *muD0;
       vector<float>   *muDz;
+      vector<float>   *muSIP;
       vector<float>   *muChi2NDF;
       vector<float>   *muInnerD0;
       vector<float>   *muInnerDz;
@@ -309,14 +314,14 @@ class TInputOutputTree{
       vector<float>   *muPFNeuIso;
       vector<float>   *muPFPUIso;
       vector<float>   *muPFMiniIso;
-      vector<int>     *muFiredTrgs;
+      vector<unsigned int> *muFiredTrgs;
+      vector<unsigned int> *muFiredL1Trgs;
       vector<float>   *muInnervalidFraction;
       vector<float>   *musegmentCompatibility;
       vector<float>   *muchi2LocalPosition;
       vector<float>   *mutrkKink;
       vector<float>   *muBestTrkPtError;
       vector<float>   *muBestTrkPt;
-      //AK4Jets
       Int_t           nJet;
       vector<float>   *jetPt;
       vector<float>   *jetEn;
@@ -333,24 +338,11 @@ class TInputOutputTree{
       vector<float>   *jetLepTrackPt;
       vector<float>   *jetLepTrackEta;
       vector<float>   *jetLepTrackPhi;
-      vector<float>   *jetpfCombinedInclusiveSecondaryVertexV2BJetTags;
+      vector<float>   *jetCSV2BJetTags;
       vector<float>   *jetJetProbabilityBJetTags;
       vector<float>   *jetpfCombinedMVAV2BJetTags;
-      vector<bool>    *jetPFLooseId;
-      vector<float>   *jetPUidFullDiscriminant;
-      vector<float>   *jetJECUnc;
-      vector<int>     *jetFiredTrgs;
-      vector<float>   *jetCHF;
-      vector<float>   *jetNHF;
-      vector<float>   *jetCEF;
-      vector<float>   *jetNEF;
-      vector<int>     *jetNCH;
-      vector<float>   *jetVtxPt;
-      vector<float>   *jetVtxMass;
-      vector<float>   *jetVtxNtrks;
-      vector<float>   *jetVtx3DVal;
-      vector<float>   *jetVtx3DSig;
       vector<int>     *jetPartonID;
+      vector<int>     *jetHadFlvr;
       vector<int>     *jetGenJetIndex;
       vector<float>   *jetGenJetEn;
       vector<float>   *jetGenJetPt;
@@ -362,8 +354,23 @@ class TInputOutputTree{
       vector<float>   *jetGenEta;
       vector<float>   *jetGenPhi;
       vector<int>     *jetGenPartonMomID;
-      
-      //AK8Jets
+      vector<bool>    *jetPFLooseId;
+      vector<int>     *jetID;
+      vector<float>   *jetPUidFullDiscriminant;
+      vector<float>   *jetJECUnc;
+      vector<unsigned int> *jetFiredTrgs;
+      vector<float>   *jetCHF;
+      vector<float>   *jetNHF;
+      vector<float>   *jetCEF;
+      vector<float>   *jetNEF;
+      vector<int>     *jetNCH;
+      vector<int>     *jetNNP;
+      vector<float>   *jetMUF;
+      vector<float>   *jetVtxPt;
+      vector<float>   *jetVtxMass;
+      vector<float>   *jetVtxNtrks;
+      vector<float>   *jetVtx3DVal;
+      vector<float>   *jetVtx3DSig;
       Int_t           nAK8Jet;
       vector<float>   *AK8JetPt;
       vector<float>   *AK8JetEn;
@@ -380,18 +387,31 @@ class TInputOutputTree{
       vector<float>   *AK8JetCEF;
       vector<float>   *AK8JetNEF;
       vector<int>     *AK8JetNCH;
-      vector<int>     *AK8Jetnconstituents;
+      vector<int>     *AK8JetNNP;
       vector<float>   *AK8JetMUF;
+      vector<int>     *AK8Jetnconstituents;
       vector<bool>    *AK8JetPFLooseId;
       vector<bool>    *AK8JetPFTightLepVetoId;
-      vector<float>   *AK8CHSSoftDropJetMass;
-      vector<float>   *AK8CHSSoftDropJetMassCorr;
-      vector<float>   *AK8CHSPrunedJetMass;
-      vector<float>   *AK8CHSPrunedJetMassCorr;
+      vector<float>   *AK8JetSoftDropMass;
+      vector<float>   *AK8JetSoftDropMassCorr;
+      vector<float>   *AK8JetPrunedMass;
+      vector<float>   *AK8JetPrunedMassCorr;
       vector<float>   *AK8JetpfBoostedDSVBTag;
+      vector<float>   *AK8JetCSV;
       vector<float>   *AK8JetJECUnc;
       vector<float>   *AK8JetL2L3corr;
+      vector<float>   *AK8puppiPt;
+      vector<float>   *AK8puppiMass;
+      vector<float>   *AK8puppiEta;
+      vector<float>   *AK8puppiPhi;
+      vector<float>   *AK8puppiTau1;
+      vector<float>   *AK8puppiTau2;
+      vector<float>   *AK8puppiTau3;
+      vector<float>   *AK8puppiSDL2L3corr;
+      vector<float>   *AK8puppiSDMass;
+      vector<float>   *AK8puppiSDMassL2L3Corr;
       vector<int>     *AK8JetPartonID;
+      vector<int>     *AK8JetHadFlvr;
       vector<int>     *AK8JetGenJetIndex;
       vector<float>   *AK8JetGenJetEn;
       vector<float>   *AK8JetGenJetPt;
@@ -403,16 +423,24 @@ class TInputOutputTree{
       vector<float>   *AK8JetGenEta;
       vector<float>   *AK8JetGenPhi;
       vector<int>     *AK8JetGenPartonMomID;
-      
-      vector<int>     *nAK8softdropSubjet;
-      vector<vector<float> > *AK8softdropSubjetPt;
-      vector<vector<float> > *AK8softdropSubjetEta;
-      vector<vector<float> > *AK8softdropSubjetPhi;
-      vector<vector<float> > *AK8softdropSubjetMass;
-      vector<vector<float> > *AK8softdropSubjetE;
-      vector<vector<int> > *AK8softdropSubjetCharge;
-      vector<vector<int> > *AK8softdropSubjetFlavour;
-      vector<vector<float> > *AK8softdropSubjetCSV;
+      vector<int>     *nAK8SDSJ;
+      vector<vector<float> > *AK8SDSJPt;
+      vector<vector<float> > *AK8SDSJEta;
+      vector<vector<float> > *AK8SDSJPhi;
+      vector<vector<float> > *AK8SDSJMass;
+      vector<vector<float> > *AK8SDSJE;
+      vector<vector<int> > *AK8SDSJCharge;
+      vector<vector<int> > *AK8SDSJFlavour;
+      vector<vector<float> > *AK8SDSJCSV;
+      vector<int>     *nAK8puppiSDSJ;
+      vector<vector<float> > *AK8puppiSDSJPt;
+      vector<vector<float> > *AK8puppiSDSJEta;
+      vector<vector<float> > *AK8puppiSDSJPhi;
+      vector<vector<float> > *AK8puppiSDSJMass;
+      vector<vector<float> > *AK8puppiSDSJE;
+      vector<vector<int> > *AK8puppiSDSJCharge;
+      vector<vector<int> > *AK8puppiSDSJFlavour;
+      vector<vector<float> > *AK8puppiSDSJCSV;
     };
 
     InputTreeLeaves treeLeaf;
@@ -425,394 +453,413 @@ class TInputOutputTree{
     };
     OutputTreeLeaves outLeaf;
 
-    //Global branches
-    TBranch        *b_run;   //!
-    TBranch        *b_event;   //!
-    TBranch        *b_lumis;   //!
-    TBranch        *b_isData;   //!
-    TBranch        *b_nVtx;   //!
-    TBranch        *b_nTrksPV;   //!
-    TBranch        *b_isPVGood;///////////////////////////
-    TBranch        *b_hasGoodVtx;//////////////////////666
-    TBranch        *b_vtx;   //!
-    TBranch        *b_vty;   //!
-    TBranch        *b_vtz;   //!
-    TBranch        *b_rho;   //!
-    TBranch        *b_rhoCentral;   //!
-    TBranch        *b_HLTEleMuX;   //!
-    TBranch        *b_HLTPho;   //!
-    TBranch        *b_HLTJet;   //!
-    TBranch        *b_HLTEleMuXIsPrescaled;   //!
-    TBranch        *b_HLTPhoIsPrescaled;   //!
-    TBranch        *b_HLTJetIsPrescaled;   //!
-    TBranch        *b_pdf;   //!
-    TBranch        *b_pthat;   //!
-    TBranch        *b_processID;   //!
-    TBranch        *b_genWeight;   //!
-    TBranch        *b_genHT;   //!
-    TBranch        *b_nPUInfo;   //!
-    TBranch        *b_nPU;   //!
-    TBranch        *b_puBX;   //!
-    TBranch        *b_puTrue;   //!
-    TBranch        *b_nMC;   //!
-    TBranch        *b_mcPID;   //!
-    TBranch        *b_mcVtx;   //!
-    TBranch        *b_mcVty;   //!
-    TBranch        *b_mcVtz;   //!
-    TBranch        *b_mcPt;   //!
-    TBranch        *b_mcMass;   //!
-    TBranch        *b_mcEta;   //!
-    TBranch        *b_mcPhi;   //!
-    TBranch        *b_mcE;   //!
-    TBranch        *b_mcEt;   //!
-    TBranch        *b_mcGMomPID;   //!
-    TBranch        *b_mcMomPID;   //!
-    TBranch        *b_mcMomPt;   //!
-    TBranch        *b_mcMomMass;   //!
-    TBranch        *b_mcMomEta;   //!
-    TBranch        *b_mcMomPhi;   //!
-    TBranch        *b_mcIndex;   //!
-    TBranch        *b_mcStatusFlag;   //!
-    TBranch        *b_mcParentage;   //!
-    TBranch        *b_mcStatus;   //!
-    TBranch        *b_mcCalIsoDR03;   //!
-    TBranch        *b_mcTrkIsoDR03;   //!
-    TBranch        *b_mcCalIsoDR04;   //!
-    TBranch        *b_mcTrkIsoDR04;   //!
-    TBranch        *b_genMET;   //!
-    TBranch        *b_genMETPhi;   //!
-    
-    TBranch        *b_metFilters;   //!
-    TBranch        *b_pfMET;   //!
-    TBranch        *b_pfMETPhi;   //!
-    TBranch        *b_pfMETsumEt;   //!
-    TBranch        *b_pfMETmEtSig;   //!
-    TBranch        *b_pfMETSig;   //!
-    TBranch        *b_pfMET_T1JERUp;   //!
-    TBranch        *b_pfMET_T1JERDo;   //!
-    TBranch        *b_pfMET_T1JESUp;   //!
-    TBranch        *b_pfMET_T1JESDo;   //!
-    TBranch        *b_pfMET_T1MESUp;   //!
-    TBranch        *b_pfMET_T1MESDo;   //!
-    TBranch        *b_pfMET_T1EESUp;   //!
-    TBranch        *b_pfMET_T1EESDo;   //!
-    TBranch        *b_pfMET_T1PESUp;   //!
-    TBranch        *b_pfMET_T1PESDo;   //!
-    TBranch        *b_pfMET_T1TESUp;   //!
-    TBranch        *b_pfMET_T1TESDo;   //!
-    TBranch        *b_pfMET_T1UESUp;   //!
-    TBranch        *b_pfMET_T1UESDo;   //!
-    //photon
-    TBranch        *b_nPho;   //!
-    TBranch        *b_phoE;   //!
-    TBranch        *b_phoEt;   //!
-    TBranch        *b_phoEta;   //!
-    TBranch        *b_phoPhi;   //!
-    TBranch        *b_phoCalibE;//6666666666666666666666666666666666666
-    TBranch        *b_phoCalibEt;//66666666666666666666666666666666666666666
-    TBranch        *b_phoSCE;   //!
-    TBranch        *b_phoSCRawE;   //!
-    TBranch        *b_phoESEn;   //!
-    TBranch        *b_phoESEnP1;   //!
-    TBranch        *b_phoESEnP2;   //!
-    TBranch        *b_phoSCEta;   //!
-    TBranch        *b_phoSCPhi;   //!
-    TBranch        *b_phoSCEtaWidth;   //!
-    TBranch        *b_phoSCPhiWidth;   //!
-    TBranch        *b_phoSCBrem;   //!
-    TBranch        *b_phohasPixelSeed;   //!
-    TBranch        *b_phoEleVeto;   //!
-    TBranch        *b_phoR9;   //!
-    TBranch        *b_phoHoverE;   //!
-    TBranch        *b_phoSigmaIEtaIEta;   //!
-    TBranch        *b_phoSigmaIEtaIPhi;   //!
-    TBranch        *b_phoSigmaIPhiIPhi;   //!
-    TBranch        *b_phoE1x3;   //!
-    TBranch        *b_phoE2x2;   //!
-    TBranch        *b_phoE2x5Max;   //!
-    TBranch        *b_phoE5x5;   //!
-    TBranch        *b_phoESEffSigmaRR;   //!
-    TBranch        *b_phoSigmaIEtaIEtaFull5x5;   //!
-    TBranch        *b_phoSigmaIEtaIPhiFull5x5;   //!
-    TBranch        *b_phoSigmaIPhiIPhiFull5x5;   //!
-    TBranch        *b_phoE1x3Full5x5;   //!
-    TBranch        *b_phoE2x2Full5x5;   //!
-    TBranch        *b_phoE2x5MaxFull5x5;   //!
-    TBranch        *b_phoE5x5Full5x5;   //!
-    TBranch        *b_phoR9Full5x5;   //!
-    TBranch        *b_phoSeedBCE;   //!
-    TBranch        *b_phoSeedBCEta;   //!
-    TBranch        *b_phoPFChIso;   //!
-    TBranch        *b_phoPFPhoIso;   //!
-    TBranch        *b_phoPFNeuIso;   //!
-    TBranch        *b_phoPFChWorstIso;   //!
-    TBranch        *b_phoPFChIsoFrix1;   //!
-    TBranch        *b_phoPFChIsoFrix2;   //!
-    TBranch        *b_phoPFChIsoFrix3;   //!
-    TBranch        *b_phoPFChIsoFrix4;   //!
-    TBranch        *b_phoPFChIsoFrix5;   //!
-    TBranch        *b_phoPFChIsoFrix6;   //!
-    TBranch        *b_phoPFChIsoFrix7;   //!
-    TBranch        *b_phoPFChIsoFrix8;   //!
-    TBranch        *b_phoPFPhoIsoFrix1;   //!
-    TBranch        *b_phoPFPhoIsoFrix2;   //!
-    TBranch        *b_phoPFPhoIsoFrix3;   //!
-    TBranch        *b_phoPFPhoIsoFrix4;   //!
-    TBranch        *b_phoPFPhoIsoFrix5;   //!
-    TBranch        *b_phoPFPhoIsoFrix6;   //!
-    TBranch        *b_phoPFPhoIsoFrix7;   //!
-    TBranch        *b_phoPFPhoIsoFrix8;   //!
-    TBranch        *b_phoPFNeuIsoFrix1;   //!
-    TBranch        *b_phoPFNeuIsoFrix2;   //!
-    TBranch        *b_phoPFNeuIsoFrix3;   //!
-    TBranch        *b_phoPFNeuIsoFrix4;   //!
-    TBranch        *b_phoPFNeuIsoFrix5;   //!
-    TBranch        *b_phoPFNeuIsoFrix6;   //!
-    TBranch        *b_phoPFNeuIsoFrix7;   //!
-    TBranch        *b_phoPFNeuIsoFrix8;   //!
-    TBranch        *b_phoEcalRecHitSumEtConeDR03;   //!
-    TBranch        *b_phohcalDepth1TowerSumEtConeDR03;   //!
-    TBranch        *b_phohcalDepth2TowerSumEtConeDR03;   //!
-    TBranch        *b_phohcalTowerSumEtConeDR03;   //!
-    TBranch        *b_photrkSumPtHollowConeDR03;   //!
-    TBranch        *b_photrkSumPtSolidConeDR03;//6666666666666666666666666666666
-    TBranch        *b_phoIDMVA;   //!
-    TBranch        *b_phoFiredSingleTrgs;   //!
-    TBranch        *b_phoFiredDoubleTrgs;   //!
-    TBranch        *b_phoIDbit;   //!
-    //electron
-    TBranch        *b_nEle;   //!
-    TBranch        *b_eleCharge;   //!
-    TBranch        *b_eleChargeConsistent;   //!
-    TBranch        *b_eleEn;   //!
-    TBranch        *b_eleSCEn;   //!
-    TBranch        *b_eleESEn;   //!
-    TBranch        *b_eleESEnP1;   //!
-    TBranch        *b_eleESEnP2;   //!
-    TBranch        *b_eleD0;   //!
-    TBranch        *b_eleDz;   //!
-    TBranch        *b_elePt;   //!
-    TBranch        *b_eleEta;   //!
-    TBranch        *b_elePhi;   //!
-    TBranch        *b_eleR9;   //!
-    TBranch        *b_eleCalibPt;//66666666666666666666666666
-    TBranch        *b_eleCalibEn;//6666666666666666666666666
-    TBranch        *b_eleSCEta;   //!
-    TBranch        *b_eleSCPhi;   //!
-    TBranch        *b_eleSCRawEn;   //!
-    TBranch        *b_eleSCEtaWidth;   //!
-    TBranch        *b_eleSCPhiWidth;   //!
-    TBranch        *b_eleHoverE;   //!
-    TBranch        *b_eleEoverP;   //!
-    TBranch        *b_eleEoverPout;   //!
-    TBranch        *b_eleEoverPInv;   //!
-    TBranch        *b_eleBrem;   //!
-    TBranch        *b_eledEtaAtVtx;   //!
-    TBranch        *b_eledPhiAtVtx;   //!
-    TBranch        *b_eledEtaAtCalo;   //!
-    TBranch        *b_eleSigmaIEtaIEta;   //!
-    TBranch        *b_eleSigmaIEtaIPhi;   //!
-    TBranch        *b_eleSigmaIPhiIPhi;   //!
-    TBranch        *b_eleSigmaIEtaIEtaFull5x5;   //!
-    TBranch        *b_eleSigmaIPhiIPhiFull5x5;   //!
-    TBranch        *b_eleConvVeto;   //!
-    TBranch        *b_eleMissHits;   //!
-    TBranch        *b_eleESEffSigmaRR;   //!
-    TBranch        *b_elePFChIso;   //!
-    TBranch        *b_elePFPhoIso;   //!
-    TBranch        *b_elePFNeuIso;   //!
-    TBranch        *b_elePFPUIso;   //!
-    TBranch        *b_elePFClusEcalIso;//6666666666666666
-    TBranch        *b_elePFClusHcalIso;//66666666666666666666
-    TBranch        *b_elePFMiniIso;//6666666666666666666666666
-    TBranch        *b_eleIDMVANonTrg;   //!
-    TBranch        *b_eleIDMVATrg;   //!
-    TBranch        *b_eledEtaseedAtVtx;   //!
-    TBranch        *b_eleE1x5;   //!
-    TBranch        *b_eleE2x5;   //!
-    TBranch        *b_eleE5x5;   //!
-    TBranch        *b_eleE1x5Full5x5;   //!
-    TBranch        *b_eleE2x5Full5x5;   //!
-    TBranch        *b_eleE5x5Full5x5;   //!
-    TBranch        *b_eleR9Full5x5;   //!
-    TBranch        *b_eleEcalDrivenSeed;   //!
-    TBranch        *b_eleDr03EcalRecHitSumEt;   //!
-    TBranch        *b_eleDr03HcalDepth1TowerSumEt;   //!
-    TBranch        *b_eleDr03HcalDepth2TowerSumEt;   //!
-    TBranch        *b_eleDr03HcalTowerSumEt;   //!
-    TBranch        *b_eleDr03TkSumPt;   //!
-    TBranch        *b_elecaloEnergy;   //!
-    TBranch        *b_eleTrkdxy;   //!
-    TBranch        *b_eleKFHits;   //!
-    TBranch        *b_eleKFChi2;   //!
-    TBranch        *b_eleGSFPt;   //!
-    TBranch        *b_eleGSFEta;   //!
-    TBranch        *b_eleGSFPhi;   //!
-    TBranch        *b_eleGSFCharge;   //!
-    TBranch        *b_eleGSFHits;   //!
-    TBranch        *b_eleGSFMissHits;   //!
-    TBranch        *b_eleGSFNHitsMax;   //!
-    TBranch        *b_eleGSFVtxProb;   //!
-    TBranch        *b_eleGSFlxyPV;   //!
-    TBranch        *b_eleGSFlxyBS;   //!
-    TBranch        *b_eleBCEn;   //!
-    TBranch        *b_eleBCEta;   //!
-    TBranch        *b_eleBCPhi;   //!
-    TBranch        *b_eleBCS25;   //!
-    TBranch        *b_eleBCS15;   //!
-    TBranch        *b_eleBCSieie;   //!
-    TBranch        *b_eleBCSieip;   //!
-    TBranch        *b_eleBCSipip;   //!
-    TBranch        *b_eleFiredTrgs;   //!
-    TBranch        *b_eleIDbit;   //!
-    TBranch        *b_eleESEnP1Raw;   //!
-    TBranch        *b_eleESEnP2Raw;   //!
-    TBranch        *b_nGSFTrk;   //!
-    TBranch        *b_gsfPt;   //!
-    TBranch        *b_gsfEta;   //!
-    TBranch        *b_gsfPhi;   //!
-    TBranch        *b_npfHF;   //!
-    TBranch        *b_pfHFEn;   //!
-    TBranch        *b_pfHFECALEn;   //!
-    TBranch        *b_pfHFHCALEn;   //!
-    TBranch        *b_pfHFPt;   //!
-    TBranch        *b_pfHFEta;   //!
-    TBranch        *b_pfHFPhi;   //!
-    TBranch        *b_pfHFIso;   //!
-    //muon
-    TBranch        *b_nMu;   //!
-    TBranch        *b_muPt;   //!
-    TBranch        *b_muEn;   //!
-    TBranch        *b_muEta;   //!
-    TBranch        *b_muPhi;   //!
-    TBranch        *b_muCharge;   //!
-    TBranch        *b_muType;   //!
-    TBranch        *b_muIsLooseID;   //!
-    TBranch        *b_muIsMediumID;   //!
-    TBranch        *b_muIsTightID;   //!
-    TBranch        *b_muIsSoftID;   //!
-    TBranch        *b_muIsHighPtID;   //!
-    TBranch        *b_muD0;   //!
-    TBranch        *b_muDz;   //!
-    TBranch        *b_muChi2NDF;   //!
-    TBranch        *b_muInnerD0;   //!
-    TBranch        *b_muInnerDz;   //!
-    TBranch        *b_muTrkLayers;   //!
-    TBranch        *b_muPixelLayers;   //!
-    TBranch        *b_muPixelHits;   //!
-    TBranch        *b_muMuonHits;   //!
-    TBranch        *b_muStations;   //!
-    TBranch        *b_muMatches;//666666666666666666666666666
-    TBranch        *b_muTrkQuality;   //!
-    TBranch        *b_muIsoTrk;   //!
-    TBranch        *b_muPFChIso;   //!
-    TBranch        *b_muPFPhoIso;   //!
-    TBranch        *b_muPFNeuIso;   //!
-    TBranch        *b_muPFPUIso;   //!
-    TBranch        *b_muFiredTrgs;   //!
-    TBranch        *b_muInnervalidFraction;   //!
-    TBranch        *b_musegmentCompatibility;   //!
-    TBranch        *b_muchi2LocalPosition;   //!
-    TBranch        *b_mutrkKink;   //!
-    TBranch        *b_muBestTrkPtError;   //!
-    TBranch        *b_muBestTrkPt;   //!
-    //AK4Jets
-    TBranch        *b_nJet;   //!
-    TBranch        *b_jetPt;   //!
-    TBranch        *b_jetEn;   //!
-    TBranch        *b_jetEta;   //!
-    TBranch        *b_jetPhi;   //!
-    TBranch        *b_jetRawPt;   //!
-    TBranch        *b_jetRawEn;   //!
-    TBranch        *b_jetMt;//666666666666666666666666
-    TBranch        *b_jetArea;   //!
-    TBranch        *b_jetLeadTrackPt;//66666666666666666666666
-    TBranch        *b_jetLeadTrackEta;//66666666666666666666666
-    TBranch        *b_jetLeadTrackPhi;//66666666666666666666666
-    TBranch        *b_jetLepTrackPID;//66666666666666666666666
-    TBranch        *b_jetLepTrackPt;//66666666666666666666666
-    TBranch        *b_jetLepTrackEta;//66666666666666666666666
-    TBranch        *b_jetLepTrackPhi;//66666666666666666666666
-    TBranch        *b_jetpfCombinedInclusiveSecondaryVertexV2BJetTags;   //!
-    TBranch        *b_jetJetProbabilityBJetTags;   //!
-    TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
-    TBranch        *b_jetPFLooseId;   //!
-    TBranch        *b_jetPUidFullDiscriminant;   //!
-    TBranch        *b_jetJECUnc;   //!
-    TBranch        *b_jetFiredTrgs;   //!
-    TBranch        *b_jetCHF;   //!
-    TBranch        *b_jetNHF;   //!
-    TBranch        *b_jetCEF;   //!
-    TBranch        *b_jetNEF;   //!
-    TBranch        *b_jetNCH;   //!
-    TBranch        *b_jetVtxPt;//666666666666666666666
-    TBranch        *b_jetVtxMass;//666666666666666666666
-    TBranch        *b_jetVtxNtrks;//666666666666666666666
-    TBranch        *b_jetVtx3DVal;//666666666666666666666
-    TBranch        *b_jetVtx3DSig;//666666666666666666666
-    TBranch        *b_jetPartonID;   //!
-    TBranch        *b_jetGenJetIndex;   //!
-    TBranch        *b_jetGenJetEn;   //!
-    TBranch        *b_jetGenJetPt;   //!
-    TBranch        *b_jetGenJetEta;   //!
-    TBranch        *b_jetGenJetPhi;   //!
-    TBranch        *b_jetGenPartonID;   //!
-    TBranch        *b_jetGenEn;   //!
-    TBranch        *b_jetGenPt;   //!
-    TBranch        *b_jetGenEta;   //!
-    TBranch        *b_jetGenPhi;   //!
-    TBranch        *b_jetGenPartonMomID;   //!
-    
-    //AK8Jets
-    TBranch        *b_nAK8Jet;   //!
-    TBranch        *b_AK8JetPt;   //!
-    TBranch        *b_AK8JetEn;   //!
-    TBranch        *b_AK8JetRawPt;   //!
-    TBranch        *b_AK8JetRawEn;   //!
-    TBranch        *b_AK8JetEta;   //!
-    TBranch        *b_AK8JetPhi;   //!
-    TBranch        *b_AK8JetMass;   //!
-    TBranch        *b_AK8Jet_tau1;   //!
-    TBranch        *b_AK8Jet_tau2;   //!
-    TBranch        *b_AK8Jet_tau3;   //!
-    TBranch        *b_AK8JetCHF;   //!
-    TBranch        *b_AK8JetNHF;   //!
-    TBranch        *b_AK8JetCEF;   //!
-    TBranch        *b_AK8JetNEF;   //!
-    TBranch        *b_AK8JetNCH;   //!
-    TBranch        *b_AK8Jetnconstituents;   //!
-    TBranch        *b_AK8JetMUF;//666666666666666
-    TBranch        *b_AK8JetPFLooseId;   //!
-    TBranch        *b_AK8JetPFTightLepVetoId;//666666666666666666666
-    TBranch        *b_AK8CHSSoftDropJetMass;   //!
-    TBranch        *b_AK8CHSSoftDropJetMassCorr;   //666666666666666666666!
-    TBranch        *b_AK8CHSPrunedJetMass;//66666666666666666
-    TBranch        *b_AK8CHSPrunedJetMassCorr;//6666666666666666666
-    TBranch        *b_AK8JetpfBoostedDSVBTag;   //!
-    TBranch        *b_AK8JetJECUnc;   //!
-    TBranch        *b_AK8JetL2L3corr;//6666666666666666666
-    TBranch        *b_AK8JetPartonID;   //!
-    TBranch        *b_AK8JetGenJetIndex;   //!
-    TBranch        *b_AK8JetGenJetEn;   //!
-    TBranch        *b_AK8JetGenJetPt;   //!
-    TBranch        *b_AK8JetGenJetEta;   //!
-    TBranch        *b_AK8JetGenJetPhi;   //!
-    TBranch        *b_AK8JetGenPartonID;   //!
-    TBranch        *b_AK8JetGenEn;   //!
-    TBranch        *b_AK8JetGenPt;   //!
-    TBranch        *b_AK8JetGenEta;   //!
-    TBranch        *b_AK8JetGenPhi;   //!
-    TBranch        *b_AK8JetGenPartonMomID;   //!
-    
-    TBranch        *b_nAK8softdropSubjet;   //!
-    TBranch        *b_AK8softdropSubjetPt;   //!
-    TBranch        *b_AK8softdropSubjetEta;   //!
-    TBranch        *b_AK8softdropSubjetPhi;   //!
-    TBranch        *b_AK8softdropSubjetMass;   //!
-    TBranch        *b_AK8softdropSubjetE;   //!
-    TBranch        *b_AK8softdropSubjetCharge;   //!
-    TBranch        *b_AK8softdropSubjetFlavour;   //!
-    TBranch        *b_AK8softdropSubjetCSV;   //!
+   // List of branches
+   TBranch        *b_run;   //!
+   TBranch        *b_event;   //!
+   TBranch        *b_lumis;   //!
+   TBranch        *b_isData;   //!
+   TBranch        *b_nVtx;   //!
+   TBranch        *b_nGoodVtx;   //!
+   TBranch        *b_nTrksPV;   //!
+   TBranch        *b_isPVGood;   //!
+   TBranch        *b_vtx;   //!
+   TBranch        *b_vty;   //!
+   TBranch        *b_vtz;   //!
+   TBranch        *b_rho;   //!
+   TBranch        *b_rhoCentral;   //!
+   TBranch        *b_HLTEleMuX;   //!
+   TBranch        *b_HLTPho;   //!
+   TBranch        *b_HLTJet;   //!
+   TBranch        *b_HLTEleMuXIsPrescaled;   //!
+   TBranch        *b_HLTPhoIsPrescaled;   //!
+   TBranch        *b_HLTJetIsPrescaled;   //!
+   TBranch        *b_pdf;   //!
+   TBranch        *b_pthat;   //!
+   TBranch        *b_processID;   //!
+   TBranch        *b_genWeight;   //!
+   TBranch        *b_genHT;   //!
+   TBranch        *b_EventTag;   //!
+   TBranch        *b_nPUInfo;   //!
+   TBranch        *b_nPU;   //!
+   TBranch        *b_puBX;   //!
+   TBranch        *b_puTrue;   //!
+   TBranch        *b_nMC;   //!
+   TBranch        *b_mcPID;   //!
+   TBranch        *b_mcVtx;   //!
+   TBranch        *b_mcVty;   //!
+   TBranch        *b_mcVtz;   //!
+   TBranch        *b_mcPt;   //!
+   TBranch        *b_mcMass;   //!
+   TBranch        *b_mcEta;   //!
+   TBranch        *b_mcPhi;   //!
+   TBranch        *b_mcE;   //!
+   TBranch        *b_mcEt;   //!
+   TBranch        *b_mcGMomPID;   //!
+   TBranch        *b_mcMomPID;   //!
+   TBranch        *b_mcMomPt;   //!
+   TBranch        *b_mcMomMass;   //!
+   TBranch        *b_mcMomEta;   //!
+   TBranch        *b_mcMomPhi;   //!
+   TBranch        *b_mcIndex;   //!
+   TBranch        *b_mcStatusFlag;   //!
+   TBranch        *b_mcParentage;   //!
+   TBranch        *b_mcStatus;   //!
+   TBranch        *b_mcCalIsoDR03;   //!
+   TBranch        *b_mcTrkIsoDR03;   //!
+   TBranch        *b_mcCalIsoDR04;   //!
+   TBranch        *b_mcTrkIsoDR04;   //!
+   TBranch        *b_genMET;   //!
+   TBranch        *b_genMETPhi;   //!
+   TBranch        *b_metFilters;   //!
+   TBranch        *b_pfMET;   //!
+   TBranch        *b_pfMETPhi;   //!
+   TBranch        *b_pfMETsumEt;   //!
+   TBranch        *b_pfMETmEtSig;   //!
+   TBranch        *b_pfMETSig;   //!
+   TBranch        *b_pfMET_T1JERUp;   //!
+   TBranch        *b_pfMET_T1JERDo;   //!
+   TBranch        *b_pfMET_T1JESUp;   //!
+   TBranch        *b_pfMET_T1JESDo;   //!
+   TBranch        *b_pfMET_T1UESUp;   //!
+   TBranch        *b_pfMET_T1UESDo;   //!
+   TBranch        *b_pfMETPhi_T1JESUp;   //!
+   TBranch        *b_pfMETPhi_T1JESDo;   //!
+   TBranch        *b_pfMETPhi_T1UESUp;   //!
+   TBranch        *b_pfMETPhi_T1UESDo;   //!
+   TBranch        *b_nPho;   //!
+   TBranch        *b_phoE;   //!
+   TBranch        *b_phoEt;   //!
+   TBranch        *b_phoEta;   //!
+   TBranch        *b_phoPhi;   //!
+   TBranch        *b_phoCalibE;   //!
+   TBranch        *b_phoCalibEt;   //!
+   TBranch        *b_phoSCE;   //!
+   TBranch        *b_phoSCRawE;   //!
+   TBranch        *b_phoESEn;   //!
+   TBranch        *b_phoESEnP1;   //!
+   TBranch        *b_phoESEnP2;   //!
+   TBranch        *b_phoSCEta;   //!
+   TBranch        *b_phoSCPhi;   //!
+   TBranch        *b_phoSCEtaWidth;   //!
+   TBranch        *b_phoSCPhiWidth;   //!
+   TBranch        *b_phoSCBrem;   //!
+   TBranch        *b_phohasPixelSeed;   //!
+   TBranch        *b_phoEleVeto;   //!
+   TBranch        *b_phoR9;   //!
+   TBranch        *b_phoHoverE;   //!
+   TBranch        *b_phoSigmaIEtaIEta;   //!
+   TBranch        *b_phoSigmaIEtaIPhi;   //!
+   TBranch        *b_phoSigmaIPhiIPhi;   //!
+   TBranch        *b_phoE1x3;   //!
+   TBranch        *b_phoE1x5;   //!
+   TBranch        *b_phoE2x2;   //!
+   TBranch        *b_phoE2x5Max;   //!
+   TBranch        *b_phoE5x5;   //!
+   TBranch        *b_phoESEffSigmaRR;   //!
+   TBranch        *b_phoSigmaIEtaIEtaFull5x5;   //!
+   TBranch        *b_phoSigmaIEtaIPhiFull5x5;   //!
+   TBranch        *b_phoSigmaIPhiIPhiFull5x5;   //!
+   TBranch        *b_phoE1x3Full5x5;   //!
+   TBranch        *b_phoE1x5Full5x5;   //!
+   TBranch        *b_phoE2x2Full5x5;   //!
+   TBranch        *b_phoE2x5MaxFull5x5;   //!
+   TBranch        *b_phoE5x5Full5x5;   //!
+   TBranch        *b_phoR9Full5x5;   //!
+   TBranch        *b_phoSeedBCE;   //!
+   TBranch        *b_phoSeedBCEta;   //!
+   TBranch        *b_phoPFChIso;   //!
+   TBranch        *b_phoPFPhoIso;   //!
+   TBranch        *b_phoPFNeuIso;   //!
+   TBranch        *b_phoPFChWorstIso;   //!
+   TBranch        *b_phoPFChIsoFrix1;   //!
+   TBranch        *b_phoPFChIsoFrix2;   //!
+   TBranch        *b_phoPFChIsoFrix3;   //!
+   TBranch        *b_phoPFChIsoFrix4;   //!
+   TBranch        *b_phoPFChIsoFrix5;   //!
+   TBranch        *b_phoPFChIsoFrix6;   //!
+   TBranch        *b_phoPFChIsoFrix7;   //!
+   TBranch        *b_phoPFChIsoFrix8;   //!
+   TBranch        *b_phoPFPhoIsoFrix1;   //!
+   TBranch        *b_phoPFPhoIsoFrix2;   //!
+   TBranch        *b_phoPFPhoIsoFrix3;   //!
+   TBranch        *b_phoPFPhoIsoFrix4;   //!
+   TBranch        *b_phoPFPhoIsoFrix5;   //!
+   TBranch        *b_phoPFPhoIsoFrix6;   //!
+   TBranch        *b_phoPFPhoIsoFrix7;   //!
+   TBranch        *b_phoPFPhoIsoFrix8;   //!
+   TBranch        *b_phoPFNeuIsoFrix1;   //!
+   TBranch        *b_phoPFNeuIsoFrix2;   //!
+   TBranch        *b_phoPFNeuIsoFrix3;   //!
+   TBranch        *b_phoPFNeuIsoFrix4;   //!
+   TBranch        *b_phoPFNeuIsoFrix5;   //!
+   TBranch        *b_phoPFNeuIsoFrix6;   //!
+   TBranch        *b_phoPFNeuIsoFrix7;   //!
+   TBranch        *b_phoPFNeuIsoFrix8;   //!
+   TBranch        *b_phoCITKChIso;   //!
+   TBranch        *b_phoCITKPhoIso;   //!
+   TBranch        *b_phoCITKNeuIso;   //!
+   TBranch        *b_phoEcalRecHitSumEtConeDR03;   //!
+   TBranch        *b_phohcalDepth1TowerSumEtConeDR03;   //!
+   TBranch        *b_phohcalDepth2TowerSumEtConeDR03;   //!
+   TBranch        *b_phohcalTowerSumEtConeDR03;   //!
+   TBranch        *b_photrkSumPtHollowConeDR03;   //!
+   TBranch        *b_photrkSumPtSolidConeDR03;   //!
+   TBranch        *b_phoIDMVA;   //!
+   TBranch        *b_phoFiredSingleTrgs;   //!
+   TBranch        *b_phoFiredDoubleTrgs;   //!
+   TBranch        *b_phoFiredL1Trgs;   //!
+   TBranch        *b_phoxtalBits;   //!
+   TBranch        *b_phoIDbit;   //!
+   TBranch        *b_nEle;   //!
+   TBranch        *b_eleCharge;   //!
+   TBranch        *b_eleChargeConsistent;   //!
+   TBranch        *b_eleEn;   //!
+   TBranch        *b_eleSCEn;   //!
+   TBranch        *b_eleESEn;   //!
+   TBranch        *b_eleESEnP1;   //!
+   TBranch        *b_eleESEnP2;   //!
+   TBranch        *b_eleD0;   //!
+   TBranch        *b_eleDz;   //!
+   TBranch        *b_eleSIP;   //!
+   TBranch        *b_elePt;   //!
+   TBranch        *b_eleEta;   //!
+   TBranch        *b_elePhi;   //!
+   TBranch        *b_eleR9;   //!
+   TBranch        *b_eleCalibPt;   //!
+   TBranch        *b_eleCalibEn;   //!
+   TBranch        *b_eleSCEta;   //!
+   TBranch        *b_eleSCPhi;   //!
+   TBranch        *b_eleSCRawEn;   //!
+   TBranch        *b_eleSCEtaWidth;   //!
+   TBranch        *b_eleSCPhiWidth;   //!
+   TBranch        *b_eleHoverE;   //!
+   TBranch        *b_eleEoverP;   //!
+   TBranch        *b_eleEoverPout;   //!
+   TBranch        *b_eleEoverPInv;   //!
+   TBranch        *b_eleBrem;   //!
+   TBranch        *b_eledEtaAtVtx;   //!
+   TBranch        *b_eledPhiAtVtx;   //!
+   TBranch        *b_eledEtaAtCalo;   //!
+   TBranch        *b_eleSigmaIEtaIEta;   //!
+   TBranch        *b_eleSigmaIEtaIPhi;   //!
+   TBranch        *b_eleSigmaIPhiIPhi;   //!
+   TBranch        *b_eleSigmaIEtaIEtaFull5x5;   //!
+   TBranch        *b_eleSigmaIPhiIPhiFull5x5;   //!
+   TBranch        *b_eleConvVeto;   //!
+   TBranch        *b_eleMissHits;   //!
+   TBranch        *b_eleESEffSigmaRR;   //!
+   TBranch        *b_elePFChIso;   //!
+   TBranch        *b_elePFPhoIso;   //!
+   TBranch        *b_elePFNeuIso;   //!
+   TBranch        *b_elePFPUIso;   //!
+   TBranch        *b_elePFClusEcalIso;   //!
+   TBranch        *b_elePFClusHcalIso;   //!
+   TBranch        *b_elePFMiniIso;   //!
+   TBranch        *b_eleIDMVA;   //!
+   TBranch        *b_eleIDMVAHZZ;   //!
+   TBranch        *b_eledEtaseedAtVtx;   //!
+   TBranch        *b_eleE1x5;   //!
+   TBranch        *b_eleE2x5;   //!
+   TBranch        *b_eleE5x5;   //!
+   TBranch        *b_eleE1x5Full5x5;   //!
+   TBranch        *b_eleE2x5Full5x5;   //!
+   TBranch        *b_eleE5x5Full5x5;   //!
+   TBranch        *b_eleR9Full5x5;   //!
+   TBranch        *b_eleEcalDrivenSeed;   //!
+   TBranch        *b_eleDr03EcalRecHitSumEt;   //!
+   TBranch        *b_eleDr03HcalDepth1TowerSumEt;   //!
+   TBranch        *b_eleDr03HcalDepth2TowerSumEt;   //!
+   TBranch        *b_eleDr03HcalTowerSumEt;   //!
+   TBranch        *b_eleDr03TkSumPt;   //!
+   TBranch        *b_elecaloEnergy;   //!
+   TBranch        *b_eleTrkdxy;   //!
+   TBranch        *b_eleKFHits;   //!
+   TBranch        *b_eleKFChi2;   //!
+   TBranch        *b_eleGSFChi2;   //!
+   TBranch        *b_eleGSFPt;   //!
+   TBranch        *b_eleGSFEta;   //!
+   TBranch        *b_eleGSFPhi;   //!
+   TBranch        *b_eleGSFCharge;   //!
+   TBranch        *b_eleGSFHits;   //!
+   TBranch        *b_eleGSFMissHits;   //!
+   TBranch        *b_eleGSFNHitsMax;   //!
+   TBranch        *b_eleGSFVtxProb;   //!
+   TBranch        *b_eleGSFlxyPV;   //!
+   TBranch        *b_eleGSFlxyBS;   //!
+   TBranch        *b_eleBCEn;   //!
+   TBranch        *b_eleBCEta;   //!
+   TBranch        *b_eleBCPhi;   //!
+   TBranch        *b_eleBCS25;   //!
+   TBranch        *b_eleBCS15;   //!
+   TBranch        *b_eleBCSieie;   //!
+   TBranch        *b_eleBCSieip;   //!
+   TBranch        *b_eleBCSipip;   //!
+   TBranch        *b_eleFiredSingleTrgs;   //!
+   TBranch        *b_eleFiredDoubleTrgs;   //!
+   TBranch        *b_eleFiredL1Trgs;   //!
+   TBranch        *b_eleIDbit;   //!
+   TBranch        *b_npfHF;   //!
+   TBranch        *b_pfHFEn;   //!
+   TBranch        *b_pfHFECALEn;   //!
+   TBranch        *b_pfHFHCALEn;   //!
+   TBranch        *b_pfHFPt;   //!
+   TBranch        *b_pfHFEta;   //!
+   TBranch        *b_pfHFPhi;   //!
+   TBranch        *b_pfHFIso;   //!
+   TBranch        *b_nMu;   //!
+   TBranch        *b_muPt;   //!
+   TBranch        *b_muEn;   //!
+   TBranch        *b_muEta;   //!
+   TBranch        *b_muPhi;   //!
+   TBranch        *b_muCharge;   //!
+   TBranch        *b_muType;   //!
+   TBranch        *b_muIDbit;   //!
+   TBranch        *b_muD0;   //!
+   TBranch        *b_muDz;   //!
+   TBranch        *b_muSIP;   //!
+   TBranch        *b_muChi2NDF;   //!
+   TBranch        *b_muInnerD0;   //!
+   TBranch        *b_muInnerDz;   //!
+   TBranch        *b_muTrkLayers;   //!
+   TBranch        *b_muPixelLayers;   //!
+   TBranch        *b_muPixelHits;   //!
+   TBranch        *b_muMuonHits;   //!
+   TBranch        *b_muStations;   //!
+   TBranch        *b_muMatches;   //!
+   TBranch        *b_muTrkQuality;   //!
+   TBranch        *b_muIsoTrk;   //!
+   TBranch        *b_muPFChIso;   //!
+   TBranch        *b_muPFPhoIso;   //!
+   TBranch        *b_muPFNeuIso;   //!
+   TBranch        *b_muPFPUIso;   //!
+   TBranch        *b_muPFMiniIso;   //!
+   TBranch        *b_muFiredTrgs;   //!
+   TBranch        *b_muFiredL1Trgs;   //!
+   TBranch        *b_muInnervalidFraction;   //!
+   TBranch        *b_musegmentCompatibility;   //!
+   TBranch        *b_muchi2LocalPosition;   //!
+   TBranch        *b_mutrkKink;   //!
+   TBranch        *b_muBestTrkPtError;   //!
+   TBranch        *b_muBestTrkPt;   //!
+   TBranch        *b_nJet;   //!
+   TBranch        *b_jetPt;   //!
+   TBranch        *b_jetEn;   //!
+   TBranch        *b_jetEta;   //!
+   TBranch        *b_jetPhi;   //!
+   TBranch        *b_jetRawPt;   //!
+   TBranch        *b_jetRawEn;   //!
+   TBranch        *b_jetMt;   //!
+   TBranch        *b_jetArea;   //!
+   TBranch        *b_jetLeadTrackPt;   //!
+   TBranch        *b_jetLeadTrackEta;   //!
+   TBranch        *b_jetLeadTrackPhi;   //!
+   TBranch        *b_jetLepTrackPID;   //!
+   TBranch        *b_jetLepTrackPt;   //!
+   TBranch        *b_jetLepTrackEta;   //!
+   TBranch        *b_jetLepTrackPhi;   //!
+   TBranch        *b_jetCSV2BJetTags;   //!
+   TBranch        *b_jetJetProbabilityBJetTags;   //!
+   TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
+   TBranch        *b_jetPartonID;   //!
+   TBranch        *b_jetHadFlvr;   //!
+   TBranch        *b_jetGenJetIndex;   //!
+   TBranch        *b_jetGenJetEn;   //!
+   TBranch        *b_jetGenJetPt;   //!
+   TBranch        *b_jetGenJetEta;   //!
+   TBranch        *b_jetGenJetPhi;   //!
+   TBranch        *b_jetGenPartonID;   //!
+   TBranch        *b_jetGenEn;   //!
+   TBranch        *b_jetGenPt;   //!
+   TBranch        *b_jetGenEta;   //!
+   TBranch        *b_jetGenPhi;   //!
+   TBranch        *b_jetGenPartonMomID;   //!
+   TBranch        *b_jetPFLooseId;   //!
+   TBranch        *b_jetID;   //!
+   TBranch        *b_jetPUidFullDiscriminant;   //!
+   TBranch        *b_jetJECUnc;   //!
+   TBranch        *b_jetFiredTrgs;   //!
+   TBranch        *b_jetCHF;   //!
+   TBranch        *b_jetNHF;   //!
+   TBranch        *b_jetCEF;   //!
+   TBranch        *b_jetNEF;   //!
+   TBranch        *b_jetNCH;   //!
+   TBranch        *b_jetNNP;   //!
+   TBranch        *b_jetMUF;   //!
+   TBranch        *b_jetVtxPt;   //!
+   TBranch        *b_jetVtxMass;   //!
+   TBranch        *b_jetVtxNtrks;   //!
+   TBranch        *b_jetVtx3DVal;   //!
+   TBranch        *b_jetVtx3DSig;   //!
+   TBranch        *b_nAK8Jet;   //!
+   TBranch        *b_AK8JetPt;   //!
+   TBranch        *b_AK8JetEn;   //!
+   TBranch        *b_AK8JetRawPt;   //!
+   TBranch        *b_AK8JetRawEn;   //!
+   TBranch        *b_AK8JetEta;   //!
+   TBranch        *b_AK8JetPhi;   //!
+   TBranch        *b_AK8JetMass;   //!
+   TBranch        *b_AK8Jet_tau1;   //!
+   TBranch        *b_AK8Jet_tau2;   //!
+   TBranch        *b_AK8Jet_tau3;   //!
+   TBranch        *b_AK8JetCHF;   //!
+   TBranch        *b_AK8JetNHF;   //!
+   TBranch        *b_AK8JetCEF;   //!
+   TBranch        *b_AK8JetNEF;   //!
+   TBranch        *b_AK8JetNCH;   //!
+   TBranch        *b_AK8JetNNP;   //!
+   TBranch        *b_AK8JetMUF;   //!
+   TBranch        *b_AK8Jetnconstituents;   //!
+   TBranch        *b_AK8JetPFLooseId;   //!
+   TBranch        *b_AK8JetPFTightLepVetoId;   //!
+   TBranch        *b_AK8JetSoftDropMass;   //!
+   TBranch        *b_AK8JetSoftDropMassCorr;   //!
+   TBranch        *b_AK8JetPrunedMass;   //!
+   TBranch        *b_AK8JetPrunedMassCorr;   //!
+   TBranch        *b_AK8JetpfBoostedDSVBTag;   //!
+   TBranch        *b_AK8JetCSV;   //!
+   TBranch        *b_AK8JetJECUnc;   //!
+   TBranch        *b_AK8JetL2L3corr;   //!
+   TBranch        *b_AK8puppiPt;   //!
+   TBranch        *b_AK8puppiMass;   //!
+   TBranch        *b_AK8puppiEta;   //!
+   TBranch        *b_AK8puppiPhi;   //!
+   TBranch        *b_AK8puppiTau1;   //!
+   TBranch        *b_AK8puppiTau2;   //!
+   TBranch        *b_AK8puppiTau3;   //!
+   TBranch        *b_AK8puppiSDL2L3corr;   //!
+   TBranch        *b_AK8puppiSDMass;   //!
+   TBranch        *b_AK8puppiSDMassL2L3Corr;   //!
+   TBranch        *b_AK8JetPartonID;   //!
+   TBranch        *b_AK8JetHadFlvr;   //!
+   TBranch        *b_AK8JetGenJetIndex;   //!
+   TBranch        *b_AK8JetGenJetEn;   //!
+   TBranch        *b_AK8JetGenJetPt;   //!
+   TBranch        *b_AK8JetGenJetEta;   //!
+   TBranch        *b_AK8JetGenJetPhi;   //!
+   TBranch        *b_AK8JetGenPartonID;   //!
+   TBranch        *b_AK8JetGenEn;   //!
+   TBranch        *b_AK8JetGenPt;   //!
+   TBranch        *b_AK8JetGenEta;   //!
+   TBranch        *b_AK8JetGenPhi;   //!
+   TBranch        *b_AK8JetGenPartonMomID;   //!
+   TBranch        *b_nAK8SDSJ;   //!
+   TBranch        *b_AK8SDSJPt;   //!
+   TBranch        *b_AK8SDSJEta;   //!
+   TBranch        *b_AK8SDSJPhi;   //!
+   TBranch        *b_AK8SDSJMass;   //!
+   TBranch        *b_AK8SDSJE;   //!
+   TBranch        *b_AK8SDSJCharge;   //!
+   TBranch        *b_AK8SDSJFlavour;   //!
+   TBranch        *b_AK8SDSJCSV;   //!
+   TBranch        *b_nAK8puppiSDSJ;   //!
+   TBranch        *b_AK8puppiSDSJPt;   //!
+   TBranch        *b_AK8puppiSDSJEta;   //!
+   TBranch        *b_AK8puppiSDSJPhi;   //!
+   TBranch        *b_AK8puppiSDSJMass;   //!
+   TBranch        *b_AK8puppiSDSJE;   //!
+   TBranch        *b_AK8puppiSDSJCharge;   //!
+   TBranch        *b_AK8puppiSDSJFlavour;   //!
+   TBranch        *b_AK8puppiSDSJCSV;   //!
 };
 
 #endif

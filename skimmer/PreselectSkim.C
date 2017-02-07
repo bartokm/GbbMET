@@ -4,6 +4,7 @@
 #include <TSystem.h>
 #include <TTree.h>
 #include <TH1F.h>
+#include <TKey.h>
 #include <iostream>
 
 PreselectSkim::PreselectSkim(TString inputFileName, TString outDir, TString nameDir, TString nameTree, bool isMC, int config)
@@ -37,33 +38,57 @@ PreselectSkim::~PreselectSkim()
 
 void PreselectSkim::LoopOverInputTree(bool isMC)
 {
-  //TFile f(_inputFileName,"READ");
-  TFile *f=TFile::Open(_inputFileName,"READ");
-  std::cout<<"processing "<<_inputFileName<<std::endl;
-  f->cd(_nameDir);
-  TTree* tree =(TTree*)gDirectory->Get(_nameTree);
+  TTree *tree;
+  TChain * ch = new TChain("EventTree","");
+  ch->Add(_inputFileName+"/ggNtuplizer/EventTree");
+  tree = ch;
+  std::cout<<"# of files: "<<ch->GetNtrees()<<std::endl;
 
   _TREE.InitInput(tree,isMC);
 
   Long64_t nentries = _TREE.fChain->GetEntries();
   std::cout<<"nentries "<<nentries<<std::endl;
-             
-  _h_cuts = new TH1D("_h_cuts","cuts;#sigma_{MC},Full,HLT",10,0,10);
+  //get histograms outside of tree
+  _hEvents= (TH1F*)_TREE.fChain->GetCurrentFile()->Get("ggNtuplizer/hEvents");
+  _hEvents->SetDirectory(0);
+  if (isMC) {
+    _hPUTrue = (TH1F*)_TREE.fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue");
+    _hPUTrue->SetDirectory(0);
+    _hGenWeight = (TH1F*)_TREE.fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight");
+    _hGenWeight->SetDirectory(0);
+  }
+
+  _h_cuts = new TH1F("_h_cuts","cuts;#sigma_{MC},Full,HLT",10,0,10);
   _h_cuts->SetBinContent(1,_sigma);
   if (!isMC) _h_cuts->SetBinContent(2,nentries);
-  int temp=-1;
-  for (Long64_t entry=0; entry<nentries; entry++) {
-  //for (Long64_t entry=0; entry<100; entry++) {
+  int temp=-1; std::string tempfilename=_TREE.fChain->GetCurrentFile()->GetName();
+  int tempnumber=_TREE.fChain->GetTreeNumber();
+  for (Long64_t jentry=0; jentry<nentries; jentry++) {
+  //for (Long64_t jentry=0; jentry<100000; jentry++) {
     gWrite=false; // tells us what events to print to skim.
-    if (entry < 0) break;
+    Long64_t ientry = _TREE.LoadTree(jentry);
+    if (ientry < 0) break;
+    _TREE.GetEntry(ientry); 
     //progress bar
-    double progress=(entry+1)/double(nentries);
-    if (temp!=int(progress * 100.0)){
-      temp=int(progress * 100.0);
-      std::cout << temp << " %\r";
+    double progress=(jentry+1)/double(nentries);
+    if (temp!=int(progress * 10000)){
+      temp=int(progress * 10000);
+      int vmi=int(progress * 100)*100;
+      std::cout << vmi/100 <<"."<< temp-vmi << " %\r";
       std::cout.flush();
     }
-    _TREE.GetEntry(entry); 
+    if (tempnumber!=_TREE.fChain->GetTreeNumber()) {
+      tempnumber=_TREE.fChain->GetTreeNumber();
+      std::cout<<_TREE.fChain->GetCurrentFile()->GetName()<<std::endl;
+    }
+    if (tempfilename != _TREE.fChain->GetCurrentFile()->GetName()) {
+      tempfilename = _TREE.fChain->GetCurrentFile()->GetName();
+      _hEvents->Add((TH1D*)_TREE.fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hEvents"));
+      if (isMC) {
+        _hPUTrue->Add((TH1D*)_TREE.fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue"));
+        _hGenWeight->Add((TH1D*)_TREE.fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight"));
+      }
+    }
     double genWeight=1;
     if (isMC){
       if (abs(_TREE.treeLeaf.genWeight)>1) genWeight=copysign(1,_TREE.treeLeaf.genWeight); //only a sign for amcatnlo
@@ -77,7 +102,6 @@ void PreselectSkim::LoopOverInputTree(bool isMC)
       for (int i=0;i<_TREE.treeLeaf.nPho;i++){
         //cut based photon selection
         if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoIDbit->at(i)>>0&1) gWrite=true;
-        //if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoHoverE->at(i)<0.05 && _TREE.treeLeaf.phoSigmaIEtaIEta->at(i)<0.0102 && _TREE.treeLeaf.phoPFChIso->at(i)<3.32 && _TREE.treeLeaf.phoPFNeuIso->at(i)<(1.92+_TREE.treeLeaf.phoEt->at(i)*0.014+pow(_TREE.treeLeaf.phoEt->at(i),2)*0.000019) && _TREE.treeLeaf.phoPFPhoIso->at(i)<(0.81+_TREE.treeLeaf.phoEt->at(i)*0.0053)) gWrite=true; //not correct
         
         //MVA based photon selection
         else if (abs(_TREE.treeLeaf.phoEta->at(i))<1.4442 && _TREE.treeLeaf.phoIDMVA->at(i)>0.374) gWrite=true;
@@ -87,18 +111,18 @@ void PreselectSkim::LoopOverInputTree(bool isMC)
     if(gWrite) _outputTree->Fill();
   }//end of entry loop
   std::cout<<std::endl;
-  if (isMC) _hPUTrue = (TH1D*)gROOT->FindObject("hPUTrue");
-  //_hPUTrue = (TH1D*)f->Get("hPUTrue");
   _fileOut->cd();
   _h_cuts->Write();
-  if (isMC) _hPUTrue->Write();
+  _hEvents->Write();
+  if (isMC) {
+    _hPUTrue->Write();
+    _hGenWeight->Write();
+  }
   _outputTree->Write(_nameTree,TObject::kOverwrite);
 
   //close output files
   _TREE.fChain = 0;
   std::cout<<"file "<<_fileOut->GetName()<<std::endl<<" closed..."<<std::endl;
-  f->Close();
-  //_hStats->SaveAs("hstats"+_nameTree+".root");
 }
 
 

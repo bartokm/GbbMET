@@ -37,8 +37,10 @@ class PreselectSkim{
     TString  _nameDir;
     TString  _nameTree;
 
-    TH1D *_h_cuts;
-    TH1D *_hPUTrue;
+    TH1F *_h_cuts;
+    TH1F *_hPUTrue;
+    TH1F *_hEvents;
+    TH1F *_hGenWeight;
     //mc cross sections
     float _Asigma[18] = {
       365896,  //gjet
