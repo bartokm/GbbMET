@@ -879,13 +879,13 @@ CopyTree::CopyTree(std::vector<std::string> arg, std::string outname, Double_t c
   }
   else {
     output_file=outname;
-    temp_fname+="_"+output_file;
+    temp_fname=output_file+"_"+temp_fname+".root";
   }
   output_file=temp_fname;
   if (arg.at(0)=="default") {
     const char* fdefault = "/data/gridout/mbartok/Analysis/Data/CMSSW8024p1/Run2016D_SinglePhoton_filtered/SinglePhoton/ggNtuple_V08_00_24_00/161214_151225/0000/ggtree_data_1.root/ggNtuplizer/EventTree";
     std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
-    std::cout<<"Usage: CopyTree t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", Xsec in [pb])"<<std::endl;
+    std::cout<<"Usage: CopyTree t({\"file1.root\",\"file2.root\",etc}, \"outputname\", Xsec in [pb])"<<std::endl;
     ch->Add(fdefault);
     tree = ch;
   }

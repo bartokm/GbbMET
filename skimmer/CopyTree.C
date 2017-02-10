@@ -110,9 +110,10 @@ void CopyTree::Loop()
      if (higgs==1 && ib1!=-1 && ib2!=-1) gWrite=true;
      */
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
-     for (int i=0;i<nPho;i++){
-       if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
-     }
+     //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
+
+     //Requiring 1 trigger
+     if (HLTPho&128) gWrite=true; //HLT_Photon175
 
      if (gWrite) skimtree->Fill();
    }//end of entry loop
@@ -122,10 +123,10 @@ void CopyTree::Loop()
      h_PU->Write();
      h_PUTrue->Write();
      h_GenWeight->Write();
+     TH1D *h_cross_section = new TH1D("h_cross_section","",1,0,1);
+     h_cross_section->SetBinContent(1,Cross_Section);
+     h_cross_section->Write();
    }
-   TH1D *h_cross_section = new TH1D("h_cross_section","",1,0,1);
-   h_cross_section->SetBinContent(1,Cross_Section);
-   h_cross_section->Write();
    f.Close();
    time.Stop("time");
    std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
