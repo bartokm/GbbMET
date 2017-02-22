@@ -845,7 +845,7 @@ public :
 
    //histograms
    double BtagCSVWP[3]={0.5426,0.8484,0.9535};
-   double BtagcMVAWP[3]={-0.5884,0.4432,0.875};
+   double BtagcMVAWP[3]={-0.5884,0.4432,0.9432};
    double BtagBDSVWP[4]={0.3,0.6,0.8,0.9};
    std::string output_file="default";
    unsigned int nFiles=0;
