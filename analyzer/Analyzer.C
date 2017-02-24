@@ -138,33 +138,34 @@ void Analyzer::Loop()
    //L_data=36773;
    
    //Btag SF
+   BTagCalibration calib;
+   BTagCalibrationReader reader_L, reader_M, reader_T;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
-   BTagCalibration calib("csvv1", "CSVv2_Moriond17_B_H.csv");
-   BTagCalibrationReader reader_L(BTagEntry::OP_LOOSE,"central",{"up", "down"});
-   BTagCalibrationReader reader_M(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
-   BTagCalibrationReader reader_T(BTagEntry::OP_TIGHT,"central",{"up", "down"});
-   reader_L.load(calib,BTagEntry::FLAV_B,"comb");
-   reader_L.load(calib,BTagEntry::FLAV_C,"comb");
-   reader_L.load(calib,BTagEntry::FLAV_UDSG,"incl");
-   reader_M.load(calib,BTagEntry::FLAV_B,"comb");
-   reader_M.load(calib,BTagEntry::FLAV_C,"comb");
-   reader_M.load(calib,BTagEntry::FLAV_UDSG,"incl");
-   reader_T.load(calib,BTagEntry::FLAV_B,"comb");
-   reader_T.load(calib,BTagEntry::FLAV_C,"comb");
-   reader_T.load(calib,BTagEntry::FLAV_UDSG,"incl");
-   BTagCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
-   BTagCalibrationReader reader_AK8L(BTagEntry::OP_LOOSE,"central",{"up", "down"});
-   BTagCalibrationReader reader_AK8M(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
-   BTagCalibrationReader reader_AK8T(BTagEntry::OP_TIGHT,"central",{"up", "down"});
-   reader_AK8L.load(calibAK8,BTagEntry::FLAV_B,"ak8");
-   reader_AK8M.load(calibAK8,BTagEntry::FLAV_B,"ak8");
-   reader_AK8T.load(calibAK8,BTagEntry::FLAV_B,"ak8");
-/*    
-   std::cout<<"test 1,260 "<<reader_L.eval_auto_bounds("central",BTagEntry::FLAV_B,1,260)<<std::endl;;
-   std::cout<<"test 1,260 up "<<reader_L.eval_auto_bounds("up",BTagEntry::FLAV_B,1,260)<<std::endl;;
-   std::cout<<"test 1,100 "<<reader_L.eval_auto_bounds("central",BTagEntry::FLAV_B,1,100)<<std::endl;;
-   std::cout<<"test 1,100 up "<<reader_L.eval_auto_bounds("up",BTagEntry::FLAV_B,1,100)<<std::endl;;
-*/
+   if (btag_file.size()>0){
+     calib = *new BTagCalibration("csvv1", "CSVv2_Moriond17_B_H.csv");
+     reader_L = *new BTagCalibrationReader(BTagEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M = *new BTagCalibrationReader(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T = *new BTagCalibrationReader(BTagEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L.load(calib,BTagEntry::FLAV_B,"comb");
+     reader_L.load(calib,BTagEntry::FLAV_C,"comb");
+     reader_L.load(calib,BTagEntry::FLAV_UDSG,"incl");
+     reader_M.load(calib,BTagEntry::FLAV_B,"comb");
+     reader_M.load(calib,BTagEntry::FLAV_C,"comb");
+     reader_M.load(calib,BTagEntry::FLAV_UDSG,"incl");
+     reader_T.load(calib,BTagEntry::FLAV_B,"comb");
+     reader_T.load(calib,BTagEntry::FLAV_C,"comb");
+     reader_T.load(calib,BTagEntry::FLAV_UDSG,"incl");
+     /*AK8 BTag SF not implemented yet
+        BTagCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
+        BTagCalibrationReader reader_AK8L(BTagEntry::OP_LOOSE,"central",{"up", "down"});
+        BTagCalibrationReader reader_AK8M(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
+        BTagCalibrationReader reader_AK8T(BTagEntry::OP_TIGHT,"central",{"up", "down"});
+        reader_AK8L.load(calibAK8,BTagEntry::FLAV_B,"ak8");
+        reader_AK8M.load(calibAK8,BTagEntry::FLAV_B,"ak8");
+        reader_AK8T.load(calibAK8,BTagEntry::FLAV_B,"ak8");
+        */
+   }
+
    //pu reweight
    TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/2016DPileUp_FINALCert_forggNtuple.root","read");
    TH1D *h_dataPU = (TH1D*)f_dataPU.Get("pileup");
@@ -285,9 +286,10 @@ void Analyzer::Loop()
        b_mcIndex->GetEntry(ientry);
        b_mcStatus->GetEntry(ientry);
        b_genMET->GetEntry(ientry);
+       b_jetHadFlvr->GetEntry(ientry);
+       b_AK8JetHadFlvr->GetEntry(ientry);
      }
      b_event->GetEntry(ientry);
-     b_isData->GetEntry(ientry);
      b_nVtx->GetEntry(ientry);
      b_HLTEleMuX->GetEntry(ientry);
      b_HLTPho->GetEntry(ientry);
@@ -330,7 +332,6 @@ void Analyzer::Loop()
      b_jetJetProbabilityBJetTags->GetEntry(ientry);
      b_jetCSV2BJetTags->GetEntry(ientry);
      b_jetpfCombinedMVAV2BJetTags->GetEntry(ientry);
-     b_jetHadFlvr->GetEntry(ientry);
      b_jetPFLooseId->GetEntry(ientry);
      b_nAK8Jet->GetEntry(ientry);
      b_AK8JetPt->GetEntry(ientry);
@@ -341,7 +342,6 @@ void Analyzer::Loop()
      b_AK8JetPrunedMassCorr->GetEntry(ientry);
      b_AK8JetPFLooseId->GetEntry(ientry);
      b_AK8JetpfBoostedDSVBTag->GetEntry(ientry);
-     b_AK8JetHadFlvr->GetEntry(ientry);
      bool newfile=false;
   
      //progress bar
