@@ -3,7 +3,7 @@
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
-#include "BTagCalibrationStandalone.cpp"
+#include "BTCalibrationStandalone.cpp"
 
 double deltaR(double phi1, double phi2, double eta1, double eta2){
   double dR=0;
@@ -12,27 +12,27 @@ double deltaR(double phi1, double phi2, double eta1, double eta2){
   return dR;
 }
 
-void CalcBtagSF(vector<float> *v_eta, vector<float> *v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTagCalibrationReader reader_L, BTagCalibrationReader reader_M, BTagCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
+void CalcBtagSF(vector<float> *v_eta, vector<float> *v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
   double p_data[3] = {1,1,1}, p_mc[3] = {1,1,1}, p_data_up[3] = {1,1,1}, p_data_do[3] = {1,1,1};
   for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
-    BTagEntry::JetFlavor FLAV;
+    BTEntry::JetFlavor FLAV;
     double mc_eff[3]={0}, eta=0, pt=0;
     eta=(*v_eta)[it->first];
     pt=(*v_pt)[it->first];
     if ((*v_had)[it->first]==5) {
-      FLAV = BTagEntry::FLAV_B;
+      FLAV = BTEntry::FLAV_B;
       mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
       mc_eff[1] = eff_b_M->GetEfficiency(eff_b_M->FindFixBin(eta,pt));
       mc_eff[2] = eff_b_T->GetEfficiency(eff_b_T->FindFixBin(eta,pt));
     }
     else if ((*v_had)[it->first]==4) {
-      FLAV = BTagEntry::FLAV_C;
+      FLAV = BTEntry::FLAV_C;
       mc_eff[0] = eff_c_L->GetEfficiency(eff_c_L->FindFixBin(eta,pt));
       mc_eff[1] = eff_c_M->GetEfficiency(eff_c_M->FindFixBin(eta,pt));
       mc_eff[2] = eff_c_T->GetEfficiency(eff_c_T->FindFixBin(eta,pt));
     }
     else if ((*v_had)[it->first]==0) {
-      FLAV = BTagEntry::FLAV_UDSG;
+      FLAV = BTEntry::FLAV_UDSG;
       mc_eff[0] = eff_l_L->GetEfficiency(eff_l_L->FindFixBin(eta,pt));
       mc_eff[1] = eff_l_M->GetEfficiency(eff_l_M->FindFixBin(eta,pt));
       mc_eff[2] = eff_l_T->GetEfficiency(eff_l_T->FindFixBin(eta,pt));
@@ -138,31 +138,31 @@ void Analyzer::Loop()
    //L_data=36773;
    
    //Btag SF
-   BTagCalibration calib;
-   BTagCalibrationReader reader_L, reader_M, reader_T;
-   // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
+   BTCalibration calib;
+   BTCalibrationReader reader_L, reader_M, reader_T;
+   // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTCalibration#Standalone
    if (btag_file.size()>0){
-     calib = *new BTagCalibration("csvv1", "CSVv2_Moriond17_B_H.csv");
-     reader_L = *new BTagCalibrationReader(BTagEntry::OP_LOOSE,"central",{"up", "down"});
-     reader_M = *new BTagCalibrationReader(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
-     reader_T = *new BTagCalibrationReader(BTagEntry::OP_TIGHT,"central",{"up", "down"});
-     reader_L.load(calib,BTagEntry::FLAV_B,"comb");
-     reader_L.load(calib,BTagEntry::FLAV_C,"comb");
-     reader_L.load(calib,BTagEntry::FLAV_UDSG,"incl");
-     reader_M.load(calib,BTagEntry::FLAV_B,"comb");
-     reader_M.load(calib,BTagEntry::FLAV_C,"comb");
-     reader_M.load(calib,BTagEntry::FLAV_UDSG,"incl");
-     reader_T.load(calib,BTagEntry::FLAV_B,"comb");
-     reader_T.load(calib,BTagEntry::FLAV_C,"comb");
-     reader_T.load(calib,BTagEntry::FLAV_UDSG,"incl");
-     /*AK8 BTag SF not implemented yet
-        BTagCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
-        BTagCalibrationReader reader_AK8L(BTagEntry::OP_LOOSE,"central",{"up", "down"});
-        BTagCalibrationReader reader_AK8M(BTagEntry::OP_MEDIUM,"central",{"up", "down"});
-        BTagCalibrationReader reader_AK8T(BTagEntry::OP_TIGHT,"central",{"up", "down"});
-        reader_AK8L.load(calibAK8,BTagEntry::FLAV_B,"ak8");
-        reader_AK8M.load(calibAK8,BTagEntry::FLAV_B,"ak8");
-        reader_AK8T.load(calibAK8,BTagEntry::FLAV_B,"ak8");
+     calib = *new BTCalibration("csvv1", "CSVv2_Moriond17_B_H.csv");
+     reader_L = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L.load(calib,BTEntry::FLAV_B,"comb");
+     reader_L.load(calib,BTEntry::FLAV_C,"comb");
+     reader_L.load(calib,BTEntry::FLAV_UDSG,"incl");
+     reader_M.load(calib,BTEntry::FLAV_B,"comb");
+     reader_M.load(calib,BTEntry::FLAV_C,"comb");
+     reader_M.load(calib,BTEntry::FLAV_UDSG,"incl");
+     reader_T.load(calib,BTEntry::FLAV_B,"comb");
+     reader_T.load(calib,BTEntry::FLAV_C,"comb");
+     reader_T.load(calib,BTEntry::FLAV_UDSG,"incl");
+     /*AK8 BT SF not implemented yet
+        BTCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
+        BTCalibrationReader reader_AK8L(BTEntry::OP_LOOSE,"central",{"up", "down"});
+        BTCalibrationReader reader_AK8M(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+        BTCalibrationReader reader_AK8T(BTEntry::OP_TIGHT,"central",{"up", "down"});
+        reader_AK8L.load(calibAK8,BTEntry::FLAV_B,"ak8");
+        reader_AK8M.load(calibAK8,BTEntry::FLAV_B,"ak8");
+        reader_AK8T.load(calibAK8,BTEntry::FLAV_B,"ak8");
         */
    }
 
