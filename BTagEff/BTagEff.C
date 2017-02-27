@@ -117,8 +117,14 @@ void BTagEff::Loop()
      nb = fChain->GetEntry(jentry);   nbytes += nb;
      bool newfile=false;
      if (jentry==0) {
-       h_Events = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hEvents");
-       h_Events->SetDirectory(0);
+       if (fChain->GetCurrentFile()->GetDirectory("ggNtuplizer") !=0) {
+         h_Events = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hEvents");
+         h_Events->SetDirectory(0);
+       }
+       else {
+         h_Events = (TH1F*)fChain->GetCurrentFile()->Get("hEvents");
+         h_Events->SetDirectory(0);
+       }
      }
 
      //progress bar
@@ -132,7 +138,8 @@ void BTagEff::Loop()
      if (temp_f != fChain->GetCurrentFile()->GetName()) {
        temp_f=fChain->GetCurrentFile()->GetName();
        newfile=true;
-       h_Events->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hEvents"));
+       if (fChain->GetCurrentFile()->GetDirectory("ggNtuplizer") !=0) h_Events->Add((TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hEvents"));
+       else h_Events->Add((TH1F*)fChain->GetCurrentFile()->Get("hEvents"));
      }
      //select jets for calculate eff. It should be the same selection as in Analyzer.C
      std::vector<int> passJet, passAK8Jet;
