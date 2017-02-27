@@ -21,7 +21,6 @@ BTag ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation<b
 cern AFS acces (for data pileup distribution)<br>
 kinit user@CERN.CH<br>
 aklog CERN.CH<br>
-You need to have root without CMSSW environment! (else BTag SFs won't compile)<br>
 Run Analyzer in root<br>
 .L Analyzer.C<br>
 Analyzer t({"file1.root","file2.root",...},"outputfile.root","../BTagEff/btagfilename.root") <br>
