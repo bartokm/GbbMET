@@ -14,8 +14,9 @@ void Plotter(){
   string bkg[8] = {"TTJets","TTGJets","WJetsToLNu","WGJets","QCD","GJets","ZJetsToNuNu","ZGTo2NuG"};
   string signal[9] = {"mCh400_mN200","mCh600_mN200","mCh600_mN400","mCh800_mN200","mCh800_mN400","mCh800_mN600","mG1000_mN200","mG1000_mN400","mG1000_mN600"};
   string PlotOutput = "plots/Plots"+outputtag;
-  vector<int> whichBkg = {6,7,0,1,2,3,5,4};
-  vector<int> whichSignal = {0,1,2,3,4,5,6,7,8};
+  vector<int> whichBkg = {6,7,0,1,2,3,4,5};
+  //vector<int> whichSignal = {0,1,2,3,4,5,6,7,8};
+  vector<int> whichSignal = {0,1,6,7,8};
 
   bool plotData = false;
   bool plotSignal = true;
@@ -62,7 +63,7 @@ void Plotter(){
         TClass *cl = gROOT->GetClass(key->GetClassName());
         if (!cl->InheritsFrom("TH1")) continue;
         TH1 *h = (TH1*)key->ReadObj();
-        h->SetFillColor(i+1);
+        h->SetFillColor(i+2);
         h->SetDirectory(0);
         if (fori==0) {THStack *stack = new THStack(); stack->Add(h); v_stack.push_back(stack);histoNames.push_back(h->GetName());}
         else v_stack.at(j)->Add(h);
@@ -89,8 +90,8 @@ void Plotter(){
         TClass *cl = gROOT->GetClass(key->GetClassName());
         if (!cl->InheritsFrom("TH1")) continue;
         TH1 *h = (TH1*)key->ReadObj();
-        h->SetLineColor(i+1);
-        h->SetMarkerColor(i+1);
+        h->SetLineColor(9-i);
+        h->SetMarkerColor(9-i);
         h->SetMarkerStyle(22+i);
         h->SetDirectory(0);
         SignalHistos->Add(h);
@@ -111,11 +112,13 @@ void Plotter(){
   for (int i=0;i<numHistos;i++){
     TCanvas *c = new TCanvas(histoNames.at(i).c_str(),histoNames.at(i).c_str());
     c->cd();
+    gPad->SetLogy();
     if (plotData) DataHistos->At(i)->Draw("P");
     else if (plotSignal) for (auto obj : SignalArrays) obj->At(i)->Draw();
     else if (plotBkg) BkgStack->At(i)->Draw("h");
     if (plotBkg) BkgStack->At(i)->Draw("sameh");
     if (plotSignal) for (auto obj : SignalArrays) obj->At(i)->Draw("same");
+    if (plotData) DataHistos->At(i)->Draw("sameP");
     leg->Draw("same");
     c->Write();
   }

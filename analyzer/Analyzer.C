@@ -179,8 +179,8 @@ void Analyzer::Loop()
    TFile f(temp_fname.c_str(),"recreate");
    
    TH1D *h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,pfMET,btag,Hmass",10,0,10);
-   TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",60,0,60);
-   TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",60,0,60);
+   TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",70,0,70);
+   TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",70,0,70);
 
    TH1D *h_phoEtL = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",30,0,1500);
    TH1D *h_phoEtM = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",30,0,1500);
@@ -189,9 +189,8 @@ void Analyzer::Loop()
    TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
    TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
    TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",30,0,1000);
-   TH1D *h_pfMETsumEt = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",30,-50,2000);
+   TH1D *h_pfMETsumEt = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",30,-50,5000);
    TH1D *h_pfMETPhi = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",30,-4,4);
-   TH1D *h_pfMETmEtSig = new TH1D("h_pfMETmEtSig",";#slash{E}_{T}mEtSig",30,0,2000);
    TH1D *h_pfMETSig = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",30,0,2000);
    TH1D *h_ST = new TH1D("h_ST",";S_{T}^{#gamma} [GeV]",30,0,2000);
    TH1D *h_MT = new TH1D("h_MT",";M_{T} [GeV]",30,0,2000);
@@ -265,7 +264,7 @@ void Analyzer::Loop()
    ULong64_t TotalEvents=1;
    int zbx=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //for (Long64_t jentry=0; jentry<10000;jentry++) {
+   //for (Long64_t jentry=0; jentry<10;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -301,7 +300,6 @@ void Analyzer::Loop()
      b_pfMET->GetEntry(ientry);
      b_pfMETPhi->GetEntry(ientry);
      b_pfMETsumEt->GetEntry(ientry);
-     b_pfMETmEtSig->GetEntry(ientry);
      b_pfMETSig->GetEntry(ientry);
      b_nEle->GetEntry(ientry);
      b_eleEta->GetEntry(ientry);
@@ -398,6 +396,11 @@ void Analyzer::Loop()
          else {
            TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("hGenWeight");
            TotalEvents = htemp->GetBinContent(1)-htemp->GetBinContent(2);
+           if (abs(genWeight)>1) {
+             TH1D *htemp=(TH1D*)fChain->GetCurrentFile()->Get("hEvents");
+             double calcXsec = TotalEvents*abs(genWeight)/htemp->GetBinContent(1);
+             std::cout<<"xsec = "<<xsec<<" calcXsec = "<<calcXsec<<std::endl;
+           }
            //std::cout<<"Tot = "<<TotalEvents<<std::endl;
          }
          //calculate PU weight
@@ -617,15 +620,15 @@ void Analyzer::Loop()
      if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoPhi)[nleadPhoL]-pfMETPhi))));
 
      //cuts
-     if (!HLTPho&128) continue; //HLT_Photon175
+     //if (!HLTPho&128) continue; //HLT_Photon175
      h_cuts->Fill(0.,w);
      if (passPhoL.size()==0) continue;
      h_cuts->Fill(1,w);
-     if ((*phoCalibEt)[nleadPhoL]<175) continue;
-     //if ((*phoCalibEt)[nleadPhoL]<90) continue;
+     double phoCut=90;
+     if ((*phoCalibEt)[nleadPhoL]<phoCut) continue;
      h_cuts->Fill(2,w);
      if (isData) if (!(metFilters==0)) continue;
-     //if (pfMET>100) continue;
+     if (pfMET<100) continue;
      h_cuts->Fill(3,w);
      //find which btag jet to use
      //AK8
@@ -674,11 +677,11 @@ void Analyzer::Loop()
      //Filling histograms
      h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
      h_phoEtaL->Fill((*phoEta)[nleadPhoL],w);
-     if (passPhoM.size()>0 && (*phoCalibEt)[nleadPhoM]>90) {
+     if (passPhoM.size()>0 && (*phoCalibEt)[nleadPhoM]>phoCut) {
        h_phoEtM->Fill((*phoCalibEt)[nleadPhoM],w);
        h_phoEtaM->Fill((*phoEta)[nleadPhoM],w);
      }
-     if (passPhoT.size()>0 && (*phoCalibEt)[nleadPhoT]>90){
+     if (passPhoT.size()>0 && (*phoCalibEt)[nleadPhoT]>phoCut){
        h_phoEtT->Fill((*phoCalibEt)[nleadPhoT],w);
        h_phoEtaT->Fill((*phoEta)[nleadPhoT],w);
      }
@@ -696,7 +699,6 @@ void Analyzer::Loop()
      h_pfMET->Fill(pfMET,w);
      h_pfMETsumEt->Fill(pfMETsumEt,w);
      h_pfMETPhi->Fill(pfMETPhi,w);
-     h_pfMETmEtSig->Fill(pfMETmEtSig,w);
      h_pfMETSig->Fill(pfMETSig,w);
      h_ST->Fill(ST,w);
      h_MT->Fill(MT,w);
