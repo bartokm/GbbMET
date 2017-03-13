@@ -113,7 +113,8 @@ void CopyTree::Loop()
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
      //Requiring 1 trigger
-     if (HLTPho&128) gWrite=true; //HLT_Photon175
+     //if (HLTPho&128) gWrite=true; //HLT_Photon175
+     if (HLTJet&4194304) gWrite=true; //HLT_PFHT300_PFMET110_v
 
      if (gWrite) skimtree->Fill();
    }//end of entry loop

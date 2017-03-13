@@ -899,14 +899,15 @@ CopyTree::CopyTree(std::vector<std::string> arg, std::string outname, Double_t c
         ch->Add(temp.c_str());
         continue;
       }
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(cstr_i);
-      if (!f || !f->IsOpen()) {
-        f = new TFile(cstr_i);
-      }
-      if (f->GetDirectory("ggNtuplizer") !=0) temp+="/ggNtuplizer/EventTree";
-      else temp+="/EventTree";
+      //TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(cstr_i);
+      //if (!f || !f->IsOpen()) {
+      //  f = new TFile(cstr_i);
+      //}
+      //if (f->GetDirectory("ggNtuplizer") !=0) temp+="/ggNtuplizer/EventTree";
+      //else temp+="/EventTree";
+      //f->Close();
+      temp+="/ggNtuplizer/EventTree";
       ch->Add(temp.c_str());
-      f->Close();
     }
     nFiles=ch->GetNtrees();
     std::cout<<nFiles<<" trees are read."<<std::endl; 
