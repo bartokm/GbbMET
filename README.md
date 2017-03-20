@@ -5,9 +5,11 @@ git clone https://github.com/bartokm/GbbMET.git
 #####Skimmer<br>
 Write skimming condition in CopyTree event loop<br>
 Run CopyTree in root:<br>
-.L CopyTree.C<br>
-CopyTree t({"file1.root","file2.root",...},"outputname",Xsec)<br>
-t.Loop()<br>
+```bash
+.L CopyTree.C
+CopyTree t({"file1.root","file2.root",...},"outputname",Xsec)
+t.Loop()
+```
 Or use the script: skimmer.csh
 
 #####BTagEff<br>
@@ -22,7 +24,9 @@ cern AFS acces (for data pileup distribution)<br>
 kinit user@CERN.CH<br>
 aklog CERN.CH<br>
 Run Analyzer in root<br>
-.L Analyzer.C<br>
-Analyzer t({"file1.root","file2.root",...},"outputfile.root","../BTagEff/btagfilename.root") <br>
-t.Loop() <br>
+```bash
+.L Analyzer.C
+Analyzer t({"file1.root","file2.root",...},"outputfile.root","../BTagEff/btagfilename.root")
+t.Loop()
+```
 Or use thr scripts: run_analyzer_data.csh, run_analyzer_mc.csh
