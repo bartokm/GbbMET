@@ -41,16 +41,23 @@ void BTagEff::Loop()
    fChain->SetBranchStatus("nJet",1);
    fChain->SetBranchStatus("jetPt",1);
    fChain->SetBranchStatus("jetEta",1);
+   fChain->SetBranchStatus("jetPhi",1);
+   fChain->SetBranchStatus("jetEn",1);
    fChain->SetBranchStatus("jetHadFlvr",1);
    fChain->SetBranchStatus("jetCSV2BJetTags",1);
    fChain->SetBranchStatus("jetpfCombinedMVAV2BJetTags",1);
    fChain->SetBranchStatus("jetPFLooseId",1);
+   fChain->SetBranchStatus("jetPUFullID",1);
+   fChain->SetBranchStatus("jetP4Smear",1);
    fChain->SetBranchStatus("nAK8Jet",1);
    fChain->SetBranchStatus("AK8JetPt",1);
    fChain->SetBranchStatus("AK8JetEta",1);
+   fChain->SetBranchStatus("AK8JetPhi",1);
+   fChain->SetBranchStatus("AK8JetEn",1);
    fChain->SetBranchStatus("AK8JetHadFlvr",1);
    fChain->SetBranchStatus("AK8JetPFLooseId",1);
    fChain->SetBranchStatus("AK8JetpfBoostedDSVBTag",1);
+   fChain->SetBranchStatus("AK8JetP4Smear",1);
 
    //Long64_t nentries = fChain->GetEntriesFast();
    Long64_t nentries = fChain->GetEntries();
@@ -111,7 +118,7 @@ void BTagEff::Loop()
 
    int temp=-1; std::string temp_f=fChain->GetCurrentFile()->GetName();
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //for (Long64_t jentry=0; jentry<100;jentry++) {
+   //for (Long64_t jentry=0; jentry<10;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -144,10 +151,21 @@ void BTagEff::Loop()
      //select jets for calculate eff. It should be the same selection as in Analyzer.C
      std::vector<int> passJet, passAK8Jet;
      passJet.clear(); passAK8Jet.clear();
+     vector<float> jetSmearedPt;
+     vector<float> jetSmearedEn;
      //AK4
      for (int i=0;i<nJet;i++) {
        bool passcut=true;
-       if (abs((*jetEta)[i])>3 || (*jetPFLooseId)[i]==0 || (*jetPt)[i]<40) passcut=false;
+       jetSmearedPt.push_back((*jetPt)[i]);
+       jetSmearedEn.push_back((*jetEn)[i]);
+       TLorentzVector jetp4;
+       jetp4.SetPtEtaPhiE((*jetPt)[i],(*jetEta)[i],(*jetPhi)[i],(*jetEn)[i]);
+       if ((*jetP4Smear)[i]>0) {
+         jetp4 *=(*jetP4Smear)[i];
+         jetSmearedPt.at(i) = jetp4.Pt();
+         jetSmearedEn.at(i) = jetp4.Energy();
+       }
+       if (abs((*jetEta)[i])>3 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<40 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
        if (passcut) passJet.push_back(i);
      }
      //AK8
