@@ -49,6 +49,7 @@ void CopyTree::Loop()
    TH1F *h_PU;
    TH1F *h_PUTrue;
    TH1F *h_GenWeight;
+   TH1F *h_SumGenWeight;
 
    TBenchmark time;
    TDatime now;
@@ -58,6 +59,7 @@ void CopyTree::Loop()
 
    bool wasData;
    int file_counter=-1, temp=-1; std::string temp_f=fChain->GetCurrentFile()->GetName();
+   unsigned int maxevents=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
    //for (Long64_t jentry=0; jentry<100;jentry++) {
      Long64_t ientry = LoadTree(jentry);
@@ -72,9 +74,11 @@ void CopyTree::Loop()
          h_PU = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPU");
          h_PUTrue = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue");
          h_GenWeight = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight");
+         h_SumGenWeight = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hSumGenWeight");
          h_PU->SetDirectory(0);
          h_PUTrue->SetDirectory(0);
          h_GenWeight->SetDirectory(0);
+         h_SumGenWeight->SetDirectory(0);
        }
      }
 
@@ -95,11 +99,16 @@ void CopyTree::Loop()
          h_PU->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPU"));
          h_PUTrue->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue"));
          h_GenWeight->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight"));
+         h_SumGenWeight->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hSumGenWeight"));
        }
      }
      //Skimming conditions
      bool gWrite=false;
      //For selecting 1H->bb SUSY signal only
+     //int neutralino=-1;
+     //for (int i=0;i<nMC;i++) if ((*mcPID)[i]==1000023) neutralino=i;
+     //if ((*mcMass)[neutralino]!=900) continue;
+     //maxevents++;
      /*
      int higgs=0, ib1=-1, ib2=-1;
      for (int i=0;i<nMC;i++) {
@@ -112,8 +121,9 @@ void CopyTree::Loop()
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
-     //Requiring 1 trigger
+     //Requiring trigger
      //if (HLTPho&128) gWrite=true; //HLT_Photon175
+     //if (HLTPho&4096) gWrite=true; //HLT_Photon165_HE10
      if (HLTJet&4194304) gWrite=true; //HLT_PFHT300_PFMET110_v
 
      if (gWrite) skimtree->Fill();
@@ -121,9 +131,12 @@ void CopyTree::Loop()
    skimtree->Write();
    h_Events->Write();
    if (!wasData) {
+     //FOR EWKINO:
+     //h_SumGenWeight->SetBinContent(1,maxevents);
      h_PU->Write();
      h_PUTrue->Write();
      h_GenWeight->Write();
+     h_SumGenWeight->Write();
      TH1D *h_cross_section = new TH1D("h_cross_section","",1,0,1);
      h_cross_section->SetBinContent(1,Cross_Section);
      h_cross_section->Write();

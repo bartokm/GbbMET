@@ -137,8 +137,8 @@ void Analyzer::Loop()
    double L_data=35867.06;
    
    //Btag SF
-   BTCalibration calib;
-   BTCalibrationReader reader_L, reader_M, reader_T;
+   BTCalibration calib, calib_fs;
+   BTCalibrationReader reader_L, reader_M, reader_T, reader_L_fs, reader_M_fs, reader_T_fs;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTCalibration#Standalone
    if (btag_file.size()>0){
      calib = *new BTCalibration("csvv1", "CSVv2_Moriond17_B_H.csv");
@@ -154,6 +154,22 @@ void Analyzer::Loop()
      reader_T.load(calib,BTEntry::FLAV_B,"comb");
      reader_T.load(calib,BTEntry::FLAV_C,"comb");
      reader_T.load(calib,BTEntry::FLAV_UDSG,"incl");
+     
+     //fastsim
+     calib_fs = *new BTCalibration("csvv1_fs", "fastsim_v2.csv");
+     reader_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_fs = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_fs = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
+     reader_L_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
+     reader_L_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
+     reader_M_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
+     reader_M_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
+     reader_M_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
+     reader_T_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
+     reader_T_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
+     reader_T_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
+
      /*AK8 BT SF not implemented yet
         BTCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
         BTCalibrationReader reader_AK8L(BTEntry::OP_LOOSE,"central",{"up", "down"});
@@ -178,21 +194,27 @@ void Analyzer::Loop()
    else temp_fname+=".root";
    TFile f(temp_fname.c_str(),"recreate");
    
-   TH1D *h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,pfMET,btag,Hmass",10,0,10);
+   TH1::SetDefaultSumw2();
+   
+   TH1D *h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,nJet,MT,ST,MET,btag",10,0,10);
    TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",70,0,70);
+   TH1D *h_nGoodVtx = new TH1D("h_nGoodVtx",";# of good vertices",70,0,70);
    TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",70,0,70);
 
-   TH1D *h_phoEtL = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",30,0,1500);
-   TH1D *h_phoEtM = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",30,0,1500);
-   TH1D *h_phoEtT = new TH1D("h_phoEtT",";CalibE_{T}^{#gamma_T} [GeV]",30,0,1500);
+   TH1D *h_phoEtL = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",60,0,1500);
+   TH1D *h_phoEtM = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",60,0,1500);
+   TH1D *h_phoEtT = new TH1D("h_phoEtT",";CalibE_{T}^{#gamma_T} [GeV]",60,0,1500);
    TH1D *h_phoEtaL = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
    TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
    TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
    TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",30,0,1000);
    TH1D *h_pfMETsumEt = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",30,-50,5000);
    TH1D *h_pfMETPhi = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",30,-4,4);
-   TH1D *h_pfMETSig = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",30,0,2000);
-   TH1D *h_ST = new TH1D("h_ST",";S_{T}^{#gamma} [GeV]",30,0,2000);
+   TH1D *h_pfMETSig = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
+   TH2D *h_MET_AK8btag= new TH2D("h_MET_AK8btag","MET vs selected AK8btag;pfMET;BDSV",30,0,1000,30,-1,1);
+   TH2D *h_MET_AK4btag= new TH2D("h_MET_AK4btag","MET vs selected AK4btag1+AK4btag2;pfMET;CSV_{bjet1}+CSV_{bjet2}",30,0,1000,30,0,2);
+   TH1D *h_ST = new TH1D("h_ST",";S_{T} [GeV]",40,0,4000);
+   TH1D *h_ST_G = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",30,0,2000);
    TH1D *h_MT = new TH1D("h_MT",";M_{T} [GeV]",30,0,2000);
    TH1D *h_nPho = new TH1D("h_nPho",";# of #gamma",10,0,10);
    TH1D *h_nEle= new TH1D("h_nEle",";# of e_{loose}",10,0,10);
@@ -238,6 +260,9 @@ void Analyzer::Loop()
    TH1D *h_doubleB_highdB = new TH1D("h_doubleB_highdB","Highest Boosted;BoostedDoubleSVTagger",30,-1,1);
    TH1D *h_bjetCSV= new TH1D("h_bjetCSV","Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
    TH1D *h_bjetCSV2= new TH1D("h_bjetCSV2","2nd Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
+   TH1D *h_b1pb2CSV= new TH1D("h_b1pb2CSV","Highest bjet CSVs;CSV_{bjet1}+CSV_{bjet2}",60,0,2);
+   TH1D *h_b1tb2CSV= new TH1D("h_b1tb2CSV","Highest bjet CSVs;CSV_{bjet1}*CSV_{bjet2}",30,0,1);
+   TH2D *h_b1b2CSV= new TH2D("h_b1b2CSV","Highest bjet CSVs;CSV_{bjet1};CSV_{bjet2}",30,0,1,30,0,1);
    TH1D *h_bjetcMVA = new TH1D("h_bjetcMVA","Highest cMVA;CombinedMVAV2BJetTags",30,-1,1);
    TH1D *h_bjetcMVA2 = new TH1D("h_bjetcMVA2","2nd Highest cMVA;CombinedMVAV2BJetTags",30,-1,1);
   
@@ -251,8 +276,10 @@ void Analyzer::Loop()
    TH1D *h_AK8HT_after = new TH1D("h_AK8HT_after","AK8HT after cuts;HT",50,0,3500);
    TH1D *h_AK8EMHT_after = new TH1D("h_AK8EMHT_after","AK8EMHT after cuts;EMHT",50,0,3500);
   
-   TH1D *h_AK8PrunedCorrjetmass_select = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",30,0,250);
-   TH1D *h_mbbjet_select= new TH1D("h_mbbjet_select","invariant mass of selected bjets;M_{bb}[GeV]",30,0,250);
+   TH1D *h_AK8PrunedCorrjetmass_select = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",20,0,250);
+   TH1D *h_AK8PrunedCorrjetmass_withABCD= new TH1D("h_AK8PrunedCorrjetmass_select_withABCD","Highest btagged AK8PrunedCorrjetmass in Higgs mass range;PrunedCorr m_{highest btag AK8jets} [GeV]",20,0,250);
+   TH1D *h_mbbjet_select= new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",20,0,250);
+   TH1D *h_mbbjet_withABCD= new TH1D("h_mbbjet_select_withABCD","Invariant mass of highest btag bjets in Higgs mass range;M_{bb}[GeV]",20,0,250);
 
    TBenchmark time;
    TDatime now;
@@ -287,16 +314,25 @@ void Analyzer::Loop()
        b_mcEt->GetEntry(ientry);
        b_mcPhi->GetEntry(ientry);
        b_mcEta->GetEntry(ientry);
-       b_mcIndex->GetEntry(ientry);
        b_mcStatus->GetEntry(ientry);
        b_genMET->GetEntry(ientry);
+       b_jetGenEta->GetEntry(ientry);
+       b_jetGenPhi->GetEntry(ientry);
        b_jetHadFlvr->GetEntry(ientry);
+       b_jetP4Smear->GetEntry(ientry);
+       b_jetP4SmearUp->GetEntry(ientry);
+       b_jetP4SmearDo->GetEntry(ientry);
        b_AK8JetHadFlvr->GetEntry(ientry);
+       b_AK8JetP4Smear->GetEntry(ientry);
+       b_AK8JetP4SmearUp->GetEntry(ientry);
+       b_AK8JetP4SmearDo->GetEntry(ientry);
      }
      b_event->GetEntry(ientry);
+     b_nGoodVtx->GetEntry(ientry);
      b_nVtx->GetEntry(ientry);
      b_HLTEleMuX->GetEntry(ientry);
      b_HLTPho->GetEntry(ientry);
+     b_metFilters->GetEntry(ientry);
      b_pfMET->GetEntry(ientry);
      b_pfMETPhi->GetEntry(ientry);
      b_pfMETsumEt->GetEntry(ientry);
@@ -321,7 +357,6 @@ void Analyzer::Loop()
      b_phohasPixelSeed->GetEntry(ientry);
      b_phoEleVeto->GetEntry(ientry);
      b_phoHoverE->GetEntry(ientry);
-     b_phoSigmaIEtaIEta->GetEntry(ientry);
      b_phoPFChIso->GetEntry(ientry);
      b_phoPFPhoIso->GetEntry(ientry);
      b_phoPFNeuIso->GetEntry(ientry);
@@ -332,14 +367,17 @@ void Analyzer::Loop()
      b_jetPt->GetEntry(ientry);
      b_jetPhi->GetEntry(ientry);
      b_jetEta->GetEntry(ientry);
+     b_jetCHF->GetEntry(ientry);
      b_jetJetProbabilityBJetTags->GetEntry(ientry);
      b_jetCSV2BJetTags->GetEntry(ientry);
      b_jetpfCombinedMVAV2BJetTags->GetEntry(ientry);
      b_jetPFLooseId->GetEntry(ientry);
+     b_jetPUFullID->GetEntry(ientry);
      b_nAK8Jet->GetEntry(ientry);
      b_AK8JetPt->GetEntry(ientry);
      b_AK8JetEta->GetEntry(ientry);
      b_AK8JetPhi->GetEntry(ientry);
+     b_AK8JetEn->GetEntry(ientry);
      b_AK8JetMass->GetEntry(ientry);
      b_AK8JetPrunedMass->GetEntry(ientry);
      b_AK8JetPrunedMassCorr->GetEntry(ientry);
@@ -390,12 +428,12 @@ void Analyzer::Loop()
          else std::cout<<"No h_cross_section found in file using xsec = "<<xsec<<std::endl;
          //for amc at nlo the TotalEvents is the sum of + and - events
          if (fChain->GetCurrentFile()->GetDirectory("ggNtuplizer") !=0) {
-           TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hGenWeight");
-           TotalEvents = htemp->GetBinContent(1)-htemp->GetBinContent(2);
+           TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hSumGenWeight");
+           TotalEvents = htemp->GetBinContent(1);
          }
          else {
-           TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("hGenWeight");
-           TotalEvents = htemp->GetBinContent(1)-htemp->GetBinContent(2);
+           TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("hSumGenWeight");
+           TotalEvents = htemp->GetBinContent(1);
            if (abs(genWeight)>1) {
              TH1D *htemp=(TH1D*)fChain->GetCurrentFile()->Get("hEvents");
              double calcXsec = TotalEvents*abs(genWeight)/htemp->GetBinContent(1);
@@ -418,6 +456,7 @@ void Analyzer::Loop()
        //get zero bunchcrossing (puTrue always the same for every bx, just in case...)
        for (int i=0;i<(*puBX).size();i++) if ((*puBX)[i]==0) zbx=i;
        double pu_weight=h_PUweight->GetBinContent(h_PUweight->FindBin((*puTrue)[zbx]));
+       if (_fastSim) pu_weight=1;
        double weight=L_data*xsec/TotalEvents;
        //std::cout<<"weight=L_data*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
        if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amc@nlo
@@ -458,6 +497,7 @@ void Analyzer::Loop()
      int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
      int leadpt_ak4=-1, leadpt_ak8=-1, highBDSV=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
      vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT;
+     vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
      map<int,char> passCSV, passcMVA, passBDSV;
      double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
      double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
@@ -491,20 +531,36 @@ void Analyzer::Loop()
      AK8EMHT_before=EMHT_before;
      AK8EMHT_after=EMHT_before;
      //jet ID
+     //bool vetoEvent=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (int i=0;i<nJet;i++) {
        bool passcut=true;
-       HT_before+=(*jetPt)[i];
-       if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || (*jetPt)[i]<40) passcut=false;
+       jetSmearedPt.push_back((*jetPt)[i]);
+       jetSmearedEn.push_back((*jetEn)[i]);
+       TLorentzVector jetp4;
+       jetp4.SetPtEtaPhiE((*jetPt)[i],(*jetEta)[i],(*jetPhi)[i],(*jetEn)[i]);
+       if (!isData && (*jetP4Smear)[i]>0) {
+         jetp4 *=(*jetP4Smear)[i];
+         jetSmearedPt.at(i) = jetp4.Pt();
+         jetSmearedEn.at(i) = jetp4.Energy();
+       }
+       HT_before+=jetSmearedPt[i];
+       if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<40 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
+       //if (_fastSim && (*jetPt)[i]>20 && abs((*jetEta)[i])<2.5 && (*jetCHF)[i]<0.1) {
+       //if (_fastSim && passcut && (*jetCHF)[i]<0.1) {
+       //  if ((*jetGenEta)[i]==-999) {std::cout<<"veto 999"<<std::endl;vetoEvent=true;}
+       //  else if (deltaR((*jetPhi)[i],(*jetGenPhi)[i],(*jetEta)[i],(*jetGenEta)[i])>0.3) {std::cout<<"veto deltar"<<std::endl;vetoEvent=true;}
+       //}
        for (int j=0;j<passPhoL.size();j++) if (deltaR((*jetPhi)[i],(*phoPhi)[passPhoL.at(j)],(*jetEta)[i],(*phoEta)[passPhoL.at(j)])<0.3) {
          passcut=false;break;
        }
        if (passcut) passJet.push_back(i);
      }
+     //if (vetoEvent) {continue;}
      //jet pt, btags
      int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
      for (int i=0;i<passJet.size();i++) {
-       if ((*jetPt)[passJet.at(i)]>(*jetPt)[leadpt_ak4]) leadpt_ak4=passJet.at(i);
-       HT_after+=(*jetPt)[passJet.at(i)];
+       if (jetSmearedPt[passJet.at(i)]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=passJet.at(i);
+       HT_after+=jetSmearedPt[passJet.at(i)];
        if ((*jetCSV2BJetTags)[passJet.at(i)]>(*jetCSV2BJetTags)[highCSV1]) {highCSV2=highCSV1;highCSV1=passJet.at(i);}
        else if (highCSV2!=-1) if ((*jetCSV2BJetTags)[passJet.at(i)]>(*jetCSV2BJetTags)[highCSV2]) highCSV2=passJet.at(i);
        if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>(*jetpfCombinedMVAV2BJetTags)[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=passJet.at(i);}
@@ -539,8 +595,17 @@ void Analyzer::Loop()
      //AK8Jet ID
      for (int i=0;i<nAK8Jet;i++) {
        bool passcut=true;
-       AK8HT_before+=(*AK8JetPt)[i];
-       if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || (*AK8JetPt)[i]<40) passcut=false;
+       AK8JetSmearedPt.push_back((*AK8JetPt)[i]);
+       AK8JetSmearedEn.push_back((*AK8JetEn)[i]);
+       TLorentzVector jetp4;
+       jetp4.SetPtEtaPhiE((*AK8JetPt)[i],(*AK8JetEta)[i],(*AK8JetPhi)[i],(*AK8JetEn)[i]);
+       if (!isData && (*AK8JetP4Smear)[i]>0) {
+         jetp4 *=(*AK8JetP4Smear)[i];
+         AK8JetSmearedPt.at(i) = jetp4.Pt();
+         AK8JetSmearedEn.at(i) = jetp4.Energy();
+       }
+       AK8HT_before+=AK8JetSmearedPt[i];
+       if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
        for (int j=0;j<passPhoL.size();j++) if (deltaR((*AK8JetPhi)[i],(*phoPhi)[passPhoL.at(j)],(*AK8JetEta)[i],(*phoEta)[passPhoL.at(j)])<0.5) {
          passcut=false;break;
        }
@@ -548,8 +613,8 @@ void Analyzer::Loop()
      }
      //AK8Jet pt, btag
      for (int i=0;i<passAK8Jet.size();i++) {
-       if ((*AK8JetPt)[passAK8Jet.at(i)]>(*AK8JetPt)[leadpt_ak8]) leadpt_ak8=passAK8Jet.at(i);
-       AK8HT_after+=(*AK8JetPt)[passAK8Jet.at(i)];
+       if (AK8JetSmearedPt[passAK8Jet.at(i)]>AK8JetSmearedPt[leadpt_ak8]) leadpt_ak8=passAK8Jet.at(i);
+       AK8HT_after+=AK8JetSmearedPt[passAK8Jet.at(i)];
        double i_jetdB=(*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)], h_jetdB;
        if (highBDSV==-1) h_jetdB=-10; else h_jetdB=(*AK8JetpfBoostedDSVBTag)[highBDSV];
        if (i_jetdB>h_jetdB) highBDSV=passAK8Jet.at(i);
@@ -614,29 +679,19 @@ void Analyzer::Loop()
        }
      }
      //MET variables
-     double ST=0, MT=0;
+     double ST=0, ST_G=0, MT=0;
      for (int i=0;i<passPhoL.size();i++) ST+=(*phoCalibEt)[passPhoL.at(i)];
      ST+=pfMET;
+     ST_G=ST;
+     for (int i=0;i<passJet.size();i++) ST+=jetSmearedPt[passJet.at(i)];
      if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoPhi)[nleadPhoL]-pfMETPhi))));
-
-     //cuts
-     //if (!HLTPho&128) continue; //HLT_Photon175
-     h_cuts->Fill(0.,w);
-     if (passPhoL.size()==0) continue;
-     h_cuts->Fill(1,w);
-     double phoCut=90;
-     if ((*phoCalibEt)[nleadPhoL]<phoCut) continue;
-     h_cuts->Fill(2,w);
-     if (isData) if (!(metFilters==0)) continue;
-     if (pfMET<100) continue;
-     h_cuts->Fill(3,w);
-     //find which btag jet to use
+     
+     //find which btag jet to use for Higgs mass
      //AK8
      bool passBtag=false, passHiggsMass=false;
      int SelectedAK8Jet=-1;
      for (int i=0;i<passAK8Jet.size();i++){
-       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]<BtagBDSVWP[0]) break;
-       passBtag=true;
+       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>BtagBDSVWP[1]) passBtag=true;
        if ((*AK8JetPrunedMassCorr)[passAK8Jet.at(i)]>70 && (*AK8JetPrunedMassCorr)[passAK8Jet.at(i)]<200) {
          passHiggsMass=true;
          SelectedAK8Jet=passAK8Jet.at(i);
@@ -644,17 +699,16 @@ void Analyzer::Loop()
        }
      }
       //AK4
-     bool passAK4Btag=false, passAK4HiggsMass=false;
+     bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
      double m_bb=-1;
      int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
      for (int i=0;i<passJet.size();i++){
-       if ((*jetCSV2BJetTags)[passJet.at(i)]<BtagCSVWP[0]) continue;
+       if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) passAK4Btag1=true;
        for (int j=i+1;j<passJet.size();j++){
-         if ((*jetCSV2BJetTags)[passJet.at(j)]<BtagCSVWP[0]) continue;
-         passAK4Btag=true;
+         if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) passAK4Btag2=true;
          TLorentzVector bjet1, bjet2;
-         bjet1.SetPtEtaPhiE((*jetPt)[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],(*jetEn)[passJet.at(i)]);
-         bjet2.SetPtEtaPhiE((*jetPt)[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],(*jetEn)[passJet.at(j)]);
+         bjet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
+         bjet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
          m_bb=(bjet1+bjet2).M();
          if (m_bb>70 && m_bb<200) {
            SelectedAK4Jet1=passJet.at(i);
@@ -665,15 +719,66 @@ void Analyzer::Loop()
        }
        if (passAK4HiggsMass) break;
      }
+
      //Calculate BTag SFs
      double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
      if (!isData && btag_file.size()>0) {
        //AK4
-       CalcBtagSF(jetEta, jetPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+       if (!_fastSim) CalcBtagSF(jetEta, jetPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+       else CalcBtagSF(jetEta, jetPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L_fs, reader_M_fs, reader_T_fs, CSV_SF_L, CSV_SF_M, CSV_SF_T);
        //AK8
      }
-     if (passAK8Jet.size()==0 || passJet.size()==0) continue;
+     
+     //cuts
+     //if (!(HLTPho&128)) continue; //HLT_Photon175
+     if (!_fastSim && !(HLTPho&4096)) continue; //HLT_Photon165_HE10
+     h_cuts->Fill(0.,w);
+     if (passPhoL.size()==0) continue;
+     h_cuts->Fill(1,w);
+     double phoCut=175;
+     if ((*phoCalibEt)[nleadPhoL]<phoCut) continue;
+     h_cuts->Fill(2,w);
+     if (passJet.size()<3) continue;
+     h_cuts->Fill(3,w);
+     if (MT<100) continue;
      h_cuts->Fill(4,w);
+     if (ST<600) continue;
+     h_cuts->Fill(5,w);
+     if (isData) if (metFilters!=1536) continue;
+     if (!isData && !_fastSim) if (metFilters&94) continue;
+     if (!isData && _fastSim) if (metFilters&86) continue;
+     if (pfMET<100) continue;
+     //if (pfMET<70 || pfMET>100) continue;
+     h_cuts->Fill(6,w);
+     if (bcounterCSV[1]<2) continue;
+     if (!isData) w*=CSV_SF_L[0];
+     h_cuts->Fill(7,w);
+     //if (bcounterBDSV[2]==0) continue;
+     //if (bcounterBDSV[1]==0 || bcounterBDSV[2]!=0) continue;
+     //h_cuts->Fill(7,w);
+
+     /*
+     //pfht300_met110 cuts
+     if (!(HLTJet&4194304)) continue; //HLT_PFHT300_PFMET110_v
+     if (HT_after<300) continue;
+     h_cuts->Fill(0.,w);
+     if (isData) if (metFilters!=1536) continue;
+     if (!isData) if (metFilters&94) continue; //86 for FASTSIM!!
+     if (pfMET<110) continue;
+     h_cuts->Fill(1,w);
+     if (MT<100) continue;
+     h_cuts->Fill(2,w);
+     if (ST<600) continue;
+     h_cuts->Fill(3,w);
+     if (passPhoL.size()==0) continue;
+     h_cuts->Fill(4,w);
+     double phoCut=150;
+     if ((*phoCalibEt)[nleadPhoL]<phoCut) continue;
+     h_cuts->Fill(5,w);
+     if (bcounterCSV[1]<2) continue;
+     h_cuts->Fill(6,w);
+     */
+
      //Filling histograms
      h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
      h_phoEtaL->Fill((*phoEta)[nleadPhoL],w);
@@ -686,6 +791,7 @@ void Analyzer::Loop()
        h_phoEtaT->Fill((*phoEta)[nleadPhoT],w);
      }
      h_nVtx->Fill(nVtx,w);
+     h_nGoodVtx->Fill(nGoodVtx,w);
      if (!isData) h_nPU->Fill((*puTrue)[zbx],w);
      h_HT_before->Fill(HT_before,w);
      h_EMHT_before->Fill(EMHT_before,w);
@@ -700,11 +806,14 @@ void Analyzer::Loop()
      h_pfMETsumEt->Fill(pfMETsumEt,w);
      h_pfMETPhi->Fill(pfMETPhi,w);
      h_pfMETSig->Fill(pfMETSig,w);
+     h_MET_AK8btag->Fill(pfMET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
+     h_MET_AK4btag->Fill(pfMET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      h_ST->Fill(ST,w);
+     h_ST_G->Fill(ST_G,w);
      h_MT->Fill(MT,w);
      h_nPho->Fill(passPhoL.size(),w);
      h_njets->Fill(passJet.size(),w);
-     h_CSVbjetsL->Fill(bcounterCSV[1],w*CSV_SF_L[0]);
+     h_CSVbjetsL->Fill(bcounterCSV[1],w);
      h_CSVbjetsM->Fill(bcounterCSV[2],w*CSV_SF_M[0]);
      h_CSVbjetsT->Fill(bcounterCSV[3],w*CSV_SF_T[0]);
      h_cMVAbjetsL->Fill(bcountercMVA[1],w);
@@ -715,6 +824,9 @@ void Analyzer::Loop()
      h_BDSVbjetsT->Fill(bcounterBDSV[3],w);
      if (highCSV1!=-1) h_bjetCSV->Fill((*jetCSV2BJetTags)[highCSV1],w);
      if (highCSV2!=-1) h_bjetCSV2->Fill((*jetCSV2BJetTags)[highCSV2],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1pb2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1tb2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]*(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1b2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1],(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      if (highcMVA1!=-1) h_bjetcMVA->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA1],w);
      if (highcMVA2!=-1) h_bjetcMVA2->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA2],w);
      if (leadpt_ak8!=-1) h_doubleB->Fill((*AK8JetpfBoostedDSVBTag)[leadpt_ak8],w);
@@ -726,20 +838,22 @@ void Analyzer::Loop()
      h_nMu->Fill(passMuL.size(),w);
      h_nMuM->Fill(passMuM.size(),w);
      h_nMuT->Fill(passMuT.size(),w);
-     if (leadpt_ak4!=-1) h_jetpt->Fill((*jetPt)[leadpt_ak4],w);
-     if (leadpt_ak8!=-1) h_AK8jetpt->Fill((*AK8JetPt)[leadpt_ak8],w);
-     if (highBDSV!=-1) h_AK8bjetpt->Fill((*AK8JetPt)[highBDSV],w);
-     if (SelectedAK8Jet!=-1) h_AK8bhjetpt->Fill((*AK8JetPt)[SelectedAK8Jet],w);
+     if (leadpt_ak4!=-1) h_jetpt->Fill(jetSmearedPt[leadpt_ak4],w);
+     if (leadpt_ak8!=-1) h_AK8jetpt->Fill(AK8JetSmearedPt[leadpt_ak8],w);
+     if (highBDSV!=-1) h_AK8bjetpt->Fill(AK8JetSmearedPt[highBDSV],w);
+     if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhjetpt->Fill(AK8JetSmearedPt[SelectedAK8Jet],w);
      if (leadpt_ak8!=-1) h_AK8ljetmass->Fill((*AK8JetMass)[leadpt_ak8],w);
      if (leadpt_ak8!=-1) h_AK8bjetmass->Fill((*AK8JetMass)[highBDSV],w);
-     if (SelectedAK8Jet!=-1) h_AK8bhjetmass->Fill((*AK8JetMass)[SelectedAK8Jet],w);
+     if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhjetmass->Fill((*AK8JetMass)[SelectedAK8Jet],w);
      if (leadpt_ak8!=-1) h_AK8bPrunedjetmass->Fill((*AK8JetPrunedMass)[highBDSV],w);
-     if (SelectedAK8Jet!=-1) h_AK8bhPrunedjetmass->Fill((*AK8JetPrunedMass)[SelectedAK8Jet],w);
+     if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhPrunedjetmass->Fill((*AK8JetPrunedMass)[SelectedAK8Jet],w);
      if (leadpt_ak8!=-1) h_AK8bPrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
-     if (SelectedAK8Jet!=-1) h_AK8bhPrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+     if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhPrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
      if (dR_pho_AK8!=-1) h_dRphoAK8jet->Fill(dR_pho_AK8,w);
-     if (SelectedAK8Jet!=-1) h_AK8PrunedCorrjetmass_select->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
-     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1)h_mbbjet_select->Fill(m_bb,w*CSV_SF_L[0]);
+     if (SelectedAK8Jet!=-1 && passBtag) h_AK8PrunedCorrjetmass_select->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+     if (SelectedAK8Jet!=-1) h_AK8PrunedCorrjetmass_withABCD->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1 && passAK4Btag1 && passAK4Btag2)h_mbbjet_select->Fill(m_bb,w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1)h_mbbjet_withABCD->Fill(m_bb,w);
      if (SelectedAK8Jet!=-1) h_AK8tau1->Fill((*AK8Jet_tau1)[SelectedAK8Jet],w);
      if (SelectedAK8Jet!=-1) h_AK8tau2->Fill((*AK8Jet_tau2)[SelectedAK8Jet],w);
      if (SelectedAK8Jet!=-1) h_AK8tau3->Fill((*AK8Jet_tau3)[SelectedAK8Jet],w);

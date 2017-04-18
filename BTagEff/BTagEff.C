@@ -153,6 +153,8 @@ void BTagEff::Loop()
      passJet.clear(); passAK8Jet.clear();
      vector<float> jetSmearedPt;
      vector<float> jetSmearedEn;
+     vector<float> AK8JetSmearedPt;
+     vector<float> AK8JetSmearedEn;
      //AK4
      for (int i=0;i<nJet;i++) {
        bool passcut=true;
@@ -171,14 +173,23 @@ void BTagEff::Loop()
      //AK8
      for (int i=0;i<nAK8Jet;i++) {
        bool passcut=true;
-       if (abs((*AK8JetEta)[i])>3 || (*AK8JetPFLooseId)[i]==0 || (*AK8JetPt)[i]<40) passcut=false;
+       AK8JetSmearedPt.push_back((*AK8JetPt)[i]);
+       AK8JetSmearedEn.push_back((*AK8JetEn)[i]);
+       TLorentzVector jetp4;
+       jetp4.SetPtEtaPhiE((*AK8JetPt)[i],(*AK8JetEta)[i],(*AK8JetPhi)[i],(*AK8JetEn)[i]);
+       if ((*AK8JetP4Smear)[i]>0) {
+         jetp4 *=(*AK8JetP4Smear)[i];
+         AK8JetSmearedPt.at(i) = jetp4.Pt();
+         AK8JetSmearedEn.at(i) = jetp4.Energy();
+       }
+       if (abs((*AK8JetEta)[i])>3 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
        if (passcut) passAK8Jet.push_back(i);
      }
      for (int i=0;i<passJet.size();i++) {
      //Fill bjet histograms
        if ((*jetHadFlvr)[passJet[i]]==5) {
          double eta=(*jetEta)[passJet[i]];
-         double pt=(*jetPt)[passJet[i]];
+         double pt=jetSmearedPt[passJet[i]];
          if (pt>2000) pt=2000;
          h_allAK4bjets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_b_CSV_L->Fill(eta,pt);
@@ -191,7 +202,7 @@ void BTagEff::Loop()
      //Fill cjet histograms
        if ((*jetHadFlvr)[passJet[i]]==4) {
          double eta=(*jetEta)[passJet[i]];
-         double pt=(*jetPt)[passJet[i]];
+         double pt=jetSmearedPt[passJet[i]];
          if (pt>2000) pt=2000;
          h_allAK4cjets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_c_CSV_L->Fill(eta,pt);
@@ -204,7 +215,7 @@ void BTagEff::Loop()
      //Fill light jet histograms
        if ((*jetHadFlvr)[passJet[i]]==0) {
          double eta=(*jetEta)[passJet[i]];
-         double pt=(*jetPt)[passJet[i]];
+         double pt=jetSmearedPt[passJet[i]];
          if (pt>2000) pt=2000;
          h_allAK4ljets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_l_CSV_L->Fill(eta,pt);
@@ -219,7 +230,7 @@ void BTagEff::Loop()
      for (int i=0;i<passAK8Jet.size();i++){
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==5) {
          double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=(*AK8JetPt)[passAK8Jet[i]];
+         double pt=AK8JetSmearedPt[passAK8Jet[i]];
          if (pt>2000) pt=2000;
          h_allAK8bjets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_b_BDSV_L->Fill(eta,pt);
@@ -229,7 +240,7 @@ void BTagEff::Loop()
        }
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==4) {
          double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=(*AK8JetPt)[passAK8Jet[i]];
+         double pt=AK8JetSmearedPt[passAK8Jet[i]];
          if (pt>2000) pt=2000;
          h_allAK8cjets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_c_BDSV_L->Fill(eta,pt);
@@ -239,7 +250,7 @@ void BTagEff::Loop()
        }
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==0) {
          double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=(*AK8JetPt)[passAK8Jet[i]];
+         double pt=AK8JetSmearedPt[passAK8Jet[i]];
          if (pt>2000) pt=2000;
          h_allAK8ljets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_l_BDSV_L->Fill(eta,pt);

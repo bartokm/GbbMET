@@ -47,6 +47,7 @@ public :
    ULong64_t       HLTEleMuXIsPrescaled;
    ULong64_t       HLTPhoIsPrescaled;
    ULong64_t       HLTJetIsPrescaled;
+   vector<int>     *phoPrescale;
    vector<float>   *pdf;
    Float_t         pthat;
    Float_t         processID;
@@ -74,7 +75,6 @@ public :
    vector<float>   *mcMomMass;
    vector<float>   *mcMomEta;
    vector<float>   *mcMomPhi;
-   vector<int>     *mcIndex;
    vector<unsigned short> *mcStatusFlag;
    vector<int>     *mcParentage;
    vector<int>     *mcStatus;
@@ -109,7 +109,6 @@ public :
    vector<float>   *phoCalibEt;
    vector<float>   *phoSCE;
    vector<float>   *phoSCRawE;
-   vector<float>   *phoESEn;
    vector<float>   *phoESEnP1;
    vector<float>   *phoESEnP2;
    vector<float>   *phoSCEta;
@@ -121,9 +120,6 @@ public :
    vector<int>     *phoEleVeto;
    vector<float>   *phoR9;
    vector<float>   *phoHoverE;
-   vector<float>   *phoSigmaIEtaIEta;
-   vector<float>   *phoSigmaIEtaIPhi;
-   vector<float>   *phoSigmaIPhiIPhi;
    vector<float>   *phoE1x3;
    vector<float>   *phoE1x5;
    vector<float>   *phoE2x2;
@@ -139,57 +135,31 @@ public :
    vector<float>   *phoE2x5MaxFull5x5;
    vector<float>   *phoE5x5Full5x5;
    vector<float>   *phoR9Full5x5;
-   vector<float>   *phoSeedBCE;
-   vector<float>   *phoSeedBCEta;
    vector<float>   *phoPFChIso;
    vector<float>   *phoPFPhoIso;
    vector<float>   *phoPFNeuIso;
    vector<float>   *phoPFChWorstIso;
-   vector<float>   *phoPFChIsoFrix1;
-   vector<float>   *phoPFChIsoFrix2;
-   vector<float>   *phoPFChIsoFrix3;
-   vector<float>   *phoPFChIsoFrix4;
-   vector<float>   *phoPFChIsoFrix5;
-   vector<float>   *phoPFChIsoFrix6;
-   vector<float>   *phoPFChIsoFrix7;
-   vector<float>   *phoPFChIsoFrix8;
-   vector<float>   *phoPFPhoIsoFrix1;
-   vector<float>   *phoPFPhoIsoFrix2;
-   vector<float>   *phoPFPhoIsoFrix3;
-   vector<float>   *phoPFPhoIsoFrix4;
-   vector<float>   *phoPFPhoIsoFrix5;
-   vector<float>   *phoPFPhoIsoFrix6;
-   vector<float>   *phoPFPhoIsoFrix7;
-   vector<float>   *phoPFPhoIsoFrix8;
-   vector<float>   *phoPFNeuIsoFrix1;
-   vector<float>   *phoPFNeuIsoFrix2;
-   vector<float>   *phoPFNeuIsoFrix3;
-   vector<float>   *phoPFNeuIsoFrix4;
-   vector<float>   *phoPFNeuIsoFrix5;
-   vector<float>   *phoPFNeuIsoFrix6;
-   vector<float>   *phoPFNeuIsoFrix7;
-   vector<float>   *phoPFNeuIsoFrix8;
    vector<float>   *phoCITKChIso;
    vector<float>   *phoCITKPhoIso;
    vector<float>   *phoCITKNeuIso;
-   vector<float>   *phoEcalRecHitSumEtConeDR03;
-   vector<float>   *phohcalDepth1TowerSumEtConeDR03;
-   vector<float>   *phohcalDepth2TowerSumEtConeDR03;
-   vector<float>   *phohcalTowerSumEtConeDR03;
-   vector<float>   *photrkSumPtHollowConeDR03;
-   vector<float>   *photrkSumPtSolidConeDR03;
    vector<float>   *phoIDMVA;
    vector<unsigned int> *phoFiredSingleTrgs;
    vector<unsigned int> *phoFiredDoubleTrgs;
    vector<unsigned int> *phoFiredL1Trgs;
+   vector<float>   *phoSeedTime;
+   vector<float>   *phoSeedEnergy;
    vector<unsigned short> *phoxtalBits;
    vector<unsigned short> *phoIDbit;
+   Int_t           npfPho;
+   vector<float>   *pfphoEt;
+   vector<float>   *pfphoEta;
+   vector<float>   *pfphoPhi;
    Int_t           nEle;
    vector<int>     *eleCharge;
    vector<int>     *eleChargeConsistent;
    vector<float>   *eleEn;
    vector<float>   *eleSCEn;
-   vector<float>   *eleESEn;
+   vector<float>   *eleEcalEn;
    vector<float>   *eleESEnP1;
    vector<float>   *eleESEnP2;
    vector<float>   *eleD0;
@@ -214,9 +184,6 @@ public :
    vector<float>   *eledEtaAtVtx;
    vector<float>   *eledPhiAtVtx;
    vector<float>   *eledEtaAtCalo;
-   vector<float>   *eleSigmaIEtaIEta;
-   vector<float>   *eleSigmaIEtaIPhi;
-   vector<float>   *eleSigmaIPhiIPhi;
    vector<float>   *eleSigmaIEtaIEtaFull5x5;
    vector<float>   *eleSigmaIPhiIPhiFull5x5;
    vector<int>     *eleConvVeto;
@@ -336,7 +303,6 @@ public :
    vector<float>   *jetpfCombinedMVAV2BJetTags;
    vector<int>     *jetPartonID;
    vector<int>     *jetHadFlvr;
-   vector<int>     *jetGenJetIndex;
    vector<float>   *jetGenJetEn;
    vector<float>   *jetGenJetPt;
    vector<float>   *jetGenJetEta;
@@ -347,9 +313,13 @@ public :
    vector<float>   *jetGenEta;
    vector<float>   *jetGenPhi;
    vector<int>     *jetGenPartonMomID;
+   vector<float>   *jetP4Smear;
+   vector<float>   *jetP4SmearUp;
+   vector<float>   *jetP4SmearDo;
    vector<bool>    *jetPFLooseId;
    vector<int>     *jetID;
-   vector<float>   *jetPUidFullDiscriminant;
+   vector<float>   *jetPUID;
+   vector<int>     *jetPUFullID;
    vector<float>   *jetJECUnc;
    vector<unsigned int> *jetFiredTrgs;
    vector<float>   *jetCHF;
@@ -416,6 +386,9 @@ public :
    vector<float>   *AK8JetGenEta;
    vector<float>   *AK8JetGenPhi;
    vector<int>     *AK8JetGenPartonMomID;
+   vector<float>   *AK8JetP4Smear;
+   vector<float>   *AK8JetP4SmearUp;
+   vector<float>   *AK8JetP4SmearDo;
    vector<int>     *nAK8SDSJ;
    vector<vector<float> > *AK8SDSJPt;
    vector<vector<float> > *AK8SDSJEta;
@@ -455,6 +428,7 @@ public :
    TBranch        *b_HLTEleMuXIsPrescaled;   //!
    TBranch        *b_HLTPhoIsPrescaled;   //!
    TBranch        *b_HLTJetIsPrescaled;   //!
+   TBranch        *b_phoPrescale;   //!
    TBranch        *b_pdf;   //!
    TBranch        *b_pthat;   //!
    TBranch        *b_processID;   //!
@@ -482,7 +456,6 @@ public :
    TBranch        *b_mcMomMass;   //!
    TBranch        *b_mcMomEta;   //!
    TBranch        *b_mcMomPhi;   //!
-   TBranch        *b_mcIndex;   //!
    TBranch        *b_mcStatusFlag;   //!
    TBranch        *b_mcParentage;   //!
    TBranch        *b_mcStatus;   //!
@@ -517,7 +490,6 @@ public :
    TBranch        *b_phoCalibEt;   //!
    TBranch        *b_phoSCE;   //!
    TBranch        *b_phoSCRawE;   //!
-   TBranch        *b_phoESEn;   //!
    TBranch        *b_phoESEnP1;   //!
    TBranch        *b_phoESEnP2;   //!
    TBranch        *b_phoSCEta;   //!
@@ -529,9 +501,6 @@ public :
    TBranch        *b_phoEleVeto;   //!
    TBranch        *b_phoR9;   //!
    TBranch        *b_phoHoverE;   //!
-   TBranch        *b_phoSigmaIEtaIEta;   //!
-   TBranch        *b_phoSigmaIEtaIPhi;   //!
-   TBranch        *b_phoSigmaIPhiIPhi;   //!
    TBranch        *b_phoE1x3;   //!
    TBranch        *b_phoE1x5;   //!
    TBranch        *b_phoE2x2;   //!
@@ -547,57 +516,31 @@ public :
    TBranch        *b_phoE2x5MaxFull5x5;   //!
    TBranch        *b_phoE5x5Full5x5;   //!
    TBranch        *b_phoR9Full5x5;   //!
-   TBranch        *b_phoSeedBCE;   //!
-   TBranch        *b_phoSeedBCEta;   //!
    TBranch        *b_phoPFChIso;   //!
    TBranch        *b_phoPFPhoIso;   //!
    TBranch        *b_phoPFNeuIso;   //!
    TBranch        *b_phoPFChWorstIso;   //!
-   TBranch        *b_phoPFChIsoFrix1;   //!
-   TBranch        *b_phoPFChIsoFrix2;   //!
-   TBranch        *b_phoPFChIsoFrix3;   //!
-   TBranch        *b_phoPFChIsoFrix4;   //!
-   TBranch        *b_phoPFChIsoFrix5;   //!
-   TBranch        *b_phoPFChIsoFrix6;   //!
-   TBranch        *b_phoPFChIsoFrix7;   //!
-   TBranch        *b_phoPFChIsoFrix8;   //!
-   TBranch        *b_phoPFPhoIsoFrix1;   //!
-   TBranch        *b_phoPFPhoIsoFrix2;   //!
-   TBranch        *b_phoPFPhoIsoFrix3;   //!
-   TBranch        *b_phoPFPhoIsoFrix4;   //!
-   TBranch        *b_phoPFPhoIsoFrix5;   //!
-   TBranch        *b_phoPFPhoIsoFrix6;   //!
-   TBranch        *b_phoPFPhoIsoFrix7;   //!
-   TBranch        *b_phoPFPhoIsoFrix8;   //!
-   TBranch        *b_phoPFNeuIsoFrix1;   //!
-   TBranch        *b_phoPFNeuIsoFrix2;   //!
-   TBranch        *b_phoPFNeuIsoFrix3;   //!
-   TBranch        *b_phoPFNeuIsoFrix4;   //!
-   TBranch        *b_phoPFNeuIsoFrix5;   //!
-   TBranch        *b_phoPFNeuIsoFrix6;   //!
-   TBranch        *b_phoPFNeuIsoFrix7;   //!
-   TBranch        *b_phoPFNeuIsoFrix8;   //!
    TBranch        *b_phoCITKChIso;   //!
    TBranch        *b_phoCITKPhoIso;   //!
    TBranch        *b_phoCITKNeuIso;   //!
-   TBranch        *b_phoEcalRecHitSumEtConeDR03;   //!
-   TBranch        *b_phohcalDepth1TowerSumEtConeDR03;   //!
-   TBranch        *b_phohcalDepth2TowerSumEtConeDR03;   //!
-   TBranch        *b_phohcalTowerSumEtConeDR03;   //!
-   TBranch        *b_photrkSumPtHollowConeDR03;   //!
-   TBranch        *b_photrkSumPtSolidConeDR03;   //!
    TBranch        *b_phoIDMVA;   //!
    TBranch        *b_phoFiredSingleTrgs;   //!
    TBranch        *b_phoFiredDoubleTrgs;   //!
    TBranch        *b_phoFiredL1Trgs;   //!
+   TBranch        *b_phoSeedTime;   //!
+   TBranch        *b_phoSeedEnergy;   //!
    TBranch        *b_phoxtalBits;   //!
    TBranch        *b_phoIDbit;   //!
+   TBranch        *b_npfPho;   //!
+   TBranch        *b_pfphoEt;   //!
+   TBranch        *b_pfphoEta;   //!
+   TBranch        *b_pfphoPhi;   //!
    TBranch        *b_nEle;   //!
    TBranch        *b_eleCharge;   //!
    TBranch        *b_eleChargeConsistent;   //!
    TBranch        *b_eleEn;   //!
    TBranch        *b_eleSCEn;   //!
-   TBranch        *b_eleESEn;   //!
+   TBranch        *b_eleEcalEn;   //!
    TBranch        *b_eleESEnP1;   //!
    TBranch        *b_eleESEnP2;   //!
    TBranch        *b_eleD0;   //!
@@ -622,9 +565,6 @@ public :
    TBranch        *b_eledEtaAtVtx;   //!
    TBranch        *b_eledPhiAtVtx;   //!
    TBranch        *b_eledEtaAtCalo;   //!
-   TBranch        *b_eleSigmaIEtaIEta;   //!
-   TBranch        *b_eleSigmaIEtaIPhi;   //!
-   TBranch        *b_eleSigmaIPhiIPhi;   //!
    TBranch        *b_eleSigmaIEtaIEtaFull5x5;   //!
    TBranch        *b_eleSigmaIPhiIPhiFull5x5;   //!
    TBranch        *b_eleConvVeto;   //!
@@ -744,7 +684,6 @@ public :
    TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
    TBranch        *b_jetPartonID;   //!
    TBranch        *b_jetHadFlvr;   //!
-   TBranch        *b_jetGenJetIndex;   //!
    TBranch        *b_jetGenJetEn;   //!
    TBranch        *b_jetGenJetPt;   //!
    TBranch        *b_jetGenJetEta;   //!
@@ -755,9 +694,13 @@ public :
    TBranch        *b_jetGenEta;   //!
    TBranch        *b_jetGenPhi;   //!
    TBranch        *b_jetGenPartonMomID;   //!
+   TBranch        *b_jetP4Smear;   //!
+   TBranch        *b_jetP4SmearUp;   //!
+   TBranch        *b_jetP4SmearDo;   //!
    TBranch        *b_jetPFLooseId;   //!
    TBranch        *b_jetID;   //!
-   TBranch        *b_jetPUidFullDiscriminant;   //!
+   TBranch        *b_jetPUID;   //!
+   TBranch        *b_jetPUFullID;   //!
    TBranch        *b_jetJECUnc;   //!
    TBranch        *b_jetFiredTrgs;   //!
    TBranch        *b_jetCHF;   //!
@@ -824,6 +767,9 @@ public :
    TBranch        *b_AK8JetGenEta;   //!
    TBranch        *b_AK8JetGenPhi;   //!
    TBranch        *b_AK8JetGenPartonMomID;   //!
+   TBranch        *b_AK8JetP4Smear;   //!
+   TBranch        *b_AK8JetP4SmearUp;   //!
+   TBranch        *b_AK8JetP4SmearDo;   //!
    TBranch        *b_nAK8SDSJ;   //!
    TBranch        *b_AK8SDSJPt;   //!
    TBranch        *b_AK8SDSJEta;   //!
@@ -849,8 +795,9 @@ public :
    double BtagBDSVWP[4]={0.3,0.6,0.8,0.9};
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
+   bool _fastSim=false;
 
-   Analyzer(std::vector<std::string> arg={"default"}, std::string outname={"default"}, std::string btag_fname={""});
+   Analyzer(std::vector<std::string> arg={"default"}, std::string outname={"default"}, std::string btag_fname={""}, bool fastSim=false);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -864,18 +811,19 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(std::vector<std::string> arg, std::string outname, std::string btag_fname) : fChain(0) 
+Analyzer::Analyzer(std::vector<std::string> arg, std::string outname, std::string btag_fname, bool fastSim) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
   btag_file=btag_fname;
+  if (fastSim) _fastSim=true;
   if (outname=="default") std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (arg.at(0)=="default") {
-    const char* fdefault = "/data/gridout/mbartok/Analysis/Data/CMSSW8024p1/Run2016D_SinglePhoton_filtered/SinglePhoton/ggNtuple_V08_00_24_00/161214_151225/0000/ggtree_data_1.root/ggNtuplizer/EventTree";
+    const char* fdefault = "/data/bartokm/Analysis/ntuples/Data/80X_V08_00_26/Run2016B_PFHT300_PFMET110_CopyTree_skimmed.root/EventTree";
     std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
-    std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\")"<<std::endl;
+    std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\", 1 for fastsim)"<<std::endl;
     ch->Add(fdefault);
     tree = ch;
   }
@@ -942,6 +890,7 @@ void Analyzer::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
+   phoPrescale = 0;
    pdf = 0;
    EventTag = 0;
    nPU = 0;
@@ -963,7 +912,6 @@ void Analyzer::Init(TTree *tree)
    mcMomMass = 0;
    mcMomEta = 0;
    mcMomPhi = 0;
-   mcIndex = 0;
    mcStatusFlag = 0;
    mcParentage = 0;
    mcStatus = 0;
@@ -979,7 +927,6 @@ void Analyzer::Init(TTree *tree)
    phoCalibEt = 0;
    phoSCE = 0;
    phoSCRawE = 0;
-   phoESEn = 0;
    phoESEnP1 = 0;
    phoESEnP2 = 0;
    phoSCEta = 0;
@@ -991,9 +938,6 @@ void Analyzer::Init(TTree *tree)
    phoEleVeto = 0;
    phoR9 = 0;
    phoHoverE = 0;
-   phoSigmaIEtaIEta = 0;
-   phoSigmaIEtaIPhi = 0;
-   phoSigmaIPhiIPhi = 0;
    phoE1x3 = 0;
    phoE1x5 = 0;
    phoE2x2 = 0;
@@ -1009,56 +953,29 @@ void Analyzer::Init(TTree *tree)
    phoE2x5MaxFull5x5 = 0;
    phoE5x5Full5x5 = 0;
    phoR9Full5x5 = 0;
-   phoSeedBCE = 0;
-   phoSeedBCEta = 0;
    phoPFChIso = 0;
    phoPFPhoIso = 0;
    phoPFNeuIso = 0;
    phoPFChWorstIso = 0;
-   phoPFChIsoFrix1 = 0;
-   phoPFChIsoFrix2 = 0;
-   phoPFChIsoFrix3 = 0;
-   phoPFChIsoFrix4 = 0;
-   phoPFChIsoFrix5 = 0;
-   phoPFChIsoFrix6 = 0;
-   phoPFChIsoFrix7 = 0;
-   phoPFChIsoFrix8 = 0;
-   phoPFPhoIsoFrix1 = 0;
-   phoPFPhoIsoFrix2 = 0;
-   phoPFPhoIsoFrix3 = 0;
-   phoPFPhoIsoFrix4 = 0;
-   phoPFPhoIsoFrix5 = 0;
-   phoPFPhoIsoFrix6 = 0;
-   phoPFPhoIsoFrix7 = 0;
-   phoPFPhoIsoFrix8 = 0;
-   phoPFNeuIsoFrix1 = 0;
-   phoPFNeuIsoFrix2 = 0;
-   phoPFNeuIsoFrix3 = 0;
-   phoPFNeuIsoFrix4 = 0;
-   phoPFNeuIsoFrix5 = 0;
-   phoPFNeuIsoFrix6 = 0;
-   phoPFNeuIsoFrix7 = 0;
-   phoPFNeuIsoFrix8 = 0;
    phoCITKChIso = 0;
    phoCITKPhoIso = 0;
    phoCITKNeuIso = 0;
-   phoEcalRecHitSumEtConeDR03 = 0;
-   phohcalDepth1TowerSumEtConeDR03 = 0;
-   phohcalDepth2TowerSumEtConeDR03 = 0;
-   phohcalTowerSumEtConeDR03 = 0;
-   photrkSumPtHollowConeDR03 = 0;
-   photrkSumPtSolidConeDR03 = 0;
    phoIDMVA = 0;
    phoFiredSingleTrgs = 0;
    phoFiredDoubleTrgs = 0;
    phoFiredL1Trgs = 0;
+   phoSeedTime = 0;
+   phoSeedEnergy = 0;
    phoxtalBits = 0;
    phoIDbit = 0;
+   pfphoEt = 0;
+   pfphoEta = 0;
+   pfphoPhi = 0;
    eleCharge = 0;
    eleChargeConsistent = 0;
    eleEn = 0;
    eleSCEn = 0;
-   eleESEn = 0;
+   eleEcalEn = 0;
    eleESEnP1 = 0;
    eleESEnP2 = 0;
    eleD0 = 0;
@@ -1083,9 +1000,6 @@ void Analyzer::Init(TTree *tree)
    eledEtaAtVtx = 0;
    eledPhiAtVtx = 0;
    eledEtaAtCalo = 0;
-   eleSigmaIEtaIEta = 0;
-   eleSigmaIEtaIPhi = 0;
-   eleSigmaIPhiIPhi = 0;
    eleSigmaIEtaIEtaFull5x5 = 0;
    eleSigmaIPhiIPhiFull5x5 = 0;
    eleConvVeto = 0;
@@ -1202,7 +1116,6 @@ void Analyzer::Init(TTree *tree)
    jetpfCombinedMVAV2BJetTags = 0;
    jetPartonID = 0;
    jetHadFlvr = 0;
-   jetGenJetIndex = 0;
    jetGenJetEn = 0;
    jetGenJetPt = 0;
    jetGenJetEta = 0;
@@ -1213,9 +1126,13 @@ void Analyzer::Init(TTree *tree)
    jetGenEta = 0;
    jetGenPhi = 0;
    jetGenPartonMomID = 0;
+   jetP4Smear = 0;
+   jetP4SmearUp = 0;
+   jetP4SmearDo = 0;
    jetPFLooseId = 0;
    jetID = 0;
-   jetPUidFullDiscriminant = 0;
+   jetPUID = 0;
+   jetPUFullID = 0;
    jetJECUnc = 0;
    jetFiredTrgs = 0;
    jetCHF = 0;
@@ -1281,6 +1198,9 @@ void Analyzer::Init(TTree *tree)
    AK8JetGenEta = 0;
    AK8JetGenPhi = 0;
    AK8JetGenPartonMomID = 0;
+   AK8JetP4Smear = 0;
+   AK8JetP4SmearUp = 0;
+   AK8JetP4SmearDo = 0;
    nAK8SDSJ = 0;
    AK8SDSJPt = 0;
    AK8SDSJEta = 0;
@@ -1324,6 +1244,7 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("HLTEleMuXIsPrescaled", &HLTEleMuXIsPrescaled, &b_HLTEleMuXIsPrescaled);
    fChain->SetBranchAddress("HLTPhoIsPrescaled", &HLTPhoIsPrescaled, &b_HLTPhoIsPrescaled);
    fChain->SetBranchAddress("HLTJetIsPrescaled", &HLTJetIsPrescaled, &b_HLTJetIsPrescaled);
+   fChain->SetBranchAddress("phoPrescale", &phoPrescale, &b_phoPrescale);
    if (fChain->GetBranch("pdf")) fChain->SetBranchAddress("pdf", &pdf, &b_pdf);
    if (fChain->GetBranch("pthat")) fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
    if (fChain->GetBranch("processID")) fChain->SetBranchAddress("processID", &processID, &b_processID);
@@ -1351,7 +1272,6 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("mcMomMass")) fChain->SetBranchAddress("mcMomMass", &mcMomMass, &b_mcMomMass);
    if (fChain->GetBranch("mcMomEta")) fChain->SetBranchAddress("mcMomEta", &mcMomEta, &b_mcMomEta);
    if (fChain->GetBranch("mcMomPhi")) fChain->SetBranchAddress("mcMomPhi", &mcMomPhi, &b_mcMomPhi);
-   if (fChain->GetBranch("mcIndex")) fChain->SetBranchAddress("mcIndex", &mcIndex, &b_mcIndex);
    if (fChain->GetBranch("mcStatusFlag")) fChain->SetBranchAddress("mcStatusFlag", &mcStatusFlag, &b_mcStatusFlag);
    if (fChain->GetBranch("mcParentage")) fChain->SetBranchAddress("mcParentage", &mcParentage, &b_mcParentage);
    if (fChain->GetBranch("mcStatus")) fChain->SetBranchAddress("mcStatus", &mcStatus, &b_mcStatus);
@@ -1386,7 +1306,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("phoCalibEt", &phoCalibEt, &b_phoCalibEt);
    fChain->SetBranchAddress("phoSCE", &phoSCE, &b_phoSCE);
    fChain->SetBranchAddress("phoSCRawE", &phoSCRawE, &b_phoSCRawE);
-   fChain->SetBranchAddress("phoESEn", &phoESEn, &b_phoESEn);
    fChain->SetBranchAddress("phoESEnP1", &phoESEnP1, &b_phoESEnP1);
    fChain->SetBranchAddress("phoESEnP2", &phoESEnP2, &b_phoESEnP2);
    fChain->SetBranchAddress("phoSCEta", &phoSCEta, &b_phoSCEta);
@@ -1398,9 +1317,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("phoEleVeto", &phoEleVeto, &b_phoEleVeto);
    fChain->SetBranchAddress("phoR9", &phoR9, &b_phoR9);
    fChain->SetBranchAddress("phoHoverE", &phoHoverE, &b_phoHoverE);
-   fChain->SetBranchAddress("phoSigmaIEtaIEta", &phoSigmaIEtaIEta, &b_phoSigmaIEtaIEta);
-   fChain->SetBranchAddress("phoSigmaIEtaIPhi", &phoSigmaIEtaIPhi, &b_phoSigmaIEtaIPhi);
-   fChain->SetBranchAddress("phoSigmaIPhiIPhi", &phoSigmaIPhiIPhi, &b_phoSigmaIPhiIPhi);
    fChain->SetBranchAddress("phoE1x3", &phoE1x3, &b_phoE1x3);
    fChain->SetBranchAddress("phoE1x5", &phoE1x5, &b_phoE1x5);
    fChain->SetBranchAddress("phoE2x2", &phoE2x2, &b_phoE2x2);
@@ -1416,57 +1332,31 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("phoE2x5MaxFull5x5", &phoE2x5MaxFull5x5, &b_phoE2x5MaxFull5x5);
    fChain->SetBranchAddress("phoE5x5Full5x5", &phoE5x5Full5x5, &b_phoE5x5Full5x5);
    fChain->SetBranchAddress("phoR9Full5x5", &phoR9Full5x5, &b_phoR9Full5x5);
-   fChain->SetBranchAddress("phoSeedBCE", &phoSeedBCE, &b_phoSeedBCE);
-   fChain->SetBranchAddress("phoSeedBCEta", &phoSeedBCEta, &b_phoSeedBCEta);
    fChain->SetBranchAddress("phoPFChIso", &phoPFChIso, &b_phoPFChIso);
    fChain->SetBranchAddress("phoPFPhoIso", &phoPFPhoIso, &b_phoPFPhoIso);
    fChain->SetBranchAddress("phoPFNeuIso", &phoPFNeuIso, &b_phoPFNeuIso);
    fChain->SetBranchAddress("phoPFChWorstIso", &phoPFChWorstIso, &b_phoPFChWorstIso);
-   fChain->SetBranchAddress("phoPFChIsoFrix1", &phoPFChIsoFrix1, &b_phoPFChIsoFrix1);
-   fChain->SetBranchAddress("phoPFChIsoFrix2", &phoPFChIsoFrix2, &b_phoPFChIsoFrix2);
-   fChain->SetBranchAddress("phoPFChIsoFrix3", &phoPFChIsoFrix3, &b_phoPFChIsoFrix3);
-   fChain->SetBranchAddress("phoPFChIsoFrix4", &phoPFChIsoFrix4, &b_phoPFChIsoFrix4);
-   fChain->SetBranchAddress("phoPFChIsoFrix5", &phoPFChIsoFrix5, &b_phoPFChIsoFrix5);
-   fChain->SetBranchAddress("phoPFChIsoFrix6", &phoPFChIsoFrix6, &b_phoPFChIsoFrix6);
-   fChain->SetBranchAddress("phoPFChIsoFrix7", &phoPFChIsoFrix7, &b_phoPFChIsoFrix7);
-   fChain->SetBranchAddress("phoPFChIsoFrix8", &phoPFChIsoFrix8, &b_phoPFChIsoFrix8);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix1", &phoPFPhoIsoFrix1, &b_phoPFPhoIsoFrix1);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix2", &phoPFPhoIsoFrix2, &b_phoPFPhoIsoFrix2);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix3", &phoPFPhoIsoFrix3, &b_phoPFPhoIsoFrix3);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix4", &phoPFPhoIsoFrix4, &b_phoPFPhoIsoFrix4);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix5", &phoPFPhoIsoFrix5, &b_phoPFPhoIsoFrix5);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix6", &phoPFPhoIsoFrix6, &b_phoPFPhoIsoFrix6);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix7", &phoPFPhoIsoFrix7, &b_phoPFPhoIsoFrix7);
-   fChain->SetBranchAddress("phoPFPhoIsoFrix8", &phoPFPhoIsoFrix8, &b_phoPFPhoIsoFrix8);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix1", &phoPFNeuIsoFrix1, &b_phoPFNeuIsoFrix1);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix2", &phoPFNeuIsoFrix2, &b_phoPFNeuIsoFrix2);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix3", &phoPFNeuIsoFrix3, &b_phoPFNeuIsoFrix3);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix4", &phoPFNeuIsoFrix4, &b_phoPFNeuIsoFrix4);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix5", &phoPFNeuIsoFrix5, &b_phoPFNeuIsoFrix5);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix6", &phoPFNeuIsoFrix6, &b_phoPFNeuIsoFrix6);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix7", &phoPFNeuIsoFrix7, &b_phoPFNeuIsoFrix7);
-   fChain->SetBranchAddress("phoPFNeuIsoFrix8", &phoPFNeuIsoFrix8, &b_phoPFNeuIsoFrix8);
    fChain->SetBranchAddress("phoCITKChIso", &phoCITKChIso, &b_phoCITKChIso);
    fChain->SetBranchAddress("phoCITKPhoIso", &phoCITKPhoIso, &b_phoCITKPhoIso);
    fChain->SetBranchAddress("phoCITKNeuIso", &phoCITKNeuIso, &b_phoCITKNeuIso);
-   fChain->SetBranchAddress("phoEcalRecHitSumEtConeDR03", &phoEcalRecHitSumEtConeDR03, &b_phoEcalRecHitSumEtConeDR03);
-   fChain->SetBranchAddress("phohcalDepth1TowerSumEtConeDR03", &phohcalDepth1TowerSumEtConeDR03, &b_phohcalDepth1TowerSumEtConeDR03);
-   fChain->SetBranchAddress("phohcalDepth2TowerSumEtConeDR03", &phohcalDepth2TowerSumEtConeDR03, &b_phohcalDepth2TowerSumEtConeDR03);
-   fChain->SetBranchAddress("phohcalTowerSumEtConeDR03", &phohcalTowerSumEtConeDR03, &b_phohcalTowerSumEtConeDR03);
-   fChain->SetBranchAddress("photrkSumPtHollowConeDR03", &photrkSumPtHollowConeDR03, &b_photrkSumPtHollowConeDR03);
-   fChain->SetBranchAddress("photrkSumPtSolidConeDR03", &photrkSumPtSolidConeDR03, &b_photrkSumPtSolidConeDR03);
    fChain->SetBranchAddress("phoIDMVA", &phoIDMVA, &b_phoIDMVA);
    fChain->SetBranchAddress("phoFiredSingleTrgs", &phoFiredSingleTrgs, &b_phoFiredSingleTrgs);
    fChain->SetBranchAddress("phoFiredDoubleTrgs", &phoFiredDoubleTrgs, &b_phoFiredDoubleTrgs);
    fChain->SetBranchAddress("phoFiredL1Trgs", &phoFiredL1Trgs, &b_phoFiredL1Trgs);
+   fChain->SetBranchAddress("phoSeedTime", &phoSeedTime, &b_phoSeedTime);
+   fChain->SetBranchAddress("phoSeedEnergy", &phoSeedEnergy, &b_phoSeedEnergy);
    fChain->SetBranchAddress("phoxtalBits", &phoxtalBits, &b_phoxtalBits);
    fChain->SetBranchAddress("phoIDbit", &phoIDbit, &b_phoIDbit);
+   fChain->SetBranchAddress("npfPho", &npfPho, &b_npfPho);
+   fChain->SetBranchAddress("pfphoEt", &pfphoEt, &b_pfphoEt);
+   fChain->SetBranchAddress("pfphoEta", &pfphoEta, &b_pfphoEta);
+   fChain->SetBranchAddress("pfphoPhi", &pfphoPhi, &b_pfphoPhi);
    fChain->SetBranchAddress("nEle", &nEle, &b_nEle);
    fChain->SetBranchAddress("eleCharge", &eleCharge, &b_eleCharge);
    fChain->SetBranchAddress("eleChargeConsistent", &eleChargeConsistent, &b_eleChargeConsistent);
    fChain->SetBranchAddress("eleEn", &eleEn, &b_eleEn);
    fChain->SetBranchAddress("eleSCEn", &eleSCEn, &b_eleSCEn);
-   fChain->SetBranchAddress("eleESEn", &eleESEn, &b_eleESEn);
+   fChain->SetBranchAddress("eleEcalEn", &eleEcalEn, &b_eleEcalEn);
    fChain->SetBranchAddress("eleESEnP1", &eleESEnP1, &b_eleESEnP1);
    fChain->SetBranchAddress("eleESEnP2", &eleESEnP2, &b_eleESEnP2);
    fChain->SetBranchAddress("eleD0", &eleD0, &b_eleD0);
@@ -1491,9 +1381,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("eledEtaAtVtx", &eledEtaAtVtx, &b_eledEtaAtVtx);
    fChain->SetBranchAddress("eledPhiAtVtx", &eledPhiAtVtx, &b_eledPhiAtVtx);
    fChain->SetBranchAddress("eledEtaAtCalo", &eledEtaAtCalo, &b_eledEtaAtCalo);
-   fChain->SetBranchAddress("eleSigmaIEtaIEta", &eleSigmaIEtaIEta, &b_eleSigmaIEtaIEta);
-   fChain->SetBranchAddress("eleSigmaIEtaIPhi", &eleSigmaIEtaIPhi, &b_eleSigmaIEtaIPhi);
-   fChain->SetBranchAddress("eleSigmaIPhiIPhi", &eleSigmaIPhiIPhi, &b_eleSigmaIPhiIPhi);
    fChain->SetBranchAddress("eleSigmaIEtaIEtaFull5x5", &eleSigmaIEtaIEtaFull5x5, &b_eleSigmaIEtaIEtaFull5x5);
    fChain->SetBranchAddress("eleSigmaIPhiIPhiFull5x5", &eleSigmaIPhiIPhiFull5x5, &b_eleSigmaIPhiIPhiFull5x5);
    fChain->SetBranchAddress("eleConvVeto", &eleConvVeto, &b_eleConvVeto);
@@ -1613,7 +1500,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("jetpfCombinedMVAV2BJetTags", &jetpfCombinedMVAV2BJetTags, &b_jetpfCombinedMVAV2BJetTags);
    if (fChain->GetBranch("jetPartonID")) fChain->SetBranchAddress("jetPartonID", &jetPartonID, &b_jetPartonID);
    if (fChain->GetBranch("jetHadFlvr")) fChain->SetBranchAddress("jetHadFlvr", &jetHadFlvr, &b_jetHadFlvr);
-   if (fChain->GetBranch("jetGenJetIndex")) fChain->SetBranchAddress("jetGenJetIndex", &jetGenJetIndex, &b_jetGenJetIndex);
    if (fChain->GetBranch("jetGenJetEn")) fChain->SetBranchAddress("jetGenJetEn", &jetGenJetEn, &b_jetGenJetEn);
    if (fChain->GetBranch("jetGenJetPt")) fChain->SetBranchAddress("jetGenJetPt", &jetGenJetPt, &b_jetGenJetPt);
    if (fChain->GetBranch("jetGenJetEta")) fChain->SetBranchAddress("jetGenJetEta", &jetGenJetEta, &b_jetGenJetEta);
@@ -1624,9 +1510,13 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("jetGenEta")) fChain->SetBranchAddress("jetGenEta", &jetGenEta, &b_jetGenEta);
    if (fChain->GetBranch("jetGenPhi")) fChain->SetBranchAddress("jetGenPhi", &jetGenPhi, &b_jetGenPhi);
    if (fChain->GetBranch("jetGenPartonMomID")) fChain->SetBranchAddress("jetGenPartonMomID", &jetGenPartonMomID, &b_jetGenPartonMomID);
+   if (fChain->GetBranch("jetP4Smear")) fChain->SetBranchAddress("jetP4Smear", &jetP4Smear, &b_jetP4Smear);
+   if (fChain->GetBranch("jetP4SmearUp")) fChain->SetBranchAddress("jetP4SmearUp", &jetP4SmearUp, &b_jetP4SmearUp);
+   if (fChain->GetBranch("jetP4SmearDo")) fChain->SetBranchAddress("jetP4SmearDo", &jetP4SmearDo, &b_jetP4SmearDo);
    fChain->SetBranchAddress("jetPFLooseId", &jetPFLooseId, &b_jetPFLooseId);
    fChain->SetBranchAddress("jetID", &jetID, &b_jetID);
-   fChain->SetBranchAddress("jetPUidFullDiscriminant", &jetPUidFullDiscriminant, &b_jetPUidFullDiscriminant);
+   fChain->SetBranchAddress("jetPUID", &jetPUID, &b_jetPUID);
+   fChain->SetBranchAddress("jetPUFullID", &jetPUFullID, &b_jetPUFullID);
    fChain->SetBranchAddress("jetJECUnc", &jetJECUnc, &b_jetJECUnc);
    fChain->SetBranchAddress("jetFiredTrgs", &jetFiredTrgs, &b_jetFiredTrgs);
    fChain->SetBranchAddress("jetCHF", &jetCHF, &b_jetCHF);
@@ -1693,6 +1583,9 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("AK8JetGenEta")) fChain->SetBranchAddress("AK8JetGenEta", &AK8JetGenEta, &b_AK8JetGenEta);
    if (fChain->GetBranch("AK8JetGenPhi")) fChain->SetBranchAddress("AK8JetGenPhi", &AK8JetGenPhi, &b_AK8JetGenPhi);
    if (fChain->GetBranch("AK8JetGenPartonMomID")) fChain->SetBranchAddress("AK8JetGenPartonMomID", &AK8JetGenPartonMomID, &b_AK8JetGenPartonMomID);
+   if (fChain->GetBranch("AK8JetP4Smear")) fChain->SetBranchAddress("AK8JetP4Smear", &AK8JetP4Smear, &b_AK8JetP4Smear);
+   if (fChain->GetBranch("AK8JetP4SmearUp")) fChain->SetBranchAddress("AK8JetP4SmearUp", &AK8JetP4SmearUp, &b_AK8JetP4SmearUp);
+   if (fChain->GetBranch("AK8JetP4SmearDo")) fChain->SetBranchAddress("AK8JetP4SmearDo", &AK8JetP4SmearDo, &b_AK8JetP4SmearDo);
    fChain->SetBranchAddress("nAK8SDSJ", &nAK8SDSJ, &b_nAK8SDSJ);
    fChain->SetBranchAddress("AK8SDSJPt", &AK8SDSJPt, &b_AK8SDSJPt);
    fChain->SetBranchAddress("AK8SDSJEta", &AK8SDSJEta, &b_AK8SDSJEta);
