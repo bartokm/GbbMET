@@ -36,11 +36,12 @@ TH1F* getplot(TString fname, TString hname) {
 void Plotter(){
   setTDRStyle();
   //string outputtag = "_hltHTMET_Pho_MET_btag.root";
-  //string outputtag = "_Pho175_MET100_MT100_ST600_TWOak4loose.root";
-  string outputtag = "_Pho175_3jet_MT100_ST600_MET100_Mak8btag.root";
-  string Aname = "_Pho175_3jet_MT100_ST600_NOMET_NOak8btag.root";
-  string Bname = "_Pho175_3jet_MT100_ST600_MET100_NOak8btag.root";
-  string Cname = "_Pho175_3jet_MT100_ST600_NOMET_Mak8btag.root";
+  //string outputtag = "_Pho175_2jet_MT100_ST600_MET100_TWOak4btag.root";
+  //string outputtag = "_Pho175_2jet_MT100_ST600_MET70to100_Mak8btag.root";
+  string outputtag = "_Pho175_5jet_MT100_ST1300_MET100_Mak8btag.root";
+  string Aname = "_Pho175_2jet_MT100_ST600_NOMET_NOak4btag.root";
+  string Bname = "_Pho175_2jet_MT100_ST600_MET100_NOak4btag.root";
+  string Cname = "_Pho175_2jet_MT100_ST600_NOMET_ONEak4btag.root";
   string pretag = "histos/Analyzer_histos_";
   string data = "Data";
   //string bkg[8] = {"TTJets","TTGJets","WJetsToLNu","WGJets","QCD","GJets","ZJetsToNuNu","ZGTo2NuG"};
@@ -49,14 +50,14 @@ void Plotter(){
   string signal[7] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mN300","mN500","mN700","mN900"};
   string PlotOutput = "plots/Plots"+outputtag;
   //vector<int> whichBkg = {6,7,0,1,2,3,4,5};
-  //vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12};
+  vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+  //vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12};
   //vector<int> whichSignal = {0,1,2,3,4,5,6};
   vector<int> whichSignal = {0,1,2,3,4};
   //vector<int> whichSignal = {0,1,2};
 
   bool plotData = 0;
-  bool plotABCD = 1;
+  bool plotABCD = 0;
   bool plotSignal = 1;
   bool plotBkg = 1;
 
@@ -170,6 +171,26 @@ void Plotter(){
   if (plotBkg) numHistos = BkgStack->GetEntries();
   if (plotSignal) numHistos = SignalArrays.at(0)->GetEntries();
   for (int i=0;i<numHistos;i++){
+    double min=1, max=0, factor=1.2;
+    TH1 *hD; THStack *sB; TH1 *hS; 
+    //get max value
+    if (plotData) {
+      hD = (TH1*)DataHistos->At(i);
+      double tempmax=hD->GetMaximum();
+      if (max<tempmax) max=tempmax;
+    }
+    if (plotBkg) {
+      sB = (THStack*) BkgStack->At(i);
+      double tempmax=sB->GetMaximum();
+      if (max<tempmax) max=tempmax;
+    }
+    if (plotSignal) {
+      for (auto obj : SignalArrays) {
+        hS = (TH1*)obj->At(i);
+        double tempmax=hS->GetMaximum();
+        if (max<tempmax) max=tempmax;
+      }
+    }
     TCanvas *c = new TCanvas(histoNames.at(i).c_str(),histoNames.at(i).c_str());
     c->cd();
     gPad->SetLogy();
@@ -182,11 +203,17 @@ void Plotter(){
       pad1->Draw();
       pad1->cd();
     }
-    if (plotData) DataHistos->At(i)->Draw("P");
-    else if (plotSignal) for (auto obj : SignalArrays) obj->At(i)->Draw();
+    if (plotData) {
+      DataHistos->At(i)->Draw("P");
+      if (!DataHistos->At(i)->InheritsFrom("TH2")) hD->SetAxisRange(min,max*factor,"Y");
+    }
+    else if (plotSignal) for (auto obj : SignalArrays) {
+      obj->At(i)->Draw();
+      if (!obj->At(i)->InheritsFrom("TH2")) hS->SetAxisRange(min,max*factor,"Y");
+    }
     else if (plotBkg) {
       if (BkgStack->At(i)->InheritsFrom("TH2")) Sum(*(THStack*)BkgStack->At(i))->Draw();
-      else BkgStack->At(i)->Draw("h");
+      else {BkgStack->At(i)->Draw("h");Sum(*(THStack*)BkgStack->At(i))->SetAxisRange(min,max*factor,"Y");}
     }
     if (plotBkg){ 
       if (BkgStack->At(i)->InheritsFrom("TH2")) Sum(*(THStack*)BkgStack->At(i))->Draw("same");
@@ -244,15 +271,3 @@ void Plotter(){
     c->Write();
   }
 }
-/*
-  TCanvas *cphoEtL = new TCanvas("cphoEtL", "cphoEtL");
-  cphoEtL->cd();
-  gPad->SetLogy();
-  hdata_phoEtL->GetYaxis()->SetTitle("Events / 33.3 GeV");
-  hdata_phoEtL->GetYaxis()->SetTitleOffset(1.15);
-  hdata_phoEtL->GetXaxis()->SetTitle("E_{T}^{#gamma}  [GeV]");
-  hdata_phoEtL->GetXaxis()->CenterTitle(kTRUE);
-  hdata_phoEtL->GetXaxis()->SetTitleOffset(1.15);
-  drawthings(nsignal, fsignal, hdata_phoEtL, sbkg_phoEtL, "hsignal_phoEtL");
-  leg->Draw("same");
-  */
