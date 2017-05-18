@@ -258,11 +258,14 @@ void Analyzer::Loop()
    
    TH1D *h_doubleB = new TH1D("h_doubleB","Highest jetPt;BoostedDoubleSVTagger",30,-1,1);
    TH1D *h_doubleB_highdB = new TH1D("h_doubleB_highdB","Highest Boosted;BoostedDoubleSVTagger",30,-1,1);
+   TH1D *h_doubleB_highdB_hmass= new TH1D("h_doubleB_highdB_hmass","Highest Boosted with Hmass;BoostedDoubleSVTagger",30,-1,1);
    TH1D *h_bjetCSV= new TH1D("h_bjetCSV","Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
    TH1D *h_bjetCSV2= new TH1D("h_bjetCSV2","2nd Highest CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
    TH1D *h_b1pb2CSV= new TH1D("h_b1pb2CSV","Highest bjet CSVs;CSV_{bjet1}+CSV_{bjet2}",60,0,2);
    TH1D *h_b1tb2CSV= new TH1D("h_b1tb2CSV","Highest bjet CSVs;CSV_{bjet1}*CSV_{bjet2}",30,0,1);
    TH2D *h_b1b2CSV= new TH2D("h_b1b2CSV","Highest bjet CSVs;CSV_{bjet1};CSV_{bjet2}",30,0,1,30,0,1);
+   TH1D *h_selectbjetCSV= new TH1D("h_selectbjetCSV","Selected jet CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
+   TH1D *h_selectbjetCSV2= new TH1D("h_selectbjetCSV2","Selected2 jet CSV;CombinedInclusiveSecondaryVertexV2BJetTags",30,0,1);
    TH1D *h_bjetcMVA = new TH1D("h_bjetcMVA","Highest cMVA;CombinedMVAV2BJetTags",30,-1,1);
    TH1D *h_bjetcMVA2 = new TH1D("h_bjetcMVA2","2nd Highest cMVA;CombinedMVAV2BJetTags",30,-1,1);
   
@@ -278,8 +281,14 @@ void Analyzer::Loop()
   
    TH1D *h_AK8PrunedCorrjetmass_select = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",20,0,250);
    TH1D *h_AK8PrunedCorrjetmass_withABCD= new TH1D("h_AK8PrunedCorrjetmass_select_withABCD","Highest btagged AK8PrunedCorrjetmass in Higgs mass range;PrunedCorr m_{highest btag AK8jets} [GeV]",20,0,250);
+   TH2D *h_AK8mass_vs_pt= new TH2D("h_AK8mass_vs_pt","Highest btagged AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,0,250,40,0,1500);
+   TH2D *h_AK8mass_all_vs_pt= new TH2D("h_AK8mass_all_vs_pt","All AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,0,250,40,0,1500);
    TH1D *h_mbbjet_select= new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",20,0,250);
    TH1D *h_mbbjet_withABCD= new TH1D("h_mbbjet_select_withABCD","Invariant mass of highest btag bjets in Higgs mass range;M_{bb}[GeV]",20,0,250);
+   TH2D *h_mbbjet_vs_pt1= new TH2D("h_mbbjet_vs_pt1","Invariant mass of highest btag bjets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
+   TH2D *h_mbbjet_vs_pt2= new TH2D("h_mbbjet_vs_pt2","Invariant mass of highest btag bjets in Higgs mass range vs 2nd p_{T};M_{bb}[GeV];p_{T}^{2} [GeV]",20,0,250,30,0,1000);
+   TH2D *h_mbbjet_comb_vs_pt1= new TH2D("h_mbbjet_comb_vs_pt1","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
+   TH2D *h_mbbjet_comb_vs_pt2= new TH2D("h_mbbjet_comb_vs_pt2","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
 
    TBenchmark time;
    TDatime now;
@@ -344,6 +353,7 @@ void Analyzer::Loop()
      b_eleIDMVA->GetEntry(ientry);
      b_eleIDbit->GetEntry(ientry);
      b_nMu->GetEntry(ientry);
+     b_muPt->GetEntry(ientry);
      b_muEta->GetEntry(ientry);
      b_muPhi->GetEntry(ientry);
      b_muIDbit->GetEntry(ientry);
@@ -525,8 +535,8 @@ void Analyzer::Loop()
        if ((*phoR9)[nleadPhoL]>0.94) w*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
        else w*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
      }
-     for (int i=0;i<passPhoM.size();i++) if ((*phoCalibEt)[passPhoM.at(i)]>(*phoCalibEt)[nleadPhoM]) nleadPhoM=passPhoL.at(i);
-     for (int i=0;i<passPhoT.size();i++) if ((*phoCalibEt)[passPhoT.at(i)]>(*phoCalibEt)[nleadPhoT]) nleadPhoT=passPhoL.at(i);
+     for (int i=0;i<passPhoM.size();i++) if ((*phoCalibEt)[passPhoM.at(i)]>(*phoCalibEt)[nleadPhoM]) nleadPhoM=passPhoM.at(i);
+     for (int i=0;i<passPhoT.size();i++) if ((*phoCalibEt)[passPhoT.at(i)]>(*phoCalibEt)[nleadPhoT]) nleadPhoT=passPhoT.at(i);
      EMHT_after=EMHT_before;
      AK8EMHT_before=EMHT_before;
      AK8EMHT_after=EMHT_before;
@@ -650,9 +660,9 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*eleIDbit)[i]>>1&1) passEleL.push_back(i);
-       if ((*eleIDbit)[i]>>2&1) passEleM.push_back(i);
-       if ((*eleIDbit)[i]>>3&1) passEleT.push_back(i);
+       if ((*eleIDbit)[i]>>1&1 && (*elePt)[i]>20) passEleL.push_back(i);
+       if ((*eleIDbit)[i]>>2&1 && (*elePt)[i]>20) passEleM.push_back(i);
+       if ((*eleIDbit)[i]>>3&1 && (*elePt)[i]>20) passEleT.push_back(i);
      }
      //muon
      for (int i=0;i<nMu;i++) {
@@ -667,9 +677,9 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*muIDbit)[i]>>0&1) passMuL.push_back(i);
-       if ((*muIDbit)[i]>>1&1) passMuM.push_back(i);
-       if ((*muIDbit)[i]>>2&1) passMuT.push_back(i);
+       if ((*muIDbit)[i]>>0&1 && (*muPt)[i]>20) passMuL.push_back(i);
+       if ((*muIDbit)[i]>>1&1 && (*muPt)[i]>20) passMuM.push_back(i);
+       if ((*muIDbit)[i]>>2&1 && (*muPt)[i]>20) passMuT.push_back(i);
      }
      //dR between leading photon & leading pt AK8
      double dR_pho_AK8=-1;
@@ -691,10 +701,10 @@ void Analyzer::Loop()
      bool passBtag=false, passHiggsMass=false;
      int SelectedAK8Jet=-1;
      for (int i=0;i<passAK8Jet.size();i++){
-       if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>BtagBDSVWP[1]) passBtag=true;
        if ((*AK8JetPrunedMassCorr)[passAK8Jet.at(i)]>70 && (*AK8JetPrunedMassCorr)[passAK8Jet.at(i)]<200) {
          passHiggsMass=true;
          SelectedAK8Jet=passAK8Jet.at(i);
+         if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(i)]>BtagBDSVWP[1]) passBtag=true;
          break;
        }
      }
@@ -703,9 +713,7 @@ void Analyzer::Loop()
      double m_bb=-1;
      int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
      for (int i=0;i<passJet.size();i++){
-       if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) passAK4Btag1=true;
        for (int j=i+1;j<passJet.size();j++){
-         if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) passAK4Btag2=true;
          TLorentzVector bjet1, bjet2;
          bjet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
          bjet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
@@ -713,12 +721,39 @@ void Analyzer::Loop()
          if (m_bb>70 && m_bb<200) {
            SelectedAK4Jet1=passJet.at(i);
            SelectedAK4Jet2=passJet.at(j);
+           if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) passAK4Btag1=true;
+           if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) passAK4Btag2=true;
            passAK4HiggsMass=true;
            break;
          }
        }
        if (passAK4HiggsMass) break;
      }
+     /*
+     double high_plus=0, high_mult=0, good_mbb=0;
+     for (int i=0;i<passJet.size();i++){
+       if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) passAK4Btag1=true;
+       for (int j=i+1;j<passJet.size();j++){
+         if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) passAK4Btag2=true;
+         double plus=(*jetCSV2BJetTags)[passJet.at(i)]+(*jetCSV2BJetTags)[passJet.at(j)];
+         double mult=(*jetCSV2BJetTags)[passJet.at(i)]*(*jetCSV2BJetTags)[passJet.at(j)];
+         TLorentzVector bjet1, bjet2;
+         bjet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
+         bjet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
+         m_bb=(bjet1+bjet2).M();
+         //if (m_bb>70 && m_bb<200 && plus>high_plus) {
+         if (m_bb>70 && m_bb<200 && mult>high_mult) {
+           //high_plus=plus;
+           high_mult=mult;
+           good_mbb=m_bb;
+           SelectedAK4Jet1=passJet.at(i);
+           SelectedAK4Jet2=passJet.at(j);
+           passAK4HiggsMass=true;
+         }
+       }
+     }
+     m_bb=good_mbb;
+     */
 
      //Calculate BTag SFs
      double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
@@ -738,11 +773,11 @@ void Analyzer::Loop()
      double phoCut=175;
      if ((*phoCalibEt)[nleadPhoL]<phoCut) continue;
      h_cuts->Fill(2,w);
-     if (passJet.size()<3) continue;
+     if (passJet.size()<5) continue;
      h_cuts->Fill(3,w);
      if (MT<100) continue;
      h_cuts->Fill(4,w);
-     if (ST<600) continue;
+     if (ST<1300) continue;
      h_cuts->Fill(5,w);
      if (isData) if (metFilters!=1536) continue;
      if (!isData && !_fastSim) if (metFilters&94) continue;
@@ -750,12 +785,11 @@ void Analyzer::Loop()
      if (pfMET<100) continue;
      //if (pfMET<70 || pfMET>100) continue;
      h_cuts->Fill(6,w);
-     if (bcounterCSV[1]<2) continue;
-     if (!isData) w*=CSV_SF_L[0];
-     h_cuts->Fill(7,w);
-     //if (bcounterBDSV[2]==0) continue;
+     //if (bcounterCSV[1]<2) continue;
+     //if (!isData) w*=CSV_SF_L[0];
+     if (bcounterBDSV[2]==0) continue;
      //if (bcounterBDSV[1]==0 || bcounterBDSV[2]!=0) continue;
-     //h_cuts->Fill(7,w);
+     h_cuts->Fill(7,w);
 
      /*
      //pfht300_met110 cuts
@@ -827,10 +861,13 @@ void Analyzer::Loop()
      if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1pb2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1tb2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]*(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_b1b2CSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1],(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+     if (SelectedAK4Jet1!=-1) h_selectbjetCSV->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1],w);
+     if (SelectedAK4Jet2!=-1) h_selectbjetCSV2->Fill((*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      if (highcMVA1!=-1) h_bjetcMVA->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA1],w);
      if (highcMVA2!=-1) h_bjetcMVA2->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA2],w);
      if (leadpt_ak8!=-1) h_doubleB->Fill((*AK8JetpfBoostedDSVBTag)[leadpt_ak8],w);
      if (highBDSV!=-1) h_doubleB_highdB->Fill((*AK8JetpfBoostedDSVBTag)[highBDSV],w);
+     if (passHiggsMass) h_doubleB_highdB_hmass->Fill((*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
      for (int i=0;i<passAK8Jet.size();i++) h_AK8jetmass->Fill((*AK8JetMass)[passAK8Jet.at(i)],w);
      h_nEle->Fill(passEleL.size(),w);
      h_nEleM->Fill(passEleM.size(),w);
@@ -859,6 +896,24 @@ void Analyzer::Loop()
      if (SelectedAK8Jet!=-1) h_AK8tau3->Fill((*AK8Jet_tau3)[SelectedAK8Jet],w);
      if (SelectedAK8Jet!=-1) h_AK8tau2_tau1->Divide(h_AK8tau2,h_AK8tau1);
      if (SelectedAK8Jet!=-1) h_AK8tau3_tau2->Divide(h_AK8tau3,h_AK8tau2);
+     if (SelectedAK8Jet!=-1) h_AK8mass_vs_pt->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],AK8JetSmearedPt[SelectedAK8Jet],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_mbbjet_vs_pt1->Fill(m_bb,jetSmearedPt[SelectedAK4Jet1],w);
+     if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) h_mbbjet_vs_pt2->Fill(m_bb,jetSmearedPt[SelectedAK4Jet2],w);
+     for (auto i : passAK8Jet) {
+       if ((*AK8JetPrunedMassCorr)[i]>70 && (*AK8JetPrunedMassCorr)[i]<200) h_AK8mass_all_vs_pt->Fill((*AK8JetPrunedMassCorr)[i],AK8JetSmearedPt[i],w);
+     }
+     for (int i=0;i<passJet.size();i++){
+       for (int j=i+1;j<passJet.size();j++){
+         TLorentzVector jet1, jet2;
+         jet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
+         jet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
+         double temp_mbb=(jet1+jet2).M();
+         if (temp_mbb>70 && temp_mbb<200) {
+           h_mbbjet_comb_vs_pt1->Fill(temp_mbb,jetSmearedPt[passJet.at(i)],w);
+           h_mbbjet_comb_vs_pt2->Fill(temp_mbb,jetSmearedPt[passJet.at(j)],w);
+         }
+       }
+     }
      }
    f.Write();
    f.Close();
