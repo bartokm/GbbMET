@@ -22,6 +22,8 @@
 #include "TFile.h"
 #include "TEfficiency.h"
 #include "TLorentzVector.h"
+//BTagSF
+#include "BTCalibrationStandalone.cpp"
 
 #ifndef Analyzer_h
 #define Analyzer_h
@@ -820,7 +822,6 @@ public :
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
-   TH1D *h_cuts;
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
@@ -831,6 +832,22 @@ public :
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
+   //histograms
+   TH1D *h_cuts;
+   TH1D *h_PUweight;
+   //histograms needed for SFs
+   TH2F *h_EGamma_SF2D;
+   TH2D *h_Scaling_Factors_HasPix_R9_high;
+   TH2D *h_Scaling_Factors_HasPix_R9_low;
+   TEfficiency* eff_b_CSV_L;
+   TEfficiency* eff_b_CSV_M;
+   TEfficiency* eff_b_CSV_T;
+   TEfficiency* eff_c_CSV_L;
+   TEfficiency* eff_c_CSV_M;
+   TEfficiency* eff_c_CSV_T;
+   TEfficiency* eff_l_CSV_L;
+   TEfficiency* eff_l_CSV_M;
+   TEfficiency* eff_l_CSV_T;
 
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={});
    virtual ~Analyzer();
@@ -841,6 +858,9 @@ public :
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+   double deltaR(double phi1, double phi2, double eta1, double eta2);
+   void CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
+
 };
 
 #endif
@@ -1694,6 +1714,13 @@ bool Parser_float(double var, string op, double val) {
   return false;
 }
 
+double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
+  double dR=0;
+  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(phi2-phi1,2)+pow(eta1-eta2,2));
+  else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
+  return dR;
+}
+
 Int_t Analyzer::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
@@ -1740,4 +1767,93 @@ Int_t Analyzer::Cut(Long64_t entry)
   }
   return returnvalue;
 }
+
+void Analyzer::CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
+  double p_data[3] = {1,1,1}, p_mc[3] = {1,1,1}, p_data_up[3] = {1,1,1}, p_data_do[3] = {1,1,1};
+  for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
+    BTEntry::JetFlavor FLAV;
+    double mc_eff[3]={0}, eta=0, pt=0;
+    eta=(*v_eta)[it->first];
+    pt=v_pt[it->first];
+    if ((*v_had)[it->first]==5) {
+      FLAV = BTEntry::FLAV_B;
+      mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
+      mc_eff[1] = eff_b_M->GetEfficiency(eff_b_M->FindFixBin(eta,pt));
+      mc_eff[2] = eff_b_T->GetEfficiency(eff_b_T->FindFixBin(eta,pt));
+    }
+    else if ((*v_had)[it->first]==4) {
+      FLAV = BTEntry::FLAV_C;
+      mc_eff[0] = eff_c_L->GetEfficiency(eff_c_L->FindFixBin(eta,pt));
+      mc_eff[1] = eff_c_M->GetEfficiency(eff_c_M->FindFixBin(eta,pt));
+      mc_eff[2] = eff_c_T->GetEfficiency(eff_c_T->FindFixBin(eta,pt));
+    }
+    else if ((*v_had)[it->first]==0) {
+      FLAV = BTEntry::FLAV_UDSG;
+      mc_eff[0] = eff_l_L->GetEfficiency(eff_l_L->FindFixBin(eta,pt));
+      mc_eff[1] = eff_l_M->GetEfficiency(eff_l_M->FindFixBin(eta,pt));
+      mc_eff[2] = eff_l_T->GetEfficiency(eff_l_T->FindFixBin(eta,pt));
+    }
+    double SF[3], SF_up[3], SF_do[3];
+    SF[0] = reader_L.eval_auto_bounds("central",FLAV,eta,pt);
+    SF[1] = reader_M.eval_auto_bounds("central",FLAV,eta,pt);
+    SF[2] = reader_T.eval_auto_bounds("central",FLAV,eta,pt);
+    SF_up[0] = reader_L.eval_auto_bounds("up", FLAV, eta, pt);
+    SF_do[0] = reader_L.eval_auto_bounds("down", FLAV, eta, pt);
+    SF_up[1] = reader_M.eval_auto_bounds("up", FLAV, eta, pt);
+    SF_do[1] = reader_M.eval_auto_bounds("down", FLAV, eta, pt);
+    SF_up[2] = reader_T.eval_auto_bounds("up", FLAV, eta, pt);
+    SF_do[2] = reader_T.eval_auto_bounds("down", FLAV, eta, pt);
+    
+    if (it->second == '0') {
+      for (int i=0;i<3;i++){
+        p_mc[i]*=(1-mc_eff[i]);
+        p_data[i]*=(1-SF[i]*mc_eff[i]);
+        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
+        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      }
+    } 
+    else if (it->second == 'L') {
+      p_mc[0]*=mc_eff[0];
+      p_data[0]*=SF[0]*mc_eff[0];
+      p_data_up[0]*=SF_up[0]*mc_eff[0];
+      p_data_do[0]*=SF_do[0]*mc_eff[0];
+      for (int i=1;i<3;i++){
+        p_mc[i]*=(1-mc_eff[i]);
+        p_data[i]*=(1-SF[i]*mc_eff[i]);
+        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
+        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      }
+    } 
+    else if (it->second == 'M') {
+      for (int i=0;i<2;i++){
+        p_mc[i]*=mc_eff[i];
+        p_data[i]*=SF[i]*mc_eff[i];
+        p_data_up[i]*=SF_up[i]*mc_eff[i];
+        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      }
+      p_mc[2]*=(1-mc_eff[2]);
+      p_data[2]*=(1-SF[2]*mc_eff[2]);
+      p_data_up[2]*=(1-SF_up[2]*mc_eff[2]);
+      p_data_do[2]*=(1-SF_do[2]*mc_eff[2]);
+    } 
+    else if (it->second == 'T') {
+      for (int i=0;i<3;i++){
+        p_mc[i]*=mc_eff[i];
+        p_data[i]*=SF[i]*mc_eff[i];
+        p_data_up[i]*=SF_up[i]*mc_eff[i];
+        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      }
+    } 
+  }
+  SF_L[0] = p_data[0]/p_mc[0];
+  SF_M[0] = p_data[1]/p_mc[1];
+  SF_T[0] = p_data[2]/p_mc[2];
+  SF_L[1] = p_data_up[0]/p_mc[0];
+  SF_L[2] = p_data_do[0]/p_mc[0];
+  SF_M[1] = p_data_up[1]/p_mc[1];
+  SF_M[2] = p_data_do[1]/p_mc[1];
+  SF_T[1] = p_data_up[2]/p_mc[2];
+  SF_T[2] = p_data_do[2]/p_mc[2];
+}
+
 #endif // #ifdef Analyzer_cxx
