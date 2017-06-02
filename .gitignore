@@ -1,0 +1,20 @@
+# Ignore every .root file
+BTagEff/*.root
+analyzer/*.root
+skimmer/*.root
+# Ignore every .csh file except for examples
+BTagEff/*.csh
+analyzer/*.csh
+skimmer/*.csh
+!BTageff/btag_eff.csh
+!skimmer/skimmer.csh
+!analyzer/run_analyzer_data.csh
+!analyzer/run_analyzer_mc.csh
+# Ignore specifically in analyzer
+analyzer/*.csv
+analyzer/*.o
+analyzer/*.txt
+analyzer/*.png
+analyzer/Analyzer
+analyzer/PeterTest
+analyzer/workshop
