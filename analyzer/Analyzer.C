@@ -24,34 +24,7 @@ int main(int argc, char* argv[]){
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
     //Print out help
-    if (is_h) {
-      cout<<"\nHow to use Analyzer?"<<endl;
-      cout<<"Options:"<<endl;
-      cout<<"-o outname \t\t Output filename will be set: histos/Analyzer_histos_+outname"<<endl;
-      cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
-      cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
-      cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
-      cout<<"--cuts \t\t Run on specified cuts, otherwise hardcoded cuts"<<endl;
-      cout<<"WARNING! --cuts option should always be the LAST option. Otherwise the order is free."<<endl;
-      cout<<"\nHow to set cuts?"<<endl;
-      cout<<"Cuts are always set in 3 parts: variable operator value"<<endl;
-      cout<<"FORMAT:\n--cuts cut_variable1 cut_operator1 cut_value1 cut_variable2 cut_operator2 cut_value2 ..."<<endl;
-      cout<<"Operators can be the following strings:"<<endl;
-      cout<<"eq\tWhich is == "<<endl; 
-      cout<<"Neq\tWhich is != "<<endl; 
-      cout<<"less\tWhich is < "<<endl; 
-      cout<<"great\tWhich is > "<<endl; 
-      cout<<"lesseq\tWhich is <= "<<endl; 
-      cout<<"greateq\tWhich is >= "<<endl; 
-      cout<<"and\tWhich is & "<<endl; 
-      cout<<"or\tWhich is | "<<endl; 
-      cout<<"xor\tWhich is ^ "<<endl;
-      cout<<"\nExamples:"<<endl;
-      cout<<"./Analyzer -i /foo/bar/ggntuple_data.root -o test.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
-      cout<<"./Analyzer -i /foo/bar/ggntuple_mc.root -o test.root -b /foo/bar/ggntuple_mc_BTagEff.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
-      cout<<"\nHave fun!"<<endl;
-      return 1;
-    }
+    if (is_h) {PrintHelp();return 1;}
     // Check second argument after option
     if (inputs && is_i) inputfiles.push_back(arg);
     if (is_o) {output=argv[i+1]; is_o=0;}

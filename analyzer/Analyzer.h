@@ -858,8 +858,8 @@ public :
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
-   double deltaR(double phi1, double phi2, double eta1, double eta2);
-   void CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
+   double           deltaR(double phi1, double phi2, double eta1, double eta2);
+   void             CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
 
 };
 
@@ -1714,13 +1714,6 @@ bool Parser_float(double var, string op, double val) {
   return false;
 }
 
-double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
-  double dR=0;
-  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(phi2-phi1,2)+pow(eta1-eta2,2));
-  else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
-  return dR;
-}
-
 Int_t Analyzer::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
@@ -1766,6 +1759,13 @@ Int_t Analyzer::Cut(Long64_t entry)
     if (returnvalue) h_cuts->Fill(i,w);
   }
   return returnvalue;
+}
+
+double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
+  double dR=0;
+  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(phi2-phi1,2)+pow(eta1-eta2,2));
+  else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
+  return dR;
 }
 
 void Analyzer::CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
@@ -1854,6 +1854,35 @@ void Analyzer::CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> 
   SF_M[2] = p_data_do[1]/p_mc[1];
   SF_T[1] = p_data_up[2]/p_mc[2];
   SF_T[2] = p_data_do[2]/p_mc[2];
+}
+
+void PrintHelp(){
+  cout<<"\nHow to use Analyzer?"<<endl;
+  cout<<"Options:"<<endl;
+  cout<<"-o outname \t\t Output filename will be set: histos/Analyzer_histos_+outname"<<endl;
+  cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
+  cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
+  cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
+  cout<<"-h \t\t Print out this help"<<endl;
+  cout<<"--cuts \t\t Run on specified cuts, otherwise hardcoded cuts"<<endl;
+  cout<<"WARNING! --cuts option should always be the LAST option. Otherwise the order is free."<<endl;
+  cout<<"\nHow to set cuts?"<<endl;
+  cout<<"Cuts are always set in 3 parts: variable operator value"<<endl;
+  cout<<"FORMAT:\n--cuts cut_variable1 cut_operator1 cut_value1 cut_variable2 cut_operator2 cut_value2 ..."<<endl;
+  cout<<"Operators can be the following strings:"<<endl;
+  cout<<"eq\tWhich is == "<<endl; 
+  cout<<"Neq\tWhich is != "<<endl; 
+  cout<<"less\tWhich is < "<<endl; 
+  cout<<"great\tWhich is > "<<endl; 
+  cout<<"lesseq\tWhich is <= "<<endl; 
+  cout<<"greateq\tWhich is >= "<<endl; 
+  cout<<"and\tWhich is & "<<endl; 
+  cout<<"or\tWhich is | "<<endl; 
+  cout<<"xor\tWhich is ^ "<<endl;
+  cout<<"\nExamples:"<<endl;
+  cout<<"./Analyzer -i /foo/bar/ggntuple_data.root -o test.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
+  cout<<"./Analyzer -i /foo/bar/ggntuple_mc.root -o test.root -b /foo/bar/ggntuple_mc_BTagEff.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
+  cout<<"\nHave fun!"<<endl;
 }
 
 #endif // #ifdef Analyzer_cxx
