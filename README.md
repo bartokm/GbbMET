@@ -20,13 +20,10 @@ The output is needed as an input for Analyzer if running on MC.<br>
 First you need some files:<br>
 Photon ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2<br>
 BTag ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation<br>
-cern AFS acces (for data pileup distribution)<br>
-kinit user@CERN.CH<br>
-aklog CERN.CH<br>
-Run Analyzer in root<br>
+Data pileup distribution: /afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root<br>
+Compile analyzer with makefile, then run Analyzer.<br>
 ```bash
-.L Analyzer.C
-Analyzer t({"file1.root","file2.root",...},"outputfile.root","../BTagEff/btagfilename.root")
-t.Loop()
+make clean; make
+./Analyzer -h
 ```
-Or use thr scripts: run_analyzer_data.csh, run_analyzer_mc.csh
+Or use the scripts: run_analyzer_data.csh, run_analyzer_mc.csh
