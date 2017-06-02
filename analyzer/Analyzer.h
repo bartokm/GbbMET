@@ -5,12 +5,31 @@
 // found on file: /afs/cern.ch/work/m/mbartok/public/mc/ggNtuple/skimmed/V07-06-03-00/job_fall15_QCD_HT200to300_25ns.root
 //////////////////////////////////////////////////////////
 
+// Standard C++ libraries
+#include <cmath>
+#include <iomanip>
+#include <algorithm>
+#include <stdio.h>
+#include <map>
+#include <iostream>
+#include <typeinfo>
+// ROOT libraries
+#include "TChain.h"
+#include "TChainElement.h"
+#include "TCanvas.h"
+#include "TStopwatch.h"
+#include "TBenchmark.h"
+#include "TFile.h"
+#include "TEfficiency.h"
+#include "TLorentzVector.h"
+
 #ifndef Analyzer_h
 #define Analyzer_h
 
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TH2.h>
 
 // Header file for the classes stored in the TTree if any.
 #include "vector"
@@ -19,6 +38,8 @@
 #include "vector"
 #include "vector"
 #include "vector"
+
+using namespace std;
 
 class Analyzer {
 public :
@@ -796,8 +817,22 @@ public :
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
    bool _fastSim=false;
+   vector<string> _cut_variable, _cut_operator;
+   vector<double> _cut_value;
+   //For cuts
+   TH1D *h_cuts;
+   int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
+   int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
+   int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
+   bool passBtag=false, passHiggsMass=false;
+   bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
+   double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
+   double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
+   double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
+   double ST=0, ST_G=0, MT=0;
+   double w=0, xsec=1;
 
-   Analyzer(std::vector<std::string> arg={"default"}, std::string outname={"default"}, std::string btag_fname={""}, bool fastSim=false);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={});
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -811,17 +846,21 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(std::vector<std::string> arg, std::string outname, std::string btag_fname, bool fastSim) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool fastSim, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
+
+  _cut_variable=cut_variable;
+  _cut_operator=cut_operator;
+  _cut_value=cut_value;
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
   btag_file=btag_fname;
   if (fastSim) _fastSim=true;
-  if (outname=="default") std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
-  if (arg.at(0)=="default") {
-    const char* fdefault = "/data/bartokm/Analysis/ntuples/Data/80X_V08_00_26/Run2016B_PFHT300_PFMET110_CopyTree_skimmed.root/EventTree";
+  if (outname=="") std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
+  if (arg.size()==0) {
+    const char* fdefault = "/data/bartokm/Analysis/ntuples/Data/80X_V08_00_26/Run2016C_PFHT300_PFMET110_CopyTree_skimmed.root/EventTree";
     std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
     std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\", 1 for fastsim)"<<std::endl;
     ch->Add(fdefault);
@@ -829,9 +868,9 @@ Analyzer::Analyzer(std::vector<std::string> arg, std::string outname, std::strin
   }
   else {
     output_file=outname;
-    for (int i=0;i<arg.size();i++) {
-      const char* cstr_i=arg.at(i).c_str();
-      std::string temp=arg.at(i);
+    for (auto i : arg) {
+      const char* cstr_i=i.c_str();
+      std::string temp=i;
       if (temp.find("*") != std::string::npos) {
         std::cout<<"Wildcard found in input argument, assuming ntuple structure: /ggNtuplizer/EventTree"<<std::endl;
         temp+="/ggNtuplizer/EventTree";
@@ -1625,11 +1664,80 @@ void Analyzer::Show(Long64_t entry)
    if (!fChain) return;
    fChain->Show(entry);
 }
+
+template <typename T>
+bool Parser(const T& var, string op, double val) {
+  if      (op == "eq")      {if (var == val) return true;}
+  else if (op == "Neq")     {if (var != val) return true;}
+  else if (op == "less")    {if (var < val)  return true;}
+  else if (op == "great")   {if (var > val)  return true;}
+  else if (op == "lesseq")  {if (var <= val) return true;}
+  else if (op == "greateq") {if (var >= val) return true;}
+  //else if (op == "andand") {if (var && val) return true;}
+  //else if (op == "oror") {if (var || val) return true;}
+  else if (op == "and")   {if (var&(int)val) return true;}
+  else if (op == "or")    {if (var|(int)val) return true;}
+  else if (op == "xor")   {if (var^(int)val) return true;}
+  else cout<<"ERROR! Unknown operator type: "<<op<<endl;
+  return false;
+}
+bool Parser_float(double var, string op, double val) {
+  if      (op == "eq") {if (var == val) return true;}
+  else if (op == "Neq") {if (var != val) return true;}
+  else if (op == "less")  {if (var < val)  return true;}
+  else if (op == "great")  {if (var > val) return true;}
+  else if (op == "lesseq") {if (var <= val) return true;}
+  else if (op == "greateq") {if (var >= val) return true;}
+  //else if (op == "andand") {if (var && val) return true;}
+  //else if (op == "oror") {if (var || val) return true;}
+  else cout<<"ERROR! Unknown operator type: "<<op<<endl;
+  return false;
+}
+
 Int_t Analyzer::Cut(Long64_t entry)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
-   return 1;
+  bool returnvalue=true;
+  for (unsigned int i=0;i<_cut_variable.size();i++){
+    if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassPhoL") returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassPhoM") returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassPhoT") returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float((*phoEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float((*phoEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float((*phoEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEt") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEtM") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEtT") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="EMHT") returnvalue*=Parser_float(EMHT_after,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="MT") returnvalue*=Parser_float(MT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="ST") returnvalue*=Parser_float(ST,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="ST_G") returnvalue*=Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="NOTmetFilters") returnvalue*= !(Parser(metFilters,_cut_operator[i],_cut_value[i]));
+    else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(pfMET,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[0];}
+    else if (_cut_variable[i]=="bcounterCSV_M") {returnvalue*=Parser(bcounterCSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_M[0];}
+    else if (_cut_variable[i]=="bcounterCSV_T") {returnvalue*=Parser(bcounterCSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_T[0];}
+    else if (_cut_variable[i]=="bcountercMVA_L") returnvalue*=Parser(bcountercMVA[1],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcountercMVA_M") returnvalue*=Parser(bcountercMVA[2],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcountercMVA_T") returnvalue*=Parser(bcountercMVA[3],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterBDSV_L") returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterBDSV_M") returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterBDSV_T") returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passHiggsMass") returnvalue*=Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
+    else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
+    if (returnvalue) h_cuts->Fill(i,w);
+  }
+  return returnvalue;
 }
 #endif // #ifdef Analyzer_cxx
