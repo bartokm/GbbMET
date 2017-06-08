@@ -5,7 +5,7 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_f=0, is_h=0, is_cuts=0;
+  bool is_i=0, is_o=0, is_b=0, is_f=0, is_h=0, is_cuts=0, is_quiet=0;
   bool inputs=0, cuts=0;
   string output, bname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
@@ -20,6 +20,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='b') is_b=1;
       else if (arg[1]=='f') is_f=1;
       else if (arg[1]=='h') is_h=1; 
+      else if (arg[1]=='q') is_quiet=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
@@ -43,29 +44,31 @@ int main(int argc, char* argv[]){
       if ((i+1)%3 ==0) cut_value.push_back(stof(v_cuts[i]));
     }
   }
-  if (!output.empty()) cout<<"Output name: "<<output<<endl;
-  if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
-  if (is_f) cout<<"FastSim is true!"<<endl;
-  if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
-  for (auto i : inputfiles) std::cout<<i<<std::endl;
-  if (!cut_variable.size()) cout<<"No cuts are set, running on hardcoded cuts."<<endl;
-  for (unsigned int i=0;i<cut_variable.size();i++) {
-    if (!i) cout<<"Following cuts are set:"<<endl;
-    string op=cut_operator[i];
-    cout<<cut_variable[i]<<" ";
-    if      (op == "eq") cout<<" == "; 
-    else if (op == "Neq") cout<<" != "; 
-    else if (op == "less") cout<<" < "; 
-    else if (op == "great") cout<<" > "; 
-    else if (op == "lesseq") cout<<" <= "; 
-    else if (op == "greateq") cout<<" >= "; 
-    else if (op == "and") cout<<" & "; 
-    else if (op == "or") cout<<" | "; 
-    else if (op == "xor") cout<<" ^ ";
-    else {cout<<"ERROR! Unknown operator type: "<<op<<" Exiting..."<<endl; return 0;}
-    cout<<cut_value[i]<<endl;
+  if (!is_quiet){
+    if (!output.empty()) cout<<"Output name: "<<output<<endl;
+    if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
+    if (is_f) cout<<"FastSim is true!"<<endl;
+    if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
+    for (auto i : inputfiles) std::cout<<i<<std::endl;
+    if (!cut_variable.size()) cout<<"No cuts are set, running on hardcoded cuts."<<endl;
+    for (unsigned int i=0;i<cut_variable.size();i++) {
+      if (!i) cout<<"Following cuts are set:"<<endl;
+      string op=cut_operator[i];
+      cout<<cut_variable[i]<<" ";
+      if      (op == "eq") cout<<" == "; 
+      else if (op == "Neq") cout<<" != "; 
+      else if (op == "less") cout<<" < "; 
+      else if (op == "great") cout<<" > "; 
+      else if (op == "lesseq") cout<<" <= "; 
+      else if (op == "greateq") cout<<" >= "; 
+      else if (op == "and") cout<<" & "; 
+      else if (op == "or") cout<<" | "; 
+      else if (op == "xor") cout<<" ^ ";
+      else {cout<<"ERROR! Unknown operator type: "<<op<<" Exiting..."<<endl; return 0;}
+      cout<<cut_value[i]<<endl;
+    }
   }
-  Analyzer t(inputfiles,output,bname,is_f,cut_variable,cut_operator,cut_value);
+  Analyzer t(inputfiles,output,bname,is_f,cut_variable,cut_operator,cut_value,is_quiet);
   t.Loop();
   return 1;
 }
@@ -261,7 +264,7 @@ void Analyzer::Loop()
 
    TBenchmark time;
    TDatime now;
-   now.Print();
+   if (!is_quiet) now.Print();
    time.Start("time");
 
    int file_counter=-1, temp=-1; std::string temp_f="";
@@ -368,11 +371,13 @@ void Analyzer::Loop()
   
      //progress bar
      double progress=(jentry+1)/double(nentries);
-     if (temp!=int(progress * 10000)){
-       temp=int(progress * 10000);
-       int vmi=int(progress * 100)*100;
-       std::cout << vmi/100 <<"."<< temp-vmi << " %\r";
-       std::cout.flush();
+     if (!is_quiet){
+       if (temp!=int(progress * 10000)){
+         temp=int(progress * 10000);
+         int vmi=int(progress * 100)*100;
+         std::cout << vmi/100 <<"."<< temp-vmi << " %\r";
+         std::cout.flush();
+       }
      }
      if (temp_f != fChain->GetCurrentFile()->GetName()) {
        temp_f=fChain->GetCurrentFile()->GetName();
@@ -398,11 +403,11 @@ void Analyzer::Loop()
          else {
            TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("hSumGenWeight");
            TotalEvents = htemp->GetBinContent(1);
-           if (abs(genWeight)>1) {
-             TH1D *htemp=(TH1D*)fChain->GetCurrentFile()->Get("hEvents");
-             double calcXsec = TotalEvents*abs(genWeight)/htemp->GetBinContent(1);
-             std::cout<<"xsec = "<<xsec<<" calcXsec = "<<calcXsec<<std::endl;
-           }
+           //if (abs(genWeight)>1) {
+             //TH1D *htemp=(TH1D*)fChain->GetCurrentFile()->Get("hEvents");
+             //double calcXsec = TotalEvents*abs(genWeight)/htemp->GetBinContent(1);
+             //std::cout<<"xsec = "<<xsec<<" calcXsec = "<<calcXsec<<std::endl;
+           //}
            //std::cout<<"Tot = "<<TotalEvents<<std::endl;
          }
          //calculate PU weight
@@ -879,5 +884,5 @@ void Analyzer::Loop()
    f.Write();
    f.Close();
    time.Stop("time");
-   std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
+   if (!is_quiet) std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
 }

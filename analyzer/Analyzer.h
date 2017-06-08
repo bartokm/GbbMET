@@ -819,6 +819,7 @@ public :
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
    bool _fastSim=false;
+   bool is_quiet=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -849,7 +850,7 @@ public :
    TEfficiency* eff_l_CSV_M;
    TEfficiency* eff_l_CSV_T;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={});
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -866,7 +867,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool fastSim, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool fastSim, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -874,25 +875,30 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool f
   _cut_variable=cut_variable;
   _cut_operator=cut_operator;
   _cut_value=cut_value;
+  is_quiet=is_q;
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
   btag_file=btag_fname;
   if (fastSim) _fastSim=true;
-  if (outname=="") std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
+  if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
+  if (outname!="") output_file=outname;
   if (arg.size()==0) {
     const char* fdefault = "/data/bartokm/Analysis/ntuples/Data/80X_V08_00_26/Run2016C_PFHT300_PFMET110_CopyTree_skimmed.root/EventTree";
-    std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
-    std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\", 1 for fastsim)"<<std::endl;
+    if (!is_quiet){
+      std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
+      //std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\", 1 for fastsim)"<<std::endl;
+    }
     ch->Add(fdefault);
     tree = ch;
   }
   else {
-    output_file=outname;
     for (auto i : arg) {
       const char* cstr_i=i.c_str();
       std::string temp=i;
       if (temp.find("*") != std::string::npos) {
-        std::cout<<"Wildcard found in input argument, assuming ntuple structure: /ggNtuplizer/EventTree"<<std::endl;
+        if (!is_quiet){
+          std::cout<<"Wildcard found in input argument, assuming ntuple structure: /ggNtuplizer/EventTree"<<std::endl;
+        }
         temp+="/ggNtuplizer/EventTree";
         ch->Add(temp.c_str());
         continue;
@@ -907,7 +913,9 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool f
       f->Close();
     }
     nFiles=ch->GetNtrees();
-    std::cout<<nFiles<<" trees are read."<<std::endl; 
+    if (!is_quiet){
+      std::cout<<nFiles<<" trees are read."<<std::endl; 
+    }
     tree = ch;
   }
   Init(tree);
@@ -1863,6 +1871,7 @@ void PrintHelp(){
   cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
   cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
+  cout<<"-q \t\t Quiet option, only errors are printed"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"--cuts \t\t Run on specified cuts, otherwise hardcoded cuts"<<endl;
   cout<<"WARNING! --cuts option should always be the LAST option. Otherwise the order is free."<<endl;
