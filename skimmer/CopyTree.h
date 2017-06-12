@@ -48,12 +48,13 @@ public :
    ULong64_t       HLTEleMuXIsPrescaled;
    ULong64_t       HLTPhoIsPrescaled;
    ULong64_t       HLTJetIsPrescaled;
-   vector<int>     *phoPrescale;
    vector<float>   *pdf;
    Float_t         pthat;
    Float_t         processID;
    Float_t         genWeight;
    Float_t         genHT;
+   Float_t         genPho1;
+   Float_t         genPho2;
    TString         *EventTag;
    Int_t           nPUInfo;
    vector<int>     *nPU;
@@ -151,6 +152,16 @@ public :
    vector<float>   *phoSeedEnergy;
    vector<unsigned short> *phoxtalBits;
    vector<unsigned short> *phoIDbit;
+   vector<float>   *phoScale_stat_up;
+   vector<float>   *phoScale_stat_dn;
+   vector<float>   *phoScale_syst_up;
+   vector<float>   *phoScale_syst_dn;
+   vector<float>   *phoScale_gain_up;
+   vector<float>   *phoScale_gain_dn;
+   vector<float>   *phoResol_rho_up;
+   vector<float>   *phoResol_rho_dn;
+   vector<float>   *phoResol_phi_up;
+   vector<float>   *phoResol_phi_dn;
    Int_t           npfPho;
    vector<float>   *pfphoEt;
    vector<float>   *pfphoEta;
@@ -240,6 +251,16 @@ public :
    vector<unsigned int> *eleFiredDoubleTrgs;
    vector<unsigned int> *eleFiredL1Trgs;
    vector<unsigned short> *eleIDbit;
+   vector<float>   *eleScale_stat_up;
+   vector<float>   *eleScale_stat_dn;
+   vector<float>   *eleScale_syst_up;
+   vector<float>   *eleScale_syst_dn;
+   vector<float>   *eleScale_gain_up;
+   vector<float>   *eleScale_gain_dn;
+   vector<float>   *eleResol_rho_up;
+   vector<float>   *eleResol_rho_dn;
+   vector<float>   *eleResol_phi_up;
+   vector<float>   *eleResol_phi_dn;
    Int_t           npfHF;
    vector<float>   *pfHFEn;
    vector<float>   *pfHFECALEn;
@@ -429,12 +450,13 @@ public :
    TBranch        *b_HLTEleMuXIsPrescaled;   //!
    TBranch        *b_HLTPhoIsPrescaled;   //!
    TBranch        *b_HLTJetIsPrescaled;   //!
-   TBranch        *b_phoPrescale;   //!
    TBranch        *b_pdf;   //!
    TBranch        *b_pthat;   //!
    TBranch        *b_processID;   //!
    TBranch        *b_genWeight;   //!
    TBranch        *b_genHT;   //!
+   TBranch        *b_genPho1;   //!
+   TBranch        *b_genPho2;   //!
    TBranch        *b_EventTag;   //!
    TBranch        *b_nPUInfo;   //!
    TBranch        *b_nPU;   //!
@@ -532,6 +554,16 @@ public :
    TBranch        *b_phoSeedEnergy;   //!
    TBranch        *b_phoxtalBits;   //!
    TBranch        *b_phoIDbit;   //!
+   TBranch        *b_phoScale_stat_up;   //!
+   TBranch        *b_phoScale_stat_dn;   //!
+   TBranch        *b_phoScale_syst_up;   //!
+   TBranch        *b_phoScale_syst_dn;   //!
+   TBranch        *b_phoScale_gain_up;   //!
+   TBranch        *b_phoScale_gain_dn;   //!
+   TBranch        *b_phoResol_rho_up;   //!
+   TBranch        *b_phoResol_rho_dn;   //!
+   TBranch        *b_phoResol_phi_up;   //!
+   TBranch        *b_phoResol_phi_dn;   //!
    TBranch        *b_npfPho;   //!
    TBranch        *b_pfphoEt;   //!
    TBranch        *b_pfphoEta;   //!
@@ -621,6 +653,16 @@ public :
    TBranch        *b_eleFiredDoubleTrgs;   //!
    TBranch        *b_eleFiredL1Trgs;   //!
    TBranch        *b_eleIDbit;   //!
+   TBranch        *b_eleScale_stat_up;   //!
+   TBranch        *b_eleScale_stat_dn;   //!
+   TBranch        *b_eleScale_syst_up;   //!
+   TBranch        *b_eleScale_syst_dn;   //!
+   TBranch        *b_eleScale_gain_up;   //!
+   TBranch        *b_eleScale_gain_dn;   //!
+   TBranch        *b_eleResol_rho_up;   //!
+   TBranch        *b_eleResol_rho_dn;   //!
+   TBranch        *b_eleResol_phi_up;   //!
+   TBranch        *b_eleResol_phi_dn;   //!
    TBranch        *b_npfHF;   //!
    TBranch        *b_pfHFEn;   //!
    TBranch        *b_pfHFECALEn;   //!
@@ -899,7 +941,6 @@ void CopyTree::Init(TTree *tree)
    // (once per file to be processed).
 
    // Set object pointer
-   phoPrescale = 0;
    pdf = 0;
    EventTag = 0;
    nPU = 0;
@@ -977,6 +1018,16 @@ void CopyTree::Init(TTree *tree)
    phoSeedEnergy = 0;
    phoxtalBits = 0;
    phoIDbit = 0;
+   phoScale_stat_up = 0;
+   phoScale_stat_dn = 0;
+   phoScale_syst_up = 0;
+   phoScale_syst_dn = 0;
+   phoScale_gain_up = 0;
+   phoScale_gain_dn = 0;
+   phoResol_rho_up = 0;
+   phoResol_rho_dn = 0;
+   phoResol_phi_up = 0;
+   phoResol_phi_dn = 0;
    pfphoEt = 0;
    pfphoEta = 0;
    pfphoPhi = 0;
@@ -1064,6 +1115,16 @@ void CopyTree::Init(TTree *tree)
    eleFiredDoubleTrgs = 0;
    eleFiredL1Trgs = 0;
    eleIDbit = 0;
+   eleScale_stat_up = 0;
+   eleScale_stat_dn = 0;
+   eleScale_syst_up = 0;
+   eleScale_syst_dn = 0;
+   eleScale_gain_up = 0;
+   eleScale_gain_dn = 0;
+   eleResol_rho_up = 0;
+   eleResol_rho_dn = 0;
+   eleResol_phi_up = 0;
+   eleResol_phi_dn = 0;
    pfHFEn = 0;
    pfHFECALEn = 0;
    pfHFHCALEn = 0;
@@ -1253,12 +1314,13 @@ void CopyTree::Init(TTree *tree)
    fChain->SetBranchAddress("HLTEleMuXIsPrescaled", &HLTEleMuXIsPrescaled, &b_HLTEleMuXIsPrescaled);
    fChain->SetBranchAddress("HLTPhoIsPrescaled", &HLTPhoIsPrescaled, &b_HLTPhoIsPrescaled);
    fChain->SetBranchAddress("HLTJetIsPrescaled", &HLTJetIsPrescaled, &b_HLTJetIsPrescaled);
-   fChain->SetBranchAddress("phoPrescale", &phoPrescale, &b_phoPrescale);
    if (fChain->GetBranch("pdf")) fChain->SetBranchAddress("pdf", &pdf, &b_pdf);
    if (fChain->GetBranch("pthat")) fChain->SetBranchAddress("pthat", &pthat, &b_pthat);
    if (fChain->GetBranch("processID")) fChain->SetBranchAddress("processID", &processID, &b_processID);
    if (fChain->GetBranch("genWeight")) fChain->SetBranchAddress("genWeight", &genWeight, &b_genWeight);
    if (fChain->GetBranch("genHT")) fChain->SetBranchAddress("genHT", &genHT, &b_genHT);
+   if (fChain->GetBranch("genPho1")) fChain->SetBranchAddress("genPho1", &genPho1, &b_genPho1);
+   if (fChain->GetBranch("genPho2")) fChain->SetBranchAddress("genPho2", &genPho2, &b_genPho2);
    if (fChain->GetBranch("EventTag")) fChain->SetBranchAddress("EventTag", &EventTag, &b_EventTag);
    if (fChain->GetBranch("nPUInfo")) fChain->SetBranchAddress("nPUInfo", &nPUInfo, &b_nPUInfo);
    if (fChain->GetBranch("nPU")) fChain->SetBranchAddress("nPU", &nPU, &b_nPU);
@@ -1356,6 +1418,16 @@ void CopyTree::Init(TTree *tree)
    fChain->SetBranchAddress("phoSeedEnergy", &phoSeedEnergy, &b_phoSeedEnergy);
    fChain->SetBranchAddress("phoxtalBits", &phoxtalBits, &b_phoxtalBits);
    fChain->SetBranchAddress("phoIDbit", &phoIDbit, &b_phoIDbit);
+   fChain->SetBranchAddress("phoScale_stat_up", &phoScale_stat_up, &b_phoScale_stat_up);
+   fChain->SetBranchAddress("phoScale_stat_dn", &phoScale_stat_dn, &b_phoScale_stat_dn);
+   fChain->SetBranchAddress("phoScale_syst_up", &phoScale_syst_up, &b_phoScale_syst_up);
+   fChain->SetBranchAddress("phoScale_syst_dn", &phoScale_syst_dn, &b_phoScale_syst_dn);
+   fChain->SetBranchAddress("phoScale_gain_up", &phoScale_gain_up, &b_phoScale_gain_up);
+   fChain->SetBranchAddress("phoScale_gain_dn", &phoScale_gain_dn, &b_phoScale_gain_dn);
+   fChain->SetBranchAddress("phoResol_rho_up", &phoResol_rho_up, &b_phoResol_rho_up);
+   fChain->SetBranchAddress("phoResol_rho_dn", &phoResol_rho_dn, &b_phoResol_rho_dn);
+   fChain->SetBranchAddress("phoResol_phi_up", &phoResol_phi_up, &b_phoResol_phi_up);
+   fChain->SetBranchAddress("phoResol_phi_dn", &phoResol_phi_dn, &b_phoResol_phi_dn);
    fChain->SetBranchAddress("npfPho", &npfPho, &b_npfPho);
    fChain->SetBranchAddress("pfphoEt", &pfphoEt, &b_pfphoEt);
    fChain->SetBranchAddress("pfphoEta", &pfphoEta, &b_pfphoEta);
@@ -1445,6 +1517,16 @@ void CopyTree::Init(TTree *tree)
    fChain->SetBranchAddress("eleFiredDoubleTrgs", &eleFiredDoubleTrgs, &b_eleFiredDoubleTrgs);
    fChain->SetBranchAddress("eleFiredL1Trgs", &eleFiredL1Trgs, &b_eleFiredL1Trgs);
    fChain->SetBranchAddress("eleIDbit", &eleIDbit, &b_eleIDbit);
+   fChain->SetBranchAddress("eleScale_stat_up", &eleScale_stat_up, &b_eleScale_stat_up);
+   fChain->SetBranchAddress("eleScale_stat_dn", &eleScale_stat_dn, &b_eleScale_stat_dn);
+   fChain->SetBranchAddress("eleScale_syst_up", &eleScale_syst_up, &b_eleScale_syst_up);
+   fChain->SetBranchAddress("eleScale_syst_dn", &eleScale_syst_dn, &b_eleScale_syst_dn);
+   fChain->SetBranchAddress("eleScale_gain_up", &eleScale_gain_up, &b_eleScale_gain_up);
+   fChain->SetBranchAddress("eleScale_gain_dn", &eleScale_gain_dn, &b_eleScale_gain_dn);
+   fChain->SetBranchAddress("eleResol_rho_up", &eleResol_rho_up, &b_eleResol_rho_up);
+   fChain->SetBranchAddress("eleResol_rho_dn", &eleResol_rho_dn, &b_eleResol_rho_dn);
+   fChain->SetBranchAddress("eleResol_phi_up", &eleResol_phi_up, &b_eleResol_phi_up);
+   fChain->SetBranchAddress("eleResol_phi_dn", &eleResol_phi_dn, &b_eleResol_phi_dn);
    fChain->SetBranchAddress("npfHF", &npfHF, &b_npfHF);
    fChain->SetBranchAddress("pfHFEn", &pfHFEn, &b_pfHFEn);
    fChain->SetBranchAddress("pfHFECALEn", &pfHFECALEn, &b_pfHFECALEn);

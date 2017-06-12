@@ -105,11 +105,14 @@ void CopyTree::Loop()
      //Skimming conditions
      bool gWrite=false;
      //For selecting 1H->bb SUSY signal only
-     //int neutralino=-1;
-     //for (int i=0;i<nMC;i++) if ((*mcPID)[i]==1000023) neutralino=i;
-     //if ((*mcMass)[neutralino]!=900) continue;
-     //maxevents++;
-     /*
+     int neutralino=-1, gluino=-1;
+     for (int i=0;i<nMC;i++) {
+       if ((*mcPID)[i]==1000023) neutralino=i;
+       if ((*mcPID)[i]==1000021) gluino=i;
+     }
+     if ((*mcMass)[gluino]!=1000) continue;
+     if ((*mcMass)[neutralino]!=400) continue;
+     maxevents++;
      int higgs=0, ib1=-1, ib2=-1;
      for (int i=0;i<nMC;i++) {
        if ((*mcPID)[i]==25) higgs++;
@@ -117,14 +120,13 @@ void CopyTree::Loop()
        if ((*mcPID)[i]==-5 && (*mcMomPID)[i]==25) ib2=i;
      }
      if (higgs==1 && ib1!=-1 && ib2!=-1) gWrite=true;
-     */
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
      //Requiring trigger
      //if (HLTPho&128) gWrite=true; //HLT_Photon175
      //if (HLTPho&4096) gWrite=true; //HLT_Photon165_HE10
-     if (HLTJet&4194304) gWrite=true; //HLT_PFHT300_PFMET110_v
+     //if (HLTJet&4194304) gWrite=true; //HLT_PFHT300_PFMET110_v
 
      if (gWrite) skimtree->Fill();
    }//end of entry loop
@@ -132,7 +134,7 @@ void CopyTree::Loop()
    h_Events->Write();
    if (!wasData) {
      //FOR EWKINO:
-     //h_SumGenWeight->SetBinContent(1,maxevents);
+     h_SumGenWeight->SetBinContent(1,maxevents);
      h_PU->Write();
      h_PUTrue->Write();
      h_GenWeight->Write();
