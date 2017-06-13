@@ -471,6 +471,9 @@ void Analyzer::Loop()
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0;
      nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
+     memset(bcounterCSV,0,sizeof bcounterCSV);
+     memset(bcountercMVA,0,sizeof bcountercMVA);
+     memset(bcounterBDSV,0,sizeof bcounterBDSV);
      //photon
      for (int i=0;i<nPho;i++){
        if (abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0) {
