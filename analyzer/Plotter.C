@@ -38,26 +38,29 @@ void Plotter(){
   //string outputtag = "_hltHTMET_Pho_MET_btag.root";
   //string outputtag = "_Pho175_2jet_MT100_ST600_MET100_TWOak4btag.root";
   //string outputtag = "_Pho175_2jet_MT100_ST600_MET70to100_Mak8btag.root";
-  string outputtag = "_Pho175_5jet_MT100_ST1300_MET100_Mak8btag.root";
-  string Aname = "_Pho175_2jet_MT100_ST600_NOMET_NOak4btag.root";
-  string Bname = "_Pho175_2jet_MT100_ST600_MET100_NOak4btag.root";
-  string Cname = "_Pho175_2jet_MT100_ST600_NOMET_ONEak4btag.root";
+  //string outputtag = "_Pho175_5jet_MT100_ST1300_MET100_Mak8btag.root";
+  string outputtagData = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassAK45_MT100_ST1300_metFilters1536_MET100_bcounterBDSV_M1.root";
+  string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassAK45_MT100_ST1300_NOTmetFilters94_MET100_bcounterBDSV_M1.root";
+  string preoutput= "CRbtag_";
+  string Aname = "A_";
+  string Bname = "Bp_";
+  string Cname = "C_";
   string pretag = "histos/Analyzer_histos_";
   string data = "Data";
   //string bkg[8] = {"TTJets","TTGJets","WJetsToLNu","WGJets","QCD","GJets","ZJetsToNuNu","ZGTo2NuG"};
   string bkg[15] = {"TTJets","TTGJets","ST","DYJetsToLL","WJetsToLNu","WJetsToQQ","WGToLNuG","WGJets","ZJetsToNuNu","ZJetsToQQ","ZGTo2LG","ZGTo2NuG","Diboson","QCD","GJets"};
   //string signal[9] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mCh400_mN200","mCh600_mN200","mCh600_mN400","mCh800_mN200","mCh800_mN400","mCh800_mN600"};
   string signal[7] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mN300","mN500","mN700","mN900"};
-  string PlotOutput = "plots/Plots"+outputtag;
+  string PlotOutput = "plots/Plots"+preoutput+outputtag;
   //vector<int> whichBkg = {6,7,0,1,2,3,4,5};
-  vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  //vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12};
+  //vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
+  vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12};
   //vector<int> whichSignal = {0,1,2,3,4,5,6};
   vector<int> whichSignal = {0,1,2,3,4};
   //vector<int> whichSignal = {0,1,2};
 
-  bool plotData = 0;
-  bool plotABCD = 0;
+  bool plotData = 1;
+  bool plotABCD = 1;
   bool plotSignal = 1;
   bool plotBkg = 1;
 
@@ -71,7 +74,7 @@ void Plotter(){
 
   if (plotData) {
     histoNames.clear();
-    string filename = pretag+data+outputtag;
+    string filename = pretag+preoutput+data+outputtagData;
     TFile f(filename.c_str(),"read");
     TIter next(f.GetListOfKeys());
     TKey *key;
@@ -93,7 +96,7 @@ void Plotter(){
     vector<THStack*> v_stack;
     histoNames.clear();
     for (int i=0;i<whichBkg.size();i++){
-      string filename = pretag+bkg[whichBkg[i]]+outputtag;
+      string filename = pretag+preoutput+bkg[whichBkg[i]]+outputtag;
       TFile f(filename.c_str(),"read");
       TIter next(f.GetListOfKeys());
       TKey *key;
@@ -108,9 +111,9 @@ void Plotter(){
         if (i==0) {THStack *stack = new THStack(); stack->Add(h); v_stack.push_back(stack);histoNames.push_back(h->GetName());}
         else v_stack.at(j)->Add(h);
         if (plotABCD && i==whichBkg.size()-1) {
-          string Afilename = pretag+data+Aname;
-          string Bfilename = pretag+data+Bname;
-          string Cfilename = pretag+data+Cname;
+          string Afilename = pretag+Aname+data+outputtagData;
+          string Bfilename = pretag+Bname+data+outputtagData;
+          string Cfilename = pretag+Cname+data+outputtagData;
           TH1F *h_A = getplot(Afilename.c_str(),h->GetName());
           TH1F *h_B = getplot(Bfilename.c_str(),h->GetName());
           TH1F *h_C = getplot(Cfilename.c_str(),h->GetName());
@@ -140,7 +143,7 @@ void Plotter(){
     int fori=0;
     for (auto i : whichSignal){
       TObjArray *SignalHistos = new TObjArray();
-      string filename = pretag+signal[i]+outputtag;
+      string filename = pretag+preoutput+signal[i]+outputtag;
       TFile f(filename.c_str(),"read");
       TIter next(f.GetListOfKeys());
       TKey *key;
