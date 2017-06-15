@@ -321,12 +321,17 @@ void Analyzer::Loop()
      b_eleEta->GetEntry(ientry);
      b_elePhi->GetEntry(ientry);
      b_elePt->GetEntry(ientry);
+     b_elePFMiniIso->GetEntry(ientry);
      b_eleIDMVA->GetEntry(ientry);
      b_eleIDbit->GetEntry(ientry);
      b_nMu->GetEntry(ientry);
      b_muPt->GetEntry(ientry);
      b_muEta->GetEntry(ientry);
      b_muPhi->GetEntry(ientry);
+     b_muSIP->GetEntry(ientry);
+     b_muDz->GetEntry(ientry);
+     b_muD0->GetEntry(ientry);
+     b_muPFMiniIso->GetEntry(ientry);
      b_muIDbit->GetEntry(ientry);
      b_nPho->GetEntry(ientry);
      b_phoEt->GetEntry(ientry);
@@ -626,11 +631,17 @@ void Analyzer::Loop()
        for (auto j : passAK8Jet) if (deltaR((*elePhi)[i],(*AK8JetPhi)[j],(*eleEta)[i],(*AK8JetEta)[j])<0.5) {
          passOverlap=false;break;
        }
+       for (auto j : passJet) if (deltaR((*elePhi)[i],(*jetPhi)[j],(*eleEta)[i],(*jetEta)[j])<0.3) {
+         passOverlap=false;break;
+       }
        if (!passOverlap) continue;
-       if ((*eleIDbit)[i]>>1&1 && (*elePt)[i]>20) passEleL.push_back(i);
-       if ((*eleIDbit)[i]>>2&1 && (*elePt)[i]>20) passEleM.push_back(i);
-       if ((*eleIDbit)[i]>>3&1 && (*elePt)[i]>20) passEleT.push_back(i);
+       if ((*eleIDbit)[i]>>1&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleL.push_back(i);
+       if ((*eleIDbit)[i]>>2&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleM.push_back(i);
+       if ((*eleIDbit)[i]>>3&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleT.push_back(i);
      }
+     nPassEleL=passEleL.size();
+     nPassEleM=passEleM.size();
+     nPassEleT=passEleT.size();
      //muon
      for (int i=0;i<nMu;i++) {
        bool passOverlap=true;
@@ -640,14 +651,20 @@ void Analyzer::Loop()
        for (auto j : passAK8Jet) if (deltaR((*muPhi)[i],(*AK8JetPhi)[j],(*muEta)[i],(*AK8JetEta)[j])<0.5) {
          passOverlap=false;break;
        }
+       for (auto j : passJet) if (deltaR((*muPhi)[i],(*jetPhi)[j],(*muEta)[i],(*jetEta)[j])<0.3) {
+         passOverlap=false;break;
+       }
        for (auto j : passEleL) if (deltaR((*muPhi)[i],(*elePhi)[j],(*muEta)[i],(*eleEta)[j])<0.3) {
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*muIDbit)[i]>>0&1 && (*muPt)[i]>20) passMuL.push_back(i);
-       if ((*muIDbit)[i]>>1&1 && (*muPt)[i]>20) passMuM.push_back(i);
-       if ((*muIDbit)[i]>>2&1 && (*muPt)[i]>20) passMuT.push_back(i);
+       if ((*muIDbit)[i]>>0&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuL.push_back(i);
+       if ((*muIDbit)[i]>>1&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuM.push_back(i);
+       if ((*muIDbit)[i]>>2&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuT.push_back(i);
      }
+     nPassMuL=passMuL.size();
+     nPassMuM=passMuM.size();
+     nPassMuT=passMuT.size();
      //dR between leading photon & leading pt AK8
      double dR_pho_AK8=-1;
      if (passPhoL.size()>0 && passAK8Jet.size()>0){

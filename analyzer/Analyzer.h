@@ -824,6 +824,8 @@ public :
    vector<double> _cut_value;
    //For cuts
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
+   int nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
+   int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
    bool passBtag=false, passHiggsMass=false;
@@ -1730,6 +1732,12 @@ Int_t Analyzer::Cut(Long64_t entry)
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassEleL") returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassEleM") returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassEleT") returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassMuL") returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassMuM") returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassMuT") returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassPhoL") returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassPhoM") returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassPhoT") returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]);
