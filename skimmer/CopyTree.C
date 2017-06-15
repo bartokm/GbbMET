@@ -107,12 +107,14 @@ void CopyTree::Loop()
      //For selecting 1H->bb SUSY signal only
      int neutralino=-1, gluino=-1;
      for (int i=0;i<nMC;i++) {
-       if ((*mcPID)[i]==1000023) neutralino=i;
-       if ((*mcPID)[i]==1000021) gluino=i;
+       if ((*mcPID)[i]==1000023 && (*mcStatus)[i]==22) neutralino=i;
+       if ((*mcPID)[i]==1000021 && (*mcStatus)[i]==22) gluino=i;
      }
      if ((*mcMass)[gluino]!=1000) continue;
-     if ((*mcMass)[neutralino]!=400) continue;
+     if ((*mcMass)[neutralino]<199 || (*mcMass)[neutralino]>201) continue;
      maxevents++;
+     gWrite=true;
+     /*
      int higgs=0, ib1=-1, ib2=-1;
      for (int i=0;i<nMC;i++) {
        if ((*mcPID)[i]==25) higgs++;
@@ -120,6 +122,7 @@ void CopyTree::Loop()
        if ((*mcPID)[i]==-5 && (*mcMomPID)[i]==25) ib2=i;
      }
      if (higgs==1 && ib1!=-1 && ib2!=-1) gWrite=true;
+     */
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
