@@ -35,31 +35,34 @@ TH1F* getplot(TString fname, TString hname) {
 
 void Plotter(){
   setTDRStyle();
-  //string outputtag = "_hltHTMET_Pho_MET_btag.root";
-  //string outputtag = "_Pho175_2jet_MT100_ST600_MET100_TWOak4btag.root";
-  //string outputtag = "_Pho175_2jet_MT100_ST600_MET70to100_Mak8btag.root";
-  //string outputtag = "_Pho175_5jet_MT100_ST1300_MET100_Mak8btag.root";
-  string outputtagData = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassAK45_MT100_ST1300_metFilters1536_MET100_bcounterBDSV_M1.root";
-  string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassAK45_MT100_ST1300_NOTmetFilters94_MET100_bcounterBDSV_M1.root";
-  string preoutput= "CRbtag_";
+  //string outputtagData = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_metFilters1536_MET100_ST1300_bcounterBDSV_M1.root";
+  //string outputtagData = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_ST1300_metFilters1536_MET100_bcounterCSV_L2.root";
+  string outputtagData = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_ST1300_metFilters1536_MET100_bcounterBDSV_M1.root";
+  //string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassAK45_MT100_ST1300_NOTmetFilters94_MET100_bcounterBDSV_M1.root";
+  //string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_NOTmetFilters94_MET100_ST1300_bcounterBDSV_M1.root";
+  //string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_ST1300_NOTmetFilters94_MET100_bcounterCSV_L2.root";
+  string outputtag = "_HLTPho4096_nPassPhoL1_phoCalibEt175_nPassEleL0_nPassMuL0_nPassAK45_MT100_ST1300_NOTmetFilters94_MET100_bcounterBDSV_M1.root";
+  string preoutput= "";
   string Aname = "A_";
-  string Bname = "Bp_";
+  string Bname = "B_";
   string Cname = "C_";
   string pretag = "histos/Analyzer_histos_";
   string data = "Data";
   //string bkg[8] = {"TTJets","TTGJets","WJetsToLNu","WGJets","QCD","GJets","ZJetsToNuNu","ZGTo2NuG"};
   string bkg[15] = {"TTJets","TTGJets","ST","DYJetsToLL","WJetsToLNu","WJetsToQQ","WGToLNuG","WGJets","ZJetsToNuNu","ZJetsToQQ","ZGTo2LG","ZGTo2NuG","Diboson","QCD","GJets"};
   //string signal[9] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mCh400_mN200","mCh600_mN200","mCh600_mN400","mCh800_mN200","mCh800_mN400","mCh800_mN600"};
-  string signal[7] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mN300","mN500","mN700","mN900"};
+  //string signal[8] = {"mG1000_mN200","mG1000_mN400","mG1000_mN600","mN300","mN500","T5qqqqHg_mG1000_mN200","T5qqqqHg_mG1000_mN400","T5qqqqHg_mG1000_mN600"};
+  string signal[9] = {"T5qqqqHg_mG800_mN200","T5qqqqHg_mG800_mN400","T5qqqqHg_mG800_mN600","T5qqqqHg_mG1000_mN200","T5qqqqHg_mG1000_mN400","T5qqqqHg_mG1000_mN600","T5qqqqHg_mG1200_mN200","T5qqqqHg_mG1200_mN400","T5qqqqHg_mG1600_mN1000"};
   string PlotOutput = "plots/Plots"+preoutput+outputtag;
   //vector<int> whichBkg = {6,7,0,1,2,3,4,5};
   //vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14};
-  vector<int> whichBkg = {0,1,2,3,4,5,6,7,8,9,10,11,12};
+  vector<int> whichBkg = {0,1,2,3,4,5,6,8,9,10,11,12};
   //vector<int> whichSignal = {0,1,2,3,4,5,6};
-  vector<int> whichSignal = {0,1,2,3,4};
-  //vector<int> whichSignal = {0,1,2};
+  //vector<int> whichSignal = {0,1,2,3,4};
+  //vector<int> whichSignal = {0,1,2,5,6,7};
+  vector<int> whichSignal = {0,2,3,5,7,8};
 
-  bool plotData = 1;
+  bool plotData = 0;
   bool plotABCD = 1;
   bool plotSignal = 1;
   bool plotBkg = 1;
