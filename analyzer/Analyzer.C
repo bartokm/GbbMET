@@ -168,7 +168,7 @@ void Analyzer::Loop()
    
    TH1::SetDefaultSumw2();
    
-   h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,nJet,MT,ST,MET,btag",10,0,10);
+   h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,eleVeto,muVeto,nJet,MT,ST,MET,btag",15,0,15);
    TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",70,0,70);
    TH1D *h_nGoodVtx = new TH1D("h_nGoodVtx",";# of good vertices",70,0,70);
    TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",70,0,70);
@@ -179,7 +179,9 @@ void Analyzer::Loop()
    TH1D *h_phoEtaL = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
    TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
    TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
-   TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",30,0,1000);
+   const int nbins_pfMET=10;
+   double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000};
+   TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
    TH1D *h_pfMETsumEt = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",30,-50,5000);
    TH1D *h_pfMETPhi = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",30,-4,4);
    TH1D *h_pfMETSig = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);

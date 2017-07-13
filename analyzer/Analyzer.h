@@ -1772,7 +1772,10 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="passHiggsMass") returnvalue*=Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
-    if (returnvalue) h_cuts->Fill(i,w);
+    if (returnvalue) {
+      if (_fastSim) h_cuts->Fill(i+1,w);
+      else h_cuts->Fill(i,w);
+    }
   }
   return returnvalue;
 }
