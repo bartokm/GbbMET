@@ -58,6 +58,7 @@ void CopyTree::Loop()
    std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
 
    bool wasData;
+   std::string gDir="";
    int file_counter=-1, temp=-1; std::string temp_f=fChain->GetCurrentFile()->GetName();
    unsigned int maxevents=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
@@ -67,14 +68,15 @@ void CopyTree::Loop()
      nb = fChain->GetEntry(jentry);   nbytes += nb;
      bool newfile=false;
      if (jentry==0) {
+       if (fChain->GetCurrentFile()->GetDirectory("ggNtuplizer") !=0) gDir="ggNtuplizer/";
        wasData=isData;
-       h_Events = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hEvents");
+       h_Events = (TH1F*)fChain->GetCurrentFile()->Get((gDir+"hEvents").c_str());
        h_Events->SetDirectory(0);
        if (!isData) {
-         h_PU = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPU");
-         h_PUTrue = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue");
-         h_GenWeight = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight");
-         h_SumGenWeight = (TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hSumGenWeight");
+         h_PU = (TH1F*)fChain->GetCurrentFile()->Get((gDir+"hPU").c_str());
+         h_PUTrue = (TH1F*)fChain->GetCurrentFile()->Get((gDir+"hPUTrue").c_str());
+         h_GenWeight = (TH1F*)fChain->GetCurrentFile()->Get((gDir+"hGenWeight").c_str());
+         h_SumGenWeight = (TH1F*)fChain->GetCurrentFile()->Get((gDir+"hSumGenWeight").c_str());
          h_PU->SetDirectory(0);
          h_PUTrue->SetDirectory(0);
          h_GenWeight->SetDirectory(0);
@@ -94,27 +96,30 @@ void CopyTree::Loop()
        temp_f=fChain->GetCurrentFile()->GetName();
        file_counter++;
        newfile=true;
-       h_Events->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hEvents"));
+       h_Events->Add((TH1F*)fChain->GetCurrentFile()->Get((gDir+"hEvents").c_str()));
        if (!isData) {
-         h_PU->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPU"));
-         h_PUTrue->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hPUTrue"));
-         h_GenWeight->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hGenWeight"));
-         h_SumGenWeight->Add((TH1F*)fChain->GetCurrentFile()->GetDirectory("ggNtuplizer")->Get("hSumGenWeight"));
+         h_PU->Add((TH1F*)fChain->GetCurrentFile()->Get((gDir+"hPU").c_str()));
+         h_PUTrue->Add((TH1F*)fChain->GetCurrentFile()->Get((gDir+"hPUTrue").c_str()));
+         h_GenWeight->Add((TH1F*)fChain->GetCurrentFile()->Get((gDir+"hGenWeight").c_str()));
+         h_SumGenWeight->Add((TH1F*)fChain->GetCurrentFile()->Get((gDir+"hSumGenWeight").c_str()));
        }
      }
      //Skimming conditions
      bool gWrite=false;
      //For selecting 1H->bb SUSY signal only
-     int neutralino=-1, gluino=-1;
+     /*
+     int higgs=0, neutralino=-1, gluino=-1;
      for (int i=0;i<nMC;i++) {
+       if ((*mcPID)[i]==25) higgs++;
        if ((*mcPID)[i]==1000023 && (*mcStatus)[i]==22) neutralino=i;
        if ((*mcPID)[i]==1000021 && (*mcStatus)[i]==22) gluino=i;
      }
      if ((*mcMass)[gluino]!=1000) continue;
-     if ((*mcMass)[neutralino]<199 || (*mcMass)[neutralino]>201) continue;
+     if ((*mcMass)[neutralino]<799 || (*mcMass)[neutralino]>801) continue;
+     if (higgs!=1) continue;
      maxevents++;
+     */
      gWrite=true;
-     /*
      int higgs=0, ib1=-1, ib2=-1;
      for (int i=0;i<nMC;i++) {
        if ((*mcPID)[i]==25) higgs++;
@@ -122,7 +127,6 @@ void CopyTree::Loop()
        if ((*mcPID)[i]==-5 && (*mcMomPID)[i]==25) ib2=i;
      }
      if (higgs==1 && ib1!=-1 && ib2!=-1) gWrite=true;
-     */
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
@@ -137,7 +141,7 @@ void CopyTree::Loop()
    h_Events->Write();
    if (!wasData) {
      //FOR EWKINO:
-     h_SumGenWeight->SetBinContent(1,maxevents);
+     //h_SumGenWeight->SetBinContent(1,maxevents);
      h_PU->Write();
      h_PUTrue->Write();
      h_GenWeight->Write();
