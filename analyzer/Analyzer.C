@@ -685,10 +685,16 @@ void Analyzer::Loop()
      //AK8
      passBtag=false, passHiggsMass=false;
      int SelectedAK8Jet=-1;
+     BDSV_selected=0; //BDSV btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
      for (auto i : passAK8Jet){
        if ((*AK8JetPrunedMassCorr)[i]>70 && (*AK8JetPrunedMassCorr)[i]<200) {
          passHiggsMass=true;
          SelectedAK8Jet=i;
+         if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[3]) BDSV_selected=4;
+         else if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[2]) BDSV_selected=3;
+         else if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[1]) BDSV_selected=2;
+         else if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[0]) BDSV_selected=1;
+         else BDSV_selected=0;
          if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[1]) passBtag=true;
          break;
        }

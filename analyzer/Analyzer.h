@@ -828,6 +828,7 @@ public :
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
+   int BDSV_selected=0;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
@@ -1766,6 +1767,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="bcounterBDSV_L") returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterBDSV_M") returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterBDSV_T") returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="BDSV_selected") returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
