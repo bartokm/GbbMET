@@ -5,7 +5,7 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_f=0, is_h=0, is_cuts=0, is_quiet=0;
+  bool is_i=0, is_o=0, is_b=0, is_f=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
   bool inputs=0, cuts=0;
   string output, bname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
@@ -20,12 +20,15 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='b') is_b=1;
       else if (arg[1]=='f') is_f=1;
       else if (arg[1]=='h') is_h=1; 
+      else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='q') is_quiet=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
     //Print out help
     if (is_h) {PrintHelp();return 1;}
+    //Print out cuts
+    if (is_c) {PrintCuts();return 1;}
     // Check second argument after option
     if (inputs && is_i) inputfiles.push_back(arg);
     if (is_o) {output=argv[i+1]; is_o=0;}
@@ -44,6 +47,9 @@ int main(int argc, char* argv[]){
       if ((i+1)%3 ==0) cut_value.push_back(stof(v_cuts[i]));
     }
   }
+  //Check if input cuts exist in the code
+  if (!CompareCuts(cut_variable)) return 0;
+
   if (!is_quiet){
     if (!output.empty()) cout<<"Output name: "<<output<<endl;
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
