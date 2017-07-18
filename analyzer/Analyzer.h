@@ -1877,54 +1877,54 @@ void Analyzer::CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> 
   SF_T[1] = p_data_up[2]/p_mc[2];
   SF_T[2] = p_data_do[2]/p_mc[2];
 }
-vector<string> _cut_list{"HLTPho\tphoton triggers",
-                         "nPassEleL\tnumber of loose electrons",
-                         "nPassEleM\tnumber of medium electrons",
-                         "nPassEleT\tnumber of tight electrons",
-                         "nPassMuL\tnumber of loose muons",
-                         "nPassMuM\tnumber of medium muons",
-                         "nPassMuT\tnumber of tight muons",
-                         "nPassPhoL\tnumber of loose photons",
-                         "nPassPhoM\tnumber of medium photons",
-                         "nPassPhoT\tnumber of tight photons",
-                         "phoEt\tEt of leading loose photon",
-                         "phoEtM\tEt of leading medium photon",
-                         "phoEtT\tEt of leading tight photon",
-                         "phoCalibEt\tCalibEt of leading loose photon",
-                         "phoCalibEtM\tCalibEt of leading medium photon",
-                         "phoCalibEtT\tCalibEt of leading tight photon",
-                         "HT\tpt sum of loose jets",
-                         "EMHT\tHT + Et of loose photons",
-                         "MT\tinvariant mass of leading loose photon and MET",
-                         "ST\tHT+MET+Et of loose photons",
-                         "ST_G\tMET+Et of loose photons",
-                         "metFilters\tmetFilters",
-                         "NOTmetFilters\tInverse of metFilters",
-                         "MET\tpfMET",
-                         "nPassAK4\tnumber of loose ak4 jets",
-                         "nPassAK8\tnumber of loose ak8 jets",
-                         "bcounterCSV_L\tnumber of loose CSV btagged jets",
-                         "bcounterCSV_M\tnumber of medium CSV btagged jets",
-                         "bcounterCSV_T\tnumber of tight CSV btagged jets",
-                         "bcountercMVA_L\tnumber of loose cMVA btagged jets",
-                         "bcountercMVA_M\tnumber of medium cMVA btagged jets",
-                         "bcountercMVA_T\tnumber of tight cMVA btagged jets",
-                         "bcounterBDSV_L\tnumber of loose BDSV btagged jets",
-                         "bcounterBDSV_M\tnumber of medium BDSV btagged jets",
-                         "bcounterBDSV_T\tnumber of tight BDSV btagged jets",
-                         "BDSV_selected\tBDSV btag (0-Nobtag, 1-loose, 2-medium, ...) of the higgs candidate ak8jet",
-                         "CSV_selected\tCSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag, ...) of the higgs candidate ak4jets",
-                         "passBtag\tHiggs candidate ak8jet passes medium btag",
-                         "passAK4Btag1\tHiggs candidate 1st ak4jet passes loose btag",
-                         "passAK4Btag2\tHiggs candidate 2nd ak4jet passes loose btag",
-                         "passHiggsMass\tAt least 1 ak8jet exist with mass 70 to 200GeV",
-                         "passAK4HiggsMass\tAt least 1 pair of ak4jets exist with mass 70 to 200GeV"};
+map<string,string> _cut_list = {{"HLTPho","photon triggers"},
+                         {"nPassEleL","number of loose electrons"},
+                         {"nPassEleM","number of medium electrons"},
+                         {"nPassEleT","number of tight electrons"},
+                         {"nPassMuL","number of loose muons"},
+                         {"nPassMuM","number of medium muons"},
+                         {"nPassMuT","number of tight muons"},
+                         {"nPassPhoL","number of loose photons"},
+                         {"nPassPhoM","number of medium photons"},
+                         {"nPassPhoT","number of tight photons"},
+                         {"phoEt","Et of leading loose photon"},
+                         {"phoEtM","Et of leading medium photon"},
+                         {"phoEtT","Et of leading tight photon"},
+                         {"phoCalibEt","CalibEt of leading loose photon"},
+                         {"phoCalibEtM","CalibEt of leading medium photon"},
+                         {"phoCalibEtT","CalibEt of leading tight photon"},
+                         {"HT","pt sum of loose jets"},
+                         {"EMHT","HT + Et of loose photons"},
+                         {"MT","invariant mass of leading loose photon and MET"},
+                         {"ST","HT+MET+Et of loose photons"},
+                         {"ST_G","MET+Et of loose photons"},
+                         {"metFilters","metFilters"},
+                         {"NOTmetFilters","Inverse of metFilters"},
+                         {"MET","pfMET"},
+                         {"nPassAK4","number of loose ak4 jets"},
+                         {"nPassAK8","number of loose ak8 jets"},
+                         {"bcounterCSV_L","number of loose CSV btagged jets"},
+                         {"bcounterCSV_M","number of medium CSV btagged jets"},
+                         {"bcounterCSV_T","number of tight CSV btagged jets"},
+                         {"bcountercMVA_L","number of loose cMVA btagged jets"},
+                         {"bcountercMVA_M","number of medium cMVA btagged jets"},
+                         {"bcountercMVA_T","number of tight cMVA btagged jets"},
+                         {"bcounterBDSV_L","number of loose BDSV btagged jets"},
+                         {"bcounterBDSV_M","number of medium BDSV btagged jets"},
+                         {"bcounterBDSV_T","number of tight BDSV btagged jets"},
+                         {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium, ...) of the higgs candidate ak8jet"},
+                         {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag, ...) of the higgs candidate ak4jets"},
+                         {"passBtag","Higgs candidate ak8jet passes medium btag"},
+                         {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
+                         {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
+                         {"passHiggsMass","At least 1 ak8jet exist with mass 70 to 200GeV"},
+                         {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"}};
 
 bool CompareCuts(vector<string> input_cuts){
   for (auto i : input_cuts) {
     bool match=false;
-    for (auto j : _cut_list) {
-      if (i == j) {match=true; break;}
+    for (auto const& j : _cut_list) {
+      if (i == j.first) {match=true; break;}
     }
     if (!match) {cout<<"ERROR! Unkown cut variable "<<i<<"\nPlease run ./Analyzer -c to see available cuts. Exiting..."<<endl; return 0;}
   }
@@ -1933,7 +1933,7 @@ bool CompareCuts(vector<string> input_cuts){
 
 void PrintCuts(){
   cout<<"Printing out available cut variables:"<<endl;
-  for (auto i : _cut_list) cout<<i<<endl;
+  for (auto const& i : _cut_list) cout<<i.first<<"\t"<<i.second<<endl;
   cout<<"Exiting..."<<endl;
 }
 
