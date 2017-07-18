@@ -828,7 +828,7 @@ public :
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
-   int BDSV_selected=0;
+   int BDSV_selected=0, CSV_selected=0;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
@@ -1768,6 +1768,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="bcounterBDSV_M") returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterBDSV_T") returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="BDSV_selected") returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="CSV_selected") returnvalue*=Parser(CSV_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
@@ -1912,6 +1913,7 @@ vector<string> _cut_list{"HLTPho\tphoton triggers",
                          "bcounterBDSV_M\tnumber of medium BDSV btagged jets",
                          "bcounterBDSV_T\tnumber of tight BDSV btagged jets",
                          "BDSV_selected\tBDSV btag (0-Nobtag, 1-loose, 2-medium, ...) of the higgs candidate ak8jet",
+                         "CSV_selected\tCSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag, ...) of the higgs candidate ak4jets",
                          "passBtag\tHiggs candidate ak8jet passes medium btag",
                          "passAK4Btag1\tHiggs candidate 1st ak4jet passes loose btag",
                          "passAK4Btag2\tHiggs candidate 2nd ak4jet passes loose btag",
@@ -1930,7 +1932,7 @@ bool CompareCuts(vector<string> input_cuts){
 }
 
 void PrintCuts(){
-  cout<<"Printing out available cuts:"<<endl;
+  cout<<"Printing out available cut variables:"<<endl;
   for (auto i : _cut_list) cout<<i<<endl;
   cout<<"Exiting..."<<endl;
 }

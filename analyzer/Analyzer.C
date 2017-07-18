@@ -34,7 +34,6 @@ int main(int argc, char* argv[]){
     if (is_o) {output=argv[i+1]; is_o=0;}
     if (is_b) {bname=argv[i+1]; is_b=0;}
     if (cuts && is_cuts) v_cuts.push_back(arg);
-    //
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
   }
@@ -709,6 +708,7 @@ void Analyzer::Loop()
      passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
      double m_bb=-1;
      int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
+     CSV_selected=0; //CSV btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
      for (unsigned int i=0;i<passJet.size();i++){
        for (unsigned int j=i+1;j<passJet.size();j++){
          TLorentzVector bjet1, bjet2;
@@ -718,8 +718,8 @@ void Analyzer::Loop()
          if (m_bb>70 && m_bb<200) {
            SelectedAK4Jet1=passJet.at(i);
            SelectedAK4Jet2=passJet.at(j);
-           if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) passAK4Btag1=true;
-           if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) passAK4Btag2=true;
+           if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) {passAK4Btag1=true;CSV_selected++;}
+           if ((*jetCSV2BJetTags)[passJet.at(j)]>BtagCSVWP[0]) {passAK4Btag2=true;CSV_selected++;}
            passAK4HiggsMass=true;
            break;
          }
