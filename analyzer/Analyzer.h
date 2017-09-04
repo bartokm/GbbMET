@@ -824,7 +824,7 @@ public :
    vector<double> _cut_value;
    //For cuts
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
-   int nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
+   int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
@@ -834,13 +834,16 @@ public :
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1};
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
    TH1D *h_PUweight;
    //histograms needed for SFs
-   TH2F *h_EGamma_SF2D;
+   TH2F *h_pho_EGamma_SF2D[3];
+   TH2F *h_ele_EGamma_SF2D[4];
+   TH2F *h_eleRec_EGamma_SF2D;
    TH2D *h_Scaling_Factors_HasPix_R9_high;
    TH2D *h_Scaling_Factors_HasPix_R9_low;
    TEfficiency* eff_b_CSV_L;
@@ -1733,15 +1736,15 @@ Int_t Analyzer::Cut(Long64_t entry)
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleL") returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleM") returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleT") returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
+    else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
+    else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
     else if (_cut_variable[i]=="nPassMuL") returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassMuM") returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassMuT") returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassPhoL") returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassPhoM") returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassPhoT") returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
+    else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
+    else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float((*phoEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float((*phoEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float((*phoEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);

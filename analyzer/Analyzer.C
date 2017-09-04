@@ -332,6 +332,8 @@ void Analyzer::Loop()
      b_eleEta->GetEntry(ientry);
      b_elePhi->GetEntry(ientry);
      b_elePt->GetEntry(ientry);
+     b_eleSCEta->GetEntry(ientry);
+     b_eleCalibPt->GetEntry(ientry);
      b_elePFMiniIso->GetEntry(ientry);
      b_eleIDMVA->GetEntry(ientry);
      b_eleIDbit->GetEntry(ientry);
@@ -449,11 +451,21 @@ void Analyzer::Loop()
        //std::cout<<"w=weight*pu_weight*genWeight "<<w<<"="<<weight<<"*"<<pu_weight<<"*"<<genWeight<<std::endl;
        //Scale factors
        if (jentry==0) {
-         //photon cutbased SF
-         TFile f_phoSF("egammaEffi.txt_EGM2D.root","read");
-         h_EGamma_SF2D = (TH2F*)f_phoSF.Get("EGamma_SF2D");
-         h_EGamma_SF2D->SetDirectory(0);
-         f_phoSF.Close();
+         //photon cutbased loose
+         TFile f_phoLooseSF("pho_looseSF_egammaEffi.txt_EGM2D.root","read");
+         h_pho_EGamma_SF2D[0] = (TH2F*)f_phoLooseSF.Get("EGamma_SF2D");
+         h_pho_EGamma_SF2D[0]->SetDirectory(0);
+         f_phoLooseSF.Close();
+         //photon cutbased medium
+         TFile f_phoMediumSF("pho_mediumSF_egammaEffi.txt_EGM2D.root","read");
+         h_pho_EGamma_SF2D[1] = (TH2F*)f_phoMediumSF.Get("EGamma_SF2D");
+         h_pho_EGamma_SF2D[1]->SetDirectory(0);
+         f_phoMediumSF.Close();
+         //photon cutbased loose
+         TFile f_phoTightSF("pho_tightSF_egammaEffi.txt_EGM2D.root","read");
+         h_pho_EGamma_SF2D[2] = (TH2F*)f_phoTightSF.Get("EGamma_SF2D");
+         h_pho_EGamma_SF2D[2]->SetDirectory(0);
+         f_phoTightSF.Close();
          //photon haspixelseed SF
          TFile f_phoPV("ScalingFactors_80X_Summer16.root","read");
          h_Scaling_Factors_HasPix_R9_high = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 > 0.94");
@@ -461,6 +473,31 @@ void Analyzer::Loop()
          h_Scaling_Factors_HasPix_R9_low = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 < 0.94");
          h_Scaling_Factors_HasPix_R9_low->SetDirectory(0);
          f_phoPV.Close();
+         //electron reconstruction efficiency
+         TFile f_eleRecSF("ele_recEff_egammaEffi.txt_EGM2D.root","read");
+         h_eleRec_EGamma_SF2D = (TH2F*)f_eleRecSF.Get("EGamma_SF2D");
+         h_eleRec_EGamma_SF2D->SetDirectory(0);
+         f_eleRecSF.Close();
+         //electron cutbased veto
+         TFile f_eleVetoSF("ele_vetoSF_egammaEffi.txt_EGM2D.root","read");
+         h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
+         h_ele_EGamma_SF2D[0]->SetDirectory(0);
+         f_eleVetoSF.Close();
+         //electron cutbased loose
+         TFile f_eleLooseSF("ele_looseSF_egammaEffi.txt_EGM2D.root","read");
+         h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
+         h_ele_EGamma_SF2D[1]->SetDirectory(0);
+         f_eleLooseSF.Close();
+         //electron cutbased medium
+         TFile f_eleMediumSF("ele_mediumSF_egammaEffi.txt_EGM2D.root","read");
+         h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
+         h_ele_EGamma_SF2D[2]->SetDirectory(0);
+         f_eleMediumSF.Close();
+         //electron cutbased tight
+         TFile f_eleTightSF("ele_tightSF_egammaEffi.txt_EGM2D.root","read");
+         h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
+         h_ele_EGamma_SF2D[3]->SetDirectory(0);
+         f_eleTightSF.Close();
          //Loading btag efficiency file, fill efficiency histograms
          if (btag_file.size()>0) {
            TFile f_btag(btag_file.c_str(),"read");
@@ -480,7 +517,7 @@ void Analyzer::Loop()
      
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highBDSV=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
-     vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT;
+     vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet,passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
      map<int,char> passCSV, passcMVA, passBDSV;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
@@ -508,12 +545,6 @@ void Analyzer::Loop()
        if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoL]) nleadPhoL=i;
        EMHT_before+=(*phoCalibEt)[i];
      }
-     //Apply photon SFs
-     if (!isData && nleadPhoL!=-1) {
-       w*=h_EGamma_SF2D->GetBinContent(h_EGamma_SF2D->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
-       if ((*phoR9)[nleadPhoL]>0.94) w*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
-       else w*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
-     }
      for (auto i : passPhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoM]) nleadPhoM=i;
      for (auto i : passPhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoT]) nleadPhoT=i;
      nPassPhoL=passPhoL.size();
@@ -522,6 +553,24 @@ void Analyzer::Loop()
      EMHT_after=EMHT_before;
      AK8EMHT_before=EMHT_before;
      AK8EMHT_after=EMHT_before;
+     //Calculate photon SFs
+     if (!isData) {
+       if (nPassPhoL!=0){
+         pho_SF[0]*=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[passPhoL[0]],(*phoCalibEt)[passPhoL[0]]));
+         if ((*phoR9)[passPhoL[0]]>0.94) pho_SF[0]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoL[0]]),100));
+         else pho_SF[0]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoL[0]]),100));
+       }
+       if (nPassPhoM!=0){
+         pho_SF[1]*=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
+         if ((*phoR9)[passPhoM[0]]>0.94) pho_SF[1]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+         else pho_SF[1]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+       }
+       if (nPassPhoT!=0){
+         pho_SF[2]*=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
+         if ((*phoR9)[passPhoT[0]]>0.94) pho_SF[2]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+         else pho_SF[2]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+       }
+     }
      //jet ID
      //bool vetoEvent=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (int i=0;i<nJet;i++) {
@@ -646,13 +695,34 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*eleIDbit)[i]>>1&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleL.push_back(i);
-       if ((*eleIDbit)[i]>>2&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleM.push_back(i);
-       if ((*eleIDbit)[i]>>3&1 && (*elePt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleT.push_back(i);
+       if ((*eleIDbit)[i]>>0&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleV.push_back(i);
+       if ((*eleIDbit)[i]>>1&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleL.push_back(i);
+       if ((*eleIDbit)[i]>>2&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleM.push_back(i);
+       if ((*eleIDbit)[i]>>3&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleT.push_back(i);
      }
+     nPassEleV=passEleV.size();
      nPassEleL=passEleL.size();
      nPassEleM=passEleM.size();
      nPassEleT=passEleT.size();
+     //Calculate electron SFs
+     if (!isData) {
+       if (nPassEleV!=0){
+       ele_SF[0]*=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+       ele_SF[0]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+       }
+       if (nPassEleL!=0){
+       ele_SF[1]*=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+       ele_SF[1]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+       }
+       if (nPassEleM!=0){
+       ele_SF[2]*=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+       ele_SF[2]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+       }
+       if (nPassEleT!=0){
+       ele_SF[3]*=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+       ele_SF[3]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+       }
+     }
      //muon
      for (int i=0;i<nMu;i++) {
        bool passOverlap=true;
