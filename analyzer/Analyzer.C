@@ -5,9 +5,9 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_f=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
+  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
   bool inputs=0, cuts=0;
-  string output, bname;
+  string output, bname, pname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
   vector<double> cut_value;
   for(int i=1; i<argc; i++) {
@@ -18,6 +18,7 @@ int main(int argc, char* argv[]){
       if (arg[1]=='i') is_i=1;
       else if (arg[1]=='o') is_o=1;
       else if (arg[1]=='b') is_b=1;
+      else if (arg[1]=='p') is_p=1;
       else if (arg[1]=='f') is_f=1;
       else if (arg[1]=='h') is_h=1; 
       else if (arg[1]=='c') is_c=1; 
@@ -33,6 +34,7 @@ int main(int argc, char* argv[]){
     if (inputs && is_i) inputfiles.push_back(arg);
     if (is_o) {output=argv[i+1]; is_o=0;}
     if (is_b) {bname=argv[i+1]; is_b=0;}
+    if (is_p) {pname=argv[i+1]; is_p=0;}
     if (cuts && is_cuts) v_cuts.push_back(arg);
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
@@ -52,6 +54,7 @@ int main(int argc, char* argv[]){
   if (!is_quiet){
     if (!output.empty()) cout<<"Output name: "<<output<<endl;
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
+    if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (auto i : inputfiles) std::cout<<i<<std::endl;
@@ -73,7 +76,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,is_f,cut_variable,cut_operator,cut_value,is_quiet);
+  Analyzer t(inputfiles,output,bname,pname,is_f,cut_variable,cut_operator,cut_value,is_quiet);
   t.Loop();
   return 1;
 }
@@ -150,7 +153,10 @@ void Analyzer::Loop()
 
    //pu reweight
    //TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/2016DPileUp_FINALCert_forggNtuple.root","read");
-   TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root","read");
+   if (pu_file=="default"){
+     pu_file="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root";
+   }
+   TFile f_dataPU(pu_file.c_str(),"read");
    TH1D *h_dataPU = (TH1D*)f_dataPU.Get("pileup");
    h_dataPU->Scale(1/(h_dataPU->Integral()));
    h_dataPU->SetDirectory(0);

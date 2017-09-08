@@ -816,7 +816,7 @@ public :
    double BtagCSVWP[3]={0.5426,0.8484,0.9535};
    double BtagcMVAWP[3]={-0.5884,0.4432,0.9432};
    double BtagBDSVWP[4]={0.3,0.6,0.8,0.9};
-   std::string output_file="default", btag_file="";
+   std::string output_file="default", btag_file="", pu_file="default";
    unsigned int nFiles=0;
    bool _fastSim=false;
    bool is_quiet=false;
@@ -861,7 +861,7 @@ public :
    TEfficiency* eff_b_BDSV_M2;
    TEfficiency* eff_b_BDSV_T;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -879,7 +879,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool fastSim, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q) : fChain(0) 
 {
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
@@ -891,6 +891,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, bool f
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
   btag_file=btag_fname;
+  if (pu_fname!="") pu_file=pu_fname;
   if (fastSim) _fastSim=true;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
@@ -2046,8 +2047,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
                          {"bcounterBDSV_M1","number of medium 1 BDSV btagged jets"},
                          {"bcounterBDSV_M2","number of medium 2 BDSV btagged jets"},
                          {"bcounterBDSV_T","number of tight BDSV btagged jets"},
-                         {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium, ...) of the higgs candidate ak8jet"},
-                         {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag, ...) of the higgs candidate ak4jets"},
+                         {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
+                         {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
                          {"passBtag","Higgs candidate ak8jet passes medium btag"},
                          {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
                          {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
@@ -2077,6 +2078,7 @@ void PrintHelp(){
   cout<<"-o outname \t\t Output filename will be set: histos/Analyzer_histos_+outname"<<endl;
   cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
   cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
+  cout<<"-p pname \t\t Data PileUp file location and name"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
   cout<<"-q \t\t Quiet option, only errors are printed"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
