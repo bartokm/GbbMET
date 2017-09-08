@@ -2,7 +2,7 @@
 
 git clone https://github.com/bartokm/GbbMET.git
 
-#####Skimmer<br>
+##### Skimmer<br>
 Write skimming condition in CopyTree event loop<br>
 Run CopyTree in root:<br>
 ```bash
@@ -12,11 +12,11 @@ t.Loop()
 ```
 Or use the script: skimmer.csh
 
-#####BTagEff<br>
+##### BTagEff<br>
 This code calculates MC BTag efficiencies and puts the results in a root file.<br>
 The output is needed as an input for Analyzer if running on MC.<br>
 
-#####Analyzer<br>
+##### Analyzer<br>
 First you need some files:<br>
 Electron & Photon ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2<br>
 BTag ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation<br>
