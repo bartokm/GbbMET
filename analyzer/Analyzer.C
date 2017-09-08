@@ -146,16 +146,6 @@ void Analyzer::Loop()
      reader_T_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
      reader_T_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
      reader_T_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
-
-     /*AK8 BT SF not implemented yet
-        BTCalibration calibAK8("bdsvv1", "BDSV_v2.csv");
-        BTCalibrationReader reader_AK8L(BTEntry::OP_LOOSE,"central",{"up", "down"});
-        BTCalibrationReader reader_AK8M(BTEntry::OP_MEDIUM,"central",{"up", "down"});
-        BTCalibrationReader reader_AK8T(BTEntry::OP_TIGHT,"central",{"up", "down"});
-        reader_AK8L.load(calibAK8,BTEntry::FLAV_B,"ak8");
-        reader_AK8M.load(calibAK8,BTEntry::FLAV_B,"ak8");
-        reader_AK8T.load(calibAK8,BTEntry::FLAV_B,"ak8");
-        */
    }
 
    //pu reweight
@@ -403,7 +393,7 @@ void Analyzer::Loop()
        //std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
        newfile=true;
      }
-     if (isData) w=1;
+     w=1;
      //MC weights and scale factors
      if (!isData){
      //getting h_cross_section & total number of events
@@ -510,6 +500,10 @@ void Analyzer::Loop()
            eff_l_CSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_CSV_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_CSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
+           eff_b_BDSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_L"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
+           eff_b_BDSV_M1 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M1"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
+           eff_b_BDSV_M2 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M2"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
+           eff_b_BDSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_T"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
            f_btag.Close();
          }
        }
@@ -830,8 +824,11 @@ void Analyzer::Loop()
      if (!isData && btag_file.size()>0) {
        //AK4
        if (!_fastSim) CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
-       else CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L_fs, reader_M_fs, reader_T_fs, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+       else {
+         CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L_fs, reader_M_fs, reader_T_fs, CSV_SF_L, CSV_SF_M, CSV_SF_T);
        //AK8
+         CalcBtagSF_AK8(AK8JetEta, AK8JetSmearedPt, AK8JetHadFlvr, passBDSV, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, BDSV_SF_L, BDSV_SF_M1, BDSV_SF_M2, BDSV_SF_T);
+       }
      }
      //cuts
      if (_cut_variable.size()>0) {if (!(Cut(ientry))) continue;}
@@ -922,8 +919,8 @@ void Analyzer::Loop()
      h_nPho->Fill(passPhoL.size(),w);
      h_njets->Fill(passJet.size(),w);
      h_CSVbjetsL->Fill(bcounterCSV[1],w);
-     h_CSVbjetsM->Fill(bcounterCSV[2],w*CSV_SF_M[0]);
-     h_CSVbjetsT->Fill(bcounterCSV[3],w*CSV_SF_T[0]);
+     h_CSVbjetsM->Fill(bcounterCSV[2],w);
+     h_CSVbjetsT->Fill(bcounterCSV[3],w);
      h_cMVAbjetsL->Fill(bcountercMVA[1],w);
      h_cMVAbjetsM->Fill(bcountercMVA[2],w);
      h_cMVAbjetsT->Fill(bcountercMVA[3],w);

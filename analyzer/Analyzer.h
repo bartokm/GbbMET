@@ -834,6 +834,7 @@ public :
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
+   double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
    double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1};
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
@@ -855,6 +856,10 @@ public :
    TEfficiency* eff_l_CSV_L;
    TEfficiency* eff_l_CSV_M;
    TEfficiency* eff_l_CSV_T;
+   TEfficiency* eff_b_BDSV_L;
+   TEfficiency* eff_b_BDSV_M1;
+   TEfficiency* eff_b_BDSV_M2;
+   TEfficiency* eff_b_BDSV_T;
 
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, bool fastSim=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
    virtual ~Analyzer();
@@ -867,6 +872,7 @@ public :
    virtual void     Show(Long64_t entry = -1);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    void             CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
+   void             CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]);
 
 };
 
@@ -1767,11 +1773,26 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="bcountercMVA_L") returnvalue*=Parser(bcountercMVA[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcountercMVA_M") returnvalue*=Parser(bcountercMVA[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcountercMVA_T") returnvalue*=Parser(bcountercMVA[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterBDSV_L") returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterBDSV_M") returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterBDSV_T") returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="BDSV_selected") returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="CSV_selected") returnvalue*=Parser(CSV_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterBDSV_L") {returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_L[0];}
+    else if (_cut_variable[i]=="bcounterBDSV_M1") {returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M1[0];}
+    else if (_cut_variable[i]=="bcounterBDSV_M2") {returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M2[0];}
+    else if (_cut_variable[i]=="bcounterBDSV_T") {returnvalue*=Parser(bcounterBDSV[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_T[0];}
+    else if (_cut_variable[i]=="BDSV_selected") {
+      returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
+      if (_fastSim) {
+        if (_cut_value[i]==1) w*=BDSV_SF_L[0];
+        if (_cut_value[i]==2) w*=BDSV_SF_M1[0];
+        if (_cut_value[i]==3) w*=BDSV_SF_M2[0];
+        if (_cut_value[i]==4) w*=BDSV_SF_T[0];
+      }
+    }
+    else if (_cut_variable[i]=="CSV_selected") {
+      returnvalue*=Parser(CSV_selected,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (_cut_value[i]==1) w*=CSV_SF_L[0];
+        if (_cut_value[i]==2) w*=CSV_SF_L[0]*CSV_SF_L[0];
+      }
+    }
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
@@ -1880,6 +1901,115 @@ void Analyzer::CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> 
   SF_T[1] = p_data_up[2]/p_mc[2];
   SF_T[2] = p_data_do[2]/p_mc[2];
 }
+
+void Analyzer::CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]){
+  double p_data[4] = {1,1,1,1}, p_mc[4] = {1,1,1,1}, p_data_up[4] = {1,1,1,1}, p_data_do[4] = {1,1,1,1};
+  for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
+    double mc_eff[4]={0}, eta=0, pt=0;
+    eta=(*v_eta)[it->first];
+    pt=v_pt[it->first];
+    if ((*v_had)[it->first]==5) {
+      mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
+      mc_eff[1] = eff_b_M1->GetEfficiency(eff_b_M1->FindFixBin(eta,pt));
+      mc_eff[2] = eff_b_M2->GetEfficiency(eff_b_M2->FindFixBin(eta,pt));
+      mc_eff[3] = eff_b_T->GetEfficiency(eff_b_T->FindFixBin(eta,pt));
+    }
+    else {
+     continue; 
+    }
+    double SF[4], SF_up[4], SF_do[4];
+    if (pt<350) {SF[0] = 0.96; SF[1] = 0.93; SF[2] = 0.92; SF[3] = 0.85;
+    SF_up[0] = SF[0]+0.03; SF_do[0] = SF[0]-0.02;
+    SF_up[1] = SF[1]+0.03; SF_do[1] = SF[1]-0.02;
+    SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.03;
+    SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.03;
+    }
+    else if (pt<430) {SF[0] = 1.00; SF[1] = 1.01; SF[2] = 1.01; SF[3] = 0.91;
+    SF_up[0] = SF[0]+0.04; SF_do[0] = SF[0]-0.03;
+    SF_up[1] = SF[1]+0.03; SF_do[1] = SF[1]-0.03;
+    SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.04;
+    SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.04;
+    }
+    else if (pt<840) {SF[0] = 1.01; SF[1] = 0.99; SF[2] = 0.92; SF[3] = 0.91;
+    SF_up[0] = SF[0]+0.02; SF_do[0] = SF[0]-0.04;
+    SF_up[1] = SF[1]+0.02; SF_do[1] = SF[1]-0.04;
+    SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.05;
+    SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.04;
+    }
+    else {SF[0] = 1.01; SF[1] = 0.99; SF[2] = 0.92; SF[3] = 0.91;
+    SF_up[0] = SF[0]+2*0.02; SF_do[0] = SF[0]-2*0.04;
+    SF_up[1] = SF[1]+2*0.02; SF_do[1] = SF[1]-2*0.04;
+    SF_up[2] = SF[2]+2*0.03; SF_do[2] = SF[2]-2*0.05;
+    SF_up[3] = SF[3]+2*0.03; SF_do[3] = SF[3]-2*0.04;
+    }
+    if (it->second == '0') {
+      for (int i=0;i<4;i++){
+        p_mc[i]*=(1-mc_eff[i]);
+        p_data[i]*=(1-SF[i]*mc_eff[i]);
+        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
+        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      }
+    } 
+    else if (it->second == 'L') {
+      p_mc[0]*=mc_eff[0];
+      p_data[0]*=SF[0]*mc_eff[0];
+      p_data_up[0]*=SF_up[0]*mc_eff[0];
+      p_data_do[0]*=SF_do[0]*mc_eff[0];
+      for (int i=1;i<4;i++){
+        p_mc[i]*=(1-mc_eff[i]);
+        p_data[i]*=(1-SF[i]*mc_eff[i]);
+        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
+        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      }
+    } 
+    else if (it->second == 'M') {
+      for (int i=0;i<2;i++){
+        p_mc[i]*=mc_eff[i];
+        p_data[i]*=SF[i]*mc_eff[i];
+        p_data_up[i]*=SF_up[i]*mc_eff[i];
+        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      }
+      for (int i=2;i<4;i++){
+        p_mc[i]*=(1-mc_eff[i]);
+        p_data[i]*=(1-SF[i]*mc_eff[i]);
+        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
+        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      }
+    } 
+    else if (it->second == 'H') {
+      for (int i=0;i<3;i++){
+        p_mc[i]*=mc_eff[i];
+        p_data[i]*=SF[i]*mc_eff[i];
+        p_data_up[i]*=SF_up[i]*mc_eff[i];
+        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      }
+      p_mc[3]*=(1-mc_eff[3]);
+      p_data[3]*=(1-SF[3]*mc_eff[3]);
+      p_data_up[3]*=(1-SF_up[3]*mc_eff[3]);
+      p_data_do[3]*=(1-SF_do[3]*mc_eff[3]);
+    } 
+    else if (it->second == 'T') {
+      for (int i=0;i<4;i++){
+        p_mc[i]*=mc_eff[i];
+        p_data[i]*=SF[i]*mc_eff[i];
+        p_data_up[i]*=SF_up[i]*mc_eff[i];
+        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      }
+    } 
+  }
+  SF_L[0] = p_data[0]/p_mc[0];
+  SF_M1[0] = p_data[1]/p_mc[1];
+  SF_M2[0] = p_data[2]/p_mc[2];
+  SF_T[0] = p_data[3]/p_mc[3];
+  SF_L[1] = p_data_up[0]/p_mc[0];
+  SF_L[2] = p_data_do[0]/p_mc[0];
+  SF_M1[1] = p_data_up[1]/p_mc[1];
+  SF_M1[2] = p_data_do[1]/p_mc[1];
+  SF_M2[1] = p_data_up[2]/p_mc[2];
+  SF_M2[2] = p_data_do[2]/p_mc[2];
+  SF_T[1] = p_data_up[3]/p_mc[3];
+  SF_T[2] = p_data_do[3]/p_mc[3];
+}
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
                          {"nPassEleL","number of loose electrons"},
                          {"nPassEleM","number of medium electrons"},
@@ -1913,7 +2043,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
                          {"bcountercMVA_M","number of medium cMVA btagged jets"},
                          {"bcountercMVA_T","number of tight cMVA btagged jets"},
                          {"bcounterBDSV_L","number of loose BDSV btagged jets"},
-                         {"bcounterBDSV_M","number of medium BDSV btagged jets"},
+                         {"bcounterBDSV_M1","number of medium 1 BDSV btagged jets"},
+                         {"bcounterBDSV_M2","number of medium 2 BDSV btagged jets"},
                          {"bcounterBDSV_T","number of tight BDSV btagged jets"},
                          {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium, ...) of the higgs candidate ak8jet"},
                          {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag, ...) of the higgs candidate ak4jets"},
