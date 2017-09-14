@@ -718,7 +718,7 @@ void Analyzer::Loop()
      if (nPassEleM != 0) nleadEleM=passEleM[0];
      if (nPassEleT != 0) nleadEleT=passEleT[0];
      //Fake Rate
-     if (_fakeRate) {
+     if (_fakeRate && nPassEleL != 0) {
        if (abs((*eleEta)[nleadEleL])>1.4442) continue;
        w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleEta)[nleadEleL],(*elePhi)[nleadEleL]));
      }
