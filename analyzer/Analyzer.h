@@ -827,6 +827,8 @@ public :
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
+   int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1;
+   int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
    int BDSV_selected=0, CSV_selected=0;
    bool passBtag=false, passHiggsMass=false;
@@ -1752,6 +1754,12 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
     else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
     else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
+    else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float((*elePt)[nleadEleL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elePtM") returnvalue*=Parser_float((*elePt)[nleadEleM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elePtT") returnvalue*=Parser_float((*elePt)[nleadEleT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="eleCalibPt") returnvalue*=Parser_float((*eleCalibPt)[nleadEleL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="eleCalibPtM") returnvalue*=Parser_float((*eleCalibPt)[nleadEleM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="eleCalibPtT") returnvalue*=Parser_float((*eleCalibPt)[nleadEleT],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float((*phoEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float((*phoEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float((*phoEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
@@ -2021,6 +2029,12 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
                          {"nPassPhoL","number of loose photons"},
                          {"nPassPhoM","number of medium photons"},
                          {"nPassPhoT","number of tight photons"},
+                         {"elePt","Pt of leading loose electron"},
+                         {"elePtM","Pt of leading medium electron"},
+                         {"elePtT","Pt of leading tight electron"},
+                         {"eleCalibPt","CalibPt of leading loose electron"},
+                         {"eleCalibPtM","CalibPt of leading medium electron"},
+                         {"eleCalibPtT","CalibPt of leading tight electron"},
                          {"phoEt","Et of leading loose photon"},
                          {"phoEtM","Et of leading medium photon"},
                          {"phoEtT","Et of leading tight photon"},

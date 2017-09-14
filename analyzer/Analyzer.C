@@ -704,6 +704,9 @@ void Analyzer::Loop()
      nPassEleL=passEleL.size();
      nPassEleM=passEleM.size();
      nPassEleT=passEleT.size();
+     if (passEleL.size() != 0) nleadEleL=passEleL[0];
+     if (passEleM.size() != 0) nleadEleM=passEleM[0];
+     if (passEleT.size() != 0) nleadEleT=passEleT[0];
      //Calculate electron SFs
      if (!isData) {
        if (nPassEleV!=0){
@@ -746,6 +749,9 @@ void Analyzer::Loop()
      nPassMuL=passMuL.size();
      nPassMuM=passMuM.size();
      nPassMuT=passMuT.size();
+     if (passMuL.size() != 0) nleadMuL=passMuL[0];
+     if (passMuM.size() != 0) nleadMuM=passMuM[0];
+     if (passMuT.size() != 0) nleadMuT=passMuT[0];
      //dR between leading photon & leading pt AK8
      double dR_pho_AK8=-1;
      if (passPhoL.size()>0 && passAK8Jet.size()>0){
