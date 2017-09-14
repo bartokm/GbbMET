@@ -5,7 +5,7 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
+  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
   bool inputs=0, cuts=0;
   string output, bname, pname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
@@ -20,6 +20,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='b') is_b=1;
       else if (arg[1]=='p') is_p=1;
       else if (arg[1]=='f') is_f=1;
+      else if (arg[1]=='F') is_F=1;
       else if (arg[1]=='h') is_h=1; 
       else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='q') is_quiet=1; 
@@ -56,6 +57,7 @@ int main(int argc, char* argv[]){
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
     if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
+    if (is_F) cout<<"EGamma Fake Rate is true!"<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (auto i : inputfiles) std::cout<<i<<std::endl;
     if (!cut_variable.size()) cout<<"No cuts are set, running on hardcoded cuts."<<endl;
@@ -76,7 +78,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,cut_variable,cut_operator,cut_value,is_quiet);
+  Analyzer t(inputfiles,output,bname,pname,is_f,is_F,cut_variable,cut_operator,cut_value,is_quiet);
   t.Loop();
   return 1;
 }
@@ -163,7 +165,7 @@ void Analyzer::Loop()
    f_dataPU.Close();
 
    std::string temp_fname="histos/Analyzer_histos"; 
-   if (output_file != "") temp_fname+="_"+output_file;
+   if (output_file != "default") temp_fname+="_"+output_file;
    else temp_fname+=".root";
    TFile f(temp_fname.c_str(),"recreate");
    
@@ -398,6 +400,12 @@ void Analyzer::Loop()
        file_counter++;
        //std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
        newfile=true;
+     }
+     if (_fakeRate && jentry==0) {
+       TFile f_FR("All_results.root","read");
+       h2_FR = (TH2D*)f_FR.Get("FR_Data_EtaPhi_50_110");
+       h2_FR->SetDirectory(0);
+       f_FR.Close();
      }
      w=1;
      //MC weights and scale factors
@@ -707,6 +715,11 @@ void Analyzer::Loop()
      if (passEleL.size() != 0) nleadEleL=passEleL[0];
      if (passEleM.size() != 0) nleadEleM=passEleM[0];
      if (passEleT.size() != 0) nleadEleT=passEleT[0];
+     //Fake Rate
+     if (_fakeRate) {
+       if (abs((*eleEta)[nleadEleL])>1.4442) continue;
+       w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleEta)[nleadEleL],(*elePhi)[nleadEleL]));
+     }
      //Calculate electron SFs
      if (!isData) {
        if (nPassEleV!=0){
