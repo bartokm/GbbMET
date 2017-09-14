@@ -1816,6 +1816,7 @@ Int_t Analyzer::Cut(Long64_t entry)
       if (_fastSim) h_cuts->Fill(i+1,w);
       else h_cuts->Fill(i,w);
     }
+    else break;
   }
   return returnvalue;
 }
@@ -2120,6 +2121,9 @@ void PrintHelp(){
   cout<<"\nExamples:"<<endl;
   cout<<"./Analyzer -i /foo/bar/ggntuple_data.root -o test.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
   cout<<"./Analyzer -i /foo/bar/ggntuple_mc.root -o test.root -b /foo/bar/ggntuple_mc_BTagEff.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
+  cout<<"NOTE: if you want to cut on object's (electron, photon, ...) variable (Pt, Et, ...) first cut on the # of object itself!"<<endl;
+  cout<<"E.g.: --cuts phoCalibEtM great 175\t might BREAK the code! (if there's an event with no photons in ntuple)"<<endl;
+  cout<<"Instead use: --cuts nPassPhoM great 0 phoCalibEtM great 175\t"<<endl;
   cout<<"\nHave fun!"<<endl;
 }
 

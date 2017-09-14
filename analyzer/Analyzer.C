@@ -532,6 +532,8 @@ void Analyzer::Loop()
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0;
      nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
+     nleadEleL=-1; nleadEleM=-1; nleadEleT=-1;
+     nleadMuL=-1; nleadMuM=-1; nleadMuT=-1;
      memset(bcounterCSV,0,sizeof bcounterCSV);
      memset(bcountercMVA,0,sizeof bcountercMVA);
      memset(bcounterBDSV,0,sizeof bcounterBDSV);
@@ -712,9 +714,9 @@ void Analyzer::Loop()
      nPassEleL=passEleL.size();
      nPassEleM=passEleM.size();
      nPassEleT=passEleT.size();
-     if (passEleL.size() != 0) nleadEleL=passEleL[0];
-     if (passEleM.size() != 0) nleadEleM=passEleM[0];
-     if (passEleT.size() != 0) nleadEleT=passEleT[0];
+     if (nPassEleL != 0) nleadEleL=passEleL[0];
+     if (nPassEleM != 0) nleadEleM=passEleM[0];
+     if (nPassEleT != 0) nleadEleT=passEleT[0];
      //Fake Rate
      if (_fakeRate) {
        if (abs((*eleEta)[nleadEleL])>1.4442) continue;
