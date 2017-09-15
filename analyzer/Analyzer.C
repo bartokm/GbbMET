@@ -846,6 +846,9 @@ void Analyzer::Loop()
      }
      m_bb=good_mbb;
      */
+     //NOT AK4 cut
+     notAK4=true;
+     if (passAK4HiggsMass && CSV_selected>=2) notAK4=false;
 
      //Calculate BTag SFs
      if (!isData && btag_file.size()>0) {

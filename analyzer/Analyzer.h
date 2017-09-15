@@ -834,6 +834,7 @@ public :
    int BDSV_selected=0, CSV_selected=0;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
+   bool notAK4=true;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
@@ -1811,6 +1812,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passHiggsMass") returnvalue*=Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
       if (_fastSim) h_cuts->Fill(i+1,w);
@@ -2072,7 +2074,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
   {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
   {"passHiggsMass","At least 1 ak8jet exist with mass 70 to 200GeV"},
-  {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"}};
+  {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
+  {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."}};
 
 bool CompareCuts(vector<string> input_cuts){
   for (auto i : input_cuts) {
