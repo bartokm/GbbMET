@@ -1825,7 +1825,7 @@ Int_t Analyzer::Cut(Long64_t entry)
 
 double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
   double dR=0;
-  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(phi2-phi1,2)+pow(eta1-eta2,2));
+  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(2*M_PI-(phi2-phi1),2)+pow(eta1-eta2,2));
   else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
   return dR;
 }
