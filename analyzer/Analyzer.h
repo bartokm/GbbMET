@@ -1750,6 +1750,7 @@ Int_t Analyzer::Cut(Long64_t entry)
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="isPVGood") returnvalue*=Parser(isPVGood,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
@@ -2027,6 +2028,7 @@ void Analyzer::CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<i
   SF_T[2] = p_data_do[3]/p_mc[3];
 }
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
+  {"isPVGood","Presence of any good vertices, 0 or 1"},
   {"nPassEleL","number of loose electrons"},
   {"nPassEleM","number of medium electrons"},
   {"nPassEleT","number of tight electrons"},

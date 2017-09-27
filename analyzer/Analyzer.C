@@ -285,6 +285,7 @@ void Analyzer::Loop()
      if (ientry < 0) break;
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
      b_isData->GetEntry(ientry); //read only this branch
+     b_isPVGood->GetEntry(ientry);
      if (!isData) {
        b_genWeight->GetEntry(ientry);
        b_nPUInfo->GetEntry(ientry);
