@@ -819,14 +819,18 @@ public :
    std::string output_file="default", btag_file="", pu_file="default";
    unsigned int nFiles=0;
    bool _fastSim=false;
-   bool _fakeRate=false;
+   int _fakeRate=0;
    bool is_quiet=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
+   int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
+   int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
+   int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
+   int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1;
@@ -867,7 +871,7 @@ public :
    //histogram for Fake Rate
    TH2D *h2_FR;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, bool fakeRate=false, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -885,7 +889,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, bool fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -899,7 +903,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   btag_file=btag_fname;
   if (pu_fname!="") pu_file=pu_fname;
   if (fastSim) _fastSim=true;
-  if (fakeRate) _fakeRate=true;
+  if (fakeRate) _fakeRate=fakeRate;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
@@ -1757,6 +1761,12 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="nPassMuL") returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassMuM") returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassMuT") returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
+    else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
+    else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
+    else if (_cut_variable[i]=="nPassElePhoL") returnvalue*=Parser(nPassElePhoL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoM") returnvalue*=Parser(nPassElePhoM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoT") returnvalue*=Parser(nPassElePhoT,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
     else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
     else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
@@ -1766,6 +1776,12 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="eleCalibPt") returnvalue*=Parser_float((*eleCalibPt)[nleadEleL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="eleCalibPtM") returnvalue*=Parser_float((*eleCalibPt)[nleadEleM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="eleCalibPtT") returnvalue*=Parser_float((*eleCalibPt)[nleadEleT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="FReleCalibPt") returnvalue*=Parser_float((*eleCalibPt)[nleadFREleL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="FReleCalibPtM") returnvalue*=Parser_float((*eleCalibPt)[nleadFREleM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="FReleCalibPtT") returnvalue*=Parser_float((*eleCalibPt)[nleadFREleT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elephoCalibPt") returnvalue*=Parser_float((*phoCalibEt)[nleadElePhoL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elephoCalibPtM") returnvalue*=Parser_float((*phoCalibEt)[nleadElePhoM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elephoCalibPtT") returnvalue*=Parser_float((*phoCalibEt)[nleadElePhoT],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float((*phoEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float((*phoEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float((*phoEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
@@ -2035,15 +2051,27 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassMuL","number of loose muons"},
   {"nPassMuM","number of medium muons"},
   {"nPassMuT","number of tight muons"},
+  {"nPassFREleL","number of loose FRele (no overlap removal with photons)"},
+  {"nPassFREleM","number of medium FRele (no overlap removal with photons)"},
+  {"nPassFREleT","number of tight FRele (no overlap removal with photons)"},
+  {"nPassElePhoL","number of loose elephotons (electrons as inverted pixelseed photons)"},
+  {"nPassElePhoM","number of medium elephotons (electrons as inverted pixelseed photons)"},
+  {"nPassElePhoT","number of tight elephotons (electrons as inverted pixelseed photons)"},
   {"nPassPhoL","number of loose photons"},
   {"nPassPhoM","number of medium photons"},
   {"nPassPhoT","number of tight photons"},
   {"elePt","Pt of leading loose electron"},
   {"elePtM","Pt of leading medium electron"},
   {"elePtT","Pt of leading tight electron"},
+  {"FReleCalibPt","CalibPt of leading loose FRelectron"},
+  {"FReleCalibPtM","CalibPt of leading medium FRelectron"},
+  {"FReleCalibPtT","CalibPt of leading tight FRelectron"},
   {"eleCalibPt","CalibPt of leading loose electron"},
   {"eleCalibPtM","CalibPt of leading medium electron"},
   {"eleCalibPtT","CalibPt of leading tight electron"},
+  {"elephoCalibPt","CalibPt of leading loose electronphoton"},
+  {"elephoCalibPtM","CalibPt of leading medium electronphoton"},
+  {"elephoCalibPtT","CalibPt of leading tight electronphoton"},
   {"phoEt","Et of leading loose photon"},
   {"phoEtM","Et of leading medium photon"},
   {"phoEtT","Et of leading tight photon"},
@@ -2104,7 +2132,7 @@ void PrintHelp(){
   cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
   cout<<"-p pname \t\t Data PileUp file location and name"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
-  cout<<"-F \t\t Turn on FakeRate weights to be applied. Needs input file \"All_results.root\""<<endl;
+  cout<<"-F 1 or 2\t\t Turn on FakeRate weights. 1->for electrons 2->\"pixelseed\" electrons. Needs input file \"All_results.root\""<<endl;
   cout<<"-q \t\t Quiet option, only errors are printed"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"-c \t\t Print out available cut variables"<<endl;

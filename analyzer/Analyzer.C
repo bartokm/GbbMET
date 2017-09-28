@@ -7,6 +7,7 @@
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
   bool inputs=0, cuts=0;
+  int FR=0;
   string output, bname, pname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
   vector<double> cut_value;
@@ -36,6 +37,7 @@ int main(int argc, char* argv[]){
     if (is_o) {output=argv[i+1]; is_o=0;}
     if (is_b) {bname=argv[i+1]; is_b=0;}
     if (is_p) {pname=argv[i+1]; is_p=0;}
+    if (is_F) {FR=atoi(argv[i+1]); is_F=0;}
     if (cuts && is_cuts) v_cuts.push_back(arg);
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
@@ -57,7 +59,7 @@ int main(int argc, char* argv[]){
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
     if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
-    if (is_F) cout<<"EGamma Fake Rate is true!"<<endl;
+    if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (auto i : inputfiles) std::cout<<i<<std::endl;
     if (!cut_variable.size()) cout<<"No cuts are set, running on hardcoded cuts."<<endl;
@@ -78,7 +80,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,is_F,cut_variable,cut_operator,cut_value,is_quiet);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet);
   t.Loop();
   return 1;
 }
@@ -527,11 +529,15 @@ void Analyzer::Loop()
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highBDSV=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
      vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT;
+     vector<int> passElePhoL, passElePhoM, passElePhoT;
+     vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
      map<int,char> passCSV, passcMVA, passBDSV;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0;
+     nleadElePhoL=-1; nleadElePhoM=-1; nleadElePhoT=-1;
+     nleadFREleL=-1; nleadFREleM=-1; nleadFREleT=-1;
      nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
      nleadEleL=-1; nleadEleM=-1; nleadEleT=-1;
      nleadMuL=-1; nleadMuM=-1; nleadMuT=-1;
@@ -551,6 +557,17 @@ void Analyzer::Loop()
          passPhoT.push_back(i);
         }
        }
+       if (abs((*phoEta)[i])<2.5 && (*phohasPixelSeed)[i]!=0) {
+        if ((*phoIDbit)[i]>>0&1) {
+         passElePhoL.push_back(i);
+        }
+        if ((*phoIDbit)[i]>>1&1) {
+         passElePhoM.push_back(i);
+        }
+        if ((*phoIDbit)[i]>>2&1) {
+         passElePhoT.push_back(i);
+        }
+       }
      }
      for (auto i : passPhoL) {
        if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoL]) nleadPhoL=i;
@@ -558,6 +575,12 @@ void Analyzer::Loop()
      }
      for (auto i : passPhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoM]) nleadPhoM=i;
      for (auto i : passPhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoT]) nleadPhoT=i;
+     for (auto i : passElePhoL) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoL]) nleadElePhoL=i;
+     for (auto i : passElePhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoM]) nleadElePhoM=i;
+     for (auto i : passElePhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoT]) nleadElePhoT=i;
+     nPassElePhoL=passElePhoL.size();
+     nPassElePhoM=passElePhoM.size();
+     nPassElePhoT=passElePhoT.size();
      nPassPhoL=passPhoL.size();
      nPassPhoM=passPhoM.size();
      nPassPhoT=passPhoT.size();
@@ -695,15 +718,20 @@ void Analyzer::Loop()
      AK8EMHT_after+=HT_after;
      //electron
      for (int i=0;i<nEle;i++) {
-       bool passOverlap=true;
+       bool passOverlap=true, passOverlapJets=true;
        for (auto j : passPhoL) if (deltaR((*elePhi)[i],(*phoPhi)[j],(*eleEta)[i],(*phoEta)[j])<0.3) {
          passOverlap=false;break;
        }
        for (auto j : passAK8Jet) if (deltaR((*elePhi)[i],(*AK8JetPhi)[j],(*eleEta)[i],(*AK8JetEta)[j])<0.5) {
-         passOverlap=false;break;
+         passOverlap=false;passOverlapJets=false;break;
        }
        for (auto j : passJet) if (deltaR((*elePhi)[i],(*jetPhi)[j],(*eleEta)[i],(*jetEta)[j])<0.3) {
-         passOverlap=false;break;
+         passOverlap=false;passOverlapJets=false;break;
+       }
+       if (passOverlapJets) {
+         if ((*eleIDbit)[i]>>1&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleL.push_back(i);
+         if ((*eleIDbit)[i]>>2&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleM.push_back(i);
+         if ((*eleIDbit)[i]>>3&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleT.push_back(i);
        }
        if (!passOverlap) continue;
        if ((*eleIDbit)[i]>>0&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleV.push_back(i);
@@ -718,10 +746,22 @@ void Analyzer::Loop()
      if (nPassEleL != 0) nleadEleL=passEleL[0];
      if (nPassEleM != 0) nleadEleM=passEleM[0];
      if (nPassEleT != 0) nleadEleT=passEleT[0];
+     nPassFREleL=passFREleL.size();
+     nPassFREleM=passFREleM.size();
+     nPassFREleT=passFREleT.size();
+     if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
+     if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
+     if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
      //Fake Rate
-     if (_fakeRate && nPassEleL != 0) {
-       if (abs((*eleEta)[nleadEleL])>1.4442) continue;
-       w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleEta)[nleadEleL],(*elePhi)[nleadEleL]));
+     if (_fakeRate) {
+       if (_fakeRate==1 && nPassFREleL != 0) {
+         if (abs((*eleEta)[nleadFREleL])>1.4442) continue;
+         w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleEta)[nleadFREleL],(*elePhi)[nleadFREleL]));
+       }
+       if (_fakeRate==2 && nPassElePhoL != 0) {
+         if (abs((*phoEta)[nleadElePhoL])>1.4442) continue;
+         w*=h2_FR->GetBinContent(h2_FR->FindBin((*phoEta)[nleadElePhoL],(*phoPhi)[nleadElePhoL]));
+       }
      }
      //Calculate electron SFs
      if (!isData) {
