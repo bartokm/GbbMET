@@ -825,14 +825,14 @@ public :
    vector<double> _cut_value;
    //For cuts
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
-   int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1;
+   int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1, nPassEleNO=-1;
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
    int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
-   int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1;
+   int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
    int BDSV_selected=0, CSV_selected=0;
@@ -844,6 +844,7 @@ public :
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
    double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1};
+   double ele_VETOSF=1;
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
    //histograms
@@ -852,6 +853,7 @@ public :
    //histograms needed for SFs
    TH2F *h_pho_EGamma_SF2D[3];
    TH2F *h_ele_EGamma_SF2D[4];
+   TH2F *h_ele_EGamma_EffMC2D[4];
    TH2F *h_eleRec_EGamma_SF2D;
    TH2D *h_Scaling_Factors_HasPix_R9_high;
    TH2D *h_Scaling_Factors_HasPix_R9_low;
@@ -1755,7 +1757,7 @@ Int_t Analyzer::Cut(Long64_t entry)
   for (unsigned int i=0;i<_cut_variable.size();i++){
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="isPVGood") returnvalue*=Parser(isPVGood,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
+    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]*ele_VETOSF;}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
     else if (_cut_variable[i]=="nPassMuL") returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]);
