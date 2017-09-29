@@ -749,7 +749,7 @@ void Analyzer::Loop()
        if ((*eleIDbit)[i]>>1&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleL.push_back(i);
        if ((*eleIDbit)[i]>>2&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleM.push_back(i);
        if ((*eleIDbit)[i]>>3&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleT.push_back(i);
-       if ((*eleIDbit)[i]>>1&1 == 0 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleNO.push_back(i);
+       if (((*eleIDbit)[i]>>1&1) == 0 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleNO.push_back(i);
      }
      nPassEleV=passEleV.size();
      nPassEleL=passEleL.size();
