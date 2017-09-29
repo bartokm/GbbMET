@@ -174,6 +174,7 @@ void Analyzer::Loop()
    TH1::SetDefaultSumw2();
    
    h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,eleVeto,muVeto,nJet,MT,ST,MET,btag",15,0,15);
+   TH1D *h_eff = new TH1D("h_eff","Events;Before cuts, After cuts",2,0,2);
    TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",70,0,70);
    TH1D *h_nGoodVtx = new TH1D("h_nGoodVtx",";# of good vertices",70,0,70);
    TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",70,0,70);
@@ -924,6 +925,8 @@ void Analyzer::Loop()
          CalcBtagSF_AK8(AK8JetEta, AK8JetSmearedPt, AK8JetHadFlvr, passBDSV, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, BDSV_SF_L, BDSV_SF_M1, BDSV_SF_M2, BDSV_SF_T);
        }
      }
+     //for efficiency
+     h_eff->Fill(0.,w);
      //cuts
      if (_cut_variable.size()>0) {if (!(Cut(ientry))) continue;}
      else {
@@ -979,6 +982,7 @@ void Analyzer::Loop()
      }
 
      //Filling histograms
+     h_eff->Fill(1.,w);
      h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
      h_phoEtaL->Fill((*phoSCEta)[nleadPhoL],w);
      if (passPhoM.size()>0) {
