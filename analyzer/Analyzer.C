@@ -181,9 +181,9 @@ void Analyzer::Loop()
    TH1D *h_phoEtL = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",10,0,1500);
    TH1D *h_phoEtM = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",10,0,1500);
    TH1D *h_phoEtT = new TH1D("h_phoEtT",";CalibE_{T}^{#gamma_T} [GeV]",10,0,1500);
-   TH1D *h_phoEtaL = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
-   TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
-   TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
+   TH1D *h_phoEtaL = new TH1D("h_phoEtaL",";SC#eta^{#gamma_{L}}",30,-3,3);
+   TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";SC#eta^{#gamma_{M}}",30,-3,3);
+   TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";SC#eta^{#gamma_{T}}",30,-3,3);
    const int nbins_pfMET=10;
    double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000};
    TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
@@ -334,6 +334,7 @@ void Analyzer::Loop()
      b_elePhi->GetEntry(ientry);
      b_elePt->GetEntry(ientry);
      b_eleSCEta->GetEntry(ientry);
+     b_eleSCPhi->GetEntry(ientry);
      b_eleCalibPt->GetEntry(ientry);
      b_elePFMiniIso->GetEntry(ientry);
      b_eleIDMVA->GetEntry(ientry);
@@ -353,6 +354,7 @@ void Analyzer::Loop()
      b_phoEta->GetEntry(ientry);
      b_phoPhi->GetEntry(ientry);
      b_phoSCEta->GetEntry(ientry);
+     b_phoSCPhi->GetEntry(ientry);
      b_phoR9->GetEntry(ientry);
      b_phohasPixelSeed->GetEntry(ientry);
      b_phoEleVeto->GetEntry(ientry);
@@ -557,7 +559,7 @@ void Analyzer::Loop()
      memset(bcounterBDSV,0,sizeof bcounterBDSV);
      //photon
      for (int i=0;i<nPho;i++){
-       if (abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0) {
+       if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0) {
         if ((*phoIDbit)[i]>>0&1) {
          passPhoL.push_back(i);
         }
@@ -568,7 +570,7 @@ void Analyzer::Loop()
          passPhoT.push_back(i);
         }
        }
-       if (abs((*phoEta)[i])<2.5 && (*phohasPixelSeed)[i]!=0) {
+       if (abs((*phoSCEta)[i])<2.5 && (*phohasPixelSeed)[i]!=0) {
         if ((*phoIDbit)[i]>>0&1) {
          passElePhoL.push_back(i);
         }
@@ -616,6 +618,96 @@ void Analyzer::Loop()
          else pho_SF[2]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
        }
      }
+     //electron
+     for (int i=0;i<nEle;i++) {
+       bool passOverlap=true;
+         for (auto j : passPhoL) if (deltaR((*eleSCPhi)[i],(*phoSCPhi)[j],(*eleSCEta)[i],(*phoSCEta)[j])<0.3) {
+           passOverlap=false;break;
+         }
+       if ((*eleCalibPt)[i]>5 && abs((*eleSCEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) {
+         if ((*eleIDbit)[i]>>1&1) passFREleL.push_back(i);
+         if ((*eleIDbit)[i]>>2&1) passFREleM.push_back(i);
+         if ((*eleIDbit)[i]>>3&1) passFREleT.push_back(i);
+         if (!passOverlap) continue;
+         if ((*eleIDbit)[i]>>0&1) passEleV.push_back(i);
+         if ((*eleIDbit)[i]>>1&1) passEleL.push_back(i);
+         if ((*eleIDbit)[i]>>2&1) passEleM.push_back(i);
+         if ((*eleIDbit)[i]>>3&1) passEleT.push_back(i);
+         if (((*eleIDbit)[i]>>1&1) == 0) passEleNO.push_back(i);
+       }
+     }
+     nPassEleV=passEleV.size();
+     nPassEleL=passEleL.size();
+     nPassEleM=passEleM.size();
+     nPassEleT=passEleT.size();
+     nPassEleNO=passEleNO.size();
+     if (nPassEleL != 0) nleadEleL=passEleL[0];
+     if (nPassEleM != 0) nleadEleM=passEleM[0];
+     if (nPassEleT != 0) nleadEleT=passEleT[0];
+     if (nPassEleNO != 0) nleadEleNO=passEleNO[0];
+     nPassFREleL=passFREleL.size();
+     nPassFREleM=passFREleM.size();
+     nPassFREleT=passFREleT.size();
+     if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
+     if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
+     if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
+     //Fake Rate
+     if (_fakeRate) {
+       if (_fakeRate==1 && nPassFREleL != 0) {
+         if (abs((*eleSCEta)[nleadFREleL])>1.4442) continue;
+         w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleSCEta)[nleadFREleL],(*eleSCPhi)[nleadFREleL]));
+       }
+       if (_fakeRate==2 && nPassElePhoL != 0) {
+         if (abs((*phoSCEta)[nleadElePhoL])>1.4442) continue;
+         w*=h2_FR->GetBinContent(h2_FR->FindBin((*phoSCEta)[nleadElePhoL],(*phoSCPhi)[nleadElePhoL]));
+       }
+     }
+     //Calculate electron SFs
+     if (!isData) {
+       if (nPassEleV!=0){
+         ele_SF[0]=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         ele_SF[0]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+       }
+       if (nPassEleL!=0){
+         ele_SF[1]=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         ele_SF[1]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+       }
+       if (nPassEleM!=0){
+         ele_SF[2]=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         ele_SF[2]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+       }
+       if (nPassEleT!=0){
+         ele_SF[3]=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         ele_SF[3]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+       }
+       if (nPassEleNO!=0){ //only for loose electrons so far
+         double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
+         double sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
+         ele_VETOSF = (1-sf*epsilon)/(1-epsilon);
+       }
+     }
+     //muon
+     for (int i=0;i<nMu;i++) {
+       bool passOverlap=true;
+       for (auto j : passPhoL) if (deltaR((*muPhi)[i],(*phoSCPhi)[j],(*muEta)[i],(*phoSCEta)[j])<0.3) {
+         passOverlap=false;break;
+       }
+       for (auto j : passEleL) if (deltaR((*muPhi)[i],(*eleSCPhi)[j],(*muEta)[i],(*eleSCEta)[j])<0.3) {
+         passOverlap=false;break;
+       }
+       if (!passOverlap) continue;
+       if ((*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) {
+         if ((*muIDbit)[i]>>0&1) passMuL.push_back(i);
+         if ((*muIDbit)[i]>>1&1) passMuM.push_back(i);
+         if ((*muIDbit)[i]>>2&1) passMuT.push_back(i);
+       }
+     }
+     nPassMuL=passMuL.size();
+     nPassMuM=passMuM.size();
+     nPassMuT=passMuT.size();
+     if (passMuL.size() != 0) nleadMuL=passMuL[0];
+     if (passMuM.size() != 0) nleadMuM=passMuM[0];
+     if (passMuT.size() != 0) nleadMuT=passMuT[0];
      //jet ID
      //bool vetoEvent=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (int i=0;i<nJet;i++) {
@@ -636,7 +728,13 @@ void Analyzer::Loop()
        //  if ((*jetGenEta)[i]==-999) {std::cout<<"veto 999"<<std::endl;vetoEvent=true;}
        //  else if (deltaR((*jetPhi)[i],(*jetGenPhi)[i],(*jetEta)[i],(*jetGenEta)[i])>0.3) {std::cout<<"veto deltar"<<std::endl;vetoEvent=true;}
        //}
-       for (auto j : passPhoL) if (deltaR((*jetPhi)[i],(*phoPhi)[j],(*jetEta)[i],(*phoEta)[j])<0.3) {
+       for (auto j : passPhoL) if (deltaR((*jetPhi)[i],(*phoSCPhi)[j],(*jetEta)[i],(*phoSCEta)[j])<0.3) {
+         passcut=false;break;
+       }
+       for (auto j : passEleL) if (deltaR((*jetPhi)[i],(*eleSCPhi)[j],(*jetEta)[i],(*eleSCEta)[j])<0.3) {
+         passcut=false;break;
+       }
+       for (auto j : passMuL) if (deltaR((*jetPhi)[i],(*muPhi)[j],(*jetEta)[i],(*muEta)[j])<0.3) {
          passcut=false;break;
        }
        if (passcut) passJet.push_back(i);
@@ -692,7 +790,13 @@ void Analyzer::Loop()
        }
        AK8HT_before+=AK8JetSmearedPt[i];
        if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
-       for (auto j : passPhoL) if (deltaR((*AK8JetPhi)[i],(*phoPhi)[j],(*AK8JetEta)[i],(*phoEta)[j])<0.5) {
+       for (auto j : passPhoL) if (deltaR((*AK8JetPhi)[i],(*phoSCPhi)[j],(*AK8JetEta)[i],(*phoSCEta)[j])<0.5) {
+         passcut=false;break;
+       }
+       for (auto j : passEleL) if (deltaR((*AK8JetPhi)[i],(*eleSCPhi)[j],(*AK8JetEta)[i],(*eleSCEta)[j])<0.5) {
+         passcut=false;break;
+       }
+       for (auto j : passMuL) if (deltaR((*AK8JetPhi)[i],(*muPhi)[j],(*AK8JetEta)[i],(*muEta)[j])<0.5) {
          passcut=false;break;
        }
        if (passcut) passAK8Jet.push_back(i);
@@ -727,111 +831,11 @@ void Analyzer::Loop()
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
-     //electron
-     for (int i=0;i<nEle;i++) {
-       bool passOverlap=true, passOverlapJets=true;
-       for (auto j : passPhoL) if (deltaR((*elePhi)[i],(*phoPhi)[j],(*eleEta)[i],(*phoEta)[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passAK8Jet) if (deltaR((*elePhi)[i],(*AK8JetPhi)[j],(*eleEta)[i],(*AK8JetEta)[j])<0.5) {
-         passOverlap=false;passOverlapJets=false;break;
-       }
-       for (auto j : passJet) if (deltaR((*elePhi)[i],(*jetPhi)[j],(*eleEta)[i],(*jetEta)[j])<0.3) {
-         passOverlap=false;passOverlapJets=false;break;
-       }
-       if (passOverlapJets) {
-         if ((*eleIDbit)[i]>>1&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleL.push_back(i);
-         if ((*eleIDbit)[i]>>2&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleM.push_back(i);
-         if ((*eleIDbit)[i]>>3&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passFREleT.push_back(i);
-       }
-       if (!passOverlap) continue;
-       if ((*eleIDbit)[i]>>0&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleV.push_back(i);
-       if ((*eleIDbit)[i]>>1&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleL.push_back(i);
-       if ((*eleIDbit)[i]>>2&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleM.push_back(i);
-       if ((*eleIDbit)[i]>>3&1 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleT.push_back(i);
-       if (((*eleIDbit)[i]>>1&1) == 0 && (*eleCalibPt)[i]>5 && abs((*eleEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) passEleNO.push_back(i);
-     }
-     nPassEleV=passEleV.size();
-     nPassEleL=passEleL.size();
-     nPassEleM=passEleM.size();
-     nPassEleT=passEleT.size();
-     nPassEleNO=passEleNO.size();
-     if (nPassEleL != 0) nleadEleL=passEleL[0];
-     if (nPassEleM != 0) nleadEleM=passEleM[0];
-     if (nPassEleT != 0) nleadEleT=passEleT[0];
-     if (nPassEleNO != 0) nleadEleNO=passEleNO[0];
-     nPassFREleL=passFREleL.size();
-     nPassFREleM=passFREleM.size();
-     nPassFREleT=passFREleT.size();
-     if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
-     if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
-     if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
-     //Fake Rate
-     if (_fakeRate) {
-       if (_fakeRate==1 && nPassFREleL != 0) {
-         if (abs((*eleEta)[nleadFREleL])>1.4442) continue;
-         w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleEta)[nleadFREleL],(*elePhi)[nleadFREleL]));
-       }
-       if (_fakeRate==2 && nPassElePhoL != 0) {
-         if (abs((*phoEta)[nleadElePhoL])>1.4442) continue;
-         w*=h2_FR->GetBinContent(h2_FR->FindBin((*phoEta)[nleadElePhoL],(*phoPhi)[nleadElePhoL]));
-       }
-     }
-     //Calculate electron SFs
-     if (!isData) {
-       if (nPassEleV!=0){
-         ele_SF[0]=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
-         ele_SF[0]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
-       }
-       if (nPassEleL!=0){
-         ele_SF[1]=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
-         ele_SF[1]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
-       }
-       if (nPassEleM!=0){
-         ele_SF[2]=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
-         ele_SF[2]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
-       }
-       if (nPassEleT!=0){
-         ele_SF[3]=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
-         ele_SF[3]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
-       }
-       if (nPassEleNO!=0){ //only for loose electrons so far
-         double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
-         double sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
-         ele_VETOSF = (1-sf*epsilon)/(1-epsilon);
-       }
-     }
-     //muon
-     for (int i=0;i<nMu;i++) {
-       bool passOverlap=true;
-       for (auto j : passPhoL) if (deltaR((*muPhi)[i],(*phoPhi)[j],(*muEta)[i],(*phoEta)[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passAK8Jet) if (deltaR((*muPhi)[i],(*AK8JetPhi)[j],(*muEta)[i],(*AK8JetEta)[j])<0.5) {
-         passOverlap=false;break;
-       }
-       for (auto j : passJet) if (deltaR((*muPhi)[i],(*jetPhi)[j],(*muEta)[i],(*jetEta)[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passEleL) if (deltaR((*muPhi)[i],(*elePhi)[j],(*muEta)[i],(*eleEta)[j])<0.3) {
-         passOverlap=false;break;
-       }
-       if (!passOverlap) continue;
-       if ((*muIDbit)[i]>>0&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuL.push_back(i);
-       if ((*muIDbit)[i]>>1&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuM.push_back(i);
-       if ((*muIDbit)[i]>>2&1 && (*muPt)[i]>5 && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) passMuT.push_back(i);
-     }
-     nPassMuL=passMuL.size();
-     nPassMuM=passMuM.size();
-     nPassMuT=passMuT.size();
-     if (passMuL.size() != 0) nleadMuL=passMuL[0];
-     if (passMuM.size() != 0) nleadMuM=passMuM[0];
-     if (passMuT.size() != 0) nleadMuT=passMuT[0];
      //dR between leading photon & leading pt AK8
      double dR_pho_AK8=-1;
      if (passPhoL.size()>0 && passAK8Jet.size()>0){
        if (abs((*AK8JetEta)[leadpt_ak8])<1.4442){
-         dR_pho_AK8=deltaR((*AK8JetPhi)[leadpt_ak8],(*phoPhi)[nleadPhoL],(*AK8JetEta)[leadpt_ak8],(*phoEta)[nleadPhoL]);
+         dR_pho_AK8=deltaR((*AK8JetPhi)[leadpt_ak8],(*phoSCPhi)[nleadPhoL],(*AK8JetEta)[leadpt_ak8],(*phoSCEta)[nleadPhoL]);
        }
      }
      //MET variables
@@ -839,7 +843,7 @@ void Analyzer::Loop()
      ST+=pfMET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
-     if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoPhi)[nleadPhoL]-pfMETPhi))));
+     if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoSCPhi)[nleadPhoL]-pfMETPhi))));
      
      //find which btag jet to use for Higgs mass
      //AK8
@@ -976,14 +980,14 @@ void Analyzer::Loop()
 
      //Filling histograms
      h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
-     h_phoEtaL->Fill((*phoEta)[nleadPhoL],w);
+     h_phoEtaL->Fill((*phoSCEta)[nleadPhoL],w);
      if (passPhoM.size()>0) {
        h_phoEtM->Fill((*phoCalibEt)[nleadPhoM],w);
-       h_phoEtaM->Fill((*phoEta)[nleadPhoM],w);
+       h_phoEtaM->Fill((*phoSCEta)[nleadPhoM],w);
      }
      if (passPhoT.size()>0){
        h_phoEtT->Fill((*phoCalibEt)[nleadPhoT],w);
-       h_phoEtaT->Fill((*phoEta)[nleadPhoT],w);
+       h_phoEtaT->Fill((*phoSCEta)[nleadPhoT],w);
      }
      h_nVtx->Fill(nVtx,w);
      h_nGoodVtx->Fill(nGoodVtx,w);
