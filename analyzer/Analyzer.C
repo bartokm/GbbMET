@@ -723,19 +723,19 @@ void Analyzer::Loop()
          jetSmearedEn.at(i) = jetp4.Energy();
        }
        HT_before+=jetSmearedPt[i];
-       if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<40 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
+       if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<30 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
        //if (_fastSim && (*jetPt)[i]>20 && abs((*jetEta)[i])<2.5 && (*jetCHF)[i]<0.1) {
        //if (_fastSim && passcut && (*jetCHF)[i]<0.1) {
        //  if ((*jetGenEta)[i]==-999) {std::cout<<"veto 999"<<std::endl;vetoEvent=true;}
        //  else if (deltaR((*jetPhi)[i],(*jetGenPhi)[i],(*jetEta)[i],(*jetGenEta)[i])>0.3) {std::cout<<"veto deltar"<<std::endl;vetoEvent=true;}
        //}
-       for (auto j : passPhoL) if (deltaR((*jetPhi)[i],(*phoSCPhi)[j],(*jetEta)[i],(*phoSCEta)[j])<0.3) {
+       for (auto j : passPhoL) if (deltaR((*jetPhi)[i],(*phoSCPhi)[j],(*jetEta)[i],(*phoSCEta)[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passEleL) if (deltaR((*jetPhi)[i],(*eleSCPhi)[j],(*jetEta)[i],(*eleSCEta)[j])<0.3) {
+       for (auto j : passEleL) if (deltaR((*jetPhi)[i],(*eleSCPhi)[j],(*jetEta)[i],(*eleSCEta)[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passMuL) if (deltaR((*jetPhi)[i],(*muPhi)[j],(*jetEta)[i],(*muEta)[j])<0.3) {
+       for (auto j : passMuL) if (deltaR((*jetPhi)[i],(*muPhi)[j],(*jetEta)[i],(*muEta)[j])<0.4) {
          passcut=false;break;
        }
        if (passcut) passJet.push_back(i);
@@ -791,13 +791,13 @@ void Analyzer::Loop()
        }
        AK8HT_before+=AK8JetSmearedPt[i];
        if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
-       for (auto j : passPhoL) if (deltaR((*AK8JetPhi)[i],(*phoSCPhi)[j],(*AK8JetEta)[i],(*phoSCEta)[j])<0.5) {
+       for (auto j : passPhoL) if (deltaR((*AK8JetPhi)[i],(*phoSCPhi)[j],(*AK8JetEta)[i],(*phoSCEta)[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passEleL) if (deltaR((*AK8JetPhi)[i],(*eleSCPhi)[j],(*AK8JetEta)[i],(*eleSCEta)[j])<0.5) {
+       for (auto j : passEleL) if (deltaR((*AK8JetPhi)[i],(*eleSCPhi)[j],(*AK8JetEta)[i],(*eleSCEta)[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passMuL) if (deltaR((*AK8JetPhi)[i],(*muPhi)[j],(*AK8JetEta)[i],(*muEta)[j])<0.5) {
+       for (auto j : passMuL) if (deltaR((*AK8JetPhi)[i],(*muPhi)[j],(*AK8JetEta)[i],(*muEta)[j])<0.8) {
          passcut=false;break;
        }
        if (passcut) passAK8Jet.push_back(i);
@@ -926,6 +926,7 @@ void Analyzer::Loop()
        }
      }
      //for efficiency
+     if (_fastSim) w*=0.5; //temporary solution to BR=0.5
      h_eff->Fill(0.,w);
      //cuts
      if (_cut_variable.size()>0) {if (!(Cut(ientry))) continue;}
