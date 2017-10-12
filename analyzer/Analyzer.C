@@ -864,6 +864,8 @@ void Analyzer::Loop()
          break;
        }
      }
+     if (!passHiggsMass && nPassAK8>0) SelectedAK8Jet = passAK8Jet.at(0);
+
       //AK4
      passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
      double m_bb=-1;
@@ -886,6 +888,8 @@ void Analyzer::Loop()
        }
        if (passAK4HiggsMass) break;
      }
+     if (!passAK4HiggsMass && nPassAK4>1) {SelectedAK4Jet1 = passJet.at(0); SelectedAK4Jet2 = passJet.at(1);}
+
      /*
      double high_plus=0, high_mult=0, good_mbb=0;
      for (int i=0;i<passJet.size();i++){
