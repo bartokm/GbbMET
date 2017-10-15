@@ -174,65 +174,65 @@ void Analyzer::Loop()
    TH1::SetDefaultSumw2();
    
    h_cuts = new TH1D("h_cuts","cuts;HLT,PhoID,PhoEt,eleVeto,muVeto,nJet,MT,ST,MET,btag",15,0,15);
-   TH1D *h_eff = new TH1D("h_eff","Events;Before cuts, After cuts",2,0,2);
-   TH1D *h_nVtx = new TH1D("h_nVtx",";# of vertices",70,0,70);
-   TH1D *h_nGoodVtx = new TH1D("h_nGoodVtx",";# of good vertices",70,0,70);
-   TH1D *h_nPU = new TH1D("h_nPU",";# of PileUp",70,0,70);
+   TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",2,-0.5,1.5);
+   TH1D *h_nVtx    = new TH1D("h_nVtx",";# of vertices",70,-0.5,69.5);
+   TH1D *h_nGoodVtx    = new TH1D("h_nGoodVtx",";# of good vertices",70,-0.5,69.5);
+   TH1D *h_nPU    = new TH1D("h_nPU",";# of PileUp",70,-0.5,69.5);
 
-   TH1D *h_phoEtL = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",10,0,1500);
-   TH1D *h_phoEtM = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",10,0,1500);
-   TH1D *h_phoEtT = new TH1D("h_phoEtT",";CalibE_{T}^{#gamma_T} [GeV]",10,0,1500);
-   TH1D *h_phoEtaL = new TH1D("h_phoEtaL",";SC#eta^{#gamma_{L}}",30,-3,3);
-   TH1D *h_phoEtaM = new TH1D("h_phoEtaM",";SC#eta^{#gamma_{M}}",30,-3,3);
-   TH1D *h_phoEtaT = new TH1D("h_phoEtaT",";SC#eta^{#gamma_{T}}",30,-3,3);
+   TH1D *h_phoEtL    = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",10,25,1525);
+   TH1D *h_phoEtM    = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",10,25,1525);
+   TH1D *h_phoEtT    = new TH1D("h_phoEtT",";CalibE_{T}^{#gamma_T} [GeV]",10,25,1525);
+   TH1D *h_phoSCEtaL    = new TH1D("h_phoSCEtaL",";#eta^{#gamma_{L}}",30,-3,3);
+   TH1D *h_phoSCEtaM    = new TH1D("h_phoSCEtaM",";#eta^{#gamma_{M}}",30,-3,3);
+   TH1D *h_phoSCEtaT    = new TH1D("h_phoSCEtaT",";#eta^{#gamma_{T}}",30,-3,3);
    const int nbins_pfMET=10;
    double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000};
-   TH1D *h_pfMET = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
-   TH1D *h_pfMETsumEt = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",20,-50,5000);
-   TH1D *h_pfMETPhi = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",20,-4,4);
-   TH1D *h_pfMETSig = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
-   TH2D *h_MET_AK8btag= new TH2D("h_MET_AK8btag","MET vs selected AK8btag;pfMET;BDSV",30,0,1000,30,-1,1);
-   TH2D *h_MET_AK4btag= new TH2D("h_MET_AK4btag","MET vs selected AK4btag1+AK4btag2;pfMET;CSV_{bjet1}+CSV_{bjet2}",30,0,1000,30,0,2);
-   TH1D *h_ST = new TH1D("h_ST",";S_{T} [GeV]",10,0,4000);
-   TH1D *h_ST_G = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
-   TH1D *h_MT = new TH1D("h_MT",";M_{T} [GeV]",10,0,2000);
-   TH1D *h_nPho = new TH1D("h_nPho",";# of #gamma",10,0,10);
-   TH1D *h_nEle= new TH1D("h_nEle",";# of e_{loose}",10,0,10);
-   TH1D *h_nEleM= new TH1D("h_nEleM",";# of e_{medium}",10,0,10);
-   TH1D *h_nEleT= new TH1D("h_nEleT",";# of e_{tight}",10,0,10);
-   TH1D *h_nMu= new TH1D("h_nMu",";# of #mu_{loose}",10,0,10);
-   TH1D *h_nMuM= new TH1D("h_nMuM",";# of #mu_{medium}",10,0,10);
-   TH1D *h_nMuT= new TH1D("h_nMuT",";# of #mu_{tight}",10,0,10);
+   TH1D *h_pfMET    = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
+   TH1D *h_pfMETsumEt    = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",20,-50,5000);
+   TH1D *h_pfMETPhi    = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",20,-4,4);
+   TH1D *h_pfMETSig    = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
+   TH2D *h_MET_AK8btag    = new TH2D("h_MET_AK8btag","MET vs selected AK8btag;pfMET;BDSV",30,5,980,30,-1,1);
+   TH2D *h_MET_AK4btag    = new TH2D("h_MET_AK4btag","MET vs selected AK4btag1+AK4btag2;pfMET;CSV_{bjet1}+CSV_{bjet2}",30,5,980,30,0,2);
+   TH1D *h_ST    = new TH1D("h_ST",";S_{T} [GeV]",10,200,4200);
+   TH1D *h_ST_G    = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
+   TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",10,100,2100);
+   TH1D *h_nPho    = new TH1D("h_nPho",";# of #gamma",10,-0.5,9.5);
+   TH1D *h_nEle    = new TH1D("h_nEle",";# of e_{loose}",10,-0.5,9.5);
+   TH1D *h_nEleM    = new TH1D("h_nEleM",";# of e_{medium}",10,-0.5,9.5);
+   TH1D *h_nEleT    = new TH1D("h_nEleT",";# of e_{tight}",10,-0.5,9.5);
+   TH1D *h_nMu    = new TH1D("h_nMu",";# of #mu_{loose}",10,-0.5,9.5);
+   TH1D *h_nMuM    = new TH1D("h_nMuM",";# of #mu_{medium}",10,-0.5,9.5);
+   TH1D *h_nMuT    = new TH1D("h_nMuT",";# of #mu_{tight}",10,-0.5,9.5);
 
-   TH1D *h_njets = new TH1D("h_njets",";# of jets",15,0,15);
-   TH1D *h_jetpt = new TH1D("h_jetpt","Leading jetpt;p_{T}^{Leading jet} [GeV]",10,0,2000);
-   TH1D *h_nAK8jets = new TH1D("h_nAK8jets",";# of AK8jets",15,0,15);
-   TH1D *h_AK8jetpt = new TH1D("h_AK8jetpt","Leading AK8jetpt;p_{T}^{Leading AK8jet} [GeV]",10,0,2000);
-   TH1D *h_AK8bjetpt = new TH1D("h_AK8bjetpt","Btagged AK8jetpt;p_{T}^{btagged AK8jet} [GeV]",10,0,2000);
-   TH1D *h_AK8bhjetpt = new TH1D("h_AK8bhjetpt","Btagged,Higgs-mass AK8jetpt;p_{T}^{Higgs btagged AK8jet} [GeV]",10,0,2000);
-   TH1D *h_AK8ljetmass = new TH1D("h_AK8ljetmass","Leading AK8jetmass;m_{AK8leading jet} [GeV]",10,0,700);
-   TH1D *h_AK8jetmass = new TH1D("h_AK8jetmass","AK8jetmass;m_{AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bjetmass = new TH1D("h_AK8bjetmass","Btagged AK8jetmass;m_{btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bhjetmass = new TH1D("h_AK8bhjetmass","Btagged, Higgs-mass AK8jetmass;m_{Higgs btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bPrunedjetmass = new TH1D("h_AK8bPrunedjetmass","Btagged AK8Prunedjetmass;Pruned m_{btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bhPrunedjetmass = new TH1D("h_AK8bhPrunedjetmass","Btagged, Higgs-mass AK8Prunedjetmass;Pruned m_{Higgs btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bPrunedCorrjetmass = new TH1D("h_AK8bPrunedCorrjetmass","Btagged AK8PrunedCorrjetmass;PrunedCorr m_{btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8bhPrunedCorrjetmass = new TH1D("h_AK8bhPrunedCorrjetmass","Btagged, Higgs-mass AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,0,700);
-   TH1D *h_AK8tau1= new TH1D("h_AK8tau1",";#tau_{1}^{AK8Jet}",10,0,1);
-   TH1D *h_AK8tau2= new TH1D("h_AK8tau2",";#tau_{2}^{AK8Jet}",10,0,1);
-   TH1D *h_AK8tau3= new TH1D("h_AK8tau3",";#tau_{3}^{AK8Jet}",10,0,1);
-   TH1D *h_AK8tau2_tau1= new TH1D("h_AK8tau2_tau1",";AK8Jet_tau2/tau1",10,0,1);
-   TH1D *h_AK8tau3_tau2= new TH1D("h_AK8tau3_tau2",";AK8Jet_tau3/tau2",10,0,1);
+   TH1D *h_njets    = new TH1D("h_njets",";# of jets",15,-0.5,14.5);
+   TH1D *h_jetpt    = new TH1D("h_jetpt","Leading jetpt;p_{T}^{Leading jet} [GeV]",10,30,2030);
+   TH1D *h_nAK8jets    = new TH1D("h_nAK8jets",";# of AK8jets",15,-0.5,14.5);
+   TH1D *h_AK8jetpt    = new TH1D("h_AK8jetpt","Leading AK8jetpt;p_{T}^{Leading AK8jet} [GeV]",10,30,2030);
+   TH1D *h_AK8bjetpt    = new TH1D("h_AK8bjetpt","Btagged AK8jetpt;p_{T}^{btagged AK8jet} [GeV]",10,100,2100);
+   TH1D *h_AK8bhjetpt    = new TH1D("h_AK8bhjetpt","Btagged,Higgs-mass AK8jetpt;p_{T}^{Higgs btagged AK8jet} [GeV]",10,100,2100);
+   TH1D *h_AK8ljetmass    = new TH1D("h_AK8ljetmass","Leading AK8jetmass;m_{AK8leading jet} [GeV]",10,5,655);
+   TH1D *h_AK8jetmass    = new TH1D("h_AK8jetmass","AK8jetmass;m_{AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bjetmass    = new TH1D("h_AK8bjetmass","Btagged AK8jetmass;m_{btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bhjetmass    = new TH1D("h_AK8bhjetmass","Btagged, Higgs-mass AK8jetmass;m_{Higgs btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bPrunedjetmass    = new TH1D("h_AK8bPrunedjetmass","Btagged AK8Prunedjetmass;Pruned m_{btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bhPrunedjetmass    = new TH1D("h_AK8bhPrunedjetmass","Btagged, Higgs-mass AK8Prunedjetmass;Pruned m_{Higgs btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bPrunedCorrjetmass    = new TH1D("h_AK8bPrunedCorrjetmass","Btagged AK8PrunedCorrjetmass;PrunedCorr m_{btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8bhPrunedCorrjetmass    = new TH1D("h_AK8bhPrunedCorrjetmass","Btagged, Higgs-mass AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8tau1    = new TH1D("h_AK8tau1",";#tau_{1}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8tau2    = new TH1D("h_AK8tau2",";#tau_{2}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8tau3    = new TH1D("h_AK8tau3",";#tau_{3}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8tau2_tau1    = new TH1D("h_AK8tau2_tau1",";AK8Jet_tau2/tau1",10,0,1);
+   TH1D *h_AK8tau3_tau2    = new TH1D("h_AK8tau3_tau2",";AK8Jet_tau3/tau2",10,0,1);
    
-   TH1D *h_CSVbjetsL = new TH1D("h_CSVbjetsL",";# of CSVLoosebjets",10,0,10);
-   TH1D *h_CSVbjetsM = new TH1D("h_CSVbjetsM",";# of CSVMediumbjets",10,0,10);
-   TH1D *h_CSVbjetsT = new TH1D("h_CSVbjetsT",";# of CSVTightbjets",10,0,10);
-   TH1D *h_cMVAbjetsL = new TH1D("h_cMVAbjetsL",";# of cMVALoosebjets",10,0,10);
-   TH1D *h_cMVAbjetsM = new TH1D("h_cMVAbjetsM",";# of cMVAMediumbjets",10,0,10);
-   TH1D *h_cMVAbjetsT = new TH1D("h_cMVAbjetsT",";# of cMVATightbjets",10,0,10);
-   TH1D *h_BDSVbjetsL = new TH1D("h_BDSVbjetsL",";# of BDSVLoosebjets",10,0,10);
-   TH1D *h_BDSVbjetsM = new TH1D("h_BDSVbjetsM",";# of BDSVMediumbjets",10,0,10);
-   TH1D *h_BDSVbjetsT = new TH1D("h_BDSVbjetsT",";# of BDSVTightbjets",10,0,10);
+   TH1D *h_CSVbjetsL    = new TH1D("h_CSVbjetsL",";# of CSVLoosebjets",10,-0.5,9.5);
+   TH1D *h_CSVbjetsM    = new TH1D("h_CSVbjetsM",";# of CSVMediumbjets",10,-0.5,9.5);
+   TH1D *h_CSVbjetsT    = new TH1D("h_CSVbjetsT",";# of CSVTightbjets",10,-0.5,9.5);
+   TH1D *h_cMVAbjetsL    = new TH1D("h_cMVAbjetsL",";# of cMVALoosebjets",10,-0.5,9.5);
+   TH1D *h_cMVAbjetsM    = new TH1D("h_cMVAbjetsM",";# of cMVAMediumbjets",10,-0.5,9.5);
+   TH1D *h_cMVAbjetsT    = new TH1D("h_cMVAbjetsT",";# of cMVATightbjets",10,-0.5,9.5);
+   TH1D *h_BDSVbjetsL    = new TH1D("h_BDSVbjetsL",";# of BDSVLoosebjets",10,-0.5,9.5);
+   TH1D *h_BDSVbjetsM    = new TH1D("h_BDSVbjetsM",";# of BDSVMediumbjets",10,-0.5,9.5);
+   TH1D *h_BDSVbjetsT    = new TH1D("h_BDSVbjetsT",";# of BDSVTightbjets",10,-0.5,9.5);
     
    TH1D *h_dRphoAK8jet= new TH1D("h_dRphoAK8jet","Distance between leading photon and leading AK8jet;dR",20,0,8);
    
@@ -249,9 +249,9 @@ void Analyzer::Loop()
    TH1D *h_bjetcMVA = new TH1D("h_bjetcMVA","Highest cMVA;CombinedMVAV2BJetTags",10,-1,1);
    TH1D *h_bjetcMVA2 = new TH1D("h_bjetcMVA2","2nd Highest cMVA;CombinedMVAV2BJetTags",10,-1,1);
 
-   TH1D *h_selectAK8bjetpt= new TH1D("h_selectAK8bjetpt","Selected AK8 jet pt;pt[GeV]",10,0,2000);
-   TH1D *h_selectbjetpt= new TH1D("h_selectbjetpt","Selected jet pt1;pt[GeV]",10,0,2000);
-   TH1D *h_selectbjetpt2= new TH1D("h_selectbjetpt2","Selected jet pt2;pt[GeV]",10,0,2000);
+   TH1D *h_selectAK8bjetpt    = new TH1D("h_selectAK8bjetpt","Selected AK8 jet pt;pt[GeV]",10,100,2100);
+   TH1D *h_selectbjetpt    = new TH1D("h_selectbjetpt","Selected jet pt1;pt[GeV]",10,30,2030);
+   TH1D *h_selectbjetpt2    = new TH1D("h_selectbjetpt2","Selected jet pt2;pt[GeV]",10,30,2030);
   
    TH1D *h_HT_before = new TH1D("h_HT_before","HT before cuts;HT",10,0,3500);
    TH1D *h_EMHT_before = new TH1D("h_EMHT_before","EMHT before cuts;EMHT",10,0,3500);
@@ -263,16 +263,16 @@ void Analyzer::Loop()
    TH1D *h_AK8HT_after = new TH1D("h_AK8HT_after","AK8HT after cuts;HT",10,0,3500);
    TH1D *h_AK8EMHT_after = new TH1D("h_AK8EMHT_after","AK8EMHT after cuts;EMHT",10,0,3500);
   
-   TH1D *h_AK8PrunedCorrjetmass_select = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,0,250);
-   TH1D *h_AK8PrunedCorrjetmass_withABCD= new TH1D("h_AK8PrunedCorrjetmass_select_withABCD","Highest btagged AK8PrunedCorrjetmass in Higgs mass range;PrunedCorr m_{highest btag AK8jets} [GeV]",10,0,250);
-   TH2D *h_AK8mass_vs_pt= new TH2D("h_AK8mass_vs_pt","Highest btagged AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,0,250,40,0,1500);
-   TH2D *h_AK8mass_all_vs_pt= new TH2D("h_AK8mass_all_vs_pt","All AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,0,250,40,0,1500);
-   TH1D *h_mbbjet_select= new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",10,0,250);
-   TH1D *h_mbbjet_withABCD= new TH1D("h_mbbjet_select_withABCD","Invariant mass of highest btag bjets in Higgs mass range;M_{bb}[GeV]",10,0,250);
-   TH2D *h_mbbjet_vs_pt1= new TH2D("h_mbbjet_vs_pt1","Invariant mass of highest btag bjets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
-   TH2D *h_mbbjet_vs_pt2= new TH2D("h_mbbjet_vs_pt2","Invariant mass of highest btag bjets in Higgs mass range vs 2nd p_{T};M_{bb}[GeV];p_{T}^{2} [GeV]",20,0,250,30,0,1000);
-   TH2D *h_mbbjet_comb_vs_pt1= new TH2D("h_mbbjet_comb_vs_pt1","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
-   TH2D *h_mbbjet_comb_vs_pt2= new TH2D("h_mbbjet_comb_vs_pt2","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,0,250,30,0,1000);
+   TH1D *h_AK8PrunedCorrjetmass_select    = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,18,278);
+   TH1D *h_AK8PrunedCorrjetmass_withABCD    = new TH1D("h_AK8PrunedCorrjetmass_select_withABCD","Highest btagged AK8PrunedCorrjetmass in Higgs mass range;PrunedCorr m_{highest btag AK8jets} [GeV]",10,18,278);
+   TH2D *h_AK8mass_vs_pt    = new TH2D("h_AK8mass_vs_pt","Highest btagged AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,18,278,50,0,1500);
+   TH2D *h_AK8mass_all_vs_pt    = new TH2D("h_AK8mass_all_vs_pt","All AK8PrunedCorrjetmass in Higgs mass range vs its pt;PrunedCorr m_{highest btag AK8jets} [GeV];p_{T}^{highest btag AK8jets} [GeV]",20,18,278,50,0,1500);
+   TH1D *h_mbbjet_select    = new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",10,18,278);
+   TH1D *h_mbbjet_withABCD    = new TH1D("h_mbbjet_select_withABCD","Invariant mass of highest btag bjets in Higgs mass range;M_{bb}[GeV]",10,18,278);
+   TH2D *h_mbbjet_vs_pt1    = new TH2D("h_mbbjet_vs_pt1","Invariant mass of highest btag bjets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,18,278,30,30,1030);
+   TH2D *h_mbbjet_vs_pt2    = new TH2D("h_mbbjet_vs_pt2","Invariant mass of highest btag bjets in Higgs mass range vs 2nd p_{T};M_{bb}[GeV];p_{T}^{2} [GeV]",20,18,278,30,30,1030);
+   TH2D *h_mbbjet_comb_vs_pt1    = new TH2D("h_mbbjet_comb_vs_pt1","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,18,278,30,30,1030);
+   TH2D *h_mbbjet_comb_vs_pt2    = new TH2D("h_mbbjet_comb_vs_pt2","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,18,278,30,30,1030);
 
    TBenchmark time;
    TDatime now;
@@ -989,14 +989,14 @@ void Analyzer::Loop()
      //Filling histograms
      h_eff->Fill(1.,w);
      h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
-     h_phoEtaL->Fill((*phoSCEta)[nleadPhoL],w);
+     h_phoSCEtaL->Fill((*phoSCEta)[nleadPhoL],w);
      if (passPhoM.size()>0) {
        h_phoEtM->Fill((*phoCalibEt)[nleadPhoM],w);
-       h_phoEtaM->Fill((*phoSCEta)[nleadPhoM],w);
+       h_phoSCEtaM->Fill((*phoSCEta)[nleadPhoM],w);
      }
      if (passPhoT.size()>0){
        h_phoEtT->Fill((*phoCalibEt)[nleadPhoT],w);
-       h_phoEtaT->Fill((*phoSCEta)[nleadPhoT],w);
+       h_phoSCEtaT->Fill((*phoSCEta)[nleadPhoT],w);
      }
      h_nVtx->Fill(nVtx,w);
      h_nGoodVtx->Fill(nGoodVtx,w);
