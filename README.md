@@ -21,6 +21,7 @@ First you need some files:<br>
 Electron & Photon ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2<br>
 BTag ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation<br>
 Data pileup distribution: /afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root<br>
+Download these files into "input" directory<br>
 Compile analyzer with makefile, then run Analyzer. Note: there is a warning after compilation, please ignore it.<br>
 ```bash
 make clean; make
