@@ -125,7 +125,7 @@ void Analyzer::Loop()
    BTCalibrationReader reader_L, reader_M, reader_T, reader_L_fs, reader_M_fs, reader_T_fs;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
    if (btag_file.size()>0){
-     calib = *new BTCalibration("csvv1", "CSVv2_Moriond17_B_H.csv");
+     calib = *new BTCalibration("csvv1", "input/CSVv2_Moriond17_B_H.csv");
      reader_L = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
      reader_M = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
      reader_T = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
@@ -140,7 +140,7 @@ void Analyzer::Loop()
      reader_T.load(calib,BTEntry::FLAV_UDSG,"incl");
      
      //fastsim
-     calib_fs = *new BTCalibration("csvv1_fs", "fastsim_v2.csv");
+     calib_fs = *new BTCalibration("csvv1_fs", "input/fastsim_v2.csv");
      reader_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
      reader_M_fs = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
      reader_T_fs = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
@@ -158,7 +158,7 @@ void Analyzer::Loop()
    //pu reweight
    //TFile f_dataPU("/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/2016DPileUp_FINALCert_forggNtuple.root","read");
    if (pu_file=="default"){
-     pu_file="/afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root";
+     pu_file="input/Full2016PileUp_ReReco_FINALCert_forggNtuple.root";
    }
    TFile f_dataPU(pu_file.c_str(),"read");
    TH1D *h_dataPU = (TH1D*)f_dataPU.Get("pileup");
@@ -408,7 +408,7 @@ void Analyzer::Loop()
        newfile=true;
      }
      if (_fakeRate && jentry==0) {
-       TFile f_FR("All_results.root","read");
+       TFile f_FR("input/All_results.root","read");
        h2_FR = (TH2D*)f_FR.Get("FR_Data_EtaPhi_50_110");
        h2_FR->SetDirectory(0);
        f_FR.Close();
@@ -462,55 +462,55 @@ void Analyzer::Loop()
        //Scale factors
        if (jentry==0) {
          //photon cutbased loose
-         TFile f_phoLooseSF("pho_looseSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_phoLooseSF("input/pho_looseSF_egammaEffi.txt_EGM2D.root","read");
          h_pho_EGamma_SF2D[0] = (TH2F*)f_phoLooseSF.Get("EGamma_SF2D");
          h_pho_EGamma_SF2D[0]->SetDirectory(0);
          f_phoLooseSF.Close();
          //photon cutbased medium
-         TFile f_phoMediumSF("pho_mediumSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_phoMediumSF("input/pho_mediumSF_egammaEffi.txt_EGM2D.root","read");
          h_pho_EGamma_SF2D[1] = (TH2F*)f_phoMediumSF.Get("EGamma_SF2D");
          h_pho_EGamma_SF2D[1]->SetDirectory(0);
          f_phoMediumSF.Close();
          //photon cutbased tight
-         TFile f_phoTightSF("pho_tightSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_phoTightSF("input/pho_tightSF_egammaEffi.txt_EGM2D.root","read");
          h_pho_EGamma_SF2D[2] = (TH2F*)f_phoTightSF.Get("EGamma_SF2D");
          h_pho_EGamma_SF2D[2]->SetDirectory(0);
          f_phoTightSF.Close();
          //photon haspixelseed SF
-         TFile f_phoPV("ScalingFactors_80X_Summer16.root","read");
+         TFile f_phoPV("input/ScalingFactors_80X_Summer16.root","read");
          h_Scaling_Factors_HasPix_R9_high = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 > 0.94");
          h_Scaling_Factors_HasPix_R9_high->SetDirectory(0);
          h_Scaling_Factors_HasPix_R9_low = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 < 0.94");
          h_Scaling_Factors_HasPix_R9_low->SetDirectory(0);
          f_phoPV.Close();
          //electron reconstruction efficiency
-         TFile f_eleRecSF("ele_recEff_egammaEffi.txt_EGM2D.root","read");
+         TFile f_eleRecSF("input/ele_recEff_egammaEffi.txt_EGM2D.root","read");
          h_eleRec_EGamma_SF2D = (TH2F*)f_eleRecSF.Get("EGamma_SF2D");
          h_eleRec_EGamma_SF2D->SetDirectory(0);
          f_eleRecSF.Close();
          //electron cutbased veto
-         TFile f_eleVetoSF("ele_vetoSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_eleVetoSF("input/ele_vetoSF_egammaEffi.txt_EGM2D.root","read");
          h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
          h_ele_EGamma_SF2D[0]->SetDirectory(0);
          h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
          h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
          f_eleVetoSF.Close();
          //electron cutbased loose
-         TFile f_eleLooseSF("ele_looseSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_eleLooseSF("input/ele_looseSF_egammaEffi.txt_EGM2D.root","read");
          h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
          h_ele_EGamma_SF2D[1]->SetDirectory(0);
          h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
          h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
          f_eleLooseSF.Close();
          //electron cutbased medium
-         TFile f_eleMediumSF("ele_mediumSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_eleMediumSF("input/ele_mediumSF_egammaEffi.txt_EGM2D.root","read");
          h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
          h_ele_EGamma_SF2D[2]->SetDirectory(0);
          h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
          h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
          f_eleMediumSF.Close();
          //electron cutbased tight
-         TFile f_eleTightSF("ele_tightSF_egammaEffi.txt_EGM2D.root","read");
+         TFile f_eleTightSF("input/ele_tightSF_egammaEffi.txt_EGM2D.root","read");
          h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
          h_ele_EGamma_SF2D[3]->SetDirectory(0);
          h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");

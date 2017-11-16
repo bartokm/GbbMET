@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <THStack.h>
-#include "tdrstyle.C"
+#include "input/tdrstyle.C"
 using namespace std;
 
 TH1* Sum(THStack s){

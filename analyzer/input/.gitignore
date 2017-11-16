@@ -1,0 +1,7 @@
+# Ignore everything in this directory
+*
+# Except this file
+!BTCalibrationStandalone.cpp
+!BTCalibrationStandalone.h
+!tdrstyle.C
+!.gitignore
