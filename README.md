@@ -19,6 +19,7 @@ The output is needed as an input for Analyzer if running on MC.<br>
 ##### Analyzer<br>
 First you need some files:<br>
 Electron & Photon ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/EgammaIDRecipesRun2<br>
+Muon ScaleFactors: https://twiki.cern.ch/twiki/bin/viewauth/CMS/MuonWorkInProgressAndPagResults<br>
 BTag ScaleFactors: https://twiki.cern.ch/twiki/bin/view/CMS/BtagRecommendation<br>
 Data pileup distribution: /afs/cern.ch/work/m/mbartok/public/data/ggNtuples/13TeV_data/PILEUP/Full2016PileUp_ReReco_FINALCert_forggNtuple.root<br>
 Download these files into "input" directory<br>
