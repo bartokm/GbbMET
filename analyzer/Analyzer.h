@@ -828,12 +828,12 @@ public :
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1, nPassEleNO=-1;
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
-   int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1;
+   int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
    int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
-   int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1;
+   int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={};
    int BDSV_selected=0, CSV_selected=0;
    bool passBtag=false, passHiggsMass=false;
@@ -843,8 +843,8 @@ public :
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1};
-   double ele_VETOSF=1;
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1};
+   double ele_VETOSF=1, mu_VETOSF=1;
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
    //histograms
@@ -857,6 +857,10 @@ public :
    TH2F *h_eleRec_EGamma_SF2D;
    TH2D *h_Scaling_Factors_HasPix_R9_high;
    TH2D *h_Scaling_Factors_HasPix_R9_low;
+   TH2D *h_muID_SF2D[3];
+   TH2D *h_muID_EffMC2D[3];
+   TH2D *h_muISO_SF2D[3];
+   TH2D *h_muTRK_SF2D[3];
    TEfficiency* eff_b_CSV_L;
    TEfficiency* eff_b_CSV_M;
    TEfficiency* eff_b_CSV_T;
@@ -1760,9 +1764,10 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]*ele_VETOSF;}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
-    else if (_cut_variable[i]=="nPassMuL") returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassMuM") returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassMuT") returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]);
+    //else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0]*mu_VETOSF;}
+    else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];} //mu_VETOSF not yet appliead because of dubious results
+    else if (_cut_variable[i]=="nPassMuM") {returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[1];}
+    else if (_cut_variable[i]=="nPassMuT") {returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[2];}
     else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
     else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}

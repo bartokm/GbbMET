@@ -283,7 +283,7 @@ void Analyzer::Loop()
    ULong64_t TotalEvents=1;
    int zbx=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //for (Long64_t jentry=0; jentry<10;jentry++) {
+   //for (Long64_t jentry=0; jentry<10000;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -516,6 +516,52 @@ void Analyzer::Loop()
          h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
          h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
          f_eleTightSF.Close();
+         //Muon ID SF
+         float lum_ratio_BCDEF = 0.5481;
+         TH2D *h_temp[3], *h_temp_eff[3];
+         TFile f_muID_BCDEF("input/EfficienciesAndSF_BCDEF.root","read");
+         h_temp[0] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_temp[1] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_temp[2] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_temp_eff[0] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         h_temp_eff[1] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         h_temp_eff[2] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         for (auto i : h_temp) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
+         for (auto i : h_temp_eff) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
+         f_muID_BCDEF.Close();
+         TFile f_muID_GH("input/EfficienciesAndSF_GH.root","read");
+         h_muID_SF2D[0] = (TH2D*)f_muID_GH.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_muID_SF2D[1] = (TH2D*)f_muID_GH.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_muID_SF2D[2] = (TH2D*)f_muID_GH.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
+         h_muID_EffMC2D[0] = (TH2D*)f_muID_GH.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         h_muID_EffMC2D[1] = (TH2D*)f_muID_GH.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         h_muID_EffMC2D[2] = (TH2D*)f_muID_GH.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
+         for (auto i : h_muID_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
+         for (auto i : h_muID_EffMC2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
+         f_muID_GH.Close();
+         h_muID_SF2D[0]->Add(h_temp[0]);
+         h_muID_SF2D[1]->Add(h_temp[1]);
+         h_muID_SF2D[2]->Add(h_temp[2]);
+         h_muID_EffMC2D[0]->Add(h_temp_eff[0]);
+         h_muID_EffMC2D[1]->Add(h_temp_eff[1]);
+         h_muID_EffMC2D[2]->Add(h_temp_eff[2]);
+         //Muon ISO SF
+         TFile f_muISO_BCDEF("input/EfficienciesAndSF_ISO_BCDEF.root","read");
+         h_temp[0] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_LooseID_pt_eta/pt_abseta_ratio");
+         h_temp[1] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_MediumID_pt_eta/pt_abseta_ratio");
+         h_temp[2] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_TightID_pt_eta/pt_abseta_ratio");
+         for (auto i : h_temp) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
+         f_muISO_BCDEF.Close();
+         TFile f_muISO_GH("input/EfficienciesAndSF_ISO_GH.root","read");
+         h_muISO_SF2D[0] = (TH2D*)f_muISO_GH.Get("LooseISO_LooseID_pt_eta/pt_abseta_ratio");
+         h_muISO_SF2D[1] = (TH2D*)f_muISO_GH.Get("LooseISO_MediumID_pt_eta/pt_abseta_ratio");
+         h_muISO_SF2D[2] = (TH2D*)f_muISO_GH.Get("LooseISO_TightID_pt_eta/pt_abseta_ratio");
+         for (auto i : h_muISO_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
+         f_muISO_GH.Close();
+         h_muISO_SF2D[0]->Add(h_temp[0]);
+         h_muISO_SF2D[1]->Add(h_temp[1]);
+         h_muISO_SF2D[2]->Add(h_temp[2]);
+
          //Loading btag efficiency file, fill efficiency histograms
          if (btag_file.size()>0) {
            TFile f_btag(btag_file.c_str(),"read");
@@ -539,7 +585,7 @@ void Analyzer::Loop()
      
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highBDSV=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
-     vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT;
+     vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT, passMuNO;
      vector<int> passElePhoL, passElePhoM, passElePhoT, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
@@ -552,8 +598,8 @@ void Analyzer::Loop()
      nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
      nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
      nleadMuL=-1; nleadMuM=-1; nleadMuT=-1;
-     ele_VETOSF=1;
-     for (int i=0;i<3;i++) pho_SF[i]=1;
+     ele_VETOSF=1, mu_VETOSF=1;
+     for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
      memset(bcounterCSV,0,sizeof bcounterCSV);
      memset(bcountercMVA,0,sizeof bcountercMVA);
@@ -701,14 +747,39 @@ void Analyzer::Loop()
          if ((*muIDbit)[i]>>0&1) passMuL.push_back(i);
          if ((*muIDbit)[i]>>1&1) passMuM.push_back(i);
          if ((*muIDbit)[i]>>2&1) passMuT.push_back(i);
+         if (((*muIDbit)[i]>>0&1) == 0) passMuNO.push_back(i);
        }
      }
      nPassMuL=passMuL.size();
      nPassMuM=passMuM.size();
      nPassMuT=passMuT.size();
+     nPassMuNO=passMuNO.size();
      if (passMuL.size() != 0) nleadMuL=passMuL[0];
      if (passMuM.size() != 0) nleadMuM=passMuM[0];
      if (passMuT.size() != 0) nleadMuT=passMuT[0];
+     if (passMuNO.size() != 0) nleadMuNO=passMuNO[0];
+     //muon SF
+     if (!isData){
+       int iter[3]={-1,-1,-1};
+       if (nPassMuL>0) iter[0]=passMuL.at(0);
+       if (nPassMuM>0) iter[1]=passMuM.at(0);
+       if (nPassMuT>0) iter[2]=passMuT.at(0);
+       for (int i=0;i<3;i++) {
+         if (iter[i]!=-1){
+           float pt = ( (*muPt)[iter[i]]< 20)? 20 : ((*muPt)[iter[i]]< 100) ? (*muPt)[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
+           mu_SF[i]=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           mu_SF[i]*=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+         }
+       }
+       //muon vetoSF (only for vetoing loose muons)
+       if (nPassMuNO>0) {
+         int i=passMuNO.at(0);
+         float pt = ( (*muPt)[i]< 20)? 20 : ((*muPt)[i]< 100) ? (*muPt)[i] : 100 ; //Histo range is: 20-120, highest bin 60-120
+         double epsilon=h_muID_EffMC2D[0]->GetBinContent(h_muID_EffMC2D[0]->FindBin(pt,abs((*muEta)[i])));
+         double sf=h_muID_SF2D[0]->GetBinContent(h_muID_SF2D[0]->FindBin(pt,abs((*muEta)[i])));
+         mu_VETOSF = (1-sf*epsilon)/(1-epsilon);
+       }
+     }
      //jet ID
      //bool vetoEvent=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (int i=0;i<nJet;i++) {
