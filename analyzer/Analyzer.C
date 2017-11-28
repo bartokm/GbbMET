@@ -5,7 +5,7 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0;
+  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0;
   bool inputs=0, cuts=0;
   int FR=0;
   string output, bname, pname;
@@ -25,6 +25,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='h') is_h=1; 
       else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='q') is_quiet=1; 
+      else if (arg[1]=='S') is_signalscan=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
@@ -59,6 +60,7 @@ int main(int argc, char* argv[]){
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
     if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
+    if (is_signalscan) cout<<"SignalScan is true!"<<endl;
     if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (auto i : inputfiles) std::cout<<i<<std::endl;
@@ -80,7 +82,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan);
   t.Loop();
   return 1;
 }
@@ -412,6 +414,17 @@ void Analyzer::Loop()
        h2_FR = (TH2D*)f_FR.Get("FR_Data_EtaPhi_50_110");
        h2_FR->SetDirectory(0);
        f_FR.Close();
+     }
+     //SignalScan variables
+     int m_Gluino=-1, m_Neutralino=-1;
+     if (SignalScan) {
+       int neutralino=-1, gluino=-1;
+       for (int i=0;i<nMC;i++) {
+         if ((*mcPID)[i]==1000023 && (*mcStatus)[i]==22) neutralino=i;
+         if ((*mcPID)[i]==1000021 && (*mcStatus)[i]==22) gluino=i;
+       }
+       m_Gluino = (*mcMass)[gluino];
+       m_Neutralino=(*mcMass)[neutralino];
      }
      w=1;
      //MC weights and scale factors
