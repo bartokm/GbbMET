@@ -1,5 +1,8 @@
 #define Analyzer_cxx
 #include "Analyzer.h"
+#include "whichGridpoint.h"
+#include "SignalScanHistograms.h"
+#include "cross_sections.h"
 #include <TH2.h>
 #include <TStyle.h>
 #include <TCanvas.h>
@@ -171,7 +174,7 @@ void Analyzer::Loop()
    std::string temp_fname="histos/Analyzer_histos"; 
    if (output_file != "default") temp_fname+="_"+output_file;
    else temp_fname+=".root";
-   TFile f(temp_fname.c_str(),"recreate");
+   TFile *f = new TFile(temp_fname.c_str(),"recreate");
    
    TH1::SetDefaultSumw2();
    
@@ -195,9 +198,13 @@ void Analyzer::Loop()
    TH1D *h_pfMETSig    = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
    TH2D *h_MET_AK8btag    = new TH2D("h_MET_AK8btag","MET vs selected AK8btag;pfMET;BDSV",30,5,980,30,-1,1);
    TH2D *h_MET_AK4btag    = new TH2D("h_MET_AK4btag","MET vs selected AK4btag1+AK4btag2;pfMET;CSV_{bjet1}+CSV_{bjet2}",30,5,980,30,0,2);
-   TH1D *h_ST    = new TH1D("h_ST",";S_{T} [GeV]",10,200,4200);
+   const int nbins_ST=7;
+   double xbins_ST[nbins_ST+1]={0, 200, 400, 600, 800, 1000, 1500, 2000};
+   TH1D *h_ST    = new TH1D("h_ST",";S_{T} [GeV]",nbins_ST,xbins_ST);
    TH1D *h_ST_G    = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
-   TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",10,100,2100);
+   const int nbins_MT=9;
+   double xbins_MT[nbins_MT+1]={0, 30, 60, 100, 130, 200, 500, 1000, 1500, 2000};
+   TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",nbins_MT,xbins_MT);
    TH1D *h_nPho    = new TH1D("h_nPho",";# of #gamma",10,-0.5,9.5);
    TH1D *h_nEle    = new TH1D("h_nEle",";# of e_{loose}",10,-0.5,9.5);
    TH1D *h_nEleM    = new TH1D("h_nEleM",";# of e_{medium}",10,-0.5,9.5);
@@ -276,6 +283,10 @@ void Analyzer::Loop()
    TH2D *h_mbbjet_comb_vs_pt1    = new TH2D("h_mbbjet_comb_vs_pt1","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,18,278,30,30,1030);
    TH2D *h_mbbjet_comb_vs_pt2    = new TH2D("h_mbbjet_comb_vs_pt2","Invariant mass of combination of all jets in Higgs mass range vs 1st p_{T};M_{bb}[GeV];p_{T}^{1} [GeV]",20,18,278,30,30,1030);
 
+   if (SignalScan) {
+     init_scan_histos(f);
+   }
+
    TBenchmark time;
    TDatime now;
    if (!is_quiet) now.Print();
@@ -285,7 +296,7 @@ void Analyzer::Loop()
    ULong64_t TotalEvents=1;
    int zbx=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //for (Long64_t jentry=0; jentry<10000;jentry++) {
+   //for (Long64_t jentry=0; jentry<1000;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -309,6 +320,7 @@ void Analyzer::Loop()
        b_mcEt->GetEntry(ientry);
        b_mcPhi->GetEntry(ientry);
        b_mcEta->GetEntry(ientry);
+       b_mcMass->GetEntry(ientry);
        b_mcStatus->GetEntry(ientry);
        b_genMET->GetEntry(ientry);
        b_jetGenEta->GetEntry(ientry);
@@ -416,15 +428,18 @@ void Analyzer::Loop()
        f_FR.Close();
      }
      //SignalScan variables
-     int m_Gluino=-1, m_Neutralino=-1;
+     pair<int,int> mass_pair;
      if (SignalScan) {
        int neutralino=-1, gluino=-1;
        for (int i=0;i<nMC;i++) {
          if ((*mcPID)[i]==1000023 && (*mcStatus)[i]==22) neutralino=i;
          if ((*mcPID)[i]==1000021 && (*mcStatus)[i]==22) gluino=i;
        }
-       m_Gluino = (*mcMass)[gluino];
-       m_Neutralino=(*mcMass)[neutralino];
+       int m_Gluino = (*mcMass)[gluino];
+       //Neutralino mass is not exact. Need to find nearest grid point
+       double m_Neutralino=(*mcMass)[neutralino];
+       pair<double,double> initial_pair(m_Gluino,m_Neutralino);
+       mass_pair = whichGridpoint(initial_pair);
      }
      w=1;
      //MC weights and scale factors
@@ -435,7 +450,7 @@ void Analyzer::Loop()
            TH1D *htemp=(TH1D*)fChain->GetCurrentFile()->Get("h_cross_section");
            xsec=htemp->GetBinContent(1);
          }
-         else std::cout<<"No h_cross_section found in file using xsec = "<<xsec<<std::endl;
+         else if (!SignalScan) std::cout<<"No h_cross_section found in file using xsec = "<<xsec<<std::endl;
          //for amc at nlo the TotalEvents is the sum of + and - events
          if (fChain->GetCurrentFile()->GetDirectory("ggNtuplizer") !=0) {
            TH1F *htemp = (TH1F*)fChain->GetCurrentFile()->Get("ggNtuplizer/hSumGenWeight");
@@ -462,11 +477,12 @@ void Analyzer::Loop()
            h_PUweight->Divide(h_mcPU);
          }
        }
+       if (SignalScan) {xsec=get_cross_section(mass_pair.first); TotalEvents=get_total_events(mass_pair);}
      //weights
        //get zero bunchcrossing (puTrue always the same for every bx, just in case...)
        for (unsigned int i=0;i<(*puBX).size();i++) if ((*puBX)[i]==0) zbx=i;
        double pu_weight=h_PUweight->GetBinContent(h_PUweight->FindBin((*puTrue)[zbx]));
-       if (_fastSim) pu_weight=1;
+       if (_fastSim || SignalScan) pu_weight=1;
        double weight=L_data*xsec/TotalEvents;
        //std::cout<<"weight=L_data*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
        if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amc@nlo
@@ -1175,9 +1191,118 @@ void Analyzer::Loop()
          }
        }
      }
+     //Filling for signal scan
+     if (SignalScan) {
+       m_eff[mass_pair]->Fill(1.,w);
+       m_phoEtL[mass_pair]->Fill((*phoCalibEt)[nleadPhoL],w);
+       m_phoSCEtaL[mass_pair]->Fill((*phoSCEta)[nleadPhoL],w);
+       if (passPhoM.size()>0) {
+         m_phoEtM[mass_pair]->Fill((*phoCalibEt)[nleadPhoM],w);
+         m_phoSCEtaM[mass_pair]->Fill((*phoSCEta)[nleadPhoM],w);
+       }
+       if (passPhoT.size()>0){
+         m_phoEtT[mass_pair]->Fill((*phoCalibEt)[nleadPhoT],w);
+         m_phoSCEtaT[mass_pair]->Fill((*phoSCEta)[nleadPhoT],w);
+       }
+       m_nVtx[mass_pair]->Fill(nVtx,w);
+       m_nGoodVtx[mass_pair]->Fill(nGoodVtx,w);
+       if (!isData) m_nPU[mass_pair]->Fill((*puTrue)[zbx],w);
+       m_HT_before[mass_pair]->Fill(HT_before,w);
+       m_EMHT_before[mass_pair]->Fill(EMHT_before,w);
+       m_HT_after[mass_pair]->Fill(HT_after,w);
+       m_EMHT_after[mass_pair]->Fill(EMHT_after,w);
+       m_AK8HT_before[mass_pair]->Fill(AK8HT_before,w);
+       m_AK8EMHT_before[mass_pair]->Fill(AK8EMHT_before,w);
+       m_AK8HT_after[mass_pair]->Fill(AK8HT_after,w);
+       m_AK8EMHT_after[mass_pair]->Fill(AK8EMHT_after,w);
+       m_nAK8jets[mass_pair]->Fill(passAK8Jet.size(),w);
+       m_pfMET[mass_pair]->Fill(pfMET,w);
+       m_pfMETsumEt[mass_pair]->Fill(pfMETsumEt,w);
+       m_pfMETPhi[mass_pair]->Fill(pfMETPhi,w);
+       m_pfMETSig[mass_pair]->Fill(pfMETSig,w);
+       m_MET_AK8btag[mass_pair]->Fill(pfMET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
+       m_MET_AK4btag[mass_pair]->Fill(pfMET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       m_ST[mass_pair]->Fill(ST,w);
+       m_ST_G[mass_pair]->Fill(ST_G,w);
+       m_MT[mass_pair]->Fill(MT,w);
+       m_nPho[mass_pair]->Fill(passPhoL.size(),w);
+       m_njets[mass_pair]->Fill(passJet.size(),w);
+       m_CSVbjetsL[mass_pair]->Fill(bcounterCSV[1],w);
+       m_CSVbjetsM[mass_pair]->Fill(bcounterCSV[2],w);
+       m_CSVbjetsT[mass_pair]->Fill(bcounterCSV[3],w);
+       m_cMVAbjetsL[mass_pair]->Fill(bcountercMVA[1],w);
+       m_cMVAbjetsM[mass_pair]->Fill(bcountercMVA[2],w);
+       m_cMVAbjetsT[mass_pair]->Fill(bcountercMVA[3],w);
+       m_BDSVbjetsL[mass_pair]->Fill(bcounterBDSV[1],w);
+       m_BDSVbjetsM[mass_pair]->Fill(bcounterBDSV[2],w);
+       m_BDSVbjetsT[mass_pair]->Fill(bcounterBDSV[3],w);
+       if (highCSV1!=-1) m_bjetCSV[mass_pair]->Fill((*jetCSV2BJetTags)[highCSV1],w);
+       if (highCSV2!=-1) m_bjetCSV2[mass_pair]->Fill((*jetCSV2BJetTags)[highCSV2],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) m_b1pb2CSV[mass_pair]->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) m_b1tb2CSV[mass_pair]->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1]*(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) m_b1b2CSV[mass_pair]->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1],(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       if (SelectedAK4Jet1!=-1) m_selectbjetCSV[mass_pair]->Fill((*jetCSV2BJetTags)[SelectedAK4Jet1],w);
+       if (SelectedAK4Jet2!=-1) m_selectbjetCSV2[mass_pair]->Fill((*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       if (highcMVA1!=-1) m_bjetcMVA[mass_pair]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA1],w);
+       if (highcMVA2!=-1) m_bjetcMVA2[mass_pair]->Fill((*jetpfCombinedMVAV2BJetTags)[highcMVA2],w);
+       if (leadpt_ak8!=-1) m_doubleB[mass_pair]->Fill((*AK8JetpfBoostedDSVBTag)[leadpt_ak8],w);
+       if (highBDSV!=-1) m_doubleB_highdB[mass_pair]->Fill((*AK8JetpfBoostedDSVBTag)[highBDSV],w);
+       if (passHiggsMass) m_doubleB_highdB_hmass[mass_pair]->Fill((*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
+       for (auto i : passAK8Jet) m_AK8jetmass[mass_pair]->Fill((*AK8JetMass)[i],w);
+       m_nEle[mass_pair]->Fill(passEleL.size(),w);
+       m_nEleM[mass_pair]->Fill(passEleM.size(),w);
+       m_nEleT[mass_pair]->Fill(passEleT.size(),w);
+       m_nMu[mass_pair]->Fill(passMuL.size(),w);
+       m_nMuM[mass_pair]->Fill(passMuM.size(),w);
+       m_nMuT[mass_pair]->Fill(passMuT.size(),w);
+       if (leadpt_ak4!=-1) m_jetpt[mass_pair]->Fill(jetSmearedPt[leadpt_ak4],w);
+       if (leadpt_ak8!=-1) m_AK8jetpt[mass_pair]->Fill(AK8JetSmearedPt[leadpt_ak8],w);
+       if (highBDSV!=-1) m_AK8bjetpt[mass_pair]->Fill(AK8JetSmearedPt[highBDSV],w);
+       if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhjetpt[mass_pair]->Fill(AK8JetSmearedPt[SelectedAK8Jet],w);
+       if (leadpt_ak8!=-1) m_AK8ljetmass[mass_pair]->Fill((*AK8JetMass)[leadpt_ak8],w);
+       if (leadpt_ak8!=-1) m_AK8bjetmass[mass_pair]->Fill((*AK8JetMass)[highBDSV],w);
+       if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhjetmass[mass_pair]->Fill((*AK8JetMass)[SelectedAK8Jet],w);
+       if (leadpt_ak8!=-1) m_AK8bPrunedjetmass[mass_pair]->Fill((*AK8JetPrunedMass)[highBDSV],w);
+       if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhPrunedjetmass[mass_pair]->Fill((*AK8JetPrunedMass)[SelectedAK8Jet],w);
+       if (leadpt_ak8!=-1) m_AK8bPrunedCorrjetmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
+       if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhPrunedCorrjetmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+       if (dR_pho_AK8!=-1) m_dRphoAK8jet[mass_pair]->Fill(dR_pho_AK8,w);
+       if (SelectedAK8Jet!=-1 && passBtag) m_AK8PrunedCorrjetmass_select[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+       if (SelectedAK8Jet!=-1) m_selectAK8bjetpt[mass_pair]->Fill(AK8JetSmearedPt[SelectedAK8Jet],w);
+       if (SelectedAK4Jet1!=-1) m_selectbjetpt[mass_pair]->Fill(jetSmearedPt[SelectedAK4Jet1],w);
+       if (SelectedAK4Jet2!=-1) m_selectbjetpt2[mass_pair]->Fill(jetSmearedPt[SelectedAK4Jet2],w);
+       if (SelectedAK8Jet!=-1) m_AK8PrunedCorrjetmass_withABCD[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1 && passAK4Btag1 && passAK4Btag2)m_mbbjet_select[mass_pair]->Fill(m_bb,w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1)m_mbbjet_withABCD[mass_pair]->Fill(m_bb,w);
+       if (SelectedAK8Jet!=-1) m_AK8tau1[mass_pair]->Fill((*AK8Jet_tau1)[SelectedAK8Jet],w);
+       if (SelectedAK8Jet!=-1) m_AK8tau2[mass_pair]->Fill((*AK8Jet_tau2)[SelectedAK8Jet],w);
+       if (SelectedAK8Jet!=-1) m_AK8tau3[mass_pair]->Fill((*AK8Jet_tau3)[SelectedAK8Jet],w);
+       if (SelectedAK8Jet!=-1) m_AK8tau2_tau1[mass_pair]->Divide(m_AK8tau2[mass_pair],m_AK8tau1[mass_pair]);
+       if (SelectedAK8Jet!=-1) m_AK8tau3_tau2[mass_pair]->Divide(m_AK8tau3[mass_pair],m_AK8tau2[mass_pair]);
+       if (SelectedAK8Jet!=-1) m_AK8mass_vs_pt[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],AK8JetSmearedPt[SelectedAK8Jet],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) m_mbbjet_vs_pt1[mass_pair]->Fill(m_bb,jetSmearedPt[SelectedAK4Jet1],w);
+       if (SelectedAK4Jet1!=-1 && SelectedAK4Jet2!=-1) m_mbbjet_vs_pt2[mass_pair]->Fill(m_bb,jetSmearedPt[SelectedAK4Jet2],w);
+       for (auto i : passAK8Jet) {
+         if ((*AK8JetPrunedMassCorr)[i]>70 && (*AK8JetPrunedMassCorr)[i]<200) m_AK8mass_all_vs_pt[mass_pair]->Fill((*AK8JetPrunedMassCorr)[i],AK8JetSmearedPt[i],w);
+       }
+       for (unsigned int i=0;i<passJet.size();i++){
+         for (unsigned int j=i+1;j<passJet.size();j++){
+           TLorentzVector jet1, jet2;
+           jet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
+           jet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
+           double temp_mbb=(jet1+jet2).M();
+           if (temp_mbb>70 && temp_mbb<200) {
+             m_mbbjet_comb_vs_pt1[mass_pair]->Fill(temp_mbb,jetSmearedPt[passJet.at(i)],w);
+             m_mbbjet_comb_vs_pt2[mass_pair]->Fill(temp_mbb,jetSmearedPt[passJet.at(j)],w);
+           }
+         }
+       }
      }
-   f.Write();
-   f.Close();
+     }
+   cout<<"Saving histograms..."<<endl;
+   f->Write();
+   gROOT->GetListOfFiles()->Remove(f);
+   f->Close();
    time.Stop("time");
    if (!is_quiet) std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
 }
