@@ -56,7 +56,7 @@ void SignalPlotter(){
   int rebin=1; bool logarithmic=0;
   bool savePNG=0; string png_out="plots/2017.11.23/"+preoutput;
   bool plotSignal = 1;
-  bool plotBkg = 1;
+  bool plotBkg = 0;
   bool plotSumBkg = 0;
 
   gROOT->SetBatch(true);
@@ -189,9 +189,42 @@ void SignalPlotter(){
       pad1->cd();
     }
     */
-    if (plotSignal) for (auto obj : SignalArrays) {
-      obj->At(i)->Draw();
-      if (!obj->At(i)->InheritsFrom("TH2")) hS->SetAxisRange(min,max*factor,"Y");
+    if (plotSignal) {
+      for (auto obj : SignalArrays) {
+        obj->At(i)->Draw();
+        if (!obj->At(i)->InheritsFrom("TH2")) hS->SetAxisRange(min,max*factor,"Y");
+      }
+      string currentname=histoNames.at(i);
+      string h1="hs_true_HiggsAK8Jet";
+      string h2="hs_true_HiggsAK4Jet";
+      int j=0;
+      if (currentname==h1) {
+        for (auto obj : SignalArrays) {
+          TH1 *hS = (TH1*)obj->At(i);
+          double pHjet=hS->GetBinContent(2)/hS->GetBinContent(1)*100;
+          double pHighest=hS->GetBinContent(3)/hS->GetBinContent(2)*100;
+          double psemiHighest=hS->GetBinContent(4)/hS->GetBinContent(2)*100;
+          double pSelected=hS->GetBinContent(5)/hS->GetBinContent(2)*100;
+          cout<<signal[j]<<" AK8: Hjet = "<<pHjet<<" Highest = "<<pHighest<<" semi-highest = "<<psemiHighest<<" Selected = "<<pSelected<<endl;
+          j++;
+        }
+      }
+      if (currentname==h2) {
+        j=0;
+        for (auto obj : SignalArrays) {
+          TH1 *hS = (TH1*)obj->At(i);
+          double pHjet1=hS->GetBinContent(2)/hS->GetBinContent(1)*100;
+          double pHjet2=hS->GetBinContent(6)/hS->GetBinContent(1)*100;
+          double pHighest1=hS->GetBinContent(3)/hS->GetBinContent(2)*100;
+          double pHighest2=hS->GetBinContent(7)/hS->GetBinContent(6)*100;
+          double psemiHighest1=hS->GetBinContent(4)/hS->GetBinContent(2)*100;
+          double psemiHighest2=hS->GetBinContent(8)/hS->GetBinContent(6)*100;
+          double pSelected1=hS->GetBinContent(5)/hS->GetBinContent(2)*100;
+          double pSelected2=hS->GetBinContent(9)/hS->GetBinContent(6)*100;
+          cout<<signal[j]<<" AK4: Hjet1 = "<<pHjet1<<" Hjet2 = "<<pHjet2<<" Highest1 = "<<pHighest1<<" semiHighest1 = "<<psemiHighest1<<" Selected1 = "<<pSelected1<<" Highest2 = "<<pHighest2<<" semiHighest2 = "<<psemiHighest2<<" Selected2 = "<<pSelected2<<endl;
+          j++;
+        }
+      }
     }
     else if (plotBkg) {
       if (BkgStack->At(i)->InheritsFrom("TH2")) Sum(*(THStack*)BkgStack->At(i))->Draw();
