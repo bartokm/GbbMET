@@ -821,6 +821,7 @@ public :
    bool _fastSim=false;
    int _fakeRate=0;
    bool is_quiet=false;
+   bool signalstudy=false;
    bool SignalScan=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
@@ -877,8 +878,10 @@ public :
    TEfficiency* eff_b_BDSV_T;
    //histogram for Fake Rate
    TH2D *h2_FR;
+   //hardcoded values for FR
+   double _A=0.0308, _B=0.4942, _C=0.615192;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -896,7 +899,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -905,6 +908,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   _cut_operator=cut_operator;
   _cut_value=cut_value;
   is_quiet=is_q;
+  signalstudy=is_signalstudy;
   SignalScan=is_signalscan;
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
@@ -2141,7 +2145,8 @@ void PrintHelp(){
   cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
   cout<<"-p pname \t\t Data PileUp file location and name"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
-  cout<<"-F 1 or 2\t\t Turn on FakeRate weights. 1->for electrons 2->\"pixelseed\" electrons. Needs input file \"All_results.root\""<<endl;
+  cout<<"-F 1 or 2\t\t Turn on FakeRate weights. 1->for electrons 2->\"pixelseed\" electrons. Needs input file \"input/FakeRate_EGamma.root\""<<endl;
+  cout<<"-s \t\t Turn on \"signalstudy\" option, which fills MC-truth histos"<<endl;
   cout<<"-q \t\t Quiet option, only errors are printed"<<endl;
   cout<<"-S \t\t SignalScan run. Use only for T5qqqqHG MC!"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
