@@ -251,9 +251,9 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
     m_AK4_AK8[MassPair] = new TH1D("h_AK4_AK8","Higgs candidate findings;",9,0.5,9.5);
     
     const int dim=4;
-    int nbins[dim]={3,3,3,4};
+    int nbins[dim]={3,3,6,3};
     double xmin[dim]={-0.5,-0.5,0.5,0.5};
-    double xmax[dim]={2.5,2.5,3.5,4.5};
+    double xmax[dim]={2.5,2.5,6.5,3.5};
     mn_searchBins[MassPair] = new THnD("hn_searchBins",";AK4_AK8;MET;njets",dim,nbins,xmin,xmax);
     unsigned int nsbins=mn_searchBins[MassPair]->GetNbins();
     m_searchBins[MassPair]= new TH1D("h_searchBins",";searchBins",nsbins,0.5,nsbins+0.5);

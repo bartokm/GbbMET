@@ -295,9 +295,9 @@ void Analyzer::Loop()
    TH3D *h_MET_AK4_AK8 = new TH3D("h_MET_AK4_AK8",";MET [GeV];AK4 (0, 1, 2 loose);AK8 0, 1 loose, 1 medium",nbins_MET,xbins_MET,3,yz,3,yz);
 
    const int dim=4;
-   int nbins[dim]={3,3,3,4};
+   int nbins[dim]={3,3,6,3};
    double xmin[dim]={-0.5,-0.5,0.5,0.5};
-   double xmax[dim]={2.5,2.5,3.5,4.5};
+   double xmax[dim]={2.5,2.5,6.5,3.5};
    THnD *hn_searchBins = new THnD("hn_searchBins",";AK4;AK8;MET;njets",dim,nbins,xmin,xmax);
    unsigned int nsbins=hn_searchBins->GetNbins();
    TH1D *h_searchBins= new TH1D("h_searchBins",";searchBins",nsbins,0.5,nsbins+0.5);
@@ -1321,12 +1321,12 @@ void Analyzer::Loop()
      }
 
        int AK8=0 ,AK4=0;
-       double met = (pfMET<200) ? 1 : (pfMET<500) ? 2 : 3;
-       double njet = (passJet.size()<4) ? passJet.size()-1 : (passJet.size()<6) ? 3 : 4;
-       if (BDSV_selected==1) AK8=1;
-       if (BDSV_selected>=2) AK8=2;
-       if (CSV_selected==1) AK4=1;
-       if (CSV_selected>=2) AK4=2;
+       double met = (pfMET<50) ? 1 : (pfMET<70) ? 2 : (pfMET<100) ? 3 : (pfMET<200) ? 4 : (pfMET<500) ? 5 : 6;
+       double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
+       if (BDSV_selected==1) {AK8=1; if (!isData) w*=BDSV_SF_L[0];}
+       if (BDSV_selected>=2) {AK8=2; if (!isData) w*=BDSV_SF_M1[0];}
+       if (CSV_selected==1) {AK4=1; if (!isData) w*=CSV_SF_L[0];}
+       if (CSV_selected>=2) {AK4=2; if (!isData) w*=CSV_SF_L[0]*CSV_SF_L[0];}
        double ak4ak8=0;
        if (AK8==0 && AK4==0) ak4ak8=1;
        if (AK8==0 && AK4==1) ak4ak8=2;
@@ -1340,6 +1340,7 @@ void Analyzer::Loop()
        h_AK4_AK8->Fill(ak4ak8,w);
        (pfMET>1000) ? h_MET_AK4_AK8->Fill(999,AK4,AK8,w) : h_MET_AK4_AK8->Fill(pfMET,AK4,AK8,w);
        double sbFill[dim]={double(AK4),double(AK8),met,njet};
+       hn_searchBins->Fill(sbFill,w);
      //signalstudy histos fill
      if (signalstudy) {
        hs_gMET_Bquark->Fill(genMET,nBquark,w);
