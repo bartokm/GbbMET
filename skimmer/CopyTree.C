@@ -118,7 +118,6 @@ void CopyTree::Loop()
      if ((*mcMass)[neutralino]<799 || (*mcMass)[neutralino]>801) continue;
      if (higgs!=1) continue;
      maxevents++;
-     */
      gWrite=true;
      int higgs=0, ib1=-1, ib2=-1;
      for (int i=0;i<nMC;i++) {
@@ -127,12 +126,13 @@ void CopyTree::Loop()
        if ((*mcPID)[i]==-5 && (*mcMomPID)[i]==25) ib2=i;
      }
      if (higgs==1 && ib1!=-1 && ib2!=-1) gWrite=true;
+     */
      //Requiring 1 loose photon with Et>90, Eta<1.4442, pixelseed==0
      //for (int i=0;i<nPho;i++) if ((*phoCalibEt)[i]>90 && abs((*phoEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoIDbit)[i]>>0&1) {gWrite=true;break;};
 
      //Requiring trigger
      //if (HLTPho&128) gWrite=true; //HLT_Photon175
-     //if (HLTPho&4096) gWrite=true; //HLT_Photon165_HE10
+     if (HLTPho&4096) gWrite=true; //HLT_Photon165_HE10
      //if (HLTJet&4194304) gWrite=true; //HLT_PFHT300_PFMET110_v
 
      if (gWrite) skimtree->Fill();
