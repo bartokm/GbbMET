@@ -35,9 +35,23 @@ public :
    vector<float>   *jetPhi;
    vector<float>   *jetRawPt;
    vector<float>   *jetRawEn;
+   vector<float>   *jetMt;
+   vector<float>   *jetArea;
+   vector<float>   *jetLeadTrackPt;
+   vector<float>   *jetLeadTrackEta;
+   vector<float>   *jetLeadTrackPhi;
+   vector<int>     *jetLepTrackPID;
+   vector<float>   *jetLepTrackPt;
+   vector<float>   *jetLepTrackEta;
+   vector<float>   *jetLepTrackPhi;
    vector<float>   *jetCSV2BJetTags;
    vector<float>   *jetJetProbabilityBJetTags;
    vector<float>   *jetpfCombinedMVAV2BJetTags;
+   vector<float>   *jetDeepCSVTags_b;
+   vector<float>   *jetDeepCSVTags_bb;
+   vector<float>   *jetDeepCSVTags_c;
+   vector<float>   *jetDeepCSVTags_cc;
+   vector<float>   *jetDeepCSVTags_udsg;
    vector<int>     *jetPartonID;
    vector<int>     *jetHadFlvr;
    vector<float>   *jetGenJetEn;
@@ -58,7 +72,7 @@ public :
    vector<float>   *jetPUID;
    vector<int>     *jetPUFullID;
    vector<float>   *jetJECUnc;
-   vector<unsigned int> *jetFiredTrgs;
+   vector<ULong64_t> *jetFiredTrgs;
    vector<float>   *jetCHF;
    vector<float>   *jetNHF;
    vector<float>   *jetCEF;
@@ -100,6 +114,16 @@ public :
    vector<float>   *AK8JetCSV;
    vector<float>   *AK8JetJECUnc;
    vector<float>   *AK8JetL2L3corr;
+   vector<float>   *AK8puppiPt;
+   vector<float>   *AK8puppiMass;
+   vector<float>   *AK8puppiEta;
+   vector<float>   *AK8puppiPhi;
+   vector<float>   *AK8puppiTau1;
+   vector<float>   *AK8puppiTau2;
+   vector<float>   *AK8puppiTau3;
+   vector<float>   *AK8puppiSDL2L3corr;
+   vector<float>   *AK8puppiSDMass;
+   vector<float>   *AK8puppiSDMassL2L3Corr;
    vector<int>     *AK8JetPartonID;
    vector<int>     *AK8JetHadFlvr;
    vector<int>     *AK8JetGenJetIndex;
@@ -116,6 +140,24 @@ public :
    vector<float>   *AK8JetP4Smear;
    vector<float>   *AK8JetP4SmearUp;
    vector<float>   *AK8JetP4SmearDo;
+   vector<int>     *nAK8SDSJ;
+   vector<vector<float> > *AK8SDSJPt;
+   vector<vector<float> > *AK8SDSJEta;
+   vector<vector<float> > *AK8SDSJPhi;
+   vector<vector<float> > *AK8SDSJMass;
+   vector<vector<float> > *AK8SDSJE;
+   vector<vector<int> > *AK8SDSJCharge;
+   vector<vector<int> > *AK8SDSJFlavour;
+   vector<vector<float> > *AK8SDSJCSV;
+   vector<int>     *nAK8puppiSDSJ;
+   vector<vector<float> > *AK8puppiSDSJPt;
+   vector<vector<float> > *AK8puppiSDSJEta;
+   vector<vector<float> > *AK8puppiSDSJPhi;
+   vector<vector<float> > *AK8puppiSDSJMass;
+   vector<vector<float> > *AK8puppiSDSJE;
+   vector<vector<int> > *AK8puppiSDSJCharge;
+   vector<vector<int> > *AK8puppiSDSJFlavour;
+   vector<vector<float> > *AK8puppiSDSJCSV;
 
    // List of branches
    TBranch        *b_nJet;   //!
@@ -125,9 +167,23 @@ public :
    TBranch        *b_jetPhi;   //!
    TBranch        *b_jetRawPt;   //!
    TBranch        *b_jetRawEn;   //!
+   TBranch        *b_jetMt;   //!
+   TBranch        *b_jetArea;   //!
+   TBranch        *b_jetLeadTrackPt;   //!
+   TBranch        *b_jetLeadTrackEta;   //!
+   TBranch        *b_jetLeadTrackPhi;   //!
+   TBranch        *b_jetLepTrackPID;   //!
+   TBranch        *b_jetLepTrackPt;   //!
+   TBranch        *b_jetLepTrackEta;   //!
+   TBranch        *b_jetLepTrackPhi;   //!
    TBranch        *b_jetCSV2BJetTags;   //!
    TBranch        *b_jetJetProbabilityBJetTags;   //!
    TBranch        *b_jetpfCombinedMVAV2BJetTags;   //!
+   TBranch        *b_jetDeepCSVTags_b;   //!
+   TBranch        *b_jetDeepCSVTags_bb;   //!
+   TBranch        *b_jetDeepCSVTags_c;   //!
+   TBranch        *b_jetDeepCSVTags_cc;   //!
+   TBranch        *b_jetDeepCSVTags_udsg;   //!
    TBranch        *b_jetPartonID;   //!
    TBranch        *b_jetHadFlvr;   //!
    TBranch        *b_jetGenJetEn;   //!
@@ -190,6 +246,16 @@ public :
    TBranch        *b_AK8JetCSV;   //!
    TBranch        *b_AK8JetJECUnc;   //!
    TBranch        *b_AK8JetL2L3corr;   //!
+   TBranch        *b_AK8puppiPt;   //!
+   TBranch        *b_AK8puppiMass;   //!
+   TBranch        *b_AK8puppiEta;   //!
+   TBranch        *b_AK8puppiPhi;   //!
+   TBranch        *b_AK8puppiTau1;   //!
+   TBranch        *b_AK8puppiTau2;   //!
+   TBranch        *b_AK8puppiTau3;   //!
+   TBranch        *b_AK8puppiSDL2L3corr;   //!
+   TBranch        *b_AK8puppiSDMass;   //!
+   TBranch        *b_AK8puppiSDMassL2L3Corr;   //!
    TBranch        *b_AK8JetPartonID;   //!
    TBranch        *b_AK8JetHadFlvr;   //!
    TBranch        *b_AK8JetGenJetIndex;   //!
@@ -206,10 +272,29 @@ public :
    TBranch        *b_AK8JetP4Smear;   //!
    TBranch        *b_AK8JetP4SmearUp;   //!
    TBranch        *b_AK8JetP4SmearDo;   //!
+   TBranch        *b_nAK8SDSJ;   //!
+   TBranch        *b_AK8SDSJPt;   //!
+   TBranch        *b_AK8SDSJEta;   //!
+   TBranch        *b_AK8SDSJPhi;   //!
+   TBranch        *b_AK8SDSJMass;   //!
+   TBranch        *b_AK8SDSJE;   //!
+   TBranch        *b_AK8SDSJCharge;   //!
+   TBranch        *b_AK8SDSJFlavour;   //!
+   TBranch        *b_AK8SDSJCSV;   //!
+   TBranch        *b_nAK8puppiSDSJ;   //!
+   TBranch        *b_AK8puppiSDSJPt;   //!
+   TBranch        *b_AK8puppiSDSJEta;   //!
+   TBranch        *b_AK8puppiSDSJPhi;   //!
+   TBranch        *b_AK8puppiSDSJMass;   //!
+   TBranch        *b_AK8puppiSDSJE;   //!
+   TBranch        *b_AK8puppiSDSJCharge;   //!
+   TBranch        *b_AK8puppiSDSJFlavour;   //!
+   TBranch        *b_AK8puppiSDSJCSV;   //!
 
    //histograms
    double BtagCSVWP[3]={0.5426,0.8484,0.9535};
    double BtagcMVAWP[3]={-0.5884,0.4432,0.9432};
+   double BtagDeepWP[3]={0.2219,0.6324,0.8958};
    double BtagBDSVWP[4]={0.3,0.6,0.8,0.9};
    std::string output_file="default";
    unsigned int nFiles=0;
@@ -322,12 +407,23 @@ void BTagEff::Init(TTree *tree)
    jetRawEn = 0;
    jetMt = 0;
    jetArea = 0;
+   jetLeadTrackPt = 0;
+   jetLeadTrackEta = 0;
+   jetLeadTrackPhi = 0;
+   jetLepTrackPID = 0;
+   jetLepTrackPt = 0;
+   jetLepTrackEta = 0;
+   jetLepTrackPhi = 0;
    jetCSV2BJetTags = 0;
    jetJetProbabilityBJetTags = 0;
    jetpfCombinedMVAV2BJetTags = 0;
+   jetDeepCSVTags_b = 0;
+   jetDeepCSVTags_bb = 0;
+   jetDeepCSVTags_c = 0;
+   jetDeepCSVTags_cc = 0;
+   jetDeepCSVTags_udsg = 0;
    jetPartonID = 0;
    jetHadFlvr = 0;
-   jetGenJetIndex = 0;
    jetGenJetEn = 0;
    jetGenJetPt = 0;
    jetGenJetEta = 0;
@@ -387,6 +483,16 @@ void BTagEff::Init(TTree *tree)
    AK8JetCSV = 0;
    AK8JetJECUnc = 0;
    AK8JetL2L3corr = 0;
+   AK8puppiPt = 0;
+   AK8puppiMass = 0;
+   AK8puppiEta = 0;
+   AK8puppiPhi = 0;
+   AK8puppiTau1 = 0;
+   AK8puppiTau2 = 0;
+   AK8puppiTau3 = 0;
+   AK8puppiSDL2L3corr = 0;
+   AK8puppiSDMass = 0;
+   AK8puppiSDMassL2L3Corr = 0;
    AK8JetPartonID = 0;
    AK8JetHadFlvr = 0;
    AK8JetGenJetIndex = 0;
@@ -403,6 +509,24 @@ void BTagEff::Init(TTree *tree)
    AK8JetP4Smear = 0;
    AK8JetP4SmearUp = 0;
    AK8JetP4SmearDo = 0;
+   nAK8SDSJ = 0;
+   AK8SDSJPt = 0;
+   AK8SDSJEta = 0;
+   AK8SDSJPhi = 0;
+   AK8SDSJMass = 0;
+   AK8SDSJE = 0;
+   AK8SDSJCharge = 0;
+   AK8SDSJFlavour = 0;
+   AK8SDSJCSV = 0;
+   nAK8puppiSDSJ = 0;
+   AK8puppiSDSJPt = 0;
+   AK8puppiSDSJEta = 0;
+   AK8puppiSDSJPhi = 0;
+   AK8puppiSDSJMass = 0;
+   AK8puppiSDSJE = 0;
+   AK8puppiSDSJCharge = 0;
+   AK8puppiSDSJFlavour = 0;
+   AK8puppiSDSJCSV = 0;
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
@@ -416,9 +540,23 @@ void BTagEff::Init(TTree *tree)
    fChain->SetBranchAddress("jetPhi", &jetPhi, &b_jetPhi);
    fChain->SetBranchAddress("jetRawPt", &jetRawPt, &b_jetRawPt);
    fChain->SetBranchAddress("jetRawEn", &jetRawEn, &b_jetRawEn);
+   fChain->SetBranchAddress("jetMt", &jetMt, &b_jetMt);
+   fChain->SetBranchAddress("jetArea", &jetArea, &b_jetArea);
+   fChain->SetBranchAddress("jetLeadTrackPt", &jetLeadTrackPt, &b_jetLeadTrackPt);
+   fChain->SetBranchAddress("jetLeadTrackEta", &jetLeadTrackEta, &b_jetLeadTrackEta);
+   fChain->SetBranchAddress("jetLeadTrackPhi", &jetLeadTrackPhi, &b_jetLeadTrackPhi);
+   fChain->SetBranchAddress("jetLepTrackPID", &jetLepTrackPID, &b_jetLepTrackPID);
+   fChain->SetBranchAddress("jetLepTrackPt", &jetLepTrackPt, &b_jetLepTrackPt);
+   fChain->SetBranchAddress("jetLepTrackEta", &jetLepTrackEta, &b_jetLepTrackEta);
+   fChain->SetBranchAddress("jetLepTrackPhi", &jetLepTrackPhi, &b_jetLepTrackPhi);
    fChain->SetBranchAddress("jetCSV2BJetTags", &jetCSV2BJetTags, &b_jetCSV2BJetTags);
    fChain->SetBranchAddress("jetJetProbabilityBJetTags", &jetJetProbabilityBJetTags, &b_jetJetProbabilityBJetTags);
    fChain->SetBranchAddress("jetpfCombinedMVAV2BJetTags", &jetpfCombinedMVAV2BJetTags, &b_jetpfCombinedMVAV2BJetTags);
+   fChain->SetBranchAddress("jetDeepCSVTags_b", &jetDeepCSVTags_b, &b_jetDeepCSVTags_b);
+   fChain->SetBranchAddress("jetDeepCSVTags_bb", &jetDeepCSVTags_bb, &b_jetDeepCSVTags_bb);
+   fChain->SetBranchAddress("jetDeepCSVTags_c", &jetDeepCSVTags_c, &b_jetDeepCSVTags_c);
+   fChain->SetBranchAddress("jetDeepCSVTags_cc", &jetDeepCSVTags_cc, &b_jetDeepCSVTags_cc);
+   fChain->SetBranchAddress("jetDeepCSVTags_udsg", &jetDeepCSVTags_udsg, &b_jetDeepCSVTags_udsg);
    if (fChain->GetBranch("jetPartonID")) fChain->SetBranchAddress("jetPartonID", &jetPartonID, &b_jetPartonID);
    if (fChain->GetBranch("jetHadFlvr")) fChain->SetBranchAddress("jetHadFlvr", &jetHadFlvr, &b_jetHadFlvr);
    if (fChain->GetBranch("jetGenJetEn")) fChain->SetBranchAddress("jetGenJetEn", &jetGenJetEn, &b_jetGenJetEn);
@@ -481,6 +619,16 @@ void BTagEff::Init(TTree *tree)
    fChain->SetBranchAddress("AK8JetCSV", &AK8JetCSV, &b_AK8JetCSV);
    fChain->SetBranchAddress("AK8JetJECUnc", &AK8JetJECUnc, &b_AK8JetJECUnc);
    fChain->SetBranchAddress("AK8JetL2L3corr", &AK8JetL2L3corr, &b_AK8JetL2L3corr);
+   fChain->SetBranchAddress("AK8puppiPt", &AK8puppiPt, &b_AK8puppiPt);
+   fChain->SetBranchAddress("AK8puppiMass", &AK8puppiMass, &b_AK8puppiMass);
+   fChain->SetBranchAddress("AK8puppiEta", &AK8puppiEta, &b_AK8puppiEta);
+   fChain->SetBranchAddress("AK8puppiPhi", &AK8puppiPhi, &b_AK8puppiPhi);
+   fChain->SetBranchAddress("AK8puppiTau1", &AK8puppiTau1, &b_AK8puppiTau1);
+   fChain->SetBranchAddress("AK8puppiTau2", &AK8puppiTau2, &b_AK8puppiTau2);
+   fChain->SetBranchAddress("AK8puppiTau3", &AK8puppiTau3, &b_AK8puppiTau3);
+   fChain->SetBranchAddress("AK8puppiSDL2L3corr", &AK8puppiSDL2L3corr, &b_AK8puppiSDL2L3corr);
+   fChain->SetBranchAddress("AK8puppiSDMass", &AK8puppiSDMass, &b_AK8puppiSDMass);
+   fChain->SetBranchAddress("AK8puppiSDMassL2L3Corr", &AK8puppiSDMassL2L3Corr, &b_AK8puppiSDMassL2L3Corr);
    if (fChain->GetBranch("AK8JetPartonID")) fChain->SetBranchAddress("AK8JetPartonID", &AK8JetPartonID, &b_AK8JetPartonID);
    if (fChain->GetBranch("AK8JetHadFlvr")) fChain->SetBranchAddress("AK8JetHadFlvr", &AK8JetHadFlvr, &b_AK8JetHadFlvr);
    if (fChain->GetBranch("AK8JetGenJetEn")) fChain->SetBranchAddress("AK8JetGenJetEn", &AK8JetGenJetEn, &b_AK8JetGenJetEn);
@@ -496,6 +644,24 @@ void BTagEff::Init(TTree *tree)
    if (fChain->GetBranch("AK8JetP4Smear")) fChain->SetBranchAddress("AK8JetP4Smear", &AK8JetP4Smear, &b_AK8JetP4Smear);
    if (fChain->GetBranch("AK8JetP4SmearUp")) fChain->SetBranchAddress("AK8JetP4SmearUp", &AK8JetP4SmearUp, &b_AK8JetP4SmearUp);
    if (fChain->GetBranch("AK8JetP4SmearDo")) fChain->SetBranchAddress("AK8JetP4SmearDo", &AK8JetP4SmearDo, &b_AK8JetP4SmearDo);
+   fChain->SetBranchAddress("nAK8SDSJ", &nAK8SDSJ, &b_nAK8SDSJ);
+   fChain->SetBranchAddress("AK8SDSJPt", &AK8SDSJPt, &b_AK8SDSJPt);
+   fChain->SetBranchAddress("AK8SDSJEta", &AK8SDSJEta, &b_AK8SDSJEta);
+   fChain->SetBranchAddress("AK8SDSJPhi", &AK8SDSJPhi, &b_AK8SDSJPhi);
+   fChain->SetBranchAddress("AK8SDSJMass", &AK8SDSJMass, &b_AK8SDSJMass);
+   fChain->SetBranchAddress("AK8SDSJE", &AK8SDSJE, &b_AK8SDSJE);
+   fChain->SetBranchAddress("AK8SDSJCharge", &AK8SDSJCharge, &b_AK8SDSJCharge);
+   fChain->SetBranchAddress("AK8SDSJFlavour", &AK8SDSJFlavour, &b_AK8SDSJFlavour);
+   fChain->SetBranchAddress("AK8SDSJCSV", &AK8SDSJCSV, &b_AK8SDSJCSV);
+   fChain->SetBranchAddress("nAK8puppiSDSJ", &nAK8puppiSDSJ, &b_nAK8puppiSDSJ);
+   fChain->SetBranchAddress("AK8puppiSDSJPt", &AK8puppiSDSJPt, &b_AK8puppiSDSJPt);
+   fChain->SetBranchAddress("AK8puppiSDSJEta", &AK8puppiSDSJEta, &b_AK8puppiSDSJEta);
+   fChain->SetBranchAddress("AK8puppiSDSJPhi", &AK8puppiSDSJPhi, &b_AK8puppiSDSJPhi);
+   fChain->SetBranchAddress("AK8puppiSDSJMass", &AK8puppiSDSJMass, &b_AK8puppiSDSJMass);
+   fChain->SetBranchAddress("AK8puppiSDSJE", &AK8puppiSDSJE, &b_AK8puppiSDSJE);
+   fChain->SetBranchAddress("AK8puppiSDSJCharge", &AK8puppiSDSJCharge, &b_AK8puppiSDSJCharge);
+   fChain->SetBranchAddress("AK8puppiSDSJFlavour", &AK8puppiSDSJFlavour, &b_AK8puppiSDSJFlavour);
+   fChain->SetBranchAddress("AK8puppiSDSJCSV", &AK8puppiSDSJCSV, &b_AK8puppiSDSJCSV);
    Notify();
 }
 

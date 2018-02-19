@@ -46,6 +46,11 @@ void BTagEff::Loop()
    fChain->SetBranchStatus("jetHadFlvr",1);
    fChain->SetBranchStatus("jetCSV2BJetTags",1);
    fChain->SetBranchStatus("jetpfCombinedMVAV2BJetTags",1);
+   fChain->SetBranchStatus("jetDeepCSVTags_b",1);
+   fChain->SetBranchStatus("jetDeepCSVTags_bb",1);
+   fChain->SetBranchStatus("jetDeepCSVTags_c",1);
+   fChain->SetBranchStatus("jetDeepCSVTags_cc",1);
+   fChain->SetBranchStatus("jetDeepCSVTags_udsg",1);
    fChain->SetBranchStatus("jetPFLooseId",1);
    fChain->SetBranchStatus("jetPUFullID",1);
    fChain->SetBranchStatus("jetP4Smear",1);
@@ -80,6 +85,9 @@ void BTagEff::Loop()
    TH2D *h_b_cMVA_L= new TH2D("h_b_cMVA_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_b_cMVA_M= new TH2D("h_b_cMVA_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_b_cMVA_T= new TH2D("h_b_cMVA_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_b_Deep_L= new TH2D("h_b_Deep_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_b_Deep_M= new TH2D("h_b_Deep_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_b_Deep_T= new TH2D("h_b_Deep_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_allAK4cjets = new TH2D("h_allAK4cjets",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_c_CSV_L= new TH2D("h_c_CSV_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_c_CSV_M= new TH2D("h_c_CSV_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
@@ -87,6 +95,9 @@ void BTagEff::Loop()
    TH2D *h_c_cMVA_L= new TH2D("h_c_cMVA_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_c_cMVA_M= new TH2D("h_c_cMVA_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_c_cMVA_T= new TH2D("h_c_cMVA_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_c_Deep_L= new TH2D("h_c_Deep_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_c_Deep_M= new TH2D("h_c_Deep_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_c_Deep_T= new TH2D("h_c_Deep_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_allAK4ljets = new TH2D("h_allAK4ljets",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_l_CSV_L= new TH2D("h_l_CSV_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_l_CSV_M= new TH2D("h_l_CSV_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
@@ -94,6 +105,9 @@ void BTagEff::Loop()
    TH2D *h_l_cMVA_L= new TH2D("h_l_cMVA_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_l_cMVA_M= new TH2D("h_l_cMVA_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_l_cMVA_T= new TH2D("h_l_cMVA_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_l_Deep_L= new TH2D("h_l_Deep_L",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_l_Deep_M= new TH2D("h_l_Deep_M",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
+   TH2D *h_l_Deep_T= new TH2D("h_l_Deep_T",";#eta;p_{T}[GeV]",nxbins,xbins,nybins,ybins);
    TH2D *h_allAK8bjets = new TH2D("h_allAK8bjets",";#eta;p_{T}[GeV]",Bnxbins,Bxbins,Bnybins,Bybins);
    TH2D *h_b_BDSV_L= new TH2D("h_b_BDSV_L",";#eta;p_{T}[GeV]",Bnxbins,Bxbins,Bnybins,Bybins);
    TH2D *h_b_BDSV_M1= new TH2D("h_b_BDSV_M1",";#eta;p_{T}[GeV]",Bnxbins,Bxbins,Bnybins,Bybins);
@@ -167,7 +181,7 @@ void BTagEff::Loop()
          jetSmearedPt.at(i) = jetp4.Pt();
          jetSmearedEn.at(i) = jetp4.Energy();
        }
-       if (abs((*jetEta)[i])>3 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<40 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
+       if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<30 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
        if (passcut) passJet.push_back(i);
      }
      //AK8
@@ -182,15 +196,16 @@ void BTagEff::Loop()
          AK8JetSmearedPt.at(i) = jetp4.Pt();
          AK8JetSmearedEn.at(i) = jetp4.Energy();
        }
-       if (abs((*AK8JetEta)[i])>3 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
+       if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
        if (passcut) passAK8Jet.push_back(i);
      }
      for (int i=0;i<passJet.size();i++) {
+       double eta=(*jetEta)[passJet[i]];
+       double pt=jetSmearedPt[passJet[i]];
+       if (pt>2000) pt=2000;
+       float DeepCSVTag=(*jetDeepCSVTags_b)[passJet.at(i)]+(*jetDeepCSVTags_bb)[passJet.at(i)];
      //Fill bjet histograms
        if ((*jetHadFlvr)[passJet[i]]==5) {
-         double eta=(*jetEta)[passJet[i]];
-         double pt=jetSmearedPt[passJet[i]];
-         if (pt>2000) pt=2000;
          h_allAK4bjets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_b_CSV_L->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[1]) h_b_CSV_M->Fill(eta,pt);
@@ -198,12 +213,12 @@ void BTagEff::Loop()
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[0]) h_b_cMVA_L->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[1]) h_b_cMVA_M->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[2]) h_b_cMVA_T->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[0]) h_b_Deep_L->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[1]) h_b_Deep_M->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[2]) h_b_Deep_T->Fill(eta,pt);
        }
      //Fill cjet histograms
        if ((*jetHadFlvr)[passJet[i]]==4) {
-         double eta=(*jetEta)[passJet[i]];
-         double pt=jetSmearedPt[passJet[i]];
-         if (pt>2000) pt=2000;
          h_allAK4cjets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_c_CSV_L->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[1]) h_c_CSV_M->Fill(eta,pt);
@@ -211,12 +226,12 @@ void BTagEff::Loop()
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[0]) h_c_cMVA_L->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[1]) h_c_cMVA_M->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[2]) h_c_cMVA_T->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[0]) h_c_Deep_L->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[1]) h_c_Deep_M->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[2]) h_c_Deep_T->Fill(eta,pt);
        }
      //Fill light jet histograms
        if ((*jetHadFlvr)[passJet[i]]==0) {
-         double eta=(*jetEta)[passJet[i]];
-         double pt=jetSmearedPt[passJet[i]];
-         if (pt>2000) pt=2000;
          h_allAK4ljets->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[0]) h_l_CSV_L->Fill(eta,pt);
          if ((*jetCSV2BJetTags)[passJet.at(i)]>BtagCSVWP[1]) h_l_CSV_M->Fill(eta,pt);
@@ -224,14 +239,17 @@ void BTagEff::Loop()
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[0]) h_l_cMVA_L->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[1]) h_l_cMVA_M->Fill(eta,pt);
          if ((*jetpfCombinedMVAV2BJetTags)[passJet.at(i)]>BtagcMVAWP[2]) h_l_cMVA_T->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[0]) h_l_Deep_L->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[1]) h_l_Deep_M->Fill(eta,pt);
+         if (DeepCSVTag>BtagDeepWP[2]) h_l_Deep_T->Fill(eta,pt);
        }
      }
      //same for AK8
      for (int i=0;i<passAK8Jet.size();i++){
+       double eta=(*AK8JetEta)[passAK8Jet[i]];
+       double pt=AK8JetSmearedPt[passAK8Jet[i]];
+       if (pt>2000) pt=2000;
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==5) {
-         double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=AK8JetSmearedPt[passAK8Jet[i]];
-         if (pt>2000) pt=2000;
          h_allAK8bjets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_b_BDSV_L->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[1]) h_b_BDSV_M1->Fill(eta,pt);
@@ -239,9 +257,6 @@ void BTagEff::Loop()
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[3]) h_b_BDSV_T->Fill(eta,pt);
        }
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==4) {
-         double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=AK8JetSmearedPt[passAK8Jet[i]];
-         if (pt>2000) pt=2000;
          h_allAK8cjets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_c_BDSV_L->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[1]) h_c_BDSV_M1->Fill(eta,pt);
@@ -249,9 +264,6 @@ void BTagEff::Loop()
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[3]) h_c_BDSV_T->Fill(eta,pt);
        }
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==0) {
-         double eta=(*AK8JetEta)[passAK8Jet[i]];
-         double pt=AK8JetSmearedPt[passAK8Jet[i]];
-         if (pt>2000) pt=2000;
          h_allAK8ljets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_l_BDSV_L->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[1]) h_l_BDSV_M1->Fill(eta,pt);
