@@ -299,6 +299,7 @@ void Analyzer::Loop()
    double xmin[dim]={-0.5,-0.5,0.5,0.5};
    double xmax[dim]={2.5,2.5,6.5,3.5};
    THnD *hn_searchBins = new THnD("hn_searchBins",";AK4;AK8;MET;njets",dim,nbins,xmin,xmax);
+   hn_searchBins->Sumw2();
    unsigned int nsbins=hn_searchBins->GetNbins();
    TH1D *h_searchBins= new TH1D("h_searchBins",";searchBins",nsbins,0.5,nsbins+0.5);
 
@@ -723,6 +724,7 @@ void Analyzer::Loop()
      for (auto i : passElePhoL) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoL]) nleadElePhoL=i;
      for (auto i : passElePhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoM]) nleadElePhoM=i;
      for (auto i : passElePhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoT]) nleadElePhoT=i;
+     if (_fakeRate==2 && nPassElePhoL != 0) {nleadPhoL=nleadElePhoL; passPhoL.push_back(nleadElePhoL);}
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
      nPassElePhoT=passElePhoT.size();
@@ -735,9 +737,11 @@ void Analyzer::Loop()
      //Calculate photon SFs
      if (!isData) {
        if (nPassPhoL!=0){
-         pho_SF[0]=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[passPhoL[0]],(*phoCalibEt)[passPhoL[0]]));
-         if ((*phoR9)[passPhoL[0]]>0.94) pho_SF[0]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoL[0]]),100));
-         else pho_SF[0]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoL[0]]),100));
+         pho_SF[0]=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
+         if (_fakeRate!=2) {
+           if ((*phoR9)[nleadPhoL]>0.94) pho_SF[0]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+           else pho_SF[0]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+         }
        }
        if (nPassPhoM!=0){
          pho_SF[1]=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
@@ -1005,6 +1009,9 @@ void Analyzer::Loop()
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
      if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoSCPhi)[nleadPhoL]-pfMETPhi))));
+     if (_fakeRate) {
+       if (_fakeRate==1 && nPassFREleL != 0) MT=sqrt(2*pfMET*(*eleCalibPt)[nleadFREleL]*(1-cos(abs((*eleSCPhi)[nleadFREleL]-pfMETPhi))));
+     }
      
      //find which btag jet to use for Higgs mass
      //AK8
@@ -1020,7 +1027,7 @@ void Analyzer::Loop()
          else if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[1]) BDSV_selected=2;
          else if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[0]) BDSV_selected=1;
          else BDSV_selected=0;
-         if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[1]) passBtag=true;
+         if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[0]) passBtag=true;
          break;
        }
      }
@@ -1535,6 +1542,19 @@ void Analyzer::Loop()
        m_AK4_AK8[mass_pair]->Fill(ak4ak8,w);
        mn_searchBins[mass_pair]->Fill(sbFill,w);
        if (signalstudy) {
+         if (ak4ak8==1) {
+           bool passak4btag = (*jetCSV2BJetTags)[passJet.at(0)]>BtagCSVWP[0];
+           bool passak8btag=0;
+           if (!passAK4HiggsMass && passak4btag) m_whyNoAK4Higgs[mass_pair]->Fill(1,w);
+           if (passAK4HiggsMass && !passak4btag) m_whyNoAK4Higgs[mass_pair]->Fill(2,w);
+           if (!passAK4HiggsMass && !passak4btag) m_whyNoAK4Higgs[mass_pair]->Fill(3,w);
+           if (passAK8Jet.size()==0) m_whyNoAK8Higgs[mass_pair]->Fill(1,w);
+           else {passak8btag = (*AK8JetpfBoostedDSVBTag)[passAK8Jet.at(0)]>BtagBDSVWP[0];
+             if (!passHiggsMass && passak8btag) m_whyNoAK8Higgs[mass_pair]->Fill(2,w);
+             if (passHiggsMass && !passak8btag) m_whyNoAK8Higgs[mass_pair]->Fill(3,w);
+             if (!passHiggsMass && !passak8btag) m_whyNoAK8Higgs[mass_pair]->Fill(4,w);
+           }
+         }
          if (iHiggs!=-1) m_Hpt[mass_pair]->Fill((*mcPt)[iHiggs]);
          if (iPho!=-1) m_PhoEt[mass_pair]->Fill((*mcEt)[iPho]);
          if (iHAK8jet!=-1) m_AK8Hmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[iHAK8jet]);
