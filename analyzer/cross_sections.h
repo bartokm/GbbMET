@@ -2020,4 +2020,109 @@ unsigned long long get_total_events(pair<int,int> input) {
   }
   return 0;
 }
+
+std::map<pair<int,int>,int> init_signal_event() {
+  std::map<pair<int,int>,int> output;
+  std::vector<int> Yticks;
+  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800});
+  for (auto i : Yticks) {pair<int,int> p(800,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800, 900}); 
+  for (auto i : Yticks) {pair<int,int> p(900,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 975, 1000}); 
+  for (auto i : Yticks) {pair<int,int> p(1000,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 1000, 1025, 1050}); 
+  for (auto i : Yticks) {pair<int,int> p(1050,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1075, 1100}); 
+  for (auto i : Yticks) {pair<int,int> p(1100,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1100, 1125, 1150}); 
+  for (auto i : Yticks) {pair<int,int> p(1150,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1175, 1200}); 
+  for (auto i : Yticks) {pair<int,int> p(1200,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1200, 1225, 1250}); 
+  for (auto i : Yticks) {pair<int,int> p(1250,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1275, 1300}); 
+  for (auto i : Yticks) {pair<int,int> p(1300,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1325, 1350}); 
+  for (auto i : Yticks) {pair<int,int> p(1350,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1375, 1400}); 
+  for (auto i : Yticks) {pair<int,int> p(1400,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1425, 1450}); 
+  for (auto i : Yticks) {pair<int,int> p(1450,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1475, 1500}); 
+  for (auto i : Yticks) {pair<int,int> p(1500,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1525, 1550}); 
+  for (auto i : Yticks) {pair<int,int> p(1550,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1575, 1600}); 
+  for (auto i : Yticks) {pair<int,int> p(1600,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1625, 1650}); 
+  for (auto i : Yticks) {pair<int,int> p(1650,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1675, 1700}); 
+  for (auto i : Yticks) {pair<int,int> p(1700,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1725, 1750}); 
+  for (auto i : Yticks) {pair<int,int> p(1750,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1775, 1800}); 
+  for (auto i : Yticks) {pair<int,int> p(1800,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1825, 1850}); 
+  for (auto i : Yticks) {pair<int,int> p(1850,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1875, 1900}); 
+  for (auto i : Yticks) {pair<int,int> p(1900,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1925, 1950}); 
+  for (auto i : Yticks) {pair<int,int> p(1950,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 1975, 2000}); 
+  for (auto i : Yticks) {pair<int,int> p(2000,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2025, 2050}); 
+  for (auto i : Yticks) {pair<int,int> p(2050,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2075, 2100}); 
+  for (auto i : Yticks) {pair<int,int> p(2100,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2100, 2125, 2150}); 
+  for (auto i : Yticks) {pair<int,int> p(2150,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2175, 2200}); 
+  for (auto i : Yticks) {pair<int,int> p(2200,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2200, 2225, 2250}); 
+  for (auto i : Yticks) {pair<int,int> p(2250,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2275, 2300}); 
+  for (auto i : Yticks) {pair<int,int> p(2300,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2300, 2325, 2350}); 
+  for (auto i : Yticks) {pair<int,int> p(2350,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2375, 2400}); 
+  for (auto i : Yticks) {pair<int,int> p(2400,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2400, 2425, 2450}); 
+  for (auto i : Yticks) {pair<int,int> p(2450,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2250, 2300, 2350, 2400, 2450, 2475, 2500});
+  for (auto i : Yticks) {pair<int,int> p(2500,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  return output;
+}
 #endif

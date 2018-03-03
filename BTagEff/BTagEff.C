@@ -202,7 +202,7 @@ void BTagEff::Loop()
      for (int i=0;i<passJet.size();i++) {
        double eta=(*jetEta)[passJet[i]];
        double pt=jetSmearedPt[passJet[i]];
-       if (pt>2000) pt=2000;
+       if (pt>=2000) pt=1999;
        float DeepCSVTag=(*jetDeepCSVTags_b)[passJet.at(i)]+(*jetDeepCSVTags_bb)[passJet.at(i)];
      //Fill bjet histograms
        if ((*jetHadFlvr)[passJet[i]]==5) {
@@ -248,7 +248,7 @@ void BTagEff::Loop()
      for (int i=0;i<passAK8Jet.size();i++){
        double eta=(*AK8JetEta)[passAK8Jet[i]];
        double pt=AK8JetSmearedPt[passAK8Jet[i]];
-       if (pt>2000) pt=2000;
+       if (pt>=2000) pt=1999;
        if ((*AK8JetHadFlvr)[passAK8Jet[i]]==5) {
          h_allAK8bjets->Fill(eta,pt);
          if ((*AK8JetpfBoostedDSVBTag)[passAK8Jet[i]]>BtagBDSVWP[0]) h_b_BDSV_L->Fill(eta,pt);

@@ -10,7 +10,7 @@
 #include <TCanvas.h>
 
 int main(int argc, char* argv[]){
-  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0;
+  bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
   bool inputs=0, cuts=0;
   int FR=0;
   string output, bname, pname;
@@ -32,6 +32,8 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='q') is_quiet=1; 
       else if (arg[1]=='S') is_signalscan=1; 
       else if (arg[1]=='s') is_signalstudy=1;
+      else if (arg[1]=='c') is_c=1; 
+      else if (arg[1]=='C') is_countSignal=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
@@ -68,6 +70,7 @@ int main(int argc, char* argv[]){
     if (is_f) cout<<"FastSim is true!"<<endl;
     if (is_signalscan) cout<<"SignalScan is true!"<<endl;
     if (is_signalstudy) cout<<"Signal study histograms will be filled! (works only on MC...)"<<endl;
+    if (is_countSignal) cout<<"Signal Count is ON, only works on T5qqqqHg sample."<<endl;
     if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (unsigned int i=0;i<inputfiles.size();i++) {std::cout<<inputfiles[i]<<std::endl; if (i==50) {cout<<"..."<<endl;break;}}
@@ -89,7 +92,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal);
   t.Loop();
   return 1;
 }
@@ -130,8 +133,9 @@ void Analyzer::Loop()
    double L_data=35867.06;
    
    //Btag SF
-   BTCalibration calib, calib_fs;
+   BTCalibration calib, calib_fs, calib_deep, calib_deep_fs;;
    BTCalibrationReader reader_L, reader_M, reader_T, reader_L_fs, reader_M_fs, reader_T_fs;
+   BTCalibrationReader reader_deep_L, reader_deep_M, reader_deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
    if (btag_file.size()>0){
      calib = *new BTCalibration("csvv1", "input/CSVv2_Moriond17_B_H.csv");
@@ -162,6 +166,36 @@ void Analyzer::Loop()
      reader_T_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
      reader_T_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
      reader_T_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
+    
+     //DeepCSV
+     calib_deep = *new BTCalibration("deepcsv", "input/DeepCSV_Moriond17_B_H.csv");
+     reader_deep_L = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_deep_M = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_deep_T = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_deep_L.load(calib_deep,BTEntry::FLAV_B,"comb");
+     reader_deep_L.load(calib_deep,BTEntry::FLAV_C,"comb");
+     reader_deep_L.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
+     reader_deep_M.load(calib_deep,BTEntry::FLAV_B,"comb");
+     reader_deep_M.load(calib_deep,BTEntry::FLAV_C,"comb");
+     reader_deep_M.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
+     reader_deep_T.load(calib_deep,BTEntry::FLAV_B,"comb");
+     reader_deep_T.load(calib_deep,BTEntry::FLAV_C,"comb");
+     reader_deep_T.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
+     
+     //fastsim
+     calib_deep_fs = *new BTCalibration("deepcsv_fs", "input/fastsim_deepcsv_ttbar_26_1_2017.csv");
+     reader_deep_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_deep_M_fs = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_deep_T_fs = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
+     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
+     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
+     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
+     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
+     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
+     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
+     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
+     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
    }
 
    //pu reweight
@@ -346,6 +380,8 @@ void Analyzer::Loop()
    if (!is_quiet) now.Print();
    time.Start("time");
 
+   std::map<pair<int,int>,int> signal_events;
+   if (CountSignal) signal_events=init_signal_event();
    int file_counter=-1, temp=-1; std::string temp_f="";
    ULong64_t TotalEvents=1;
    int zbx=0;
@@ -444,6 +480,11 @@ void Analyzer::Loop()
      b_jetJetProbabilityBJetTags->GetEntry(ientry);
      b_jetCSV2BJetTags->GetEntry(ientry);
      b_jetpfCombinedMVAV2BJetTags->GetEntry(ientry);
+     b_jetDeepCSVTags_b->GetEntry(ientry);
+     b_jetDeepCSVTags_bb->GetEntry(ientry);
+     b_jetDeepCSVTags_c->GetEntry(ientry);
+     b_jetDeepCSVTags_cc->GetEntry(ientry);
+     b_jetDeepCSVTags_udsg->GetEntry(ientry);
      b_jetPFLooseId->GetEntry(ientry);
      b_jetPUFullID->GetEntry(ientry);
      b_nAK8Jet->GetEntry(ientry);
@@ -497,6 +538,10 @@ void Analyzer::Loop()
        double m_Neutralino=(*mcMass)[neutralino];
        pair<double,double> initial_pair(m_Gluino,m_Neutralino);
        mass_pair = whichGridpoint(initial_pair);
+       if (CountSignal) {
+         auto search = signal_events.find(mass_pair);
+         if (search!=signal_events.end()) search->second +=1;
+       }
      }
      w=1;
      //MC weights and scale factors
@@ -541,7 +586,7 @@ void Analyzer::Loop()
        double pu_weight=h_PUweight->GetBinContent(h_PUweight->FindBin((*puTrue)[zbx]));
        if (_fastSim || SignalScan) pu_weight=1;
        double weight=L_data*xsec/TotalEvents;
-       //std::cout<<"weight=L_data*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
+       //if (newfile) std::cout<<"weight=L_data*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
        if (abs(genWeight)>1) w=copysign(weight*pu_weight,genWeight); //only a sign for amc@nlo
        else w=weight*pu_weight*genWeight;
        //std::cout<<"w=weight*pu_weight*genWeight "<<w<<"="<<weight<<"*"<<pu_weight<<"*"<<genWeight<<std::endl;
@@ -660,6 +705,15 @@ void Analyzer::Loop()
            eff_l_CSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_CSV_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_CSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
+           eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
+           eff_b_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
+           eff_b_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
+           eff_c_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
+           eff_c_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
+           eff_c_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
+           eff_l_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
+           eff_l_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
+           eff_l_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_b_BDSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_L"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
            eff_b_BDSV_M1 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M1"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
            eff_b_BDSV_M2 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M2"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
@@ -675,7 +729,7 @@ void Analyzer::Loop()
      vector<int> passElePhoL, passElePhoM, passElePhoT, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
-     map<int,char> passCSV, passcMVA, passBDSV;
+     map<int,char> passCSV, passcMVA, passBDSV, passDeep;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0;
@@ -690,6 +744,7 @@ void Analyzer::Loop()
      memset(bcounterCSV,0,sizeof bcounterCSV);
      memset(bcountercMVA,0,sizeof bcountercMVA);
      memset(bcounterBDSV,0,sizeof bcounterBDSV);
+     memset(bcounterDeep,0,sizeof bcounterDeep);
      //photon
      for (int i=0;i<nPho;i++){
        if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0) {
@@ -908,6 +963,7 @@ void Analyzer::Loop()
      //if (vetoEvent) {continue;}
      //jet pt, btags
      for (auto i : passJet) {
+       float DeepCSVTag=(*jetDeepCSVTags_b)[i]+(*jetDeepCSVTags_bb)[i];
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
        if ((*jetCSV2BJetTags)[i]>(*jetCSV2BJetTags)[highCSV1]) {highCSV2=highCSV1;highCSV1=i;}
@@ -922,11 +978,17 @@ void Analyzer::Loop()
        else if ((*jetCSV2BJetTags)[i]>BtagCSVWP[1]) {passCSV.insert(pair<int,char>(i,'M'));bcounterCSV[2]++;}
        else if ((*jetCSV2BJetTags)[i]>BtagCSVWP[0]) {passCSV.insert(pair<int,char>(i,'L'));bcounterCSV[1]++;}
        else {passCSV.insert(pair<int,char>(i,'0'));bcounterCSV[0]++;}
+       if (DeepCSVTag>BtagDeepWP[2]) {passDeep.insert(pair<int,char>(i,'T'));bcounterDeep[3]++;}
+       else if (DeepCSVTag>BtagDeepWP[1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
+       else if (DeepCSVTag>BtagDeepWP[0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
+       else {passDeep.insert(pair<int,char>(i,'0'));bcounterDeep[0]++;}
      }
      bcounterCSV[2] += bcounterCSV[3];
      bcounterCSV[1] += bcounterCSV[2];
      bcountercMVA[2] += bcountercMVA[3];
      bcountercMVA[1] += bcountercMVA[2];
+     bcounterDeep[2] += bcounterDeep[3];
+     bcounterDeep[1] += bcounterDeep[2];
      //Sort passJet from highest CSV btag to lowest
      for (unsigned int i=0;i<passJet.size();i++){
      int temp;
@@ -1056,6 +1118,40 @@ void Analyzer::Loop()
        if (passAK4HiggsMass) break;
      }
      if (!passAK4HiggsMass && nPassAK4>1) {SelectedAK4Jet1 = passJet.at(0); SelectedAK4Jet2 = passJet.at(1);}
+     
+     //Sort passJet according to DeepCSV
+     for (unsigned int i=0;i<passJet.size();i++){
+     int temp;
+       for (unsigned int j=passJet.size()-1;j>i;j--){
+         float DeepCSVTag_1=(*jetDeepCSVTags_b)[passJet.at(j)]+(*jetDeepCSVTags_bb)[passJet.at(j)];
+         float DeepCSVTag_2=(*jetDeepCSVTags_b)[passJet.at(j-1)]+(*jetDeepCSVTags_bb)[passJet.at(j-1)];
+         if (DeepCSVTag_1>DeepCSVTag_2){
+           temp=passJet[j-1];
+           passJet[j-1]=passJet[j];
+           passJet[j]=temp;
+         }
+       }
+     }
+     double m_bb_deep=-1;
+     bool passAK4DeepHiggsMass=false;
+     Deep_selected=0; //Deep btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
+     for (unsigned int i=0;i<passJet.size();i++){
+       for (unsigned int j=i+1;j<passJet.size();j++){
+         TLorentzVector bjet1, bjet2;
+         bjet1.SetPtEtaPhiE(jetSmearedPt[passJet.at(i)],(*jetEta)[passJet.at(i)],(*jetPhi)[passJet.at(i)],jetSmearedEn[passJet.at(i)]);
+         bjet2.SetPtEtaPhiE(jetSmearedPt[passJet.at(j)],(*jetEta)[passJet.at(j)],(*jetPhi)[passJet.at(j)],jetSmearedEn[passJet.at(j)]);
+         m_bb_deep=(bjet1+bjet2).M();
+         if (m_bb_deep>70 && m_bb_deep<200) {
+           float DeepCSVTag_1=(*jetDeepCSVTags_b)[passJet.at(i)]+(*jetDeepCSVTags_bb)[passJet.at(i)];
+           float DeepCSVTag_2=(*jetDeepCSVTags_b)[passJet.at(j)]+(*jetDeepCSVTags_bb)[passJet.at(j)];
+           if (DeepCSVTag_1>BtagDeepWP[0]) Deep_selected++;
+           if (DeepCSVTag_2>BtagDeepWP[0]) Deep_selected++;
+           passAK4DeepHiggsMass=true;
+           break;
+         }
+       }
+       if (passAK4DeepHiggsMass) break;
+     }
 
      //Calculate dR between higgs candidate jets
      double drmin_ak4ak8=-1, drmax_ak4ak8=-1, dr_ak4ak4=-1;
@@ -1098,9 +1194,13 @@ void Analyzer::Loop()
      //Calculate BTag SFs
      if (!isData && btag_file.size()>0) {
        //AK4
-       if (!_fastSim) CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+       if (!_fastSim) {
+         CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+         CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L, reader_deep_M, reader_deep_T, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+       }
        else {
          CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L_fs, reader_M_fs, reader_T_fs, CSV_SF_L, CSV_SF_M, CSV_SF_T);
+         CalcBtagSF(jetEta, jetSmearedPt, jetHadFlvr, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs, Deep_SF_L, Deep_SF_M, Deep_SF_T);
        //AK8
          CalcBtagSF_AK8(AK8JetEta, AK8JetSmearedPt, AK8JetHadFlvr, passBDSV, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, BDSV_SF_L, BDSV_SF_M1, BDSV_SF_M2, BDSV_SF_T);
        }
@@ -1334,6 +1434,8 @@ void Analyzer::Loop()
        if (BDSV_selected>=2) {AK8=2; if (!isData) w*=BDSV_SF_M1[0];}
        if (CSV_selected==1) {AK4=1; if (!isData) w*=CSV_SF_L[0];}
        if (CSV_selected>=2) {AK4=2; if (!isData) w*=CSV_SF_L[0]*CSV_SF_L[0];}
+       //if (Deep_selected==1) {AK4=1; if (!isData) w*=Deep_SF_L[0];}
+       //if (Deep_selected>=2) {AK4=2; if (!isData) w*=Deep_SF_L[0]*Deep_SF_L[0];}
        double ak4ak8=0;
        if (AK8==0 && AK4==0) ak4ak8=1;
        if (AK8==0 && AK4==1) ak4ak8=2;
@@ -1624,4 +1726,5 @@ void Analyzer::Loop()
    f->Close();
    time.Stop("time");
    if (!is_quiet) std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
+   if (CountSignal) for (auto i : signal_events) cout<<i.first.first<<" "<<i.first.second<<" "<<i.second<<endl;
 }
