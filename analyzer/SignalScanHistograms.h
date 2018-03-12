@@ -37,6 +37,8 @@
 	map< pair<int, int>, TH1D* > m_nMu;
 	map< pair<int, int>, TH1D* > m_nMuM;
 	map< pair<int, int>, TH1D* > m_nMuT;
+	map< pair<int, int>, TH1D* > m_nTau;
+	map< pair<int, int>, TH1D* > m_nIso;
  
 	map< pair<int, int>, TH1D* > m_njets;
 	map< pair<int, int>, TH1D* > m_jetpt;
@@ -112,6 +114,7 @@
 	map< pair<int, int>, TH2D* > m_AK8mass_vs_ST;
 	map< pair<int, int>, TH2D* > m_mbbjet_vs_MT;
 	map< pair<int, int>, TH2D* > m_mbbjet_vs_ST;
+	map< pair<int, int>, TH1D* > m_AK4_category;
 	
   map< pair<int, int>, THnD* > mn_searchBins;
   map< pair<int, int>, TH1D* > m_searchBins;
@@ -127,6 +130,8 @@
 	map< pair<int, int>, TH1D* > m_true_HiggsAK8Jet;
 	map< pair<int, int>, TH1D* > m_whyNoAK4Higgs;
 	map< pair<int, int>, TH1D* > m_whyNoAK8Higgs;
+	map< pair<int, int>, TH2D* > m_ak4_selected;
+	map< pair<int, int>, TH1D* > m_true_ak4bjets;
 
 void init_scan_histos(TFile *outFile, bool signalstudy){
 
@@ -174,6 +179,8 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
 		m_nMu[MassPair] = new TH1D("h_nMu",";# of #mu_{loose}",10,-0.5,9.5);
 		m_nMuM[MassPair] = new TH1D("h_nMuM",";# of #mu_{medium}",10,-0.5,9.5);
 		m_nMuT[MassPair] = new TH1D("h_nMuT",";# of #mu_{tight}",10,-0.5,9.5);
+		m_nTau[MassPair] = new TH1D("h_nTau",";# of #tau_{loose}",10,-0.5,9.5);
+		m_nIso[MassPair] = new TH1D("h_nIso",";# of IsoTracks",10,-0.5,9.5);
 
 		m_njets[MassPair] = new TH1D("h_njets",";# of jets",15,-0.5,14.5);
 		m_jetpt[MassPair] = new TH1D("h_jetpt","Leading jetpt;p_{T}^{Leading jet} [GeV]",10,30,2030);
@@ -251,6 +258,7 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
 		m_AK8mass_vs_ST[MassPair] = new TH2D("h_AK8mass_vs_ST","Invariant mass of selected AK8 jet vs 1st S_{T};M_{AK8}[GeV];S_{T}^{1} [GeV]",20,18,278,60,0,2000);
       
     m_AK4_AK8[MassPair] = new TH1D("h_AK4_AK8","Higgs candidate findings;",9,0.5,9.5);
+    m_AK4_category[MassPair] = new TH1D("h_AK4_category","AK4 btag-Higgs window categories;NoBtag-NoWindow, 1Btag-NoWindow, 2Btag-NoWindow, NoBtag-Window, Undecided, 1Selected, 2Selected",7,0.5,7.5);
     
     const int dim=4;
     int nbins[dim]={3,3,6,3};
@@ -271,6 +279,8 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
       m_true_HiggsAK4Jet[MassPair]= new TH1D("hs_true_HiggsAK4Jet","True Higgs AK4Jet;1 Higgs, 1 Hjet, 1Hjet=highest, 1 Hjet=selected, 2 Hjet, 2Hjet=highest, 2Hjet=selected",7,0.5,7.5);
       m_whyNoAK4Higgs[MassPair]= new TH1D("hs_whyAK4NoHiggs","Failed AK4 Higgs tag;Higgs window, btag, both",3,0.5,3.5);
       m_whyNoAK8Higgs[MassPair]= new TH1D("hs_whyAK8NoHiggs","Failed AK8 Higgs tag;No AK8jet, Higgs window, btag, both",4,0.5,4.5);
+      m_ak4_selected[MassPair] = new TH2D("hs_ak4_selected","Index of Higgs candidate ak4 jets;First;Second",20,-0.5,19.5,20,-0.5,19.5);
+      m_true_ak4bjets[MassPair] = new TH1D("hs_true_ak4bjets","# of true ak4 b jets;# of true b jets",10,-0.5,9.5);
     }
 	}
 }

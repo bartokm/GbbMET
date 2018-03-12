@@ -1073,16 +1073,19 @@ public :
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
+   int nPassTauL=-1, nPassTauM=-1, nPassTauT=-1, nPassIso=-1;
    int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
    int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
+   int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={}, bcounterDeep[4]={};
    int BDSV_selected=0, CSV_selected=0, Deep_selected=0;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true;
+   bool Hbb=false;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
@@ -2335,12 +2338,14 @@ Int_t Analyzer::Cut(Long64_t entry)
         if (_cut_value[i]==2) w*=Deep_SF_L[0]*Deep_SF_L[0];
       }
     }
+    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(CSV_selected+BDSV_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passHiggsMass") returnvalue*=Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
       if (_fastSim) h_cuts->Fill(i+1,w);
@@ -2617,12 +2622,14 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
+  {"sth_selected","CSV_selected+BDSV_selected"},
   {"passBtag","Higgs candidate ak8jet passes medium btag"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
   {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
   {"passHiggsMass","At least 1 ak8jet exist with mass 70 to 200GeV"},
   {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
-  {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."}};
+  {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
+  {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"}};
 
 bool CompareCuts(vector<string> input_cuts){
   for (auto i : input_cuts) {
