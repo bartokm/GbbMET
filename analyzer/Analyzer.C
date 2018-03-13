@@ -772,7 +772,7 @@ void Analyzer::Loop()
      memset(bcounterDeep,0,sizeof bcounterDeep);
      //photon
      for (int i=0;i<nPho;i++){
-       if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0) {
+       if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
         if ((*phoIDbit)[i]>>0&1) {
          passPhoL.push_back(i);
         }
@@ -1037,12 +1037,12 @@ void Analyzer::Loop()
        for (auto j : passMuL) if (deltaR((*jetPhi)[i],(*muPhi)[j],(*jetEta)[i],(*muEta)[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passTauL) if (deltaR((*jetPhi)[i],(*tauPhi)[j],(*jetEta)[i],(*tauEta)[j])<0.4) {
-         passcut=false;break;
-       }
-       for (auto j : passIso) if (deltaR((*jetPhi)[i],(*isoPhi)[j],(*jetEta)[i],(*isoEta)[j])<0.4) {
-         passcut=false;break;
-       }
+       //for (auto j : passTauL) if (deltaR((*jetPhi)[i],(*tauPhi)[j],(*jetEta)[i],(*tauEta)[j])<0.4) {
+       //  passcut=false;break;
+       //}
+       //for (auto j : passIso) if (deltaR((*jetPhi)[i],(*isoPhi)[j],(*jetEta)[i],(*isoEta)[j])<0.4) {
+       //  passcut=false;break;
+       //}
        if (passcut) passJet.push_back(i);
      }
      nPassAK4=passJet.size();
@@ -1112,12 +1112,12 @@ void Analyzer::Loop()
        for (auto j : passMuL) if (deltaR((*AK8JetPhi)[i],(*muPhi)[j],(*AK8JetEta)[i],(*muEta)[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passTauL) if (deltaR((*AK8JetPhi)[i],(*tauPhi)[j],(*AK8JetEta)[i],(*tauEta)[j])<0.4) {
-         passcut=false;break;
-       }
-       for (auto j : passIso) if (deltaR((*AK8JetPhi)[i],(*isoPhi)[j],(*AK8JetEta)[i],(*isoEta)[j])<0.4) {
-         passcut=false;break;
-       }
+       //for (auto j : passTauL) if (deltaR((*AK8JetPhi)[i],(*tauPhi)[j],(*AK8JetEta)[i],(*tauEta)[j])<0.8) {
+       //  passcut=false;break;
+       //}
+       //for (auto j : passIso) if (deltaR((*AK8JetPhi)[i],(*isoPhi)[j],(*AK8JetEta)[i],(*isoEta)[j])<0.8) {
+       //  passcut=false;break;
+       //}
        if (passcut) passAK8Jet.push_back(i);
      }
      nPassAK8=passAK8Jet.size();
@@ -1861,5 +1861,15 @@ void Analyzer::Loop()
    f->Close();
    time.Stop("time");
    if (!is_quiet) std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
-   if (CountSignal) for (auto i : signal_events) cout<<i.first.first<<" "<<i.first.second<<" "<<i.second<<endl;
+   if (CountSignal) {
+     ofstream counttxt;
+     counttxt.open ("CountSignal.txt");
+     bool newg=true;
+     for (auto i : signal_events) {
+       if (newg) counttxt<<"  if (a=="<<i.first.first<<") {\n    switch (b) {"<<endl;
+       newg=false;
+       counttxt<<"      case "<<i.first.second<<" : return "<<i.second<<";"<<endl;
+       if (i.first.first==i.first.second) {newg=true; counttxt<<"    }\n  }"<<endl;}
+     }
+   }
 }
