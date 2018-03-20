@@ -11,8 +11,9 @@
 
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
+  bool is_t=0;
   bool inputs=0, cuts=0;
-  int FR=0;
+  int FR=0, tr=0;
   string output, bname, pname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
   vector<double> cut_value;
@@ -34,6 +35,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='s') is_signalstudy=1;
       else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='C') is_countSignal=1; 
+      else if (arg[1]=='t') is_t=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
@@ -47,6 +49,7 @@ int main(int argc, char* argv[]){
     if (is_b) {bname=argv[i+1]; is_b=0;}
     if (is_p) {pname=argv[i+1]; is_p=0;}
     if (is_F) {FR=atoi(argv[i+1]); is_F=0;}
+    if (is_t) {(atoi(argv[i+1])==0) ? tr=1000 : tr=atoi(argv[i+1]); is_t=0;}
     if (cuts && is_cuts) v_cuts.push_back(arg);
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
@@ -68,12 +71,13 @@ int main(int argc, char* argv[]){
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
     if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
+    if (tr) cout<<"This is a test run on "<<tr<<" events!"<<endl;
     if (is_signalscan) cout<<"SignalScan is true!"<<endl;
     if (is_signalstudy) cout<<"Signal study histograms will be filled! (works only on MC...)"<<endl;
     if (is_countSignal) cout<<"Signal Count is ON, only works on T5qqqqHg sample."<<endl;
     if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
-    for (unsigned int i=0;i<inputfiles.size();i++) {std::cout<<inputfiles[i]<<std::endl; if (i==50) {cout<<"..."<<endl;break;}}
+    for (unsigned int i=0;i<inputfiles.size();i++) {std::cout<<inputfiles[i]<<std::endl; if (i==30) {cout<<"...More files..."<<endl;break;}}
     if (!cut_variable.size()) cout<<"No cuts are set, running on hardcoded cuts."<<endl;
     for (unsigned int i=0;i<cut_variable.size();i++) {
       if (!i) cout<<"Following cuts are set:"<<endl;
@@ -92,7 +96,7 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal, tr);
   t.Loop();
   return 1;
 }
@@ -124,7 +128,9 @@ void Analyzer::Loop()
 //by  b_branchname->GetEntry(ientry); //read only this branch
    if (fChain == 0) return;
    //Long64_t nentries = fChain->GetEntriesFast();
-   Long64_t nentries = fChain->GetEntries();
+   Long64_t nentries = 0;
+   if (!_testRun) nentries = fChain->GetEntries();
+   else nentries = _testRun;
 
    //Long64_t nbytes = 0, nb = 0; //not used
    //Luminosity of data in [pb]
@@ -266,13 +272,20 @@ void Analyzer::Loop()
    TH1D *h_AK8bhjetmass    = new TH1D("h_AK8bhjetmass","Btagged, Higgs-mass AK8jetmass;m_{Higgs btagged AK8jets} [GeV]",10,5,655);
    TH1D *h_AK8bPrunedjetmass    = new TH1D("h_AK8bPrunedjetmass","Btagged AK8Prunedjetmass;Pruned m_{btagged AK8jets} [GeV]",10,5,655);
    TH1D *h_AK8bhPrunedjetmass    = new TH1D("h_AK8bhPrunedjetmass","Btagged, Higgs-mass AK8Prunedjetmass;Pruned m_{Higgs btagged AK8jets} [GeV]",10,5,655);
-   TH1D *h_AK8bPrunedCorrjetmass    = new TH1D("h_AK8bPrunedCorrjetmass","Btagged AK8PrunedCorrjetmass;PrunedCorr m_{btagged AK8jets} [GeV]",10,5,655);
    TH1D *h_AK8bhPrunedCorrjetmass    = new TH1D("h_AK8bhPrunedCorrjetmass","Btagged, Higgs-mass AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,5,655);
+   TH1D *h_AK8PrunedCorrjetmass    = new TH1D("h_AK8PrunedCorrjetmass","Highest btagged AK8jetmess;PrunedCorr m_{AK8jets} [GeV]",20,5,655);
+   TH1D *h_AK8SoftDropCorrjetmass    = new TH1D("h_AK8SoftDropCorrjetmass","Highest btagged AK8jetmess;SoftDropCorr m_{AK8jets} [GeV]",20,5,655);
+   TH1D *h_AK8PUPPISDjetmass    = new TH1D("h_AK8PUPPISDjetmass","Highest btagged AK8jetmess;PUPPISD m_{AK8jets} [GeV]",20,5,655);
    TH1D *h_AK8tau1    = new TH1D("h_AK8tau1",";#tau_{1}^{AK8Jet}",10,0,1);
    TH1D *h_AK8tau2    = new TH1D("h_AK8tau2",";#tau_{2}^{AK8Jet}",10,0,1);
    TH1D *h_AK8tau3    = new TH1D("h_AK8tau3",";#tau_{3}^{AK8Jet}",10,0,1);
    TH1D *h_AK8tau2_tau1    = new TH1D("h_AK8tau2_tau1",";AK8Jet_tau2/tau1",10,0,1);
    TH1D *h_AK8tau3_tau2    = new TH1D("h_AK8tau3_tau2",";AK8Jet_tau3/tau2",10,0,1);
+   TH1D *h_AK8puppitau1    = new TH1D("h_AK8puppitau1",";puppi#tau_{1}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8puppitau2    = new TH1D("h_AK8puppitau2",";puppi#tau_{2}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8puppitau3    = new TH1D("h_AK8puppitau3",";puppi#tau_{3}^{AK8Jet}",10,0,1);
+   TH1D *h_AK8puppitau2_tau1    = new TH1D("h_AK8puppitau2_tau1",";AK8Jetpuppi_tau2/tau1",10,0,1);
+   TH1D *h_AK8puppitau3_tau2    = new TH1D("h_AK8puppitau3_tau2",";AK8Jetpuppi_tau3/tau2",10,0,1);
    
    TH1D *h_CSVbjetsL    = new TH1D("h_CSVbjetsL",";# of CSVLoosebjets",10,-0.5,9.5);
    TH1D *h_CSVbjetsM    = new TH1D("h_CSVbjetsM",";# of CSVMediumbjets",10,-0.5,9.5);
@@ -392,7 +405,6 @@ void Analyzer::Loop()
    ULong64_t TotalEvents=1;
    int zbx=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
-   //for (Long64_t jentry=0; jentry<1000;jentry++) {
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
@@ -508,11 +520,16 @@ void Analyzer::Loop()
      b_AK8JetMass->GetEntry(ientry);
      b_AK8JetPrunedMass->GetEntry(ientry);
      b_AK8JetPrunedMassCorr->GetEntry(ientry);
+     b_AK8JetSoftDropMassCorr->GetEntry(ientry);
      b_AK8JetPFLooseId->GetEntry(ientry);
      b_AK8JetpfBoostedDSVBTag->GetEntry(ientry);
      b_AK8Jet_tau1->GetEntry(ientry);
      b_AK8Jet_tau2->GetEntry(ientry);
      b_AK8Jet_tau3->GetEntry(ientry);
+     b_AK8puppiSDMassL2L3Corr->GetEntry(ientry);
+     b_AK8puppiTau1->GetEntry(ientry);
+     b_AK8puppiTau2->GetEntry(ientry);
+     b_AK8puppiTau3->GetEntry(ientry);
      b_nIsoTrack->GetEntry(ientry);
      b_isoPt->GetEntry(ientry);
      b_isoEta->GetEntry(ientry);
@@ -715,6 +732,10 @@ void Analyzer::Loop()
          h_muISO_SF2D[0]->Add(h_temp[0]);
          h_muISO_SF2D[1]->Add(h_temp[1]);
          h_muISO_SF2D[2]->Add(h_temp[2]);
+         //Muon Tracking SF
+         TFile f_muTrk("input/Tracking_EfficienciesAndSF_BCDEFGH.root","read");
+         h_muTrk_SF = (TGraph*)f_muTrk.Get("ratio_eff_eta3_dr030e030_corr");
+         f_muTrk.Close();
 
          //Loading btag efficiency file, fill efficiency histograms
          if (btag_file.size()>0) {
@@ -940,6 +961,12 @@ void Analyzer::Loop()
            float pt = ( (*muPt)[iter[i]]< 20)? 20 : ((*muPt)[iter[i]]< 100) ? (*muPt)[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
            mu_SF[i]=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
            mu_SF[i]*=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           double *y = h_muTrk_SF->GetY(); double *x = h_muTrk_SF->GetX(); int whichx=0;
+           for (int j=0;;j++) {
+             double xdo=h_muTrk_SF->GetErrorXlow(j); double xup=h_muTrk_SF->GetErrorXhigh(j);
+             if ((*muEta)[iter[i]] >= (x[j]-xdo) && (*muEta)[iter[i]] <= (x[j]+xup)) {whichx=j;break;}
+           }
+           mu_SF[i]*=y[whichx];
          }
        }
        //muon vetoSF (only for vetoing loose muons)
@@ -1174,6 +1201,7 @@ void Analyzer::Loop()
      BDSV_selected=0; //BDSV btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
      for (auto i : passAK8Jet){
        if ((*AK8JetPrunedMassCorr)[i]>70 && (*AK8JetPrunedMassCorr)[i]<200) {
+       //if ((*AK8puppiSDMassL2L3Corr)[i]>70 && (*AK8puppiSDMassL2L3Corr)[i]<200) {
          passHiggsMass=true;
          SelectedAK8Jet=i;
          if ((*AK8JetpfBoostedDSVBTag)[i]>BtagBDSVWP[3]) BDSV_selected=4;
@@ -1520,8 +1548,15 @@ void Analyzer::Loop()
      if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhjetmass->Fill((*AK8JetMass)[SelectedAK8Jet],w);
      if (leadpt_ak8!=-1) h_AK8bPrunedjetmass->Fill((*AK8JetPrunedMass)[highBDSV],w);
      if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhPrunedjetmass->Fill((*AK8JetPrunedMass)[SelectedAK8Jet],w);
-     if (leadpt_ak8!=-1) h_AK8bPrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
      if (SelectedAK8Jet!=-1 && passBtag) h_AK8bhPrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+     if (leadpt_ak8!=-1) h_AK8PrunedCorrjetmass->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8SoftDropCorrjetmass->Fill((*AK8JetSoftDropMassCorr)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8PUPPISDjetmass->Fill((*AK8puppiSDMassL2L3Corr)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8puppitau1->Fill((*AK8puppiTau1)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8puppitau2->Fill((*AK8puppiTau2)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8puppitau3->Fill((*AK8puppiTau3)[highBDSV],w);
+     if (leadpt_ak8!=-1) h_AK8puppitau2_tau1->Divide(h_AK8puppitau2,h_AK8puppitau1);
+     if (leadpt_ak8!=-1) h_AK8puppitau3_tau2->Divide(h_AK8puppitau3,h_AK8puppitau2);
      if (dR_pho_AK8!=-1) h_dRphoAK8jet->Fill(dR_pho_AK8,w);
      if (SelectedAK8Jet!=-1 && passBtag) h_AK8PrunedCorrjetmass_select->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
      if (SelectedAK8Jet!=-1) h_selectAK8bjetpt->Fill(AK8JetSmearedPt[SelectedAK8Jet],w);
@@ -1554,7 +1589,7 @@ void Analyzer::Loop()
        }
      }
 
-       int AK8=0 ,AK4=0;
+       int AK8=0, AK4=0;
        double met = (pfMET<50) ? 1 : (pfMET<70) ? 2 : (pfMET<100) ? 3 : (pfMET<200) ? 4 : (pfMET<500) ? 5 : 6;
        double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
        if (BDSV_selected==1) {AK8=1; if (!isData) w*=BDSV_SF_L[0];}
@@ -1740,10 +1775,17 @@ void Analyzer::Loop()
        if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhjetmass[mass_pair]->Fill((*AK8JetMass)[SelectedAK8Jet],w);
        if (leadpt_ak8!=-1) m_AK8bPrunedjetmass[mass_pair]->Fill((*AK8JetPrunedMass)[highBDSV],w);
        if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhPrunedjetmass[mass_pair]->Fill((*AK8JetPrunedMass)[SelectedAK8Jet],w);
-       if (leadpt_ak8!=-1) m_AK8bPrunedCorrjetmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
        if (SelectedAK8Jet!=-1 && passBtag) m_AK8bhPrunedCorrjetmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
        if (dR_pho_AK8!=-1) m_dRphoAK8jet[mass_pair]->Fill(dR_pho_AK8,w);
        if (SelectedAK8Jet!=-1 && passBtag) m_AK8PrunedCorrjetmass_select[mass_pair]->Fill((*AK8JetPrunedMassCorr)[SelectedAK8Jet],w);
+       if (leadpt_ak8!=-1) m_AK8PrunedCorrjetmass[mass_pair]->Fill((*AK8JetPrunedMassCorr)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8SoftDropCorrjetmass[mass_pair]->Fill((*AK8JetSoftDropMassCorr)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8PUPPISDjetmass[mass_pair]->Fill((*AK8puppiSDMassL2L3Corr)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8puppitau1[mass_pair]->Fill((*AK8puppiTau1)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8puppitau2[mass_pair]->Fill((*AK8puppiTau2)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8puppitau3[mass_pair]->Fill((*AK8puppiTau3)[highBDSV],w);
+       if (leadpt_ak8!=-1) m_AK8puppitau2_tau1[mass_pair]->Divide(h_AK8puppitau2,h_AK8puppitau1);
+       if (leadpt_ak8!=-1) m_AK8puppitau3_tau2[mass_pair]->Divide(h_AK8puppitau3,h_AK8puppitau2);
        if (SelectedAK8Jet!=-1) m_selectAK8bjetpt[mass_pair]->Fill(AK8JetSmearedPt[SelectedAK8Jet],w);
        if (SelectedAK4Jet1!=-1) m_selectbjetpt[mass_pair]->Fill(jetSmearedPt[SelectedAK4Jet1],w);
        if (SelectedAK4Jet2!=-1) m_selectbjetpt2[mass_pair]->Fill(jetSmearedPt[SelectedAK4Jet2],w);

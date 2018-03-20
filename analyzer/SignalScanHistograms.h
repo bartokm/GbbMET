@@ -52,13 +52,20 @@
 	map< pair<int, int>, TH1D* > m_AK8bhjetmass;
 	map< pair<int, int>, TH1D* > m_AK8bPrunedjetmass;
 	map< pair<int, int>, TH1D* > m_AK8bhPrunedjetmass;
-	map< pair<int, int>, TH1D* > m_AK8bPrunedCorrjetmass;
 	map< pair<int, int>, TH1D* > m_AK8bhPrunedCorrjetmass;
+	map< pair<int, int>, TH1D* > m_AK8PrunedCorrjetmass;
+	map< pair<int, int>, TH1D* > m_AK8SoftDropCorrjetmass;
+	map< pair<int, int>, TH1D* > m_AK8PUPPISDjetmass;
 	map< pair<int, int>, TH1D* > m_AK8tau1;
 	map< pair<int, int>, TH1D* > m_AK8tau2;
 	map< pair<int, int>, TH1D* > m_AK8tau3;
 	map< pair<int, int>, TH1D* > m_AK8tau2_tau1;
 	map< pair<int, int>, TH1D* > m_AK8tau3_tau2;
+	map< pair<int, int>, TH1D* > m_AK8puppitau1;
+	map< pair<int, int>, TH1D* > m_AK8puppitau2;
+	map< pair<int, int>, TH1D* > m_AK8puppitau3;
+	map< pair<int, int>, TH1D* > m_AK8puppitau2_tau1;
+	map< pair<int, int>, TH1D* > m_AK8puppitau3_tau2;
 	 
 	map< pair<int, int>, TH1D* > m_CSVbjetsL;
 	map< pair<int, int>, TH1D* > m_CSVbjetsM;
@@ -194,13 +201,20 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
 		m_AK8bhjetmass[MassPair] = new TH1D("h_AK8bhjetmass","Btagged, Higgs-mass AK8jetmass;m_{Higgs btagged AK8jets} [GeV]",10,5,655);
 		m_AK8bPrunedjetmass[MassPair] = new TH1D("h_AK8bPrunedjetmass","Btagged AK8Prunedjetmass;Pruned m_{btagged AK8jets} [GeV]",10,5,655);
 		m_AK8bhPrunedjetmass[MassPair] = new TH1D("h_AK8bhPrunedjetmass","Btagged, Higgs-mass AK8Prunedjetmass;Pruned m_{Higgs btagged AK8jets} [GeV]",10,5,655);
-		m_AK8bPrunedCorrjetmass[MassPair] = new TH1D("h_AK8bPrunedCorrjetmass","Btagged AK8PrunedCorrjetmass;PrunedCorr m_{btagged AK8jets} [GeV]",10,5,655);
 		m_AK8bhPrunedCorrjetmass[MassPair] = new TH1D("h_AK8bhPrunedCorrjetmass","Btagged, Higgs-mass AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,5,655);
+    m_AK8PrunedCorrjetmass[MassPair] = new TH1D("h_AK8PrunedCorrjetmass","Highest btagged AK8jetmess;PrunedCorr m_{AK8jets} [GeV]",20,5,655);
+    m_AK8SoftDropCorrjetmass[MassPair] = new TH1D("h_AK8SoftDropCorrjetmass","Highest btagged AK8jetmess;SoftDropCorr m_{AK8jets} [GeV]",20,5,655);
+    m_AK8PUPPISDjetmass[MassPair] = new TH1D("h_AK8PUPPISDjetmass","Highest btagged AK8jetmess;PUPPISD m_{AK8jets} [GeV]",20,5,655);
 		m_AK8tau1[MassPair] = new TH1D("h_AK8tau1",";#tau_{1}^{AK8Jet}",10,0,1);
 		m_AK8tau2[MassPair] = new TH1D("h_AK8tau2",";#tau_{2}^{AK8Jet}",10,0,1);
 		m_AK8tau3[MassPair] = new TH1D("h_AK8tau3",";#tau_{3}^{AK8Jet}",10,0,1);
 		m_AK8tau2_tau1[MassPair] = new TH1D("h_AK8tau2_tau1",";AK8Jet_tau2/tau1",10,0,1);
 		m_AK8tau3_tau2[MassPair] = new TH1D("h_AK8tau3_tau2",";AK8Jet_tau3/tau2",10,0,1);
+    m_AK8puppitau1[MassPair] = new TH1D("h_AK8puppitau1",";puppi#tau_{1}^{AK8Jet}",10,0,1);
+    m_AK8puppitau2[MassPair] = new TH1D("h_AK8puppitau2",";puppi#tau_{2}^{AK8Jet}",10,0,1);
+    m_AK8puppitau3[MassPair] = new TH1D("h_AK8puppitau3",";puppi#tau_{3}^{AK8Jet}",10,0,1);
+    m_AK8puppitau2_tau1[MassPair] = new TH1D("h_AK8puppitau2_tau1",";AK8Jetpuppi_tau2/tau1",10,0,1);
+    m_AK8puppitau3_tau2[MassPair] = new TH1D("h_AK8puppitau3_tau2",";AK8Jetpuppi_tau3/tau2",10,0,1);
 
 		m_CSVbjetsL[MassPair] = new TH1D("h_CSVbjetsL",";# of CSVLoosebjets",10,-0.5,9.5);
 		m_CSVbjetsM[MassPair] = new TH1D("h_CSVbjetsM",";# of CSVMediumbjets",10,-0.5,9.5);

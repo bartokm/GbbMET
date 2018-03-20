@@ -32,6 +32,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TH2.h>
+#include <TGraph.h>
 
 // Header file for the classes stored in the TTree if any.
 #include "vector"
@@ -1061,6 +1062,7 @@ public :
    unsigned int nFiles=0;
    bool _fastSim=false;
    int _fakeRate=0;
+   int _testRun=0;
    bool is_quiet=false;
    bool signalstudy=false;
    bool SignalScan=false;
@@ -1108,7 +1110,7 @@ public :
    TH2D *h_muID_SF2D[3];
    TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
-   TH2D *h_muTRK_SF2D[3];
+   TGraph *h_muTrk_SF;
    TEfficiency* eff_b_CSV_L;
    TEfficiency* eff_b_CSV_M;
    TEfficiency* eff_b_CSV_T;
@@ -1136,7 +1138,7 @@ public :
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1154,7 +1156,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1172,6 +1174,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (pu_fname!="") pu_file=pu_fname;
   if (fastSim) _fastSim=true;
   if (fakeRate) _fakeRate=fakeRate;
+  if (testrun) _testRun=testrun;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
@@ -2671,6 +2674,7 @@ void PrintHelp(){
   cout<<"-C \t\t Counts and prints out T5qqqqHg signal events for each mass point"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"-c \t\t Print out available cut variables"<<endl;
+  cout<<"-t x \t\t Test running only on \"x\" number of events. (default is x=1000)"<<endl;
   cout<<"--cuts \t\t Run on specified cuts, otherwise hardcoded cuts"<<endl;
   cout<<"WARNING! --cuts option should always be the LAST option. Otherwise the order is free."<<endl;
   cout<<"\nHow to set cuts?"<<endl;

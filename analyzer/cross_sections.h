@@ -1135,8 +1135,8 @@ unsigned long long get_total_events(pair<int,int> input) {
   int a=input.first, b=input.second;
   if (a==800) {
     switch (b) {
-      case 127 : return 147541;
-      case 200 : return 153117;
+      case 127 : return 147537;
+      case 200 : return 153121;
       case 300 : return 143071;
       case 400 : return 151397;
       case 500 : return 147905;
@@ -1160,217 +1160,217 @@ unsigned long long get_total_events(pair<int,int> input) {
   }
   if (a==1000) {
     switch (b) {
-      case 127  : return 145067;
-      case 150  : return 143210;
-      case 175  : return 160282;
-      case 200  : return 149238;
-      case 300  : return 144793;
-      case 400  : return 153178;
-      case 500  : return 149500;
-      case 600  : return 145921;
-      case 700  : return 144231;
-      case 750  : return 143796;
-      case 800  : return 152956;
-      case 850  : return 142767;
-      case 900  : return 158612;
-      case 950  : return 154803;
-      case 975  : return 152850;
-      case 1000 : return 145704;
+      case 127 : return 145050;
+      case 150 : return 143207;
+      case 175 : return 160286;
+      case 200 : return 149254;
+      case 300 : return 144793;
+      case 400 : return 153178;
+      case 500 : return 149500;
+      case 600 : return 145921;
+      case 700 : return 144231;
+      case 750 : return 143796;
+      case 800 : return 152956;
+      case 850 : return 142767;
+      case 900 : return 158612;
+      case 950 : return 154787;
+      case 975 : return 152609;
+      case 1000 : return 145961;
     }
   }
   if (a==1050) {
     switch (b) {
-      case 127  : return 148565;
-      case 150  : return 150353;
-      case 175  : return 153015;
-      case 200  : return 149987;
-      case 300  : return 151437;
-      case 400  : return 154925;
-      case 500  : return 147272;
-      case 600  : return 153897;
-      case 700  : return 154336;
-      case 750  : return 149980;
-      case 800  : return 143741;
-      case 850  : return 146004;
-      case 900  : return 157510;
-      case 950  : return 147676;
-      case 1000 : return 147963;
-      case 1025 : return 150999;
-      case 1050 : return 158510;
+      case 127 : return 148543;
+      case 150 : return 150352;
+      case 175 : return 153019;
+      case 200 : return 150006;
+      case 300 : return 151437;
+      case 400 : return 154925;
+      case 500 : return 147272;
+      case 600 : return 153897;
+      case 700 : return 154336;
+      case 750 : return 149980;
+      case 800 : return 143741;
+      case 850 : return 146004;
+      case 900 : return 157510;
+      case 950 : return 147676;
+      case 1000 : return 147950;
+      case 1025 : return 150721;
+      case 1050 : return 158801;
     }
   }
   if (a==1100) {
     switch (b) {
-      case 127  : return 135893;
-      case 150  : return 132568;
-      case 175  : return 137481;
-      case 200  : return 137047;
-      case 300  : return 135344;
-      case 400  : return 138889;
-      case 500  : return 134578;
-      case 600  : return 132089;
-      case 700  : return 126901;
-      case 800  : return 129040;
-      case 850  : return 126612;
-      case 900  : return 120406;
-      case 950  : return 136968;
+      case 127 : return 135870;
+      case 150 : return 132572;
+      case 175 : return 137486;
+      case 200 : return 137061;
+      case 300 : return 135344;
+      case 400 : return 138889;
+      case 500 : return 134578;
+      case 600 : return 132089;
+      case 700 : return 126901;
+      case 800 : return 129040;
+      case 850 : return 126612;
+      case 900 : return 120406;
+      case 950 : return 136968;
       case 1000 : return 135799;
-      case 1050 : return 133496;
-      case 1075 : return 129145;
-      case 1100 : return 129295;
+      case 1050 : return 133483;
+      case 1075 : return 128943;
+      case 1100 : return 129510;
     }
   }
   if (a==1150) {
     switch (b) {
-      case 127  : return 91624;
-      case 150  : return 101638;
-      case 175  : return 100078;
-      case 200  : return 101712;
-      case 300  : return 104122;
-      case 400  : return 98622;
-      case 500  : return 101260;
-      case 600  : return 95195;
-      case 700  : return 97034;
-      case 800  : return 96950;
-      case 850  : return 100577;
-      case 900  : return 93283;
-      case 950  : return 100689;
+      case 127 : return 91614;
+      case 150 : return 101634;
+      case 175 : return 100081;
+      case 200 : return 101723;
+      case 300 : return 104122;
+      case 400 : return 98622;
+      case 500 : return 101260;
+      case 600 : return 95195;
+      case 700 : return 97034;
+      case 800 : return 96950;
+      case 850 : return 100577;
+      case 900 : return 93283;
+      case 950 : return 100689;
       case 1000 : return 95652;
       case 1050 : return 97883;
-      case 1100 : return 103163;
-      case 1125 : return 104381;
-      case 1150 : return 98882;
+      case 1100 : return 103147;
+      case 1125 : return 104227;
+      case 1150 : return 99052;
     }
   }
   if (a==1200) {
     switch (b) {
-      case 127  : return 69922;
-      case 150  : return 62359;
-      case 175  : return 69608;
-      case 200  : return 68403;
-      case 300  : return 69552;
-      case 400  : return 72459;
-      case 500  : return 70886;
-      case 600  : return 63780;
-      case 700  : return 68208;
-      case 800  : return 67335;
-      case 900  : return 73570;
-      case 950  : return 68902;
+      case 127 : return 69910;
+      case 150 : return 62365;
+      case 175 : return 69610;
+      case 200 : return 68407;
+      case 300 : return 69552;
+      case 400 : return 72459;
+      case 500 : return 70886;
+      case 600 : return 63780;
+      case 700 : return 68208;
+      case 800 : return 67335;
+      case 900 : return 73570;
+      case 950 : return 68902;
       case 1000 : return 64769;
       case 1050 : return 71918;
       case 1100 : return 66781;
-      case 1150 : return 69291;
-      case 1175 : return 71051;
-      case 1200 : return 69926;
+      case 1150 : return 69284;
+      case 1175 : return 70923;
+      case 1200 : return 70061;
     }
   }
   if (a==1250) {
     switch (b) {
-      case 127  : return 54252;
-      case 150  : return 49668;
-      case 175  : return 54755;
-      case 200  : return 54201;
-      case 300  : return 52304;
-      case 400  : return 54037;
-      case 500  : return 50114;
-      case 600  : return 54409;
-      case 700  : return 50301;
-      case 800  : return 51113;
-      case 900  : return 54279;
-      case 950  : return 50742;
+      case 127 : return 54244;
+      case 150 : return 49669;
+      case 175 : return 54752;
+      case 200 : return 54211;
+      case 300 : return 52304;
+      case 400 : return 54037;
+      case 500 : return 50114;
+      case 600 : return 54409;
+      case 700 : return 50301;
+      case 800 : return 51113;
+      case 900 : return 54279;
+      case 950 : return 50742;
       case 1000 : return 51846;
       case 1050 : return 51786;
       case 1100 : return 55378;
       case 1150 : return 51608;
-      case 1200 : return 52503;
-      case 1225 : return 47830;
-      case 1250 : return 51420;
+      case 1200 : return 52494;
+      case 1225 : return 47752;
+      case 1250 : return 51507;
     }
   }
   if (a==1300) {
     switch (b) {
-      case 127  : return 43645;
-      case 150  : return 38130;
-      case 175  : return 40647;
-      case 200  : return 43451;
-      case 300  : return 45570;
-      case 400  : return 41728;
-      case 500  : return 42854;
-      case 600  : return 43450;
-      case 700  : return 35892;
-      case 800  : return 37259;
-      case 900  : return 47989;
+      case 127 : return 43642;
+      case 150 : return 38131;
+      case 175 : return 40644;
+      case 200 : return 43456;
+      case 300 : return 45570;
+      case 400 : return 41728;
+      case 500 : return 42854;
+      case 600 : return 43450;
+      case 700 : return 35892;
+      case 800 : return 37259;
+      case 900 : return 47989;
       case 1000 : return 45015;
       case 1050 : return 40624;
       case 1100 : return 43466;
       case 1150 : return 36054;
       case 1200 : return 36524;
-      case 1250 : return 40927;
-      case 1275 : return 42832;
-      case 1300 : return 41997;
+      case 1250 : return 40921;
+      case 1275 : return 42748;
+      case 1300 : return 42087;
     }
   }
   if (a==1350) {
     switch (b) {
-      case 127  : return 48380;
-      case 150  : return 42934;
-      case 175  : return 39456;
-      case 200  : return 46548;
-      case 300  : return 38391;
-      case 400  : return 35998;
-      case 500  : return 39255;
-      case 600  : return 40113;
-      case 700  : return 43606;
-      case 800  : return 40563;
-      case 900  : return 38342;
+      case 127 : return 48370;
+      case 150 : return 42938;
+      case 175 : return 39455;
+      case 200 : return 46555;
+      case 300 : return 38391;
+      case 400 : return 35998;
+      case 500 : return 39255;
+      case 600 : return 40113;
+      case 700 : return 43606;
+      case 800 : return 40563;
+      case 900 : return 38342;
       case 1000 : return 41015;
       case 1050 : return 42332;
       case 1100 : return 42855;
       case 1150 : return 41073;
       case 1200 : return 38607;
       case 1250 : return 38416;
-      case 1300 : return 42872;
-      case 1325 : return 40006;
-      case 1350 : return 39030;
+      case 1300 : return 42867;
+      case 1325 : return 39942;
+      case 1350 : return 39099;
     }
   }
   if (a==1400) {
     switch (b) {
-      case 127  : return 42615;
-      case 150  : return 40614;
-      case 175  : return 42176;
-      case 200  : return 36651;
-      case 300  : return 39749;
-      case 400  : return 39924;
-      case 500  : return 35834;
-      case 600  : return 39596;
-      case 700  : return 35759;
-      case 800  : return 45724;
-      case 900  : return 36962;
+      case 127 : return 42610;
+      case 150 : return 40613;
+      case 175 : return 42174;
+      case 200 : return 36659;
+      case 300 : return 39749;
+      case 400 : return 39924;
+      case 500 : return 35834;
+      case 600 : return 39596;
+      case 700 : return 35759;
+      case 800 : return 45724;
+      case 900 : return 36962;
       case 1000 : return 37384;
       case 1100 : return 39169;
       case 1150 : return 37935;
       case 1200 : return 43333;
       case 1250 : return 35203;
       case 1300 : return 34949;
-      case 1350 : return 40989;
-      case 1375 : return 39642;
-      case 1400 : return 37638;
+      case 1350 : return 40986;
+      case 1375 : return 39588;
+      case 1400 : return 37695;
     }
   }
   if (a==1450) {
     switch (b) {
-      case 127  : return 41611;
-      case 150  : return 40314;
-      case 175  : return 43319;
-      case 200  : return 32725;
-      case 300  : return 42866;
-      case 400  : return 42610;
-      case 500  : return 38420;
-      case 600  : return 36730;
-      case 700  : return 37465;
-      case 800  : return 45060;
-      case 900  : return 38635;
+      case 127 : return 41606;
+      case 150 : return 40316;
+      case 175 : return 43320;
+      case 200 : return 32727;
+      case 300 : return 42866;
+      case 400 : return 42610;
+      case 500 : return 38420;
+      case 600 : return 36730;
+      case 700 : return 37465;
+      case 800 : return 45060;
+      case 900 : return 38635;
       case 1000 : return 36461;
       case 1100 : return 39396;
       case 1150 : return 41262;
@@ -1378,24 +1378,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1250 : return 41621;
       case 1300 : return 38178;
       case 1350 : return 44367;
-      case 1400 : return 42754;
-      case 1425 : return 46246;
-      case 1450 : return 43069;
+      case 1400 : return 42748;
+      case 1425 : return 46172;
+      case 1450 : return 43149;
     }
   }
   if (a==1500) {
     switch (b) {
-      case 127  : return 36164;
-      case 150  : return 43020;
-      case 175  : return 38017;
-      case 200  : return 35515;
-      case 300  : return 38811;
-      case 400  : return 33844;
-      case 500  : return 39000;
-      case 600  : return 41958;
-      case 700  : return 41012;
-      case 800  : return 34469;
-      case 900  : return 37198;
+      case 127 : return 36159;
+      case 150 : return 43020;
+      case 175 : return 38016;
+      case 200 : return 35521;
+      case 300 : return 38811;
+      case 400 : return 33844;
+      case 500 : return 39000;
+      case 600 : return 41958;
+      case 700 : return 41012;
+      case 800 : return 34469;
+      case 900 : return 37198;
       case 1000 : return 36372;
       case 1100 : return 42090;
       case 1200 : return 37146;
@@ -1403,24 +1403,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1300 : return 36957;
       case 1350 : return 36362;
       case 1400 : return 39035;
-      case 1450 : return 42373;
-      case 1475 : return 36556;
-      case 1500 : return 42438;
+      case 1450 : return 42368;
+      case 1475 : return 36480;
+      case 1500 : return 42519;
     }
   }
   if (a==1550) {
     switch (b) {
-      case 127  : return 41392;
-      case 150  : return 37378;
-      case 175  : return 37959;
-      case 200  : return 38116;
-      case 300  : return 44048;
-      case 400  : return 40501;
-      case 500  : return 40294;
-      case 600  : return 39320;
-      case 700  : return 39760;
-      case 800  : return 40751;
-      case 900  : return 39447;
+      case 127 : return 41388;
+      case 150 : return 37374;
+      case 175 : return 37962;
+      case 200 : return 38121;
+      case 300 : return 44048;
+      case 400 : return 40501;
+      case 500 : return 40294;
+      case 600 : return 39320;
+      case 700 : return 39760;
+      case 800 : return 40751;
+      case 900 : return 39447;
       case 1000 : return 38344;
       case 1100 : return 39797;
       case 1200 : return 41651;
@@ -1429,24 +1429,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1350 : return 39063;
       case 1400 : return 39214;
       case 1450 : return 42408;
-      case 1500 : return 35343;
-      case 1525 : return 39676;
-      case 1550 : return 36431;
+      case 1500 : return 35340;
+      case 1525 : return 39604;
+      case 1550 : return 36506;
     }
   }
   if (a==1600) {
     switch (b) {
-      case 127  : return 38340;
-      case 150  : return 42207;
-      case 175  : return 40942;
-      case 200  : return 37764;
-      case 300  : return 43098;
-      case 400  : return 37218;
-      case 500  : return 39005;
-      case 600  : return 37207;
-      case 700  : return 45301;
-      case 800  : return 40298;
-      case 900  : return 41328;
+      case 127 : return 38335;
+      case 150 : return 42206;
+      case 175 : return 40945;
+      case 200 : return 37767;
+      case 300 : return 43098;
+      case 400 : return 37218;
+      case 500 : return 39005;
+      case 600 : return 37207;
+      case 700 : return 45301;
+      case 800 : return 40298;
+      case 900 : return 41328;
       case 1000 : return 42428;
       case 1100 : return 43242;
       case 1200 : return 37754;
@@ -1455,24 +1455,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1400 : return 43643;
       case 1450 : return 38426;
       case 1500 : return 39996;
-      case 1550 : return 42033;
-      case 1575 : return 40722;
-      case 1600 : return 38985;
+      case 1550 : return 42023;
+      case 1575 : return 40649;
+      case 1600 : return 39068;
     }
   }
   if (a==1650) {
     switch (b) {
-      case 127  : return 36531;
-      case 150  : return 46136;
-      case 175  : return 42688;
-      case 200  : return 41130;
-      case 300  : return 37244;
-      case 400  : return 40985;
-      case 500  : return 41130;
-      case 600  : return 40357;
-      case 700  : return 41908;
-      case 800  : return 38885;
-      case 900  : return 44835;
+      case 127 : return 36527;
+      case 150 : return 46135;
+      case 175 : return 42688;
+      case 200 : return 41135;
+      case 300 : return 37244;
+      case 400 : return 40985;
+      case 500 : return 41130;
+      case 600 : return 40357;
+      case 700 : return 41908;
+      case 800 : return 38885;
+      case 900 : return 44835;
       case 1000 : return 42736;
       case 1100 : return 42771;
       case 1200 : return 38697;
@@ -1482,24 +1482,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1450 : return 43401;
       case 1500 : return 42430;
       case 1550 : return 44632;
-      case 1600 : return 41421;
-      case 1625 : return 38929;
-      case 1650 : return 38226;
+      case 1600 : return 41417;
+      case 1625 : return 38862;
+      case 1650 : return 38297;
     }
   }
   if (a==1700) {
     switch (b) {
-      case 127  : return 38985;
-      case 150  : return 40659;
-      case 175  : return 33880;
-      case 200  : return 40672;
-      case 300  : return 38330;
-      case 400  : return 44973;
-      case 500  : return 41179;
-      case 600  : return 43396;
-      case 700  : return 47335;
-      case 800  : return 40187;
-      case 900  : return 41357;
+      case 127 : return 38978;
+      case 150 : return 40661;
+      case 175 : return 33882;
+      case 200 : return 40675;
+      case 300 : return 38330;
+      case 400 : return 44973;
+      case 500 : return 41179;
+      case 600 : return 43396;
+      case 700 : return 47335;
+      case 800 : return 40187;
+      case 900 : return 41357;
       case 1000 : return 40697;
       case 1100 : return 40998;
       case 1200 : return 43326;
@@ -1509,24 +1509,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1500 : return 41331;
       case 1550 : return 44776;
       case 1600 : return 43721;
-      case 1650 : return 37109;
-      case 1675 : return 43171;
-      case 1700 : return 44233;
+      case 1650 : return 37099;
+      case 1675 : return 43101;
+      case 1700 : return 44313;
     }
   }
   if (a==1750) {
     switch (b) {
-      case 127  : return 43090;
-      case 150  : return 44545;
-      case 175  : return 41817;
-      case 200  : return 40643;
-      case 300  : return 42068;
-      case 400  : return 41249;
-      case 500  : return 41911;
-      case 600  : return 47269;
-      case 700  : return 43319;
-      case 800  : return 45770;
-      case 900  : return 41439;
+      case 127 : return 43088;
+      case 150 : return 44542;
+      case 175 : return 41818;
+      case 200 : return 40647;
+      case 300 : return 42068;
+      case 400 : return 41249;
+      case 500 : return 41911;
+      case 600 : return 47269;
+      case 700 : return 43319;
+      case 800 : return 45770;
+      case 900 : return 41439;
       case 1000 : return 39793;
       case 1100 : return 39134;
       case 1200 : return 43824;
@@ -1537,24 +1537,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1550 : return 44844;
       case 1600 : return 43217;
       case 1650 : return 43475;
-      case 1700 : return 41246;
-      case 1725 : return 37944;
-      case 1750 : return 38161;
+      case 1700 : return 41244;
+      case 1725 : return 37872;
+      case 1750 : return 38235;
     }
   }
   if (a==1800) {
     switch (b) {
-      case 127  : return 39392;
-      case 150  : return 42087;
-      case 175  : return 35527;
-      case 200  : return 42310;
-      case 300  : return 34411;
-      case 400  : return 42306;
-      case 500  : return 42203;
-      case 600  : return 35935;
-      case 700  : return 40951;
-      case 800  : return 34325;
-      case 900  : return 37182;
+      case 127 : return 39390;
+      case 150 : return 42085;
+      case 175 : return 35525;
+      case 200 : return 42316;
+      case 300 : return 34411;
+      case 400 : return 42306;
+      case 500 : return 42203;
+      case 600 : return 35935;
+      case 700 : return 40951;
+      case 800 : return 34325;
+      case 900 : return 37182;
       case 1000 : return 40872;
       case 1100 : return 35122;
       case 1200 : return 36115;
@@ -1565,24 +1565,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1600 : return 40407;
       case 1650 : return 38645;
       case 1700 : return 38452;
-      case 1750 : return 42310;
-      case 1775 : return 35910;
-      case 1800 : return 40916;
+      case 1750 : return 42298;
+      case 1775 : return 35829;
+      case 1800 : return 41009;
     }
   }
   if (a==1850) {
     switch (b) {
-      case 127  : return 41636;
-      case 150  : return 37679;
-      case 175  : return 37838;
-      case 200  : return 35414;
-      case 300  : return 40844;
-      case 400  : return 44462;
-      case 500  : return 37930;
-      case 600  : return 36088;
-      case 700  : return 39828;
-      case 800  : return 38277;
-      case 900  : return 34949;
+      case 127 : return 41634;
+      case 150 : return 37675;
+      case 175 : return 37841;
+      case 200 : return 35417;
+      case 300 : return 40844;
+      case 400 : return 44462;
+      case 500 : return 37930;
+      case 600 : return 36088;
+      case 700 : return 39828;
+      case 800 : return 38277;
+      case 900 : return 34949;
       case 1000 : return 39441;
       case 1100 : return 40900;
       case 1200 : return 42597;
@@ -1594,24 +1594,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1650 : return 38746;
       case 1700 : return 43435;
       case 1750 : return 36111;
-      case 1800 : return 37258;
-      case 1825 : return 38852;
-      case 1850 : return 42133;
+      case 1800 : return 37256;
+      case 1825 : return 38779;
+      case 1850 : return 42208;
     }
   }
   if (a==1900) {
     switch (b) {
-      case 127  : return 38577;
-      case 150  : return 42012;
-      case 175  : return 38788;
-      case 200  : return 42199;
-      case 300  : return 41232;
-      case 400  : return 38311;
-      case 500  : return 39028;
-      case 600  : return 36851;
-      case 700  : return 36699;
-      case 800  : return 41674;
-      case 900  : return 41259;
+      case 127 : return 38574;
+      case 150 : return 42006;
+      case 175 : return 38787;
+      case 200 : return 42209;
+      case 300 : return 41232;
+      case 400 : return 38311;
+      case 500 : return 39028;
+      case 600 : return 36851;
+      case 700 : return 36699;
+      case 800 : return 41674;
+      case 900 : return 41259;
       case 1000 : return 39510;
       case 1100 : return 43652;
       case 1200 : return 42696;
@@ -1624,23 +1624,23 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1750 : return 36530;
       case 1800 : return 41622;
       case 1850 : return 39525;
-      case 1875 : return 45711;
-      case 1900 : return 44038;
+      case 1875 : return 45623;
+      case 1900 : return 44126;
     }
   }
   if (a==1950) {
     switch (b) {
-      case 127  : return 36936;
-      case 150  : return 46036;
-      case 175  : return 42415;
-      case 200  : return 36592;
-      case 300  : return 39279;
-      case 400  : return 39774;
-      case 500  : return 40081;
-      case 600  : return 36937;
-      case 700  : return 45433;
-      case 800  : return 37097;
-      case 900  : return 39463;
+      case 127 : return 36929;
+      case 150 : return 46037;
+      case 175 : return 42418;
+      case 200 : return 36595;
+      case 300 : return 39279;
+      case 400 : return 39774;
+      case 500 : return 40081;
+      case 600 : return 36937;
+      case 700 : return 45433;
+      case 800 : return 37097;
+      case 900 : return 39463;
       case 1000 : return 40332;
       case 1100 : return 43184;
       case 1200 : return 42211;
@@ -1653,24 +1653,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1750 : return 40512;
       case 1800 : return 41324;
       case 1850 : return 40945;
-      case 1900 : return 41522;
-      case 1925 : return 44087;
-      case 1950 : return 35513;
+      case 1900 : return 41518;
+      case 1925 : return 44033;
+      case 1950 : return 35571;
     }
   }
   if (a==2000) {
     switch (b) {
-      case 127  : return 17880;
-      case 150  : return 21195;
-      case 175  : return 21543;
-      case 200  : return 20124;
-      case 300  : return 19152;
-      case 400  : return 24661;
-      case 500  : return 21137;
-      case 600  : return 22623;
-      case 700  : return 18198;
-      case 800  : return 23197;
-      case 900  : return 19814;
+      case 127 : return 17874;
+      case 150 : return 21197;
+      case 175 : return 21546;
+      case 200 : return 20125;
+      case 300 : return 19152;
+      case 400 : return 24661;
+      case 500 : return 21137;
+      case 600 : return 22623;
+      case 700 : return 18198;
+      case 800 : return 23197;
+      case 900 : return 19814;
       case 1000 : return 19881;
       case 1100 : return 21618;
       case 1200 : return 16779;
@@ -1683,24 +1683,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1800 : return 20920;
       case 1850 : return 18412;
       case 1900 : return 21232;
-      case 1950 : return 16083;
-      case 1975 : return 21748;
-      case 2000 : return 21936;
+      case 1950 : return 16078;
+      case 1975 : return 21714;
+      case 2000 : return 21975;
     }
   }
   if (a==2050) {
     switch (b) {
-      case 127  : return 19962;
-      case 150  : return 21336;
-      case 175  : return 23018;
-      case 200  : return 20332;
-      case 300  : return 22277;
-      case 400  : return 27181;
-      case 500  : return 21312;
-      case 600  : return 17797;
-      case 700  : return 22617;
-      case 800  : return 17557;
-      case 900  : return 21752;
+      case 127 : return 19959;
+      case 150 : return 21332;
+      case 175 : return 23025;
+      case 200 : return 20332;
+      case 300 : return 22277;
+      case 400 : return 27181;
+      case 500 : return 21312;
+      case 600 : return 17797;
+      case 700 : return 22617;
+      case 800 : return 17557;
+      case 900 : return 21752;
       case 1000 : return 20431;
       case 1100 : return 22195;
       case 1200 : return 19632;
@@ -1714,24 +1714,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1850 : return 20848;
       case 1900 : return 22378;
       case 1950 : return 22398;
-      case 2000 : return 19400;
-      case 2025 : return 22781;
-      case 2050 : return 17812;
+      case 2000 : return 19395;
+      case 2025 : return 22764;
+      case 2050 : return 17834;
     }
   }
   if (a==2100) {
     switch (b) {
-      case 127  : return 20028;
-      case 150  : return 20777;
-      case 175  : return 20416;
-      case 200  : return 20563;
-      case 300  : return 18652;
-      case 400  : return 22299;
-      case 500  : return 20042;
-      case 600  : return 19062;
-      case 700  : return 21136;
-      case 800  : return 20106;
-      case 900  : return 17516;
+      case 127 : return 20028;
+      case 150 : return 20775;
+      case 175 : return 20418;
+      case 200 : return 20563;
+      case 300 : return 18652;
+      case 400 : return 22299;
+      case 500 : return 20042;
+      case 600 : return 19062;
+      case 700 : return 21136;
+      case 800 : return 20106;
+      case 900 : return 17516;
       case 1000 : return 17821;
       case 1100 : return 21919;
       case 1200 : return 25150;
@@ -1745,24 +1745,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1900 : return 16892;
       case 1950 : return 18810;
       case 2000 : return 21368;
-      case 2050 : return 20999;
-      case 2075 : return 20476;
-      case 2100 : return 22307;
+      case 2050 : return 20996;
+      case 2075 : return 20444;
+      case 2100 : return 22342;
     }
   }
   if (a==2150) {
     switch (b) {
-      case 127  : return 19201;
-      case 150  : return 21439;
-      case 175  : return 19702;
-      case 200  : return 17997;
-      case 300  : return 19653;
-      case 400  : return 16883;
-      case 500  : return 19503;
-      case 600  : return 20958;
-      case 700  : return 22345;
-      case 800  : return 19237;
-      case 900  : return 22260;
+      case 127 : return 19197;
+      case 150 : return 21434;
+      case 175 : return 19707;
+      case 200 : return 18001;
+      case 300 : return 19653;
+      case 400 : return 16883;
+      case 500 : return 19503;
+      case 600 : return 20958;
+      case 700 : return 22345;
+      case 800 : return 19237;
+      case 900 : return 22260;
       case 1000 : return 17856;
       case 1100 : return 18034;
       case 1200 : return 18907;
@@ -1777,24 +1777,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1950 : return 16035;
       case 2000 : return 16793;
       case 2050 : return 18705;
-      case 2100 : return 17653;
-      case 2125 : return 20933;
-      case 2150 : return 20010;
+      case 2100 : return 17651;
+      case 2125 : return 20896;
+      case 2150 : return 20049;
     }
   }
   if (a==2200) {
     switch (b) {
-      case 127  : return 20330;
-      case 150  : return 22741;
-      case 175  : return 16707;
-      case 200  : return 20309;
-      case 300  : return 21941;
-      case 400  : return 20722;
-      case 500  : return 20085;
-      case 600  : return 21112;
-      case 700  : return 18130;
-      case 800  : return 19925;
-      case 900  : return 22322;
+      case 127 : return 20326;
+      case 150 : return 22741;
+      case 175 : return 16709;
+      case 200 : return 20311;
+      case 300 : return 21941;
+      case 400 : return 20722;
+      case 500 : return 20085;
+      case 600 : return 21112;
+      case 700 : return 18130;
+      case 800 : return 19925;
+      case 900 : return 22322;
       case 1000 : return 19572;
       case 1100 : return 15947;
       case 1200 : return 19266;
@@ -1809,24 +1809,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2000 : return 18981;
       case 2050 : return 17349;
       case 2100 : return 20567;
-      case 2150 : return 19587;
-      case 2175 : return 19127;
-      case 2200 : return 23143;
+      case 2150 : return 19582;
+      case 2175 : return 19083;
+      case 2200 : return 23192;
     }
   }
   if (a==2250) {
     switch (b) {
-      case 127  : return 19965;
-      case 150  : return 22239;
-      case 175  : return 22496;
-      case 200  : return 22378;
-      case 300  : return 17650;
-      case 400  : return 17717;
-      case 500  : return 21711;
-      case 600  : return 16878;
-      case 700  : return 18100;
-      case 800  : return 22952;
-      case 900  : return 17977;
+      case 127 : return 19965;
+      case 150 : return 22235;
+      case 175 : return 22497;
+      case 200 : return 22381;
+      case 300 : return 17650;
+      case 400 : return 17717;
+      case 500 : return 21711;
+      case 600 : return 16878;
+      case 700 : return 18100;
+      case 800 : return 22952;
+      case 900 : return 17977;
       case 1000 : return 18337;
       case 1100 : return 17933;
       case 1200 : return 18936;
@@ -1842,24 +1842,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2050 : return 20383;
       case 2100 : return 13818;
       case 2150 : return 20024;
-      case 2200 : return 18926;
-      case 2225 : return 20026;
-      case 2250 : return 22167;
+      case 2200 : return 18924;
+      case 2225 : return 19991;
+      case 2250 : return 22204;
     }
   }
   if (a==2300) {
     switch (b) {
-      case 127  : return 19002;
-      case 150  : return 17558;
-      case 175  : return 23737;
-      case 200  : return 20792;
-      case 300  : return 19858;
-      case 400  : return 18855;
-      case 500  : return 22316;
-      case 600  : return 23954;
-      case 700  : return 17879;
-      case 800  : return 19412;
-      case 900  : return 22918;
+      case 127 : return 19002;
+      case 150 : return 17556;
+      case 175 : return 23733;
+      case 200 : return 20798;
+      case 300 : return 19858;
+      case 400 : return 18855;
+      case 500 : return 22316;
+      case 600 : return 23954;
+      case 700 : return 17879;
+      case 800 : return 19412;
+      case 900 : return 22918;
       case 1000 : return 16063;
       case 1100 : return 15993;
       case 1200 : return 19067;
@@ -1875,24 +1875,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2100 : return 19223;
       case 2150 : return 20858;
       case 2200 : return 17902;
-      case 2250 : return 19275;
-      case 2275 : return 19981;
-      case 2300 : return 19528;
+      case 2250 : return 19274;
+      case 2275 : return 19941;
+      case 2300 : return 19569;
     }
   }
   if (a==2350) {
     switch (b) {
-      case 127  : return 19332;
-      case 150  : return 17757;
-      case 175  : return 20885;
-      case 200  : return 19155;
-      case 300  : return 18329;
-      case 400  : return 17915;
-      case 500  : return 20887;
-      case 600  : return 19853;
-      case 700  : return 15783;
-      case 800  : return 19103;
-      case 900  : return 17857;
+      case 127 : return 19330;
+      case 150 : return 17757;
+      case 175 : return 20885;
+      case 200 : return 19157;
+      case 300 : return 18329;
+      case 400 : return 17915;
+      case 500 : return 20887;
+      case 600 : return 19853;
+      case 700 : return 15783;
+      case 800 : return 19103;
+      case 900 : return 17857;
       case 1000 : return 19360;
       case 1100 : return 14047;
       case 1200 : return 25775;
@@ -1909,24 +1909,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2150 : return 20542;
       case 2200 : return 19815;
       case 2250 : return 16170;
-      case 2300 : return 18768;
-      case 2325 : return 18438;
-      case 2350 : return 21525;
+      case 2300 : return 18765;
+      case 2325 : return 18402;
+      case 2350 : return 21564;
     }
   }
   if (a==2400) {
     switch (b) {
-      case 127  : return 18482;
-      case 150  : return 22585;
-      case 175  : return 18710;
-      case 200  : return 18537;
-      case 300  : return 19864;
-      case 400  : return 22376;
-      case 500  : return 20195;
-      case 600  : return 18863;
-      case 700  : return 19744;
-      case 800  : return 19099;
-      case 900  : return 18500;
+      case 127 : return 18479;
+      case 150 : return 22583;
+      case 175 : return 18715;
+      case 200 : return 18537;
+      case 300 : return 19864;
+      case 400 : return 22376;
+      case 500 : return 20195;
+      case 600 : return 18863;
+      case 700 : return 19744;
+      case 800 : return 19099;
+      case 900 : return 18500;
       case 1000 : return 21465;
       case 1100 : return 19760;
       case 1200 : return 20330;
@@ -1943,24 +1943,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2200 : return 19591;
       case 2250 : return 15842;
       case 2300 : return 16031;
-      case 2350 : return 17807;
-      case 2375 : return 20381;
-      case 2400 : return 18536;
+      case 2350 : return 17805;
+      case 2375 : return 20357;
+      case 2400 : return 18562;
     }
   }
   if (a==2450) {
     switch (b) {
-      case 127  : return 20048;
-      case 150  : return 21555;
-      case 175  : return 19195;
-      case 200  : return 17451;
-      case 300  : return 21570;
-      case 400  : return 22720;
-      case 500  : return 18907;
-      case 600  : return 18292;
-      case 700  : return 22231;
-      case 800  : return 18816;
-      case 900  : return 19023;
+      case 127 : return 20044;
+      case 150 : return 21557;
+      case 175 : return 19193;
+      case 200 : return 17455;
+      case 300 : return 21570;
+      case 400 : return 22720;
+      case 500 : return 18907;
+      case 600 : return 18292;
+      case 700 : return 22231;
+      case 800 : return 18816;
+      case 900 : return 19023;
       case 1000 : return 20201;
       case 1100 : return 20510;
       case 1200 : return 19435;
@@ -1978,24 +1978,24 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2250 : return 17437;
       case 2300 : return 20274;
       case 2350 : return 18219;
-      case 2400 : return 20340;
-      case 2425 : return 27060;
-      case 2450 : return 21778;
+      case 2400 : return 20337;
+      case 2425 : return 27028;
+      case 2450 : return 21813;
     }
   }
   if (a==2500) {
     switch (b) {
-      case 127  : return 23477;
-      case 150  : return 18326;
-      case 175  : return 17060;
-      case 200  : return 20286;
-      case 300  : return 20873;
-      case 400  : return 20868;
-      case 500  : return 20934;
-      case 600  : return 20673;
-      case 700  : return 20717;
-      case 800  : return 16100;
-      case 900  : return 21432;
+      case 127 : return 23476;
+      case 150 : return 18325;
+      case 175 : return 17060;
+      case 200 : return 20288;
+      case 300 : return 20873;
+      case 400 : return 20868;
+      case 500 : return 20934;
+      case 600 : return 20673;
+      case 700 : return 20717;
+      case 800 : return 16100;
+      case 900 : return 21432;
       case 1000 : return 14830;
       case 1100 : return 14863;
       case 1200 : return 18976;
@@ -2013,9 +2013,9 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2300 : return 21865;
       case 2350 : return 18597;
       case 2400 : return 18447;
-      case 2450 : return 18234;
-      case 2475 : return 17369;
-      case 2500 : return 14565;
+      case 2450 : return 18231;
+      case 2475 : return 17344;
+      case 2500 : return 14593;
     }
   }
   return 0;
