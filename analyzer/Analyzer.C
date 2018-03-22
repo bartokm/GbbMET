@@ -352,6 +352,26 @@ void Analyzer::Loop()
    hn_searchBins->Sumw2();
    unsigned int nsbins=hn_searchBins->GetNbins();
    TH1D *h_searchBins= new TH1D("h_searchBins",";searchBins",nsbins,0.5,nsbins+0.5);
+   
+   //AK4 searchbins
+   const int dim_ak4=4;
+   int nbins_ak4[dim_ak4]={2,3,6,3};
+   double xmin_ak4[dim_ak4]={-0.5,-0.5,0.5,0.5};
+   double xmax_ak4[dim_ak4]={1.5,2.5,6.5,3.5};
+   THnD *hn_AK4searchBins = new THnD("hn_AK4searchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
+   hn_AK4searchBins->Sumw2();
+   unsigned int nsbins_ak4=hn_AK4searchBins->GetNbins();
+   TH1D *h_AK4searchBins= new TH1D("h_AK4searchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
+   
+   //AK8 searchbins
+   const int dim_ak8=4;
+   int nbins_ak8[dim_ak8]={2,2,6,3};
+   double xmin_ak8[dim_ak8]={-0.5,-0.5,0.5,0.5};
+   double xmax_ak8[dim_ak8]={1.5,1.5,6.5,3.5};
+   THnD *hn_AK8searchBins = new THnD("hn_AK8searchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
+   hn_AK8searchBins->Sumw2();
+   unsigned int nsbins_ak8=hn_AK8searchBins->GetNbins();
+   TH1D *h_AK8searchBins= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
 
    //Histograms for signalstudy
    TH1D *hs_Hpt, *hs_AK8Hmass, *hs_AK4Hmass, *hs_PhoEt, *hs_AK4_AK8_true, *hs_drmin_AK4AK8[4], *hs_drmax_AK4AK8[4], *hs_dr_AK4AK4[4];
@@ -1613,6 +1633,32 @@ void Analyzer::Loop()
        double sbFill[dim]={double(AK4),double(AK8),met,njet};
        hn_searchBins->Fill(sbFill,w);
        h_AK4_category->Fill(catFill,w);
+
+       //AK4-AK8 searchBins
+       int AK4AK8=0, VR=0, boost=0;
+       //Signal Region
+       if (BDSV_selected>0) {boost=1;AK4AK8=1; w*=BDSV_SF_L[0];}
+       else {if (CSV_selected==1) {AK4AK8=1; w*=CSV_SF_L[0];} if (CSV_selected==2) {AK4AK8=2; w*=CSV_SF_L[0]*CSV_SF_L[0];}}
+       //Control and Validation regions
+       if (BDSV_selected==0 && CSV_selected==0) {
+         if (bcounterBDSV[1]>0) {boost=1; VR=1; AK4AK8=1; w*=BDSV_SF_L[0];}
+         else if (passHiggsMass) boost=1;
+         if (!boost) {
+           if (bcounterCSV[1]==1) {VR=1;AK4AK8=1; w*=CSV_SF_L[0];}
+           if (bcounterCSV[1]>1) {VR=1;AK4AK8=2; w*=CSV_SF_L[0]*CSV_SF_L[0];}
+           if (!passAK4HiggsMass && bcounterCSV[1]==0) boost=2;
+         }
+       }
+       double sbFill_ak4ak8[dim_ak4]={double(VR),double(AK4AK8),met,njet};
+       switch (boost) {
+         case 0 : hn_AK4searchBins->Fill(sbFill_ak4ak8,w);
+         break;
+         case 1 : hn_AK8searchBins->Fill(sbFill_ak4ak8,w);
+         break;
+         case 2 : {hn_AK4searchBins->Fill(sbFill_ak4ak8,w); hn_AK8searchBins->Fill(sbFill_ak4ak8,w);}
+         break;
+       }
+
      //signalstudy histos fill
      if (signalstudy) {
        hs_gMET_Bquark->Fill(genMET,nBquark,w);
@@ -1818,6 +1864,14 @@ void Analyzer::Loop()
        m_AK4_AK8[mass_pair]->Fill(ak4ak8,w);
        m_AK4_category[mass_pair]->Fill(catFill,w);
        mn_searchBins[mass_pair]->Fill(sbFill,w);
+       switch (boost) {
+         case 0 : mn_AK4searchBins[mass_pair]->Fill(sbFill_ak4ak8,w);
+         break;
+         case 1 : mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w);
+         break;
+         case 2 : {mn_AK4searchBins[mass_pair]->Fill(sbFill_ak4ak8,w); mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w);}
+         break;
+       }
        if (signalstudy) {
          m_ak4_selected[mass_pair]->Fill(ith_jet,jth_jet,w);
          m_true_ak4bjets[mass_pair]->Fill(nBjets,w);
@@ -1887,6 +1941,10 @@ void Analyzer::Loop()
    for (unsigned int i=1;i<nsbins+1;i++) {
      h_searchBins->SetBinContent(i,hn_searchBins->GetBinContent(i));
      h_searchBins->SetBinError(i,hn_searchBins->GetBinError(i));
+     h_AK4searchBins->SetBinContent(i,hn_AK4searchBins->GetBinContent(i));
+     h_AK4searchBins->SetBinError(i,hn_AK4searchBins->GetBinError(i));
+     h_AK8searchBins->SetBinContent(i,hn_AK8searchBins->GetBinContent(i));
+     h_AK8searchBins->SetBinError(i,hn_AK8searchBins->GetBinError(i));
    }
    if (SignalScan) {
      for (unsigned int i=0;i<GridX.size();i++ ) {	
@@ -1894,6 +1952,10 @@ void Analyzer::Loop()
        for (unsigned int i=1;i<nsbins+1;i++) {
          m_searchBins[MassPair]->SetBinContent(i,mn_searchBins[MassPair]->GetBinContent(i));
          m_searchBins[MassPair]->SetBinError(i,mn_searchBins[MassPair]->GetBinError(i));
+         m_AK4searchBins[MassPair]->SetBinContent(i,mn_AK4searchBins[MassPair]->GetBinContent(i));
+         m_AK4searchBins[MassPair]->SetBinError(i,mn_AK4searchBins[MassPair]->GetBinError(i));
+         m_AK8searchBins[MassPair]->SetBinContent(i,mn_AK8searchBins[MassPair]->GetBinContent(i));
+         m_AK8searchBins[MassPair]->SetBinError(i,mn_AK8searchBins[MassPair]->GetBinError(i));
        }
      }
    }
