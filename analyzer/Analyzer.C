@@ -1084,9 +1084,9 @@ void Analyzer::Loop()
        for (auto j : passMuL) if (deltaR((*jetPhi)[i],(*muPhi)[j],(*jetEta)[i],(*muEta)[j])<0.4) {
          passcut=false;break;
        }
-       //for (auto j : passTauL) if (deltaR((*jetPhi)[i],(*tauPhi)[j],(*jetEta)[i],(*tauEta)[j])<0.4) {
-       //  passcut=false;break;
-       //}
+       for (auto j : passTauL) if (deltaR((*jetPhi)[i],(*tauPhi)[j],(*jetEta)[i],(*tauEta)[j])<0.4) {
+         passcut=false;break;
+       }
        //for (auto j : passIso) if (deltaR((*jetPhi)[i],(*isoPhi)[j],(*jetEta)[i],(*isoEta)[j])<0.4) {
        //  passcut=false;break;
        //}
@@ -1159,9 +1159,9 @@ void Analyzer::Loop()
        for (auto j : passMuL) if (deltaR((*AK8JetPhi)[i],(*muPhi)[j],(*AK8JetEta)[i],(*muEta)[j])<0.8) {
          passcut=false;break;
        }
-       //for (auto j : passTauL) if (deltaR((*AK8JetPhi)[i],(*tauPhi)[j],(*AK8JetEta)[i],(*tauEta)[j])<0.8) {
-       //  passcut=false;break;
-       //}
+       for (auto j : passTauL) if (deltaR((*AK8JetPhi)[i],(*tauPhi)[j],(*AK8JetEta)[i],(*tauEta)[j])<0.8) {
+         passcut=false;break;
+       }
        //for (auto j : passIso) if (deltaR((*AK8JetPhi)[i],(*isoPhi)[j],(*AK8JetEta)[i],(*isoEta)[j])<0.8) {
        //  passcut=false;break;
        //}
@@ -1614,10 +1614,10 @@ void Analyzer::Loop()
        double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
        if (BDSV_selected==1) {AK8=1; if (!isData) w*=BDSV_SF_L[0];}
        if (BDSV_selected>=2) {AK8=2; if (!isData) w*=BDSV_SF_M1[0];}
-       if (CSV_selected==1) {AK4=1; if (!isData) w*=CSV_SF_L[0];}
-       if (CSV_selected>=2) {AK4=2; if (!isData) w*=CSV_SF_L[0]*CSV_SF_L[0];}
-       //if (Deep_selected==1) {AK4=1; if (!isData) w*=Deep_SF_L[0];}
-       //if (Deep_selected>=2) {AK4=2; if (!isData) w*=Deep_SF_L[0]*Deep_SF_L[0];}
+       //if (CSV_selected==1) {AK4=1; if (!isData) w*=CSV_SF_L[0];}
+       //if (CSV_selected>=2) {AK4=2; if (!isData) w*=CSV_SF_L[0]*CSV_SF_L[0];}
+       if (Deep_selected==1) {AK4=1; if (!isData) w*=Deep_SF_L[0];}
+       if (Deep_selected>=2) {AK4=2; if (!isData) w*=Deep_SF_L[0]*Deep_SF_L[0];}
        double ak4ak8=0;
        if (AK8==0 && AK4==0) ak4ak8=1;
        if (AK8==0 && AK4==1) ak4ak8=2;
@@ -1640,13 +1640,17 @@ void Analyzer::Loop()
        if (BDSV_selected>0) {boost=1;AK4AK8=1; w*=BDSV_SF_L[0];}
        else {if (CSV_selected==1) {AK4AK8=1; w*=CSV_SF_L[0];} if (CSV_selected==2) {AK4AK8=2; w*=CSV_SF_L[0]*CSV_SF_L[0];}}
        //Control and Validation regions
-       if (BDSV_selected==0 && CSV_selected==0) {
+       //if (BDSV_selected==0 && CSV_selected==0) {
+       if (BDSV_selected==0 && Deep_selected==0) {
          if (bcounterBDSV[1]>0) {boost=1; VR=1; AK4AK8=1; w*=BDSV_SF_L[0];}
          else if (passHiggsMass) boost=1;
          if (!boost) {
-           if (bcounterCSV[1]==1) {VR=1;AK4AK8=1; w*=CSV_SF_L[0];}
-           if (bcounterCSV[1]>1) {VR=1;AK4AK8=2; w*=CSV_SF_L[0]*CSV_SF_L[0];}
-           if (!passAK4HiggsMass && bcounterCSV[1]==0) boost=2;
+           //if (bcounterCSV[1]==1) {VR=1;AK4AK8=1; w*=CSV_SF_L[0];}
+           //if (bcounterCSV[1]>1) {VR=1;AK4AK8=2; w*=CSV_SF_L[0]*CSV_SF_L[0];}
+           //if (!passAK4HiggsMass && bcounterCSV[1]==0) boost=2;
+           if (bcounterDeep[1]==1) {VR=1;AK4AK8=1; w*=Deep_SF_L[0];}
+           if (bcounterDeep[1]>1) {VR=1;AK4AK8=2; w*=Deep_SF_L[0]*Deep_SF_L[0];}
+           if (!passAK4DeepHiggsMass && bcounterDeep[1]==0) {boost=2; VR=1;}
          }
        }
        double sbFill_ak4ak8[dim_ak4]={double(VR),double(AK4AK8),met,njet};
