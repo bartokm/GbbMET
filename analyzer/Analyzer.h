@@ -1076,6 +1076,7 @@ public :
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
    int nPassTauL=-1, nPassTauM=-1, nPassTauT=-1, nPassIso=-1;
+   int nPassLepL=-1, nPassLepM=-1, nPassLepT=-1;
    int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
@@ -1093,7 +1094,7 @@ public :
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1};
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={0.99,0.97,0.95};
    double ele_VETOSF=1, mu_VETOSF=1;
    double ST=0, ST_G=0, MT=0;
    double w=0, xsec=1;
@@ -2266,12 +2267,15 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
     //else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0]*mu_VETOSF;}
     else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];} //mu_VETOSF not yet appliead because of dubious results
-    else if (_cut_variable[i]=="nPassTauL") {returnvalue*=Parser(nPassTauL,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="nPassTauM") {returnvalue*=Parser(nPassTauM,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="nPassTauT") {returnvalue*=Parser(nPassTauT,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="nPassIso") {returnvalue*=Parser(nPassIso,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="nPassMuM") {returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[1];}
     else if (_cut_variable[i]=="nPassMuT") {returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[2];}
+    else if (_cut_variable[i]=="nPassTauL") {returnvalue*=Parser(nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[0];}
+    else if (_cut_variable[i]=="nPassTauM") {returnvalue*=Parser(nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[1];}
+    else if (_cut_variable[i]=="nPassTauT") {returnvalue*=Parser(nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[2];}
+    else if (_cut_variable[i]=="nPassIso") {returnvalue*=Parser(nPassIso,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
+    else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]; if (nPassMuM) w*=mu_SF[1]; if (nPassTauM) w*=tau_SF[1];}}
+    else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleT) w*=ele_SF[3]; if (nPassMuT) w*=mu_SF[2]; if (nPassTauT) w*=tau_SF[2];}}
     else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
     else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
@@ -2579,6 +2583,9 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassTauL","number of loose taus"},
   {"nPassTauM","number of medium taus"},
   {"nPassTauT","number of tight taus"},
+  {"nPassLepL","number of loose leptons (e+mu+tau)"},
+  {"nPassLepM","number of medium leptons (e+mu+tau)"},
+  {"nPassLepT","number of tight leptons (e+mu+tau)"},
   {"nPassIso","number of isolated tracks"},
   {"nPassFREleL","number of loose FRele (no overlap removal with photons)"},
   {"nPassFREleM","number of medium FRele (no overlap removal with photons)"},
