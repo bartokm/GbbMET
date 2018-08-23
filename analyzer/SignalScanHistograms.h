@@ -123,6 +123,8 @@
 	map< pair<int, int>, TH2D* > m_mbbjet_vs_ST;
 	map< pair<int, int>, TH1D* > m_AK4_category;
 	
+  map< pair<int, int>, TH1D* > m_dphi_met_jet;
+	
   map< pair<int, int>, THnD* > mn_searchBins;
   map< pair<int, int>, TH1D* > m_searchBins;
   map< pair<int, int>, THnD* > mn_AK4searchBins;
@@ -143,6 +145,11 @@
 	map< pair<int, int>, TH1D* > m_whyNoAK8Higgs;
 	map< pair<int, int>, TH2D* > m_ak4_selected;
 	map< pair<int, int>, TH1D* > m_true_ak4bjets;
+	map< pair<int, int>, TH2D* > m_higgs_ak8tagging;
+	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_first;
+	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_sum;
+	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_mult;
+	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_top;
 
 void init_scan_histos(TFile *outFile, bool signalstudy){
 
@@ -277,11 +284,13 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
       
     m_AK4_AK8[MassPair] = new TH1D("h_AK4_AK8","Higgs candidate findings;",9,0.5,9.5);
     m_AK4_category[MassPair] = new TH1D("h_AK4_category","AK4 btag-Higgs window categories;NoBtag-NoWindow, 1Btag-NoWindow, 2Btag-NoWindow, NoBtag-Window, Undecided, 1Selected, 2Selected",7,0.5,7.5);
+   
+    m_dphi_met_jet[MassPair] = new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",10,0,3.2);
     
     const int dim=4;
-    int nbins[dim]={3,3,6,3};
+    int nbins[dim]={3,3,6,2};
     double xmin[dim]={-0.5,-0.5,0.5,0.5};
-    double xmax[dim]={2.5,2.5,6.5,3.5};
+    double xmax[dim]={2.5,2.5,6.5,2.5};
     mn_searchBins[MassPair] = new THnD("hn_searchBins",";AK4_AK8;MET;njets",dim,nbins,xmin,xmax);
     mn_searchBins[MassPair]->Sumw2();
     unsigned int nsbins=mn_searchBins[MassPair]->GetNbins();
@@ -289,9 +298,9 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
    
     //AK4 searchbins
     const int dim_ak4=4;
-    int nbins_ak4[dim_ak4]={2,3,6,3};
+    int nbins_ak4[dim_ak4]={2,3,6,2};
     double xmin_ak4[dim_ak4]={-0.5,-0.5,0.5,0.5};
-    double xmax_ak4[dim_ak4]={1.5,2.5,6.5,3.5};
+    double xmax_ak4[dim_ak4]={1.5,2.5,6.5,2.5};
     mn_AK4searchBins[MassPair] = new THnD("hn_AK4searchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
     mn_AK4searchBins[MassPair]->Sumw2();
     unsigned int nsbins_ak4=mn_AK4searchBins[MassPair]->GetNbins();
@@ -299,9 +308,9 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
    
    //AK8 searchbins
    const int dim_ak8=4;
-   int nbins_ak8[dim_ak8]={2,2,6,3};
+   int nbins_ak8[dim_ak8]={2,2,6,2};
    double xmin_ak8[dim_ak8]={-0.5,-0.5,0.5,0.5};
-   double xmax_ak8[dim_ak8]={1.5,1.5,6.5,3.5};
+   double xmax_ak8[dim_ak8]={1.5,1.5,6.5,2.5};
    mn_AK8searchBins[MassPair] = new THnD("hn_AK8searchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
    mn_AK8searchBins[MassPair]->Sumw2();
    unsigned int nsbins_ak8=mn_AK8searchBins[MassPair]->GetNbins();
@@ -319,6 +328,11 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
       m_whyNoAK8Higgs[MassPair]= new TH1D("hs_whyAK8NoHiggs","Failed AK8 Higgs tag;No AK8jet, Higgs window, btag, both",4,0.5,4.5);
       m_ak4_selected[MassPair] = new TH2D("hs_ak4_selected","Index of Higgs candidate ak4 jets;First;Second",20,-0.5,19.5,20,-0.5,19.5);
       m_true_ak4bjets[MassPair] = new TH1D("hs_true_ak4bjets","# of true ak4 b jets;# of true b jets",10,-0.5,9.5);
+      m_higgs_ak8tagging[MassPair]= new TH2D("hs_higgs_ak8tagging",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
+      m_higgs_ak4tagging_first[MassPair]= new TH2D("hs_higgs_ak4tagging_first",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
+      m_higgs_ak4tagging_sum[MassPair]= new TH2D("hs_higgs_ak4tagging_sum",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
+      m_higgs_ak4tagging_mult[MassPair]= new TH2D("hs_higgs_ak4tagging_mult",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
+      m_higgs_ak4tagging_top[MassPair]= new TH2D("hs_higgs_ak4tagging_top",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
     }
 	}
 }

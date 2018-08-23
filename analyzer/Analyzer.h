@@ -1063,6 +1063,7 @@ public :
    bool _fastSim=false;
    int _fakeRate=0;
    int _testRun=0;
+   double _emu_pt=5;
    bool is_quiet=false;
    bool signalstudy=false;
    bool SignalScan=false;
@@ -1088,15 +1089,16 @@ public :
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true;
-   bool Hbb=false;
+   bool Hbb=false, mcLeptonFilter=false;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={0.99,0.97,0.95};
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
    double ele_VETOSF=1, mu_VETOSF=1;
    double ST=0, ST_G=0, MT=0;
+   double dphi_met_jet=999;
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
@@ -1139,7 +1141,7 @@ public :
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, double pt=5);
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1151,13 +1153,16 @@ public :
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    void             CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
    void             CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]);
+   void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
+   void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
+   void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
 
 };
 
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, double pt) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1176,6 +1181,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (fastSim) _fastSim=true;
   if (fakeRate) _fakeRate=fakeRate;
   if (testrun) _testRun=testrun;
+  if (pt) _emu_pt=pt;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
@@ -2311,6 +2317,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="NOTmetFilters") returnvalue*= !(Parser(metFilters,_cut_operator[i],_cut_value[i]));
     else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(pfMET,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[0];}
@@ -2349,7 +2356,7 @@ Int_t Analyzer::Cut(Long64_t entry)
         if (_cut_value[i]==2) w*=Deep_SF_L[0]*Deep_SF_L[0];
       }
     }
-    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(CSV_selected+BDSV_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+BDSV_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
@@ -2357,6 +2364,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
       if (_fastSim) h_cuts->Fill(i+1,w);
@@ -2572,6 +2580,69 @@ void Analyzer::CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<i
   SF_T[1] = p_data_up[3]/p_mc[3];
   SF_T[2] = p_data_do[3]/p_mc[3];
 }
+
+void Analyzer::Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation){
+  for (unsigned int i=0;i<v.size();i++){
+  pair<int,int> temp;
+    for (unsigned int j=v.size()-1;j>i;j--){
+      float DeepCSVTag_1j=(*b)[v.at(j).first]+(*bb)[v.at(j).first];
+      float DeepCSVTag_2j=(*b)[v.at(j).second]+(*bb)[v.at(j).second];
+      float DeepCSVTag_1j2=(*b)[v.at(j-1).first]+(*bb)[v.at(j-1).first];
+      float DeepCSVTag_2j2=(*b)[v.at(j-1).second]+(*bb)[v.at(j-1).second];
+      float value_j=0, value_j2=0;
+      switch (operation) {
+        case 0 : {value_j=DeepCSVTag_1j+DeepCSVTag_2j; value_j2=DeepCSVTag_1j2+DeepCSVTag_2j2;}
+                 break;
+        case 1 : {value_j=DeepCSVTag_1j*DeepCSVTag_2j; value_j2=DeepCSVTag_1j2*DeepCSVTag_2j2;}
+                 break;
+      }
+      if (value_j>value_j2){
+        temp=v[j-1];
+        v[j-1]=v[j];
+        v[j]=temp;
+      }
+    }
+  }
+}
+void Analyzer::SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected){
+  for (auto i : v){
+    TLorentzVector bjet1, bjet2;
+    bjet1.SetPtEtaPhiE(pt[i.first],(*eta)[i.first],(*phi)[i.first],en[i.first]);
+    bjet2.SetPtEtaPhiE(pt[i.second],(*eta)[i.second],(*phi)[i.second],en[i.second]);
+    double mass=(bjet1+bjet2).M();
+    float DeepCSVTag_1=(*b)[i.first]+(*bb)[i.first];
+    //float DeepCSVTag_2=(*b)[i.second]+(*bb)[i.second];
+    //if (mass>70 && mass<200 && DeepCSVTag_1>BtagDeepWP[0] && DeepCSVTag_2>BtagDeepWP[0]) {
+    if (mass>70 && mass<200 && DeepCSVTag_1>BtagDeepWP[0]) {
+      ak4selected.push_back(1); int temp=0;
+      for (auto j : ak4_hjets) if (j==i.first || j==i.second) temp++;
+      ak4trueselected.push_back(temp);
+    }
+    else {ak4selected.push_back(0);ak4trueselected.push_back(0);}
+  }
+}
+
+void Analyzer::FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]){
+  for (unsigned int i=0;i<ak4selected.size();i++) {
+    if (ak4selected[i]) {
+      if (i==0) for (int j=0;j<6;j++) MassBtagAK4[j]=1;
+      else if (i==1) for (int j=1;j<6;j++) MassBtagAK4[j]=1;
+      else if (i==2) for (int j=2;j<6;j++) MassBtagAK4[j]=1;
+      else if (i==3) for (int j=3;j<6;j++) MassBtagAK4[j]=1;
+      else if (i==4) for (int j=4;j<6;j++) MassBtagAK4[j]=1;
+      else MassBtagAK4[5]=1;
+      if (ak4trueselected[i]) {
+        if (i==0) for (int j=1;j<7;j++) true_higgsak4jet[j]=ak4trueselected[i];
+        else if (i==1) for (int j=2;j<7;j++) true_higgsak4jet[j]=ak4trueselected[i];
+        else if (i==2) for (int j=3;j<7;j++) true_higgsak4jet[j]=ak4trueselected[i];
+        else if (i==3) for (int j=4;j<7;j++) true_higgsak4jet[j]=ak4trueselected[i];
+        else if (i==4) for (int j=5;j<7;j++) true_higgsak4jet[j]=ak4trueselected[i];
+        else true_higgsak4jet[6]=ak4trueselected[i];
+      }
+    }
+  }
+}
+
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"isPVGood","Presence of any good vertices, 0 or 1"},
   {"nPassEleL","number of loose electrons"},
@@ -2622,6 +2693,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"metFilters","metFilters"},
   {"NOTmetFilters","Inverse of metFilters"},
   {"MET","pfMET"},
+  {"dphi_met_jet","Dphi of met and nearest jet with pt>100"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
   {"bcounterCSV_L","number of loose CSV btagged jets"},
@@ -2640,14 +2712,15 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
-  {"sth_selected","CSV_selected+BDSV_selected"},
+  {"sth_selected","Deep_selected+BDSV_selected"},
   {"passBtag","Higgs candidate ak8jet passes medium btag"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
   {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
   {"passHiggsMass","At least 1 ak8jet exist with mass 70 to 200GeV"},
   {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
-  {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"}};
+  {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
+  {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
 
 bool CompareCuts(vector<string> input_cuts){
   for (auto i : input_cuts) {
