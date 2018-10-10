@@ -1097,6 +1097,10 @@ public :
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
    double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
    double ele_VETOSF=1, mu_VETOSF=1;
+   int BDSV_whichSF=0, CSV_whichSF=0, Deep_whichSF=0;
+   int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
+   int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF;
+   int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
    double ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
    double w=0, xsec=1;
@@ -1141,7 +1145,7 @@ public :
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, double pt=5);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, double pt=5, map<string,int> systematics={});
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1150,6 +1154,7 @@ public :
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
+   void             Systematics(map<string, int> systematics);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    void             CalcBtagSF(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
    void             CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<int> *v_had, map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]);
@@ -1162,7 +1167,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, double pt) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, double pt, map<string,int> systematics) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1170,6 +1175,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   _cut_variable=cut_variable;
   _cut_operator=cut_operator;
   _cut_value=cut_value;
+  Systematics(systematics);
   is_quiet=is_q;
   signalstudy=is_signalstudy;
   SignalScan=is_signalscan;
@@ -1185,11 +1191,8 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
-    const char* fdefault = "/data/bartokm/Analysis/ntuples/Data/80X_V08_00_26/Run2016C_PFHT300_PFMET110_CopyTree_skimmed.root/EventTree";
-    if (!is_quiet){
-      std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
-      //std::cout<<"Usage: Analyzer t({\"file1.root\",\"file2.root\",etc}, \"outputname.root\", \"BtagEfficiency_file.root\", 1 for fastsim)"<<std::endl;
-    }
+    const char* fdefault = "/data/ggntuples/skimmed_ntuples/Data/V08_00_26_07/Run2016C_Pho165_HE10_CopyTree_skimmed.root/EventTree";
+    if (!is_quiet) std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
     ch->Add(fdefault);
     tree = ch;
   }
@@ -2320,40 +2323,40 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[0];}
-    else if (_cut_variable[i]=="bcounterCSV_M") {returnvalue*=Parser(bcounterCSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_M[0];}
-    else if (_cut_variable[i]=="bcounterCSV_T") {returnvalue*=Parser(bcounterCSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_T[0];}
+    else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[CSV_whichSF];}
+    else if (_cut_variable[i]=="bcounterCSV_M") {returnvalue*=Parser(bcounterCSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_M[CSV_whichSF];}
+    else if (_cut_variable[i]=="bcounterCSV_T") {returnvalue*=Parser(bcounterCSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_T[CSV_whichSF];}
     else if (_cut_variable[i]=="bcountercMVA_L") returnvalue*=Parser(bcountercMVA[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcountercMVA_M") returnvalue*=Parser(bcountercMVA[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcountercMVA_T") returnvalue*=Parser(bcountercMVA[3],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_L") returnvalue*=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_M") returnvalue*=Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_T") returnvalue*=Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterBDSV_L") {returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_L[0];}
-    else if (_cut_variable[i]=="bcounterBDSV_M1") {returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M1[0];}
-    else if (_cut_variable[i]=="bcounterBDSV_M2") {returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M2[0];}
-    else if (_cut_variable[i]=="bcounterBDSV_T") {returnvalue*=Parser(bcounterBDSV[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_T[0];}
+    else if (_cut_variable[i]=="bcounterBDSV_L") {returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_L[BDSV_whichSF];}
+    else if (_cut_variable[i]=="bcounterBDSV_M1") {returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M1[BDSV_whichSF];}
+    else if (_cut_variable[i]=="bcounterBDSV_M2") {returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M2[BDSV_whichSF];}
+    else if (_cut_variable[i]=="bcounterBDSV_T") {returnvalue*=Parser(bcounterBDSV[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_T[BDSV_whichSF];}
     else if (_cut_variable[i]=="BDSV_selected") {
       returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
-        if (_cut_value[i]==1) w*=BDSV_SF_L[0];
-        if (_cut_value[i]==2) w*=BDSV_SF_M1[0];
-        if (_cut_value[i]==3) w*=BDSV_SF_M2[0];
-        if (_cut_value[i]==4) w*=BDSV_SF_T[0];
+        if (_cut_value[i]==1) w*=BDSV_SF_L[BDSV_whichSF];
+        if (_cut_value[i]==2) w*=BDSV_SF_M1[BDSV_whichSF];
+        if (_cut_value[i]==3) w*=BDSV_SF_M2[BDSV_whichSF];
+        if (_cut_value[i]==4) w*=BDSV_SF_T[BDSV_whichSF];
       }
     }
     else if (_cut_variable[i]=="CSV_selected") {
       returnvalue*=Parser(CSV_selected,_cut_operator[i],_cut_value[i]);
       if (!isData) {
-        if (_cut_value[i]==1) w*=CSV_SF_L[0];
-        if (_cut_value[i]==2) w*=CSV_SF_L[0]*CSV_SF_L[0];
+        if (_cut_value[i]==1) w*=CSV_SF_L[CSV_whichSF];
+        if (_cut_value[i]==2) w*=CSV_SF_L[CSV_whichSF]*CSV_SF_L[CSV_whichSF];
       }
     }
     else if (_cut_variable[i]=="Deep_selected") {
       returnvalue*=Parser(Deep_selected,_cut_operator[i],_cut_value[i]);
       if (!isData) {
-        if (_cut_value[i]==1) w*=Deep_SF_L[0];
-        if (_cut_value[i]==2) w*=Deep_SF_L[0]*Deep_SF_L[0];
+        if (_cut_value[i]==1) w*=Deep_SF_L[Deep_whichSF];
+        if (_cut_value[i]==2) w*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];
       }
     }
     else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+BDSV_selected,_cut_operator[i],_cut_value[i]);
@@ -2581,6 +2584,29 @@ void Analyzer::CalcBtagSF_AK8(vector<float> *v_eta, vector<float> v_pt, vector<i
   SF_T[2] = p_data_do[3]/p_mc[3];
 }
 
+void Analyzer::Systematics(map<string, int> systematics) {
+  for (auto const& x : systematics) {
+    if (x.first=="BDSV") BDSV_whichSF=x.second;
+    else if (x.first=="CSV") CSV_whichSF=x.second;
+    else if (x.first=="Deep") Deep_whichSF=x.second;
+    else if (x.first=="AK4Smear") AK4Smear_whichSF=x.second;
+    else if (x.first=="AK8Smear") AK8Smear_whichSF=x.second;
+    else if (x.first=="AK4JEC") AK4jetJEC_whichSF=x.second;
+    else if (x.first=="AK8JEC") AK8jetJEC_whichSF=x.second;
+    else if (x.first=="phoID") phoID_whichSF=x.second;
+    else if (x.first=="phoPix") phoPix_whichSF=x.second;
+    else if (x.first=="eleID") eleID_whichSF=x.second;
+    else if (x.first=="eleRec") eleRec_whichSF=x.second;
+    else if (x.first=="muID") muID_whichSF=x.second;
+    else if (x.first=="muISO") muISO_whichSF=x.second;
+    else if (x.first=="tau") tau_whichSF=x.second;
+    else if (x.first=="metJER") metJER_whichSF=x.second;
+    else if (x.first=="metJES") metJES_whichSF=x.second;
+    else if (x.first=="metUES") metUES_whichSF=x.second;
+    else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
+  }
+}
+
 void Analyzer::Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation){
   for (unsigned int i=0;i<v.size();i++){
   pair<int,int> temp;
@@ -2755,8 +2781,10 @@ void PrintHelp(){
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"-c \t\t Print out available cut variables"<<endl;
   cout<<"-t x \t\t Test running only on \"x\" number of events. (default is x=1000)"<<endl;
+  cout<<"--syst \t\t run with +- systematics settings"<<endl;
+  cout<<"FORMAT:\n--syst systematics_type 1 systematics_type 2 ..."<<endl;
+  cout<<"The number meaning: 1 = upper, 2 = lower\n"<<endl;
   cout<<"--cuts \t\t Run on specified cuts, otherwise hardcoded cuts"<<endl;
-  cout<<"WARNING! --cuts option should always be the LAST option. Otherwise the order is free."<<endl;
   cout<<"\nHow to set cuts?"<<endl;
   cout<<"Cuts are always set in 3 parts: variable operator value"<<endl;
   cout<<"FORMAT:\n--cuts cut_variable1 cut_operator1 cut_value1 cut_variable2 cut_operator2 cut_value2 ..."<<endl;

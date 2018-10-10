@@ -8,21 +8,23 @@
 #include <THn.h>
 #include <TStyle.h>
 #include <TCanvas.h>
+#include <cstdlib>
 
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
-  bool is_t=0, is_l=0;
-  bool inputs=0, cuts=0;
+  bool is_t=0, is_l=0, is_syst=0;
+  bool inputs=0, cuts=0, syst=0;
   int FR=0, tr=0;
   double pt=5;
   string output, bname, pname;
-  vector<string> inputfiles, v_cuts, cut_variable, cut_operator;
+  vector<string> inputfiles, v_cuts, cut_variable, cut_operator, v_syst;
   vector<double> cut_value;
+  map<string, int> systematics;
   for(int i=1; i<argc; i++) {
     std::string arg = argv[i];
     // Check existence of an option
     if (arg[0]=='-' && arg.size()==2) {
-      is_i=0; is_cuts=0;
+      is_i=0; is_cuts=0; is_syst=0;
       if (arg[1]=='i') is_i=1;
       else if (arg[1]=='o') is_o=1;
       else if (arg[1]=='b') is_b=1;
@@ -40,6 +42,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='l') is_l=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
+    else if (arg=="--syst") {is_i=0;is_syst=1;}
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
     //Print out help
     if (is_h) {PrintHelp();return 1;}
@@ -53,9 +56,13 @@ int main(int argc, char* argv[]){
     if (is_F) {FR=atoi(argv[i+1]); is_F=0;}
     if (is_t) {(atoi(argv[i+1])==0) ? tr=1000 : tr=atoi(argv[i+1]); is_t=0;}
     if (is_l) {(atoi(argv[i+1])==0) ? pt=5 : pt=atof(argv[i+1]); is_l=0;}
+    if (cuts && arg[0]=='-') is_cuts=0;
+    if (syst && arg[0]=='-') is_syst=0;
     if (cuts && is_cuts) v_cuts.push_back(arg);
+    if (syst && is_syst) v_syst.push_back(arg);
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
+    if (is_syst) syst=1;
   }
   //Fill cut variables
   if (v_cuts.size()%3 != 0) {cout<<"Wrong number of --cuts input! Exiting..."<<endl; return 0;}
@@ -68,6 +75,17 @@ int main(int argc, char* argv[]){
   }
   //Check if input cuts exist in the code
   if (!CompareCuts(cut_variable)) return 0;
+  
+  //Fill systematics variables
+  if (v_syst.size()%2 != 0) {cout<<"Wrong number of --syst input! Exiting..."<<endl; return 0;}
+  else {
+    string stemp; int itemp;
+    for (unsigned int i=0;i<v_syst.size();i++) {
+      if ((i+1)%2 ==1) stemp=v_syst[i];
+      if ((i+1)%2 ==0) itemp=stoi(v_syst[i]);
+      if (i!=0 && (i+1)%2 ==0) systematics.insert(pair<string,int>(stemp,itemp));
+    }
+  }
 
   if (!is_quiet){
     if (!output.empty()) cout<<"Output name: "<<output<<endl;
@@ -99,8 +117,9 @@ int main(int argc, char* argv[]){
       else {cout<<"ERROR! Unknown operator type: "<<op<<" Exiting..."<<endl; return 0;}
       cout<<cut_value[i]<<endl;
     }
+    for (auto const& x : systematics) cout<<"Systematics for "<<x.first<<" set to "<<x.second<<endl;
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal, tr, pt);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal, tr, pt, systematics);
   t.Loop();
   return 1;
 }
@@ -221,7 +240,15 @@ void Analyzer::Loop()
 
    std::string temp_fname="histos/Analyzer_histos"; 
    if (signalstudy) temp_fname+="_truth";
-   if (output_file != "default") temp_fname+="_"+output_file;
+   if (output_file != "default") {
+     if (output_file.compare(0,1,"/") != 0) temp_fname+="_"+output_file;
+     else {
+       size_t found = output_file.find_last_of("/\\");
+       string dir="mkdir -p "; dir+=output_file.substr(0,found);
+       const int dir_err = system(dir.c_str());
+       temp_fname=output_file;
+     }
+   }
    else temp_fname+=".root";
    TFile *f = new TFile(temp_fname.c_str(),"recreate");
    
@@ -488,6 +515,16 @@ void Analyzer::Loop()
      b_pfMETPhi->GetEntry(ientry);
      b_pfMETsumEt->GetEntry(ientry);
      b_pfMETSig->GetEntry(ientry);
+     b_pfMET_T1JERUp->GetEntry(ientry);
+     b_pfMET_T1JERDo->GetEntry(ientry);
+     b_pfMET_T1JESUp->GetEntry(ientry);
+     b_pfMET_T1JESDo->GetEntry(ientry);
+     b_pfMET_T1UESUp->GetEntry(ientry);
+     b_pfMET_T1UESDo->GetEntry(ientry);
+     b_pfMETPhi_T1JESUp->GetEntry(ientry);
+     b_pfMETPhi_T1JESDo->GetEntry(ientry);
+     b_pfMETPhi_T1UESUp->GetEntry(ientry);
+     b_pfMETPhi_T1UESDo->GetEntry(ientry);
      b_nEle->GetEntry(ientry);
      b_eleEta->GetEntry(ientry);
      b_elePhi->GetEntry(ientry);
@@ -546,6 +583,7 @@ void Analyzer::Loop()
      b_jetDeepCSVTags_udsg->GetEntry(ientry);
      b_jetPFLooseId->GetEntry(ientry);
      b_jetPUFullID->GetEntry(ientry);
+     b_jetJECUnc->GetEntry(ientry);
      b_nAK8Jet->GetEntry(ientry);
      b_AK8JetPt->GetEntry(ientry);
      b_AK8JetEta->GetEntry(ientry);
@@ -564,6 +602,7 @@ void Analyzer::Loop()
      b_AK8puppiTau1->GetEntry(ientry);
      b_AK8puppiTau2->GetEntry(ientry);
      b_AK8puppiTau3->GetEntry(ientry);
+     b_AK8JetJECUnc->GetEntry(ientry);
      b_nIsoTrack->GetEntry(ientry);
      b_isoPt->GetEntry(ientry);
      b_isoEta->GetEntry(ientry);
@@ -827,9 +866,9 @@ void Analyzer::Loop()
      memset(bcounterDeep,0,sizeof bcounterDeep);
      //photon
      for (int i=0;i<nPho;i++){
-       if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
+       //if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
        //if (1.566<abs((*phoSCEta)[i])<3 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
-       //if ((abs((*phoSCEta)[i])<1.4442 || 1.566<abs((*phoSCEta)[i])<3) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
+       if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<3)) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
         if ((*phoIDbit)[i]>>0&1) {
          passPhoL.push_back(i);
         }
@@ -873,20 +912,52 @@ void Analyzer::Loop()
      AK8EMHT_after=EMHT_before;
      //Calculate photon SFs
      if (!isData) {
+       double id_sf=0, pix_sf=0, syst_id=0, syst_pix=0;
+       int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
-         pho_SF[0]=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
-         if ((*phoR9)[nleadPhoL]>0.94) pho_SF[0]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
-         else pho_SF[0]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
+         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
+         if ((*phoR9)[nleadPhoL]>0.94) {
+           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+         }
+         else {
+           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
+         }
+         (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
+         pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoM!=0){
-         pho_SF[1]=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
-         if ((*phoR9)[passPhoM[0]]>0.94) pho_SF[1]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
-         else pho_SF[1]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
+         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
+         if ((*phoR9)[passPhoM[0]]>0.94) {
+           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+         }
+         else {
+           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
+         }
+         (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
+         pho_SF[1]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoT!=0){
-         pho_SF[2]=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
-         if ((*phoR9)[passPhoT[0]]>0.94) pho_SF[2]*=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
-         else pho_SF[2]*=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
+         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
+         if ((*phoR9)[passPhoT[0]]>0.94) {
+           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+         }
+         else {
+           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
+         }
+         (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
+         pho_SF[2]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
      }
      //electron
@@ -929,7 +1000,8 @@ void Analyzer::Loop()
          w*=h2_FR->GetBinContent(h2_FR->FindBin((*eleSCEta)[nleadFREleL],(*eleSCPhi)[nleadFREleL]));
        }
        if (_fakeRate==2 && nPassElePhoL != 0) {
-         if (abs((*phoSCEta)[nleadElePhoL])>1.4442) continue;
+         //if (abs((*phoSCEta)[nleadElePhoL])>1.4442) continue;
+         if (abs((*phoSCEta)[nleadElePhoL])>2.5) continue;
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin((*phoSCEta)[nleadElePhoL],(*phoSCPhi)[nleadElePhoL]));
          double FRvalue=FRetaphi*_C*(_A*nGoodVtx+_B);
          //cout<<"etaphi "<<(*phoSCEta)[nleadElePhoL]<<" "<<(*phoSCPhi)[nleadElePhoL]<<endl;
@@ -939,21 +1011,44 @@ void Analyzer::Loop()
      }
      //Calculate electron SFs
      if (!isData) {
+       double id_sf=0, rec_sf=0, syst_id=0, syst_rec=0;
+       int sign_id=0, sign_rec=0;
        if (nPassEleV!=0){
-         ele_SF[0]=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
-         ele_SF[0]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         id_sf=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         syst_id=h_ele_EGamma_SF2D[0]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
+         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
+         ele_SF[0]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
+         //cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
        }
        if (nPassEleL!=0){
-         ele_SF[1]=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
-         ele_SF[1]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
+         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
+         ele_SF[1]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleM!=0){
-         ele_SF[2]=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
-         ele_SF[2]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         id_sf=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         syst_id=h_ele_EGamma_SF2D[2]->GetBinError(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
+         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
+         ele_SF[2]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleT!=0){
-         ele_SF[3]=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
-         ele_SF[3]*=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         id_sf=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         syst_id=h_ele_EGamma_SF2D[3]->GetBinError(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
+         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
+         ele_SF[3]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleNO!=0){ //only for loose electrons so far
          double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
@@ -995,8 +1090,16 @@ void Analyzer::Loop()
        for (int i=0;i<3;i++) {
          if (iter[i]!=-1){
            float pt = ( (*muPt)[iter[i]]< 20)? 20 : ((*muPt)[iter[i]]< 100) ? (*muPt)[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
-           mu_SF[i]=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
-           mu_SF[i]*=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           double id_sf=0, iso_sf=0, syst_id=0, syst_iso=0;
+           int sign_id=0, sign_iso=0;
+           id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           syst_id=h_muID_SF2D[i]->GetBinError(h_muID_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           iso_sf=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           syst_iso=h_muISO_SF2D[i]->GetBinError(h_muISO_SF2D[i]->FindBin(pt,abs((*muEta)[iter[i]])));
+           (muID_whichSF==1) ? sign_id=1 : (muID_whichSF==2) ? sign_id=-1 : sign_id=0;
+           (muISO_whichSF==1) ? sign_iso=1 : (muISO_whichSF==2) ? sign_iso=-1 : sign_iso=0;
+           mu_SF[i]=(id_sf+sign_id*syst_id)*(iso_sf+sign_iso*syst_iso);
+           //cout<<"id_sf "<<id_sf<<"*"<<iso_sf<<"="<<id_sf*iso_sf<<" +- "<<syst_id<<" "<<syst_iso<<" finalSF= "<<mu_SF[0]<<endl;
            double *y = h_muTrk_SF->GetY(); double *x = h_muTrk_SF->GetX(); int whichx=0;
            for (int j=0;;j++) {
              double xdo=h_muTrk_SF->GetErrorXlow(j); double xup=h_muTrk_SF->GetErrorXhigh(j);
@@ -1044,6 +1147,9 @@ void Analyzer::Loop()
      if (passTauT.size() != 0) nleadTauT=passTauT[0];
      //if (passTauNO.size() != 0) nleadTauNO=passTauNO[0];
      
+     //Tau SF uncertainty
+     if (!isData) for (unsigned int i=0;i<3;i++) (tau_whichSF==1) ? tau_SF[i]+=0.05 : (tau_whichSF==2) ? tau_SF[i]-=0.05 : tau_SF[i]+=0;
+     
      //IsoTrack
      for (int i=0;i<nIsoTrack;i++) {
        bool passOverlap=true;
@@ -1080,10 +1186,14 @@ void Analyzer::Loop()
        TLorentzVector jetp4;
        jetp4.SetPtEtaPhiE((*jetPt)[i],(*jetEta)[i],(*jetPhi)[i],(*jetEn)[i]);
        if (!isData && (*jetP4Smear)[i]>0) {
-         jetp4 *=(*jetP4Smear)[i];
-         jetSmearedPt.at(i) = jetp4.Pt();
-         jetSmearedEn.at(i) = jetp4.Energy();
+         double sf=(*jetP4Smear)[i];
+         if (AK4Smear_whichSF==1) sf=(*jetP4SmearUp)[i];
+         else if (AK4Smear_whichSF==2) sf=(*jetP4SmearDo)[i];
+         jetp4 *=sf;
        }
+       (AK4jetJEC_whichSF==1) ? jetp4+=jetp4*(*jetJECUnc)[i] : (AK4jetJEC_whichSF==2) ? jetp4-=jetp4*(*jetJECUnc)[i] : jetp4=jetp4;
+       jetSmearedPt.at(i) = jetp4.Pt();
+       jetSmearedEn.at(i) = jetp4.Energy();
        HT_before+=jetSmearedPt[i];
        if (abs((*jetEta)[i])>2.4 || (*jetPFLooseId)[i]==0 || jetSmearedPt[i]<30 || !((*jetPUFullID)[i]&(1<<2))) passcut=false;
        //if (_fastSim && (*jetPt)[i]>20 && abs((*jetEta)[i])<2.5 && (*jetCHF)[i]<0.1) {
@@ -1160,10 +1270,14 @@ void Analyzer::Loop()
        TLorentzVector jetp4;
        jetp4.SetPtEtaPhiE((*AK8JetPt)[i],(*AK8JetEta)[i],(*AK8JetPhi)[i],(*AK8JetEn)[i]);
        if (!isData && (*AK8JetP4Smear)[i]>0) {
-         jetp4 *=(*AK8JetP4Smear)[i];
-         AK8JetSmearedPt.at(i) = jetp4.Pt();
-         AK8JetSmearedEn.at(i) = jetp4.Energy();
+         double sf=(*AK8JetP4Smear)[i];
+         if (AK8Smear_whichSF==1) sf=(*AK8JetP4SmearUp)[i];
+         else if (AK8Smear_whichSF==2) sf=(*AK8JetP4SmearDo)[i];
+         jetp4 *=sf;
        }
+       (AK8jetJEC_whichSF==1) ? jetp4+=jetp4*(*AK8JetJECUnc)[i] : (AK8jetJEC_whichSF==2) ? jetp4-=jetp4*(*AK8JetJECUnc)[i] : jetp4=jetp4;
+       AK8JetSmearedPt.at(i) = jetp4.Pt();
+       AK8JetSmearedEn.at(i) = jetp4.Energy();
        AK8HT_before+=AK8JetSmearedPt[i];
        if (abs((*AK8JetEta)[i])>2.4 || (*AK8JetPFLooseId)[i]==0 || AK8JetSmearedPt[i]<300) passcut=false;
        for (auto j : passPhoL) if (deltaR((*AK8JetPhi)[i],(*phoSCPhi)[j],(*AK8JetEta)[i],(*phoSCEta)[j])<0.8) {
@@ -1222,39 +1336,41 @@ void Analyzer::Loop()
      }
      //MET variables
      for (auto i : passPhoL) ST+=(*phoCalibEt)[i];
-     ST+=pfMET;
+     double MET=pfMET, METPhi=pfMETPhi, METsumEt=pfMETsumEt, METSig=pfMETSig;
+     (metJER_whichSF==1) ? MET=pfMET_T1JERUp : (metJER_whichSF==2) ? MET=pfMET_T1JERDo : MET=MET;
+     if (metJES_whichSF==1) {MET=pfMET_T1JESUp; METPhi=pfMETPhi_T1JESUp;}
+     else if (metJES_whichSF==2) {MET=pfMET_T1JESDo; METPhi=pfMETPhi_T1JESDo;}
+     if (metUES_whichSF==1) {MET=pfMET_T1UESUp; METPhi=pfMETPhi_T1UESUp;}
+     else if (metUES_whichSF==2) {MET=pfMET_T1UESDo; METPhi=pfMETPhi_T1UESDo;}
+     ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
-     if (passPhoL.size()>0) MT=sqrt(2*pfMET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoSCPhi)[nleadPhoL]-pfMETPhi))));
+     if (passPhoL.size()>0) MT=sqrt(2*MET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoSCPhi)[nleadPhoL]-METPhi))));
      if (_fakeRate) {
-       if (_fakeRate==1 && nPassFREleL != 0) MT=sqrt(2*pfMET*(*eleCalibPt)[nleadFREleL]*(1-cos(abs((*eleSCPhi)[nleadFREleL]-pfMETPhi))));
+       if (_fakeRate==1 && nPassFREleL != 0) MT=sqrt(2*MET*(*eleCalibPt)[nleadFREleL]*(1-cos(abs((*eleSCPhi)[nleadFREleL]-METPhi))));
      }
      dphi_met_jet=999;
      for (auto i : passJet) {
        if (jetSmearedPt[i]<100) continue;
-       double dphi=((*jetPhi)[i]-pfMETPhi>M_PI) ? pfMETPhi-(*jetPhi)[i] : (*jetPhi)[i]-pfMETPhi;
+       double dphi=((*jetPhi)[i]-METPhi>M_PI) ? METPhi-(*jetPhi)[i] : (*jetPhi)[i]-METPhi;
        if (abs(dphi)<dphi_met_jet) dphi_met_jet=abs(dphi);
      }
-     double dphi_pho=((*phoSCPhi)[nleadPhoL]-pfMETPhi>M_PI) ? pfMETPhi-(*phoSCPhi)[nleadPhoL] : (*phoSCPhi)[nleadPhoL]-pfMETPhi;
+     double dphi_pho=((*phoSCPhi)[nleadPhoL]-METPhi>M_PI) ? METPhi-(*phoSCPhi)[nleadPhoL] : (*phoSCPhi)[nleadPhoL]-METPhi;
      if (dphi_met_jet>dphi_pho) dphi_met_jet=dphi_pho;
 
 
      if (!isData ){
        mcLeptonFilter=false;
        for (int i=0; i<nMC; i++){
-         if (abs((*mcPID)[i])== 11 ||abs((*mcPID)[i])== 13 ||abs((*mcPID)[i])== 15 ){
-           //if ( (*mcPt)[i]>0) && ( (*mcStatusFlag)[i] & 1 || (*mcStatusFlag)[i] & 4) )
-           if ( (*mcPt)[i]>10) {
-             mcLeptonFilter=true;
-             //cout<<"pid "<<(*mcPID)[i]<<" pt "<<(*mcPt)[i]<<" status "<<(*mcStatus)[i]<<" momPID "<<(*mcMomPID)[i]<<endl;
-             break;
-           }
+         if (abs((*mcMomPID)[i])==24 && (abs((*mcPID)[i])== 11 ||abs((*mcPID)[i])== 13 ||abs((*mcPID)[i])== 15 )){
+         //if (abs((*mcPID)[i])== 24 && (*mcStatusFlag)[i] & 240 != 0){
+           mcLeptonFilter=true;
+           //cout<<"pid "<<(*mcPID)[i]<<" pt "<<(*mcPt)[i]<<" statusflag "<<(*mcStatusFlag)[i]<<" momPID "<<(*mcMomPID)[i]<<endl;
          }
        }
        //cout<<"lepton "<<mcLeptonFilter<<endl;
      }
-   
-     
+  
      //find which btag jet to use for Higgs mass
      //AK8
      passBtag=false; passHiggsMass=false;
@@ -1653,11 +1769,11 @@ void Analyzer::Loop()
        if (!isData && !_fastSim) if (metFilters&94) continue;
        if (!isData && _fastSim) if (metFilters&86) continue;
        h_cuts->Fill(6,w);
-       if (pfMET<100) continue;
-       //if (pfMET<70 || pfMET>100) continue;
+       if (MET<100) continue;
+       //if (MET<70 || MET>100) continue;
        h_cuts->Fill(7,w);
        if (bcounterCSV[1]<2) continue;
-       if (!isData) w*=CSV_SF_L[0];
+       if (!isData) w*=CSV_SF_L[CSV_whichSF];
        //if (bcounterBDSV[2]==0) continue;
        //if (bcounterBDSV[1]==0 || bcounterBDSV[2]!=0) continue;
        h_cuts->Fill(8,w);
@@ -1689,12 +1805,12 @@ void Analyzer::Loop()
      h_AK8HT_after->Fill(AK8HT_after,w);
      h_AK8EMHT_after->Fill(AK8EMHT_after,w);
      h_nAK8jets->Fill(passAK8Jet.size(),w);
-     h_pfMET->Fill(pfMET,w);
-     h_pfMETsumEt->Fill(pfMETsumEt,w);
-     h_pfMETPhi->Fill(pfMETPhi,w);
-     h_pfMETSig->Fill(pfMETSig,w);
-     h_MET_AK8btag->Fill(pfMET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
-     h_MET_AK4btag->Fill(pfMET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+     h_pfMET->Fill(MET,w);
+     h_pfMETsumEt->Fill(METsumEt,w);
+     h_pfMETPhi->Fill(METPhi,w);
+     h_pfMETSig->Fill(METSig,w);
+     h_MET_AK8btag->Fill(MET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
+     h_MET_AK4btag->Fill(MET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
      h_ST->Fill(ST,w);
      h_ST_G->Fill(ST_G,w);
      h_MT->Fill(MT,w);
@@ -1782,16 +1898,16 @@ void Analyzer::Loop()
      }
 
        int AK8=0, AK4=0;
-       double met = (pfMET<50) ? 1 : (pfMET<70) ? 2 : (pfMET<100) ? 3 : (pfMET<200) ? 4 : (pfMET<500) ? 5 : 6;
+       double met = (MET<50) ? 1 : (MET<70) ? 2 : (MET<100) ? 3 : (MET<200) ? 4 : (MET<500) ? 5 : 6;
        //double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
        double njet = (passJet.size()<6) ? 1 : 2;
        double w_searchBin=w, w_AK4searchBin=w, w_AK8searchBin=w;
-       if (BDSV_selected==1) {AK8=1; if (!isData) w_searchBin*=BDSV_SF_L[0];}
-       if (BDSV_selected>=2) {AK8=2; if (!isData) w_searchBin*=BDSV_SF_M1[0];}
-       //if (CSV_selected==1) {AK4=1; if (!isData) w_searchBin*=CSV_SF_L[0];}
-       //if (CSV_selected>=2) {AK4=2; if (!isData) w_searchBin*=CSV_SF_L[0]*CSV_SF_L[0];}
-       if (Deep_selected==1) {AK4=1; if (!isData) w_searchBin*=Deep_SF_L[0];}
-       if (Deep_selected>=2) {AK4=2; if (!isData) w_searchBin*=Deep_SF_L[0]*Deep_SF_L[0];}
+       if (BDSV_selected==1) {AK8=1; if (!isData) w_searchBin*=BDSV_SF_L[BDSV_whichSF];}
+       if (BDSV_selected>=2) {AK8=2; if (!isData) w_searchBin*=BDSV_SF_M1[BDSV_whichSF];}
+       //if (CSV_selected==1) {AK4=1; if (!isData) w_searchBin*=CSV_SF_L[CSV_whichSF];}
+       //if (CSV_selected>=2) {AK4=2; if (!isData) w_searchBin*=CSV_SF_L[CSV_whichSF]*CSV_SF_L[CSV_whichSF];}
+       if (Deep_selected==1) {AK4=1; if (!isData) w_searchBin*=Deep_SF_L[Deep_whichSF];}
+       if (Deep_selected>=2) {AK4=2; if (!isData) w_searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
        double ak4ak8=0;
        if (AK8==0 && AK4==0) ak4ak8=1;
        if (AK8==0 && AK4==1) ak4ak8=2;
@@ -1803,7 +1919,7 @@ void Analyzer::Loop()
        if (AK8==2 && AK4==1) ak4ak8=8;
        if (AK8==2 && AK4==2) ak4ak8=9;
        h_AK4_AK8->Fill(ak4ak8,w);
-       (pfMET>1000) ? h_MET_AK4_AK8->Fill(999,AK4,AK8,w) : h_MET_AK4_AK8->Fill(pfMET,AK4,AK8,w);
+       (MET>1000) ? h_MET_AK4_AK8->Fill(999,AK4,AK8,w) : h_MET_AK4_AK8->Fill(MET,AK4,AK8,w);
        double sbFill[dim]={double(AK4),double(AK8),met,njet};
        hn_searchBins->Fill(sbFill,w_searchBin);
        h_AK4_category->Fill(catFill,w_searchBin);
@@ -1811,20 +1927,20 @@ void Analyzer::Loop()
        //AK4-AK8 searchBins
        int AK4AK8=0, VR=0, boost=0;
        //Signal Region
-       if (BDSV_selected>0) {boost=1;AK4AK8=1; w_AK8searchBin*=BDSV_SF_L[0];}
-       //else {if (CSV_selected==1) {AK4AK8=1; w_AK4searchBin*=CSV_SF_L[0];} if (CSV_selected==2) {AK4AK8=2; w_AK4searchBin*=CSV_SF_L[0]*CSV_SF_L[0];}}
-       else {if (Deep_selected==1) {AK4AK8=1; w_AK4searchBin*=Deep_SF_L[0];} if (Deep_selected==2) {AK4AK8=2; w_AK4searchBin*=Deep_SF_L[0]*Deep_SF_L[0];}}
+       if (BDSV_selected>0) {boost=1;AK4AK8=1; w_AK8searchBin*=BDSV_SF_L[BDSV_whichSF];}
+       //else {if (CSV_selected==1) {AK4AK8=1; w_AK4searchBin*=CSV_SF_L[CSV_whichSF];} if (CSV_selected==2) {AK4AK8=2; w_AK4searchBin*=CSV_SF_L[CSV_whichSF]*CSV_SF_L[CSV_whichSF];}}
+       else {if (Deep_selected==1) {AK4AK8=1; w_AK4searchBin*=Deep_SF_L[Deep_whichSF];} if (Deep_selected==2) {AK4AK8=2; w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}}
        //Control and Validation regions
        //if (BDSV_selected==0 && CSV_selected==0) {
        if (BDSV_selected==0 && Deep_selected==0) {
-         if (bcounterBDSV[1]>0) {boost=1; VR=1; AK4AK8=1; w_AK8searchBin*=BDSV_SF_L[0];}
+         if (bcounterBDSV[1]>0) {boost=1; VR=1; AK4AK8=1; w_AK8searchBin*=BDSV_SF_L[BDSV_whichSF];}
          else if (passHiggsMass) boost=1;
          if (!boost) {
-           //if (bcounterCSV[1]==1) {VR=1;AK4AK8=1; w_AK4searchBin*=CSV_SF_L[0];}
-           //if (bcounterCSV[1]>1) {VR=1;AK4AK8=2; w_AK4searchBin*=CSV_SF_L[0]*CSV_SF_L[0];}
+           //if (bcounterCSV[1]==1) {VR=1;AK4AK8=1; w_AK4searchBin*=CSV_SF_L[CSV_whichSF];}
+           //if (bcounterCSV[1]>1) {VR=1;AK4AK8=2; w_AK4searchBin*=CSV_SF_L[CSV_whichSF]*CSV_SF_L[CSV_whichSF];}
            //if (!passAK4HiggsMass && bcounterCSV[1]==0) boost=2;
-           if (bcounterDeep[1]==1) {VR=1;AK4AK8=1; w_AK4searchBin*=Deep_SF_L[0];}
-           if (bcounterDeep[1]>1) {VR=1;AK4AK8=2; w_AK4searchBin*=Deep_SF_L[0]*Deep_SF_L[0];}
+           if (bcounterDeep[1]==1) {VR=1;AK4AK8=1; w_AK4searchBin*=Deep_SF_L[Deep_whichSF];}
+           if (bcounterDeep[1]>1) {VR=1;AK4AK8=2; w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
            if (!passAK4DeepHiggsMass && bcounterDeep[1]==0) {boost=2; VR=1;}
          }
        }
@@ -1841,17 +1957,17 @@ void Analyzer::Loop()
      //signalstudy histos fill
      if (signalstudy) {
        hs_gMET_Bquark->Fill(genMET,nBquark,w);
-       hs_MET_Bquark->Fill(pfMET,nBquark,w);
+       hs_MET_Bquark->Fill(MET,nBquark,w);
        hs_gMET_Bjetlikequark->Fill(genMET,nBjetlikequark,w);
-       hs_MET_Bjetlikequark->Fill(pfMET,nBjetlikequark,w);
-       hs_MET_trueBjets->Fill(pfMET,nBjets,w);
-       hs_MET_trueBjets_loose->Fill(pfMET,nBjets_tagged[0],w);
-       hs_MET_trueBjets_medium->Fill(pfMET,nBjets_tagged[1],w);
-       hs_MET_trueBjets_tight->Fill(pfMET,nBjets_tagged[2],w);
-       hs_MET_trueBjets_AK8->Fill(pfMET,nBjets_ak8,w);
-       hs_MET_trueBjets_loose_AK8->Fill(pfMET,nBjets_tagged_ak8[0],w);
-       hs_MET_trueBjets_medium_AK8->Fill(pfMET,nBjets_tagged_ak8[1],w);
-       hs_MET_trueBjets_tight_AK8->Fill(pfMET,nBjets_tagged_ak8[2],w);
+       hs_MET_Bjetlikequark->Fill(MET,nBjetlikequark,w);
+       hs_MET_trueBjets->Fill(MET,nBjets,w);
+       hs_MET_trueBjets_loose->Fill(MET,nBjets_tagged[0],w);
+       hs_MET_trueBjets_medium->Fill(MET,nBjets_tagged[1],w);
+       hs_MET_trueBjets_tight->Fill(MET,nBjets_tagged[2],w);
+       hs_MET_trueBjets_AK8->Fill(MET,nBjets_ak8,w);
+       hs_MET_trueBjets_loose_AK8->Fill(MET,nBjets_tagged_ak8[0],w);
+       hs_MET_trueBjets_medium_AK8->Fill(MET,nBjets_tagged_ak8[1],w);
+       hs_MET_trueBjets_tight_AK8->Fill(MET,nBjets_tagged_ak8[2],w);
        if (iHiggs!=-1) hs_Hpt->Fill((*mcPt)[iHiggs]);
        if (iPho!=-1) hs_PhoEt->Fill((*mcEt)[iPho]);
        if (iHAK8jet!=-1) hs_AK8Hmass->Fill((*AK8JetPrunedMassCorr)[iHAK8jet]);
@@ -1967,12 +2083,12 @@ void Analyzer::Loop()
        m_AK8HT_after[mass_pair]->Fill(AK8HT_after,w);
        m_AK8EMHT_after[mass_pair]->Fill(AK8EMHT_after,w);
        m_nAK8jets[mass_pair]->Fill(passAK8Jet.size(),w);
-       m_pfMET[mass_pair]->Fill(pfMET,w);
-       m_pfMETsumEt[mass_pair]->Fill(pfMETsumEt,w);
-       m_pfMETPhi[mass_pair]->Fill(pfMETPhi,w);
-       m_pfMETSig[mass_pair]->Fill(pfMETSig,w);
-       m_MET_AK8btag[mass_pair]->Fill(pfMET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
-       m_MET_AK4btag[mass_pair]->Fill(pfMET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
+       m_pfMET[mass_pair]->Fill(MET,w);
+       m_pfMETsumEt[mass_pair]->Fill(METsumEt,w);
+       m_pfMETPhi[mass_pair]->Fill(METPhi,w);
+       m_pfMETSig[mass_pair]->Fill(METSig,w);
+       m_MET_AK8btag[mass_pair]->Fill(MET,(*AK8JetpfBoostedDSVBTag)[SelectedAK8Jet],w);
+       m_MET_AK4btag[mass_pair]->Fill(MET,(*jetCSV2BJetTags)[SelectedAK4Jet1]+(*jetCSV2BJetTags)[SelectedAK4Jet2],w);
        m_ST[mass_pair]->Fill(ST,w);
        m_ST_G[mass_pair]->Fill(ST_G,w);
        m_MT[mass_pair]->Fill(MT,w);
