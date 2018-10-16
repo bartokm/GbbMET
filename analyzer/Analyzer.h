@@ -1063,7 +1063,6 @@ public :
    bool _fastSim=false;
    int _fakeRate=0;
    int _testRun=0;
-   double _emu_pt=5;
    bool is_quiet=false;
    bool signalstudy=false;
    bool SignalScan=false;
@@ -1103,6 +1102,7 @@ public :
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
    double ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
+   double e_pt=5, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
@@ -1145,7 +1145,7 @@ public :
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
 
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, double pt=5, map<string,int> systematics={});
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={});
    virtual ~Analyzer();
    virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1167,7 +1167,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, double pt, map<string,int> systematics) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string pu_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1176,6 +1176,15 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   _cut_operator=cut_operator;
   _cut_value=cut_value;
   Systematics(systematics);
+  //Determine lepton pt cuts
+  
+  for (auto const& x : leptonpts) {
+    if (x.first=="e") e_pt=x.second;
+    else if (x.first=="m") mu_pt=x.second;
+    else if (x.first=="t") tau_pt=x.second;
+    else cout<<"Unkown lepton type \""<<x.first<<"\""<<endl;
+  }
+
   is_quiet=is_q;
   signalstudy=is_signalstudy;
   SignalScan=is_signalscan;
@@ -1187,7 +1196,6 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (fastSim) _fastSim=true;
   if (fakeRate) _fakeRate=fakeRate;
   if (testrun) _testRun=testrun;
-  if (pt) _emu_pt=pt;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
@@ -2781,6 +2789,8 @@ void PrintHelp(){
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"-c \t\t Print out available cut variables"<<endl;
   cout<<"-t x \t\t Test running only on \"x\" number of events. (default is x=1000)"<<endl;
+  cout<<"--lept \t\t set lepton pt cut for e/m/t"<<endl;
+  cout<<"FORMAT:\n--lept e 10 m 5 t 20"<<endl;
   cout<<"--syst \t\t run with +- systematics settings"<<endl;
   cout<<"FORMAT:\n--syst systematics_type 1 systematics_type 2 ..."<<endl;
   cout<<"The number meaning: 1 = upper, 2 = lower\n"<<endl;

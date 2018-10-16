@@ -13,18 +13,18 @@
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_p=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
   bool is_t=0, is_l=0, is_syst=0;
-  bool inputs=0, cuts=0, syst=0;
+  bool inputs=0, cuts=0, syst=0, lept=0;
   int FR=0, tr=0;
-  double pt=5;
   string output, bname, pname;
-  vector<string> inputfiles, v_cuts, cut_variable, cut_operator, v_syst;
+  vector<string> inputfiles, v_cuts, cut_variable, cut_operator, v_syst, v_lept;
   vector<double> cut_value;
   map<string, int> systematics;
+  map<string, double> leptonpts;
   for(int i=1; i<argc; i++) {
     std::string arg = argv[i];
     // Check existence of an option
     if (arg[0]=='-' && arg.size()==2) {
-      is_i=0; is_cuts=0; is_syst=0;
+      is_i=0; is_cuts=0; is_syst=0, is_l=0;
       if (arg[1]=='i') is_i=1;
       else if (arg[1]=='o') is_o=1;
       else if (arg[1]=='b') is_b=1;
@@ -39,11 +39,11 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='C') is_countSignal=1; 
       else if (arg[1]=='t') is_t=1; 
-      else if (arg[1]=='l') is_l=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--syst") {is_i=0;is_syst=1;}
     else if (arg=="--cuts") {is_i=0;is_cuts=1;}
+    else if (arg=="--lept") {is_i=0;is_l=1;}
     //Print out help
     if (is_h) {PrintHelp();return 1;}
     //Print out cuts
@@ -55,14 +55,16 @@ int main(int argc, char* argv[]){
     if (is_p) {pname=argv[i+1]; is_p=0;}
     if (is_F) {FR=atoi(argv[i+1]); is_F=0;}
     if (is_t) {(atoi(argv[i+1])==0) ? tr=1000 : tr=atoi(argv[i+1]); is_t=0;}
-    if (is_l) {(atoi(argv[i+1])==0) ? pt=5 : pt=atof(argv[i+1]); is_l=0;}
+    if (lept && arg[0]=='-') is_l=0;
     if (cuts && arg[0]=='-') is_cuts=0;
     if (syst && arg[0]=='-') is_syst=0;
     if (cuts && is_cuts) v_cuts.push_back(arg);
     if (syst && is_syst) v_syst.push_back(arg);
+    if (lept && is_l) v_lept.push_back(arg);
     if (is_i) inputs=1;
     if (is_cuts) cuts=1;
     if (is_syst) syst=1;
+    if (is_l) lept=1;
   }
   //Fill cut variables
   if (v_cuts.size()%3 != 0) {cout<<"Wrong number of --cuts input! Exiting..."<<endl; return 0;}
@@ -86,6 +88,17 @@ int main(int argc, char* argv[]){
       if (i!=0 && (i+1)%2 ==0) systematics.insert(pair<string,int>(stemp,itemp));
     }
   }
+  
+  //Fill leptonic pt variables
+  if (v_lept.size()%2 != 0) {cout<<"Wrong number of --lept input! Exiting..."<<endl; return 0;}
+  else {
+    string stemp; double dtemp;
+    for (unsigned int i=0;i<v_lept.size();i++) {
+      if ((i+1)%2 ==1) stemp=v_lept[i];
+      if ((i+1)%2 ==0) dtemp=stof(v_lept[i]);
+      if (i!=0 && (i+1)%2 ==0) leptonpts.insert(pair<string,double>(stemp,dtemp));
+    }
+  }
 
   if (!is_quiet){
     if (!output.empty()) cout<<"Output name: "<<output<<endl;
@@ -93,7 +106,6 @@ int main(int argc, char* argv[]){
     if (!pname.empty()) cout<<"Data PileUp file name: "<<pname<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
     if (tr) cout<<"This is a test run on "<<tr<<" events!"<<endl;
-    if (pt) cout<<"Electron/muon pt threshold set to "<<pt<<" GeV!"<<endl;
     if (is_signalscan) cout<<"SignalScan is true!"<<endl;
     if (is_signalstudy) cout<<"Signal study histograms will be filled! (works only on MC...)"<<endl;
     if (is_countSignal) cout<<"Signal Count is ON, only works on T5qqqqHg sample."<<endl;
@@ -118,8 +130,9 @@ int main(int argc, char* argv[]){
       cout<<cut_value[i]<<endl;
     }
     for (auto const& x : systematics) cout<<"Systematics for "<<x.first<<" set to "<<x.second<<endl;
+    for (auto const& x : leptonpts) cout<<"Lepton pt for "<<x.first<<" set to "<<x.second<<endl;
   }
-  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal, tr, pt, systematics);
+  Analyzer t(inputfiles,output,bname,pname,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_signalscan,is_signalstudy,is_countSignal, tr, systematics, leptonpts);
   t.Loop();
   return 1;
 }
@@ -868,7 +881,7 @@ void Analyzer::Loop()
      for (int i=0;i<nPho;i++){
        //if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
        //if (1.566<abs((*phoSCEta)[i])<3 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
-       if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<3)) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
+       if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<2.5)) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
         if ((*phoIDbit)[i]>>0&1) {
          passPhoL.push_back(i);
         }
@@ -966,7 +979,7 @@ void Analyzer::Loop()
          for (auto j : passPhoL) if (deltaR((*eleSCPhi)[i],(*phoSCPhi)[j],(*eleSCEta)[i],(*phoSCEta)[j])<0.3) {
            passOverlap=false;break;
          }
-       if ((*eleCalibPt)[i]>_emu_pt && abs((*eleSCEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) {
+       if ((*eleCalibPt)[i]>e_pt && abs((*eleSCEta)[i])<2.5 && (*elePFMiniIso)[i]<0.2) {
          if ((*eleIDbit)[i]>>1&1) passFREleL.push_back(i);
          if ((*eleIDbit)[i]>>2&1) passFREleM.push_back(i);
          if ((*eleIDbit)[i]>>3&1) passFREleT.push_back(i);
@@ -1013,13 +1026,13 @@ void Analyzer::Loop()
      if (!isData) {
        double id_sf=0, rec_sf=0, syst_id=0, syst_rec=0;
        int sign_id=0, sign_rec=0;
+       (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+       (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
        if (nPassEleV!=0){
          id_sf=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
          syst_id=h_ele_EGamma_SF2D[0]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
          rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
          syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleV[0]],(*eleCalibPt)[passEleV[0]]));
-         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
          ele_SF[0]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
          //cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
        }
@@ -1028,8 +1041,6 @@ void Analyzer::Loop()
          syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
          rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
          syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleL[0]],(*eleCalibPt)[passEleL[0]]));
-         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
          ele_SF[1]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleM!=0){
@@ -1037,8 +1048,6 @@ void Analyzer::Loop()
          syst_id=h_ele_EGamma_SF2D[2]->GetBinError(h_ele_EGamma_SF2D[2]->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
          rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
          syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleM[0]],(*eleCalibPt)[passEleM[0]]));
-         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
          ele_SF[2]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleT!=0){
@@ -1046,14 +1055,13 @@ void Analyzer::Loop()
          syst_id=h_ele_EGamma_SF2D[3]->GetBinError(h_ele_EGamma_SF2D[3]->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
          rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
          syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin((*eleSCEta)[passEleT[0]],(*eleCalibPt)[passEleT[0]]));
-         (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
          ele_SF[3]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleNO!=0){ //only for loose electrons so far
          double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
-         double sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
-         ele_VETOSF = (1-sf*epsilon)/(1-epsilon);
+         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
+         syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin((*eleSCEta)[passEleNO[0]],(*eleCalibPt)[passEleNO[0]]));
+         ele_VETOSF = (1-(id_sf+sign_id*syst_id)*epsilon)/(1-epsilon);
        }
      }
      //muon
@@ -1066,7 +1074,7 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*muPt)[i]>_emu_pt && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) {
+       if ((*muPt)[i]>mu_pt && abs((*muEta)[i])<2.4 && (*muSIP)[i]<4 && (*muDz)[i]<0.1 && (*muD0)[i]<0.05 && (*muPFMiniIso)[i]<0.2) {
          if ((*muIDbit)[i]>>0&1) passMuL.push_back(i);
          if ((*muIDbit)[i]>>1&1) passMuM.push_back(i);
          if ((*muIDbit)[i]>>2&1) passMuT.push_back(i);
@@ -1131,7 +1139,7 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
-       if ((*tauPt)[i]>20 && abs((*tauEta)[i])<2.3) {
+       if ((*tauPt)[i]>tau_pt && abs((*tauEta)[i])<2.3) {
          if ((*tauByLooseIsolationMVArun2v1DBoldDMwLT)[i]) passTauL.push_back(i);
          if ((*tauByMediumIsolationMVArun2v1DBoldDMwLT)[i]) passTauM.push_back(i);
          if ((*tauByTightIsolationMVArun2v1DBoldDMwLT)[i]) passTauT.push_back(i);
