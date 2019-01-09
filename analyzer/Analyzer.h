@@ -1070,7 +1070,7 @@ public :
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
-   int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1;
+   int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1, nonHiggsJet=-1;
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1, nPassEleNO=-1;
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
@@ -1088,7 +1088,7 @@ public :
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true;
-   bool Hbb=false, mcLeptonFilter=false;
+   bool Hbb=false, HP=false, mcLeptonFilter=false;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
@@ -1102,7 +1102,7 @@ public :
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
    double ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
-   double e_pt=5, mu_pt=5, tau_pt=20;
+   double e_pt=10, mu_pt=10, tau_pt=20;
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
@@ -2293,6 +2293,10 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
     else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]; if (nPassMuM) w*=mu_SF[1]; if (nPassTauM) w*=tau_SF[1];}}
     else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleT) w*=ele_SF[3]; if (nPassMuT) w*=mu_SF[2]; if (nPassTauT) w*=tau_SF[2];}}
+    else if (_cut_variable[i]=="nPassLepVLL") {returnvalue*=Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleV) w*=ele_SF[0]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
+    else if (_cut_variable[i]=="nPassLepMLL") {returnvalue*=Parser(nPassEleM+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
+    else if (_cut_variable[i]=="nPassLepLML") {returnvalue*=Parser(nPassEleL+nPassMuM+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuM) w*=mu_SF[1]; if (nPassTauL) w*=tau_SF[0];}}
+    else if (_cut_variable[i]=="nPassLepLLM") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauM) w*=tau_SF[1];}}
     else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
     else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
@@ -2331,6 +2335,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nonHiggsJet") returnvalue*=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[CSV_whichSF];}
     else if (_cut_variable[i]=="bcounterCSV_M") {returnvalue*=Parser(bcounterCSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_M[CSV_whichSF];}
     else if (_cut_variable[i]=="bcounterCSV_T") {returnvalue*=Parser(bcounterCSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_T[CSV_whichSF];}
@@ -2375,6 +2380,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="HP") {returnvalue*=Parser(HP,_cut_operator[i],_cut_value[i]); if (!isData) w*=0.5;}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
@@ -2691,6 +2697,10 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassLepL","number of loose leptons (e+mu+tau)"},
   {"nPassLepM","number of medium leptons (e+mu+tau)"},
   {"nPassLepT","number of tight leptons (e+mu+tau)"},
+  {"nPassLepVLL","number of veto e + loose mu + loose tau"},
+  {"nPassLepMLL","number of medium e + loose mu + loose tau"},
+  {"nPassLepLML","number of loose e + medium mu + loose tau"},
+  {"nPassLepLLM","number of loose e + loose mu + medium tau"},
   {"nPassIso","number of isolated tracks"},
   {"nPassFREleL","number of loose FRele (no overlap removal with photons)"},
   {"nPassFREleM","number of medium FRele (no overlap removal with photons)"},
@@ -2730,6 +2740,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"dphi_met_jet","Dphi of met and nearest jet with pt>100"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
+  {"nonHiggsJet","number of loose ak4 jets which are not Higgs candidates"},
   {"bcounterCSV_L","number of loose CSV btagged jets"},
   {"bcounterCSV_M","number of medium CSV btagged jets"},
   {"bcounterCSV_T","number of tight CSV btagged jets"},
@@ -2754,6 +2765,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
   {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
+  {"HP","Neutralinos decaying to 1 Higgs and 1 Photon found in the event, scale down weight by w*=0.5!"},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
 
 bool CompareCuts(vector<string> input_cuts){

@@ -131,6 +131,11 @@
   map< pair<int, int>, TH1D* > m_AK4searchBins;
   map< pair<int, int>, THnD* > mn_AK8searchBins;
   map< pair<int, int>, TH1D* > m_AK8searchBins;
+  
+  map< pair<int, int>, TH1D* > m_mHAK8_METmed;
+  map< pair<int, int>, TH1D* > m_mHAK8_METhigh;
+  map< pair<int, int>, TH1D* > m_mHAK4_METmed;
+  map< pair<int, int>, TH1D* > m_mHAK4_METhigh;
    
   //signalstudy
 	map< pair<int, int>, TH1D* > m_Hpt;
@@ -286,6 +291,10 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
     m_AK4_category[MassPair] = new TH1D("h_AK4_category","AK4 btag-Higgs window categories;NoBtag-NoWindow, 1Btag-NoWindow, 2Btag-NoWindow, NoBtag-Window, Undecided, 1Selected, 2Selected",7,0.5,7.5);
    
     m_dphi_met_jet[MassPair] = new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",10,0,3.2);
+    m_mHAK8_METmed[MassPair] = new TH1D("h_mHAK8_METmed",";M_{AK8}[GeV]",10,18,278);
+    m_mHAK8_METhigh[MassPair] = new TH1D("h_mHAK8_METhigh",";M_{AK8}[GeV]",10,18,278);
+    m_mHAK4_METmed[MassPair] = new TH1D("h_mHAK4_METmed",";M_{bb}[GeV]",10,18,278);
+    m_mHAK4_METhigh[MassPair] = new TH1D("h_mHAK4_METhigh",";M_{bb}[GeV]",10,18,278);
     
     const int dim=4;
     int nbins[dim]={3,3,6,2};
