@@ -1362,19 +1362,25 @@ void Analyzer::Loop()
      ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
-     if (passPhoL.size()>0) MT=sqrt(2*MET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs((*phoSCPhi)[nleadPhoL]-METPhi))));
+     if (passPhoL.size()>0) {
+       double dphi_MT=((*phoSCPhi)[nleadPhoL]-METPhi)>M_PI ? 2*M_PI-(METPhi-(*phoSCPhi)[nleadPhoL]) : (*phoSCPhi)[nleadPhoL]-METPhi;
+       MT=sqrt(2*MET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs(dphi_MT))));
+     }
      if (_fakeRate) {
-       if (_fakeRate==1 && nPassFREleL != 0) MT=sqrt(2*MET*(*eleCalibPt)[nleadFREleL]*(1-cos(abs((*eleSCPhi)[nleadFREleL]-METPhi))));
+       if (_fakeRate==1 && nPassFREleL != 0) {
+         double dphi_MT=((*eleSCPhi)[nleadFREleL]-METPhi)>M_PI ? 2*M_PI-(METPhi-(*eleSCPhi)[nleadFREleL]) : (*eleSCPhi)[nleadFREleL]-METPhi;
+         MT=sqrt(2*MET*(*eleCalibPt)[nleadFREleL]*(1-cos(abs(dphi_MT))));
+       }
      }
      dphi_met_jet=999;
      for (auto i : passJet) {
        if (jetSmearedPt[i]<100) continue;
-       double dphi=((*jetPhi)[i]-METPhi>M_PI) ? METPhi-(*jetPhi)[i] : (*jetPhi)[i]-METPhi;
+       double dphi=((*jetPhi)[i]-METPhi>M_PI) ? 2*M_PI-(METPhi-(*jetPhi)[i]) : (*jetPhi)[i]-METPhi;
        if (abs(dphi)<dphi_met_jet) dphi_met_jet=abs(dphi);
      }
      double dphi_pho=999;
      for (auto i : passPhoL) {
-       double dphi=((*phoSCPhi)[i]-METPhi>M_PI) ? METPhi-(*phoSCPhi)[i] : (*phoSCPhi)[i]-METPhi;
+       double dphi=((*phoSCPhi)[i]-METPhi>M_PI) ? 2*M_PI-(METPhi-(*phoSCPhi)[i]) : (*phoSCPhi)[i]-METPhi;
        if (abs(dphi)<dphi_pho) dphi_pho=abs(dphi);
      }
      if (dphi_met_jet>dphi_pho) dphi_met_jet=dphi_pho;
@@ -1985,7 +1991,6 @@ void Analyzer::Loop()
        //AK4 AK8 overlap CR/VR
        if (!boost) nonHiggsJet=passJet.size()-2;
        else {
-         cout<<"AK8 "<<passAK8Jet.size()<<endl;
          auto i = passJet.begin();
          while (i!=passJet.end()) {
            if (deltaR((*AK8JetPhi)[SelectedAK8Jet],(*jetPhi)[*i],(*AK8JetEta)[SelectedAK8Jet],(*jetEta)[*i])<0.8) passJet.erase(i);
