@@ -1085,10 +1085,12 @@ public :
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={}, bcounterDeep[4]={};
    int BDSV_selected=0, CSV_selected=0, Deep_selected=0;
+   bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true;
-   bool Hbb=false, HP=false, mcLeptonFilter=false;
+   bool Hbb=false, mcLeptonFilter=false;
+   int SignalHiggs=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
@@ -2333,6 +2335,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="NOTmetFilters") returnvalue*= !(Parser(metFilters,_cut_operator[i],_cut_value[i]));
     else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(pfMET,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nonHiggsJet") returnvalue*=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
@@ -2380,7 +2383,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="HP") {returnvalue*=Parser(HP,_cut_operator[i],_cut_value[i]); if (!isData) w*=0.5;}
+    else if (_cut_variable[i]=="SignalHiggs") {returnvalue*=Parser(SignalHiggs,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
@@ -2738,6 +2741,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"NOTmetFilters","Inverse of metFilters"},
   {"MET","pfMET"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
+  {"L1prefire","True if event could be affected by L1prefire"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
   {"nonHiggsJet","number of loose ak4 jets which are not Higgs candidates"},
@@ -2765,7 +2769,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
   {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
-  {"HP","Neutralinos decaying to 1 Higgs and 1 Photon found in the event, scale down weight by w*=0.5!"},
+  {"SignalHiggs","Neutralinos decay to 0,1 or 2 Higgs. Cut on number of Higgs bosons."},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
 
 bool CompareCuts(vector<string> input_cuts){
