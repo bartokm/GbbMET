@@ -869,6 +869,16 @@ void Analyzer::Loop()
            eff_b_BDSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_T"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
            f_btag.Close();
          }
+
+         //L1prefire maps
+         TFile f_L1_phomap("input/L1prefiring_photonpt_2016BtoH.root","read");
+         h_L1prefire_phoMap = (TH2D*)f_L1_phomap.Get("L1prefiring_photonpt_2016BtoH");
+         h_L1prefire_phoMap->SetDirectory(0);
+         f_L1_phomap.Close();
+         TFile f_L1_jetmap("input/L1prefiring_jetpt_2016BtoH.root","read");
+         h_L1prefire_jetMap = (TH2D*)f_L1_jetmap.Get("L1prefiring_jetpt_2016BtoH");
+         h_L1prefire_jetMap->SetDirectory(0);
+         f_L1_jetmap.Close();
        }
      }
      
@@ -896,8 +906,20 @@ void Analyzer::Loop()
      memset(bcountercMVA,0,sizeof bcountercMVA);
      memset(bcounterBDSV,0,sizeof bcounterBDSV);
      memset(bcounterDeep,0,sizeof bcounterDeep);
+     double nonPrefiringProbability[3]={1,1,1};
      //photon
      for (int i=0;i<nPho;i++){
+       //L1prefire correction
+       if (!isData && (*phoEt)[i]>20 && abs((*phoSCEta)[i])>2 && abs((*phoSCEta)[i])<3) {
+         double max=h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
+         double pt = ((*phoEt)[i]>max) ? max-0.01 : (*phoEt)[i];
+         double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin((*phoSCEta)[i],pt));
+         double stat = h_L1prefire_phoMap->GetBinError(h_L1prefire_phoMap->FindBin((*phoSCEta)[i],pt));
+         double syst = prefireProb*0.2;
+         nonPrefiringProbability[0]*=(1-prefireProb);
+         nonPrefiringProbability[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
+         nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
+       }
        //if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
        //if (1.566<abs((*phoSCEta)[i])<3 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
        if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<2.5)) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
@@ -1207,6 +1229,45 @@ void Analyzer::Loop()
      //jet ID
      bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (int i=0;i<nJet;i++) {
+       //L1prefire correction
+       if (!isData && (*jetPt)[i]>20 && abs((*jetEta)[i])>2 && abs((*jetEta)[i])<3) {
+         double nonPrefiringProb_overlapPho[3]={1,1,1};
+         for (int j=0;j<nPho;j++) {
+           if (!isData && (*phoEt)[j]>20 && abs((*phoSCEta)[j])>2 && abs((*phoSCEta)[j])<3) {
+             if (deltaR((*jetPhi)[i],(*phoSCPhi)[j],(*jetEta)[i],(*phoSCEta)[j])>0.4) continue;
+             double max=h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
+             double pt = ((*phoEt)[j]>max) ? max-0.01 : (*phoEt)[j];
+             double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin((*phoSCEta)[j],pt));
+             double stat = h_L1prefire_phoMap->GetBinError(h_L1prefire_phoMap->FindBin((*phoSCEta)[j],pt));
+             double syst = prefireProb*0.2;
+             nonPrefiringProb_overlapPho[0]*=(1-prefireProb);
+             nonPrefiringProb_overlapPho[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
+             nonPrefiringProb_overlapPho[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
+           }
+         }
+         double max=h_L1prefire_jetMap->GetYaxis()->GetBinLowEdge(h_L1prefire_jetMap->GetNbinsY());
+         double pt = ((*jetPt)[i]>max) ? max-0.01 : (*jetPt)[i];
+         double prefireProb_jet = h_L1prefire_jetMap->GetBinContent(h_L1prefire_jetMap->FindBin((*jetEta)[i],pt));
+         double stat = h_L1prefire_jetMap->GetBinError(h_L1prefire_jetMap->FindBin((*jetEta)[i],pt));
+         double syst = prefireProb_jet*0.2;
+         double nonPrefiringProb_overlapJet[3]={1,1,1};
+         nonPrefiringProb_overlapJet[0]*=(1-prefireProb_jet);
+         nonPrefiringProb_overlapJet[1]*=(1-std::min(1.,prefireProb_jet+sqrt(pow(stat,2)+pow(syst,2))));
+         nonPrefiringProb_overlapJet[2]*=(1-std::max(0.,prefireProb_jet-sqrt(pow(stat,2)+pow(syst,2))));
+         if (nonPrefiringProb_overlapPho[0] == 1) {
+           nonPrefiringProbability[0]*=nonPrefiringProb_overlapJet[0];
+           nonPrefiringProbability[1]*=nonPrefiringProb_overlapJet[1];
+           nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2];
+         }
+         else if (nonPrefiringProb_overlapPho[0] > nonPrefiringProb_overlapJet[0]) {
+           if (nonPrefiringProb_overlapPho!=0) {
+             nonPrefiringProbability[0]*=nonPrefiringProb_overlapJet[0]/nonPrefiringProb_overlapPho[0];
+             nonPrefiringProbability[1]*=nonPrefiringProb_overlapJet[1]/nonPrefiringProb_overlapPho[1];
+             nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2]/nonPrefiringProb_overlapPho[2];
+           }
+           else {nonPrefiringProbability[0]=0;nonPrefiringProbability[1]=0;nonPrefiringProbability[2]=0;}
+         }
+       }
        bool passcut=true;
        jetSmearedPt.push_back((*jetPt)[i]);
        jetSmearedEn.push_back((*jetEn)[i]);
@@ -1249,6 +1310,7 @@ void Analyzer::Loop()
        if (passcut) passJet.push_back(i);
      }
      nPassAK4=passJet.size();
+     if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
      if (vetoFastSim) continue;
      //jet pt, btags
      for (auto i : passJet) {

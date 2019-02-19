@@ -1100,8 +1100,9 @@ public :
    double ele_VETOSF=1, mu_VETOSF=1;
    int BDSV_whichSF=0, CSV_whichSF=0, Deep_whichSF=0;
    int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
-   int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF;
+   int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
+   int L1prefire_whichSF=0;
    double ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
    double e_pt=10, mu_pt=10, tau_pt=20;
@@ -1119,6 +1120,8 @@ public :
    TH2D *h_muID_SF2D[3];
    TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
+   TH2D *h_L1prefire_phoMap;
+   TH2D *h_L1prefire_jetMap;
    TGraph *h_muTrk_SF;
    TEfficiency* eff_b_CSV_L;
    TEfficiency* eff_b_CSV_M;
@@ -2620,6 +2623,7 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="metJER") metJER_whichSF=x.second;
     else if (x.first=="metJES") metJES_whichSF=x.second;
     else if (x.first=="metUES") metUES_whichSF=x.second;
+    else if (x.first=="L1prefire") L1prefire_whichSF=x.second;
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
 }
