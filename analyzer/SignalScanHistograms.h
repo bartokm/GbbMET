@@ -9,7 +9,6 @@
 	//map of histos
   map< pair<int, int>, TDirectory* > MassPairToDirectoy;
 	
-  map< pair<int, int>, TH1D* > m_cuts;
   map< pair<int, int>, TH1D* > m_eff;
 	map< pair<int, int>, TH1D* > m_nVtx;
 	map< pair<int, int>, TH1D* > m_nGoodVtx;
@@ -149,6 +148,8 @@
   map< pair<int, int>, TH1D* > m_mHAK4_top5;
   map< pair<int, int>, TH1D* > m_mHAK4_top6;
    
+  map< pair<int, int>, TH1D* > m_dR_ak4_Hcandidate;
+   
   //signalstudy
 	map< pair<int, int>, TH1D* > m_Hpt;
 	map< pair<int, int>, TH1D* > m_AK8Hmass;
@@ -167,8 +168,9 @@
 	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_sum;
 	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_mult;
 	map< pair<int, int>, TH2D* > m_higgs_ak4tagging_top;
+	map< pair<int, int>, TH1D* > m_dR_AK4AK4_trueHbb;
 
-void init_scan_histos(TFile *outFile, bool signalstudy){
+void Analyzer::init_scan_histos(TFile *outFile, bool signalstudy){
 
 	for (unsigned int i=0;i<GridX.size();i++ )
 	{	
@@ -186,6 +188,7 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
     double xbins_MT[nbins_MT+1]={0, 30, 60, 100, 130, 200, 500, 1000, 1500, 2000};
 	
 		
+    m_cuts[MassPair] = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,BDSV,Deep1,Deep2",15,0,15);
 		m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts, After cuts",2,0,2);
 		m_nVtx[MassPair] = new TH1D("h_nVtx",";# of vertices",70,-0.5,69.5);
 		m_nGoodVtx[MassPair] = new TH1D("h_nGoodVtx",";# of good vertices",70,-0.5,69.5);
@@ -319,6 +322,8 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
     m_mHAK4_top4[MassPair] = new TH1D("h_mHAK4_top4",";M_{bb}[GeV]",10,18,278);
     m_mHAK4_top5[MassPair] = new TH1D("h_mHAK4_top5",";M_{bb}[GeV]",10,18,278);
     m_mHAK4_top6[MassPair] = new TH1D("h_mHAK4_top6",";M_{bb}[GeV]",10,18,278);
+   
+    m_dR_ak4_Hcandidate[MassPair] = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
     
     const int dim=4;
     int nbins[dim]={3,3,6,2};
@@ -366,6 +371,7 @@ void init_scan_histos(TFile *outFile, bool signalstudy){
       m_higgs_ak4tagging_sum[MassPair]= new TH2D("hs_higgs_ak4tagging_sum",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
       m_higgs_ak4tagging_mult[MassPair]= new TH2D("hs_higgs_ak4tagging_mult",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
       m_higgs_ak4tagging_top[MassPair]= new TH2D("hs_higgs_ak4tagging_top",";nomass,top1,top2,top3,top4,top5,all;Truth higgs jets",7,0.5,7.5,3,-0.5,2.5);
+      m_dR_AK4AK4_trueHbb[MassPair] = new TH1D("hs_dR_AK4AK4_trueHbb","dR between true Hbb jets ;dR",20,0,5);
     }
 	}
 }

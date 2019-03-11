@@ -1109,6 +1109,7 @@ public :
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
+   map< pair<int, int>, TH1D* > m_cuts;
    TH1D *h_PUweight;
    //histograms needed for SFs
    TH2F *h_pho_EGamma_SF2D[3];
@@ -1152,7 +1153,8 @@ public :
 
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string pu_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={});
    virtual ~Analyzer();
-   virtual Int_t    Cut(Long64_t entry);
+   virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
+   void             init_scan_histos(TFile *outFile, bool signalstudy);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
@@ -2275,7 +2277,7 @@ bool Parser_float(double var, string op, double val) {
   return false;
 }
 
-Int_t Analyzer::Cut(Long64_t entry)
+Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
 {
   // This function may be called from Loop.
   // returns  1 if entry is accepted.
@@ -2390,7 +2392,7 @@ Int_t Analyzer::Cut(Long64_t entry)
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
-      if (_fastSim) h_cuts->Fill(i+1,w);
+      if (_fastSim) {h_cuts->Fill(i); m_cuts[mass_pair]->Fill(i,w);}
       else h_cuts->Fill(i,w);
     }
     else break;
