@@ -600,6 +600,16 @@ void Analyzer::Loop()
      b_phoPFNeuIso->GetEntry(ientry);
      b_phoIDMVA->GetEntry(ientry);
      b_phoIDbit->GetEntry(ientry);
+     b_phoScale_stat_up->GetEntry(ientry);
+     b_phoScale_stat_dn->GetEntry(ientry);
+     b_phoScale_syst_up->GetEntry(ientry);
+     b_phoScale_syst_dn->GetEntry(ientry);
+     b_phoScale_gain_up->GetEntry(ientry);
+     b_phoScale_gain_dn->GetEntry(ientry);
+     b_phoResol_rho_up->GetEntry(ientry);
+     b_phoResol_rho_dn->GetEntry(ientry);
+     b_phoResol_phi_up->GetEntry(ientry);
+     b_phoResol_phi_dn->GetEntry(ientry);
      b_nTau->GetEntry(ientry);
      b_tauPt->GetEntry(ientry);
      b_tauEta->GetEntry(ientry);
@@ -737,6 +747,7 @@ void Analyzer::Loop()
        //get zero bunchcrossing (puTrue always the same for every bx, just in case...)
        for (unsigned int i=0;i<(*puBX).size();i++) if ((*puBX)[i]==0) zbx=i;
        double pu_weight=h_PUweight->GetBinContent(h_PUweight->FindBin((*puTrue)[zbx]));
+       truePU=(*puTrue)[zbx]; //for signal: mean=25.16, median 23.67
        if (_fastSim || SignalScan) pu_weight=1;
        double weight=L_data*xsec/TotalEvents;
        //if (newfile) std::cout<<"weight=L_data*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
@@ -915,8 +926,15 @@ void Analyzer::Loop()
      memset(bcounterBDSV,0,sizeof bcounterBDSV);
      memset(bcounterDeep,0,sizeof bcounterDeep);
      double nonPrefiringProbability[3]={1,1,1};
+     phoCalibET.clear();
      //photon
      for (int i=0;i<nPho;i++){
+       //Systematics for Egamma scaling
+       double correction = 1;
+       (Egamma_Statscale_whichSF==1) ? correction*=(*phoScale_stat_up)[i] : (Egamma_Statscale_whichSF==2) ? correction*=(*phoScale_stat_dn)[i] : correction=correction;
+       (Egamma_Systscale_whichSF==1) ? correction*=(*phoScale_syst_up)[i] : (Egamma_Systscale_whichSF==2) ? correction*=(*phoScale_syst_dn)[i] : correction=correction;
+       (Egamma_Gainscale_whichSF==1) ? correction*=(*phoScale_gain_up)[i] : (Egamma_Gainscale_whichSF==2) ? correction*=(*phoScale_gain_dn)[i] : correction=correction;
+       phoCalibET.push_back((*phoCalibEt)[i]*correction);
        //L1prefire correction
        if (!isData && (*phoEt)[i]>20 && abs((*phoSCEta)[i])>2 && abs((*phoSCEta)[i])<3) {
          double max=h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
@@ -928,9 +946,9 @@ void Analyzer::Loop()
          nonPrefiringProbability[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
          nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
        }
-       //if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
-       //if (1.566<abs((*phoSCEta)[i])<3 && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
-       if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<2.5)) && (*phohasPixelSeed)[i]==0 && (*phoCalibEt)[i]>40) {
+       //if (abs((*phoSCEta)[i])<1.4442 && (*phohasPixelSeed)[i]==0 && phoCalibET[i]>40) {
+       //if (1.566<abs((*phoSCEta)[i])<3 && (*phohasPixelSeed)[i]==0 && phoCalibET[i]>40) {
+       if ((abs((*phoSCEta)[i])<1.4442 || (1.566<abs((*phoSCEta)[i]) && abs((*phoSCEta)[i])<2.5)) && (*phohasPixelSeed)[i]==0 && phoCalibET[i]>40) {
         if ((*phoIDbit)[i]>>0&1) {
          passPhoL.push_back(i);
         }
@@ -954,14 +972,14 @@ void Analyzer::Loop()
        }
      }
      for (auto i : passPhoL) {
-       if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoL]) nleadPhoL=i;
-       EMHT_before+=(*phoCalibEt)[i];
+       if (phoCalibET[i]>phoCalibET[nleadPhoL]) nleadPhoL=i;
+       EMHT_before+=phoCalibET[i];
      }
-     for (auto i : passPhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoM]) nleadPhoM=i;
-     for (auto i : passPhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadPhoT]) nleadPhoT=i;
-     for (auto i : passElePhoL) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoL]) nleadElePhoL=i;
-     for (auto i : passElePhoM) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoM]) nleadElePhoM=i;
-     for (auto i : passElePhoT) if ((*phoCalibEt)[i]>(*phoCalibEt)[nleadElePhoT]) nleadElePhoT=i;
+     for (auto i : passPhoM) if (phoCalibET[i]>phoCalibET[nleadPhoM]) nleadPhoM=i;
+     for (auto i : passPhoT) if (phoCalibET[i]>phoCalibET[nleadPhoT]) nleadPhoT=i;
+     for (auto i : passElePhoL) if (phoCalibET[i]>phoCalibET[nleadElePhoL]) nleadElePhoL=i;
+     for (auto i : passElePhoM) if (phoCalibET[i]>phoCalibET[nleadElePhoM]) nleadElePhoM=i;
+     for (auto i : passElePhoT) if (phoCalibET[i]>phoCalibET[nleadElePhoT]) nleadElePhoT=i;
      if (_fakeRate==2 && nPassElePhoL != 0) {nleadPhoL=nleadElePhoL; passPhoL.push_back(nleadElePhoL);}
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
@@ -977,8 +995,8 @@ void Analyzer::Loop()
        double id_sf=0, pix_sf=0, syst_id=0, syst_pix=0;
        int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
-         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
-         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],(*phoCalibEt)[nleadPhoL]));
+         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],phoCalibET[nleadPhoL]));
+         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin((*phoSCEta)[nleadPhoL],phoCalibET[nleadPhoL]));
          if ((*phoR9)[nleadPhoL]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[nleadPhoL]),100));
@@ -992,8 +1010,8 @@ void Analyzer::Loop()
          pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoM!=0){
-         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
-         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],(*phoCalibEt)[passPhoM[0]]));
+         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],phoCalibET[passPhoM[0]]));
+         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin((*phoSCEta)[passPhoM[0]],phoCalibET[passPhoM[0]]));
          if ((*phoR9)[passPhoM[0]]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoM[0]]),100));
@@ -1007,8 +1025,8 @@ void Analyzer::Loop()
          pho_SF[1]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoT!=0){
-         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
-         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],(*phoCalibEt)[passPhoT[0]]));
+         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],phoCalibET[passPhoT[0]]));
+         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin((*phoSCEta)[passPhoT[0]],phoCalibET[passPhoT[0]]));
          if ((*phoR9)[passPhoT[0]]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs((*phoSCEta)[passPhoT[0]]),100));
@@ -1435,8 +1453,9 @@ void Analyzer::Loop()
        }
      }
      //MET variables
-     for (auto i : passPhoL) ST+=(*phoCalibEt)[i];
-     double MET=pfMET, METPhi=pfMETPhi, METsumEt=pfMETsumEt, METSig=pfMETSig;
+     for (auto i : passPhoL) ST+=phoCalibET[i];
+     MET=pfMET; double METPhi=pfMETPhi, METsumEt=pfMETsumEt, METSig=pfMETSig;
+     (!isData && genMET_whichSF==1) ? MET=genMET : MET=MET;
      (metJER_whichSF==1) ? MET=pfMET_T1JERUp : (metJER_whichSF==2) ? MET=pfMET_T1JERDo : MET=MET;
      if (metJES_whichSF==1) {MET=pfMET_T1JESUp; METPhi=pfMETPhi_T1JESUp;}
      else if (metJES_whichSF==2) {MET=pfMET_T1JESDo; METPhi=pfMETPhi_T1JESDo;}
@@ -1447,7 +1466,7 @@ void Analyzer::Loop()
      for (auto i : passJet) ST+=jetSmearedPt[i];
      if (passPhoL.size()>0) {
        double dphi_MT=((*phoSCPhi)[nleadPhoL]-METPhi)>M_PI ? 2*M_PI-(METPhi-(*phoSCPhi)[nleadPhoL]) : (*phoSCPhi)[nleadPhoL]-METPhi;
-       MT=sqrt(2*MET*(*phoCalibEt)[nleadPhoL]*(1-cos(abs(dphi_MT))));
+       MT=sqrt(2*MET*phoCalibET[nleadPhoL]*(1-cos(abs(dphi_MT))));
      }
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) {
@@ -1483,7 +1502,7 @@ void Analyzer::Loop()
      //L1prefire
      //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0
      L1prefire=0;
-     for (auto i : passPhoL) if ((*phoCalibEt)[i]>50 && abs((*phoSCEta)[i])>2.25) L1prefire=1;
+     for (auto i : passPhoL) if (phoCalibET[i]>50 && abs((*phoSCEta)[i])>2.25) L1prefire=1;
      for (auto i : passJet) if (jetSmearedPt[i]>100 && abs((*jetEta)[i])>2.25) L1prefire=1;
      //for (auto i : passAK8Jet) if (abs((*AK8JetEta)[i])>2.25) L1prefire=1; //should it be used for AK8 jets?
   
@@ -2053,7 +2072,7 @@ void Analyzer::Loop()
        h_cuts->Fill(0.,w);
        if (passPhoL.size()==0) continue;
        h_cuts->Fill(1,w);
-       if ((*phoCalibEt)[nleadPhoL]<175) continue;
+       if (phoCalibET[nleadPhoL]<175) continue;
        h_cuts->Fill(2,w);
        if (passJet.size()<5) continue;
        h_cuts->Fill(3,w);
@@ -2080,14 +2099,14 @@ void Analyzer::Loop()
 
      //Filling histograms
      h_eff->Fill(1.,w);
-     h_phoEtL->Fill((*phoCalibEt)[nleadPhoL],w);
+     h_phoEtL->Fill(phoCalibET[nleadPhoL],w);
      h_phoSCEtaL->Fill((*phoSCEta)[nleadPhoL],w);
      if (passPhoM.size()>0) {
-       h_phoEtM->Fill((*phoCalibEt)[nleadPhoM],w);
+       h_phoEtM->Fill(phoCalibET[nleadPhoM],w);
        h_phoSCEtaM->Fill((*phoSCEta)[nleadPhoM],w);
      }
      if (passPhoT.size()>0){
-       h_phoEtT->Fill((*phoCalibEt)[nleadPhoT],w);
+       h_phoEtT->Fill(phoCalibET[nleadPhoT],w);
        h_phoSCEtaT->Fill((*phoSCEta)[nleadPhoT],w);
      }
      h_nVtx->Fill(nVtx,w);
@@ -2375,14 +2394,14 @@ void Analyzer::Loop()
      //Filling for signal scan
      if (SignalScan) {
        m_eff[mass_pair]->Fill(1.,w);
-       m_phoEtL[mass_pair]->Fill((*phoCalibEt)[nleadPhoL],w);
+       m_phoEtL[mass_pair]->Fill(phoCalibET[nleadPhoL],w);
        m_phoSCEtaL[mass_pair]->Fill((*phoSCEta)[nleadPhoL],w);
        if (passPhoM.size()>0) {
-         m_phoEtM[mass_pair]->Fill((*phoCalibEt)[nleadPhoM],w);
+         m_phoEtM[mass_pair]->Fill(phoCalibET[nleadPhoM],w);
          m_phoSCEtaM[mass_pair]->Fill((*phoSCEta)[nleadPhoM],w);
        }
        if (passPhoT.size()>0){
-         m_phoEtT[mass_pair]->Fill((*phoCalibEt)[nleadPhoT],w);
+         m_phoEtT[mass_pair]->Fill(phoCalibET[nleadPhoT],w);
          m_phoSCEtaT[mass_pair]->Fill((*phoSCEta)[nleadPhoT],w);
        }
        m_nVtx[mass_pair]->Fill(nVtx,w);

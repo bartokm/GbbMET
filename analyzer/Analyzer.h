@@ -1090,6 +1090,7 @@ public :
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true;
    bool Hbb=false, mcLeptonFilter=false;
+   int truePU=0;
    int SignalHiggs=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
@@ -1102,8 +1103,9 @@ public :
    int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
-   int L1prefire_whichSF=0;
-   double ST=0, ST_G=0, MT=0;
+   int L1prefire_whichSF=0, genMET_whichSF=0, Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0;
+   vector<double> phoCalibET;
+   double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
    double e_pt=10, mu_pt=10, tau_pt=20;
    double w=0, xsec=1;
@@ -2328,9 +2330,9 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float((*phoEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float((*phoEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float((*phoEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoCalibEt") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoL],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoCalibEtM") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoM],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoCalibEtT") returnvalue*=Parser_float((*phoCalibEt)[nleadPhoT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEt") returnvalue*=Parser_float(phoCalibET[nleadPhoL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEtM") returnvalue*=Parser_float(phoCalibET[nleadPhoM],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoCalibEtT") returnvalue*=Parser_float(phoCalibET[nleadPhoT],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="EMHT") returnvalue*=Parser_float(EMHT_after,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="MT") returnvalue*=Parser_float(MT,_cut_operator[i],_cut_value[i]);
@@ -2338,7 +2340,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="ST_G") returnvalue*=Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="NOTmetFilters") returnvalue*= !(Parser(metFilters,_cut_operator[i],_cut_value[i]));
-    else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(pfMET,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(MET,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
@@ -2389,10 +2391,11 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="SignalHiggs") {returnvalue*=Parser(SignalHiggs,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="truePU") {returnvalue*=Parser(truePU,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
-      if (_fastSim) {h_cuts->Fill(i); m_cuts[mass_pair]->Fill(i,w);}
+      if (_fastSim) {h_cuts->Fill(i,w); m_cuts[mass_pair]->Fill(i,w);}
       else h_cuts->Fill(i,w);
     }
     else break;
@@ -2626,6 +2629,10 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="metJES") metJES_whichSF=x.second;
     else if (x.first=="metUES") metUES_whichSF=x.second;
     else if (x.first=="L1prefire") L1prefire_whichSF=x.second;
+    else if (x.first=="Egamma_scale_stat") Egamma_Statscale_whichSF=x.second;
+    else if (x.first=="Egamma_scale_syst") Egamma_Systscale_whichSF=x.second;
+    else if (x.first=="Egamma_scale_gain") Egamma_Gainscale_whichSF=x.second;
+    else if (x.first=="genMET") genMET_whichSF=x.second;
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
 }
@@ -2776,6 +2783,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
   {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
   {"SignalHiggs","Neutralinos decay to 0,1 or 2 Higgs. Cut on number of Higgs bosons."},
+  {"truePU","Cut on number of true pileup."},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
 
 bool CompareCuts(vector<string> input_cuts){
