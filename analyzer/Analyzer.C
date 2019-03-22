@@ -1286,7 +1286,7 @@ void Analyzer::Loop()
            nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2];
          }
          else if (nonPrefiringProb_overlapPho[0] > nonPrefiringProb_overlapJet[0]) {
-           if (nonPrefiringProb_overlapPho!=0) {
+           if (nonPrefiringProb_overlapPho[0]!=0) {
              nonPrefiringProbability[0]*=nonPrefiringProb_overlapJet[0]/nonPrefiringProb_overlapPho[0];
              nonPrefiringProbability[1]*=nonPrefiringProb_overlapJet[1]/nonPrefiringProb_overlapPho[1];
              nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2]/nonPrefiringProb_overlapPho[2];
