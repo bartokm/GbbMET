@@ -13,6 +13,7 @@
 	map< pair<int, int>, TH1D* > m_nVtx;
 	map< pair<int, int>, TH1D* > m_nGoodVtx;
 	map< pair<int, int>, TH1D* > m_nPU;
+	map< pair<int, int>, TH2D* > m_SB_nVtx;
  
 	map< pair<int, int>, TH1D* > m_phoEtL;
 	map< pair<int, int>, TH1D* > m_phoEtM;
@@ -193,6 +194,7 @@ void Analyzer::init_scan_histos(TFile *outFile, bool signalstudy){
 		m_nVtx[MassPair] = new TH1D("h_nVtx",";# of vertices",70,-0.5,69.5);
 		m_nGoodVtx[MassPair] = new TH1D("h_nGoodVtx",";# of good vertices",70,-0.5,69.5);
 		m_nPU[MassPair] = new TH1D("h_nPU",";# of PileUp",70,-0.5,69.5);
+    m_SB_nVtx[MassPair]= new TH2D("h_SB_nVtx",";Searchbins;nVtx",16,0.5,16.5,70,-0.5,69.5);
 
 		m_phoEtL[MassPair] = new TH1D("h_phoEtL",";CalibE_{T}^{#gamma_L} [GeV]",10,25,1525);
 		m_phoEtM[MassPair] = new TH1D("h_phoEtM",";CalibE_{T}^{#gamma_M} [GeV]",10,25,1525);

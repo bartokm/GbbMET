@@ -1097,13 +1097,14 @@ public :
    double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
    double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};   //tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
    double ele_VETOSF=1, mu_VETOSF=1;
    int BDSV_whichSF=0, CSV_whichSF=0, Deep_whichSF=0;
    int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
-   int L1prefire_whichSF=0, genMET_whichSF=0, Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0;
+   int L1prefire_whichSF=0, genMET_whichSF=0;
+   int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
    vector<double> phoCalibET;
    double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
@@ -2288,7 +2289,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
   for (unsigned int i=0;i<_cut_variable.size();i++){
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="isPVGood") returnvalue*=Parser(isPVGood,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]*ele_VETOSF;}
+    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
     //else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0]*mu_VETOSF;}
@@ -2299,7 +2300,8 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassTauM") {returnvalue*=Parser(nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[1];}
     else if (_cut_variable[i]=="nPassTauT") {returnvalue*=Parser(nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[2];}
     else if (_cut_variable[i]=="nPassIso") {returnvalue*=Parser(nPassIso,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
+    //else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {double tempw=w;if (nPassEleL) {cout<<"ele w "<<ele_SF[1]<<endl; w*=ele_SF[1]; if (_cut_value[i]==0) w*=ele_VETOSF;} if (nPassMuL) {cout<<"mu w "<<mu_SF[0]<<endl; w*=mu_SF[0];} if (nPassTauL) {cout<<"tau w "<<tau_SF[0]<<endl; w*=tau_SF[0];}cout<<"lepton w "<<w/tempw<<endl;}}
+    else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) {w*=ele_SF[1]; if (_cut_value[i]==0) w*=ele_VETOSF;} if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
     else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]; if (nPassMuM) w*=mu_SF[1]; if (nPassTauM) w*=tau_SF[1];}}
     else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleT) w*=ele_SF[3]; if (nPassMuT) w*=mu_SF[2]; if (nPassTauT) w*=tau_SF[2];}}
     else if (_cut_variable[i]=="nPassLepVLL") {returnvalue*=Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleV) w*=ele_SF[0]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
@@ -2312,6 +2314,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassElePhoL") returnvalue*=Parser(nPassElePhoL,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassElePhoM") returnvalue*=Parser(nPassElePhoM,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassElePhoT") returnvalue*=Parser(nPassElePhoT,_cut_operator[i],_cut_value[i]);
+    //else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0]; cout<<"photon w "<<pho_SF[0]<<endl;}
     else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
     else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
     else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
@@ -2392,6 +2395,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="SignalHiggs") {returnvalue*=Parser(SignalHiggs,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="truePU") {returnvalue*=Parser(truePU,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="nVtx") {returnvalue*=Parser(nVtx,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
@@ -2405,7 +2409,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
 
 double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
   double dR=0;
-  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(2*M_PI-(phi2-phi1),2)+pow(eta1-eta2,2));
+  if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(2*M_PI-(abs(phi2-phi1)),2)+pow(eta1-eta2,2));
   else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
   return dR;
 }
@@ -2632,6 +2636,8 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="Egamma_scale_stat") Egamma_Statscale_whichSF=x.second;
     else if (x.first=="Egamma_scale_syst") Egamma_Systscale_whichSF=x.second;
     else if (x.first=="Egamma_scale_gain") Egamma_Gainscale_whichSF=x.second;
+    else if (x.first=="Egamma_resol_rho") Egamma_Rhoresol_whichSF=x.second;
+    else if (x.first=="Egamma_resol_phi") Egamma_Phiresol_whichSF=x.second;
     else if (x.first=="genMET") genMET_whichSF=x.second;
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
@@ -2784,6 +2790,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
   {"SignalHiggs","Neutralinos decay to 0,1 or 2 Higgs. Cut on number of Higgs bosons."},
   {"truePU","Cut on number of true pileup."},
+  {"nVtx","Cut on number of vertices."},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
 
 bool CompareCuts(vector<string> input_cuts){
