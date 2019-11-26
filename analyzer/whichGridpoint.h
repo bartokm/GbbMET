@@ -6,9 +6,15 @@ std::pair<int, int> whichGridpoint(std::pair<double, double> in)
 
     std::vector<int> Yticks;
 
+    std::vector<int> Xticks = {800,900,1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,2000,2050,2100,2150,2200,2250,2300,2350,2400,2450,2500};
+    int mG=800, delta_mG=800;
+    for (auto i : Xticks) {
+      if (int(in.first)==i) {mG=i; break;}
+      int mdiff=abs(int(in.first)-i);
+      if (mdiff<delta_mG) {delta_mG=mdiff; mG=i;}
+    }
 
-
-    switch(int(in.first) ){
+    switch(mG){
         case  800 :   Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800}); 
                     break;
         case  900 :   Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800, 900}); 
@@ -95,8 +101,7 @@ std::pair<int, int> whichGridpoint(std::pair<double, double> in)
         Yind = ( (y-Yticks[Yind-1]) > (Yticks[Yind]-y) )?Yind:(Yind-1);
     }
 
-
-    std::pair<int,int> a(in.first,Yticks[Yind]);
+    std::pair<int,int> a(mG,Yticks[Yind]);
     return a;
 
 }
