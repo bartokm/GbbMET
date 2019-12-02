@@ -173,6 +173,7 @@ void Analyzer::Loop()
    else nentries = _testRun;
    
    double L_data=35867.06;
+   //double L_data=101270;
    
    //Btag SF
    BTCalibration calib, calib_fs, calib_deep, calib_deep_fs;;
@@ -339,9 +340,9 @@ void Analyzer::Loop()
    TH1D *h_AK8searchBins= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
    
    //Histograms for signalstudy
-
+   map<int,vector<int>> grid;
    if (SignalScan) {
-     init_scan_histos(f,signalstudy);
+     grid=init_scan_histos(f,signalstudy);
    }
 
    TBenchmark time;
@@ -540,6 +541,7 @@ void Analyzer::Loop()
      bool newfile=false;
   
      //progress bar
+     if (jentry==0 && !is_quiet) cout<<"Total number of events: "<<nentries<<endl;;
      double progress=(jentry+1)/double(nentries);
      if (!is_quiet){
        if (temp!=int(progress * 10000)){
@@ -575,7 +577,6 @@ void Analyzer::Loop()
          if (GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) gluino=i;
        }
        int m_Gluino = GenPart_mass[gluino];
-       if (m_Gluino>2530) continue; //previous scan was until 2500, new scan grid points need to be added soon
        //Neutralino/gluino mass is not exact. Need to find nearest grid point
        double m_Neutralino=GenPart_mass[neutralino];
        pair<double,double> initial_pair(m_Gluino,m_Neutralino);
@@ -1623,13 +1624,15 @@ void Analyzer::Loop()
      h_AK8searchBins->SetBinError(i,hn_AK8searchBins->GetBinError(i));
    }
    if (SignalScan) {
-     for (unsigned int i=0;i<GridX.size();i++ ) {	
-       std::pair<int,int> MassPair(GridX[i],GridY[i]);
-       for (unsigned int i=1;i<nsbins_ak4+1;i++) {
-         m_AK4searchBins[MassPair]->SetBinContent(i,mn_AK4searchBins[MassPair]->GetBinContent(i));
-         m_AK4searchBins[MassPair]->SetBinError(i,mn_AK4searchBins[MassPair]->GetBinError(i));
-         m_AK8searchBins[MassPair]->SetBinContent(i,mn_AK8searchBins[MassPair]->GetBinContent(i));
-         m_AK8searchBins[MassPair]->SetBinError(i,mn_AK8searchBins[MassPair]->GetBinError(i));
+     for (auto const&i : grid) {
+       for (auto j : i.second) {
+       std::pair<int,int> MassPair(i.first,j);
+         for (unsigned int k=1;k<nsbins_ak4+1;k++) {
+           m_AK4searchBins[MassPair]->SetBinContent(k,mn_AK4searchBins[MassPair]->GetBinContent(k));
+           m_AK4searchBins[MassPair]->SetBinError(k,mn_AK4searchBins[MassPair]->GetBinError(k));
+           m_AK8searchBins[MassPair]->SetBinContent(k,mn_AK8searchBins[MassPair]->GetBinContent(k));
+           m_AK8searchBins[MassPair]->SetBinError(k,mn_AK8searchBins[MassPair]->GetBinError(k));
+         }
        }
      }
    }
@@ -1647,7 +1650,7 @@ void Analyzer::Loop()
        if (newg) counttxt<<"  if (a=="<<i.first.first<<") {\n    switch (b) {"<<endl;
        newg=false;
        counttxt<<"      case "<<i.first.second<<" : return "<<i.second<<";"<<endl;
-       if (i.first.first==i.first.second) {newg=true; counttxt<<"    }\n  }"<<endl;}
+       if (i.first.first-10==i.first.second) {newg=true; counttxt<<"    }\n  }"<<endl;}
      }
    }
 }

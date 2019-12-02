@@ -1288,7 +1288,7 @@ public :
    virtual ~Analyzer();
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string xsec_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={});
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
-   void             init_scan_histos(TFile *outFile, bool signalstudy);
+   map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);

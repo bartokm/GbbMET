@@ -1021,8 +1021,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 400 : return 136379;
       case 500 : return 138946;
       case 600 : return 143811;
-      case 700 : return 139084;
-      case 800 : return 135299;
+      case 700 : return 139064;
+      case 790 : return 135319;
     }
   }
   if (a==900) {
@@ -1034,8 +1034,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 500 : return 138691;
       case 600 : return 141933;
       case 700 : return 139388;
-      case 800 : return 145536;
-      case 900 : return 137363;
+      case 800 : return 145519;
+      case 890 : return 137380;
     }
   }
   if (a==1000) {
@@ -1054,8 +1054,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 850 : return 140530;
       case 900 : return 150819;
       case 950 : return 133914;
-      case 975 : return 151311;
-      case 1000 : return 131022;
+      case 975 : return 150746;
+      case 990 : return 131587;
     }
   }
   if (a==1050) {
@@ -1075,8 +1075,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 900 : return 146374;
       case 950 : return 146283;
       case 1000 : return 143803;
-      case 1025 : return 148737;
-      case 1050 : return 146785;
+      case 1025 : return 147758;
+      case 1040 : return 147764;
     }
   }
   if (a==1100) {
@@ -1096,8 +1096,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 950 : return 127654;
       case 1000 : return 124114;
       case 1050 : return 126010;
-      case 1075 : return 121250;
-      case 1100 : return 124888;
+      case 1075 : return 120873;
+      case 1090 : return 125265;
     }
   }
   if (a==1150) {
@@ -1118,8 +1118,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1000 : return 95359;
       case 1050 : return 94527;
       case 1100 : return 89981;
-      case 1125 : return 84069;
-      case 1150 : return 89757;
+      case 1125 : return 83493;
+      case 1140 : return 90333;
     }
   }
   if (a==1200) {
@@ -1140,8 +1140,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1050 : return 64037;
       case 1100 : return 64605;
       case 1150 : return 65443;
-      case 1175 : return 64353;
-      case 1200 : return 62220;
+      case 1175 : return 64179;
+      case 1190 : return 62394;
     }
   }
   if (a==1250) {
@@ -1163,8 +1163,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1100 : return 48906;
       case 1150 : return 48395;
       case 1200 : return 54162;
-      case 1225 : return 43589;
-      case 1250 : return 45377;
+      case 1225 : return 43286;
+      case 1240 : return 45680;
     }
   }
   if (a==1300) {
@@ -1186,8 +1186,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1150 : return 41195;
       case 1200 : return 37862;
       case 1250 : return 35607;
-      case 1275 : return 37513;
-      case 1300 : return 35020;
+      case 1275 : return 37398;
+      case 1290 : return 35135;
     }
   }
   if (a==1350) {
@@ -1210,8 +1210,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1200 : return 37046;
       case 1250 : return 36968;
       case 1300 : return 38770;
-      case 1325 : return 42180;
-      case 1350 : return 39564;
+      case 1325 : return 41936;
+      case 1340 : return 39808;
     }
   }
   if (a==1400) {
@@ -1234,8 +1234,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1250 : return 32489;
       case 1300 : return 33196;
       case 1350 : return 37780;
-      case 1375 : return 41355;
-      case 1400 : return 38567;
+      case 1375 : return 41224;
+      case 1390 : return 38698;
     }
   }
   if (a==1450) {
@@ -1259,8 +1259,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1300 : return 38949;
       case 1350 : return 32520;
       case 1400 : return 35752;
-      case 1425 : return 31373;
-      case 1450 : return 39168;
+      case 1425 : return 31108;
+      case 1440 : return 39433;
     }
   }
   if (a==1500) {
@@ -1284,8 +1284,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1350 : return 36617;
       case 1400 : return 36453;
       case 1450 : return 36968;
-      case 1475 : return 36550;
-      case 1500 : return 36893;
+      case 1475 : return 36419;
+      case 1490 : return 37024;
     }
   }
   if (a==1550) {
@@ -1310,8 +1310,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1400 : return 35796;
       case 1450 : return 36866;
       case 1500 : return 35927;
-      case 1525 : return 35808;
-      case 1550 : return 37287;
+      case 1525 : return 35541;
+      case 1540 : return 37554;
     }
   }
   if (a==1600) {
@@ -1336,8 +1336,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1450 : return 39800;
       case 1500 : return 36108;
       case 1550 : return 35446;
-      case 1575 : return 36150;
-      case 1600 : return 41396;
+      case 1575 : return 36021;
+      case 1590 : return 41525;
     }
   }
   if (a==1650) {
@@ -1363,8 +1363,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1500 : return 40953;
       case 1550 : return 38395;
       case 1600 : return 39808;
-      case 1625 : return 39282;
-      case 1650 : return 40879;
+      case 1625 : return 39006;
+      case 1640 : return 41155;
     }
   }
   if (a==1700) {
@@ -1390,8 +1390,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1550 : return 39079;
       case 1600 : return 35346;
       case 1650 : return 40036;
-      case 1675 : return 39052;
-      case 1700 : return 38583;
+      case 1675 : return 38939;
+      case 1690 : return 38696;
     }
   }
   if (a==1750) {
@@ -1418,8 +1418,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1600 : return 36799;
       case 1650 : return 39221;
       case 1700 : return 38446;
-      case 1725 : return 37937;
-      case 1750 : return 39867;
+      case 1725 : return 37700;
+      case 1740 : return 40104;
     }
   }
   if (a==1800) {
@@ -1446,8 +1446,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1650 : return 40862;
       case 1700 : return 34872;
       case 1750 : return 36109;
-      case 1775 : return 32786;
-      case 1800 : return 38912;
+      case 1775 : return 32644;
+      case 1790 : return 39054;
     }
   }
   if (a==1850) {
@@ -1475,8 +1475,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1700 : return 36507;
       case 1750 : return 35950;
       case 1800 : return 37413;
-      case 1825 : return 38099;
-      case 1850 : return 32736;
+      case 1825 : return 37878;
+      case 1840 : return 32957;
     }
   }
   if (a==1900) {
@@ -1504,8 +1504,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1750 : return 31431;
       case 1800 : return 43507;
       case 1850 : return 39977;
-      case 1875 : return 32834;
-      case 1900 : return 32523;
+      case 1875 : return 32707;
+      case 1890 : return 32650;
     }
   }
   if (a==1950) {
@@ -1534,8 +1534,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1800 : return 35964;
       case 1850 : return 38192;
       case 1900 : return 42012;
-      case 1925 : return 36975;
-      case 1950 : return 38472;
+      case 1925 : return 36712;
+      case 1940 : return 38735;
     }
   }
   if (a==2000) {
@@ -1564,8 +1564,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1850 : return 21274;
       case 1900 : return 15962;
       case 1950 : return 16822;
-      case 1975 : return 21459;
-      case 2000 : return 20258;
+      case 1975 : return 21387;
+      case 1990 : return 20330;
     }
   }
   if (a==2050) {
@@ -1595,8 +1595,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 1900 : return 18498;
       case 1950 : return 21268;
       case 2000 : return 19134;
-      case 2025 : return 20494;
-      case 2050 : return 20267;
+      case 2025 : return 20370;
+      case 2040 : return 20391;
     }
   }
   if (a==2100) {
@@ -1627,7 +1627,7 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2000 : return 15529;
       case 2050 : return 20458;
       case 2075 : return 17553;
-      case 2100 : return 19255;
+      case 2090 : return 19255;
     }
   }
   if (a==2150) {
@@ -1658,8 +1658,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2000 : return 15722;
       case 2050 : return 18195;
       case 2100 : return 15589;
-      case 2125 : return 26702;
-      case 2150 : return 8834;
+      case 2125 : return 17727;
+      case 2140 : return 17809;
     }
   }
   if (a==2200) {
@@ -1690,8 +1690,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2050 : return 18403;
       case 2100 : return 20550;
       case 2150 : return 19480;
-      case 2175 : return 21500;
-      case 2200 : return 18424;
+      case 2175 : return 21326;
+      case 2190 : return 18598;
     }
   }
   if (a==2250) {
@@ -1724,7 +1724,7 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2150 : return 19465;
       case 2200 : return 16449;
       case 2225 : return 18385;
-      case 2250 : return 18007;
+      case 2240 : return 18007;
     }
   }
   if (a==2300) {
@@ -1757,7 +1757,7 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2200 : return 18876;
       case 2250 : return 15012;
       case 2275 : return 18923;
-      case 2300 : return 20161;
+      case 2290 : return 20161;
     }
   }
   if (a==2350) {
@@ -1790,8 +1790,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2200 : return 17639;
       case 2250 : return 16724;
       case 2300 : return 19472;
-      case 2325 : return 25744;
-      case 2350 : return 9849;
+      case 2325 : return 16091;
+      case 2340 : return 19502;
     }
   }
   if (a==2400) {
@@ -1824,8 +1824,8 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2250 : return 17459;
       case 2300 : return 16783;
       case 2350 : return 16328;
-      case 2375 : return 16534;
-      case 2400 : return 15382;
+      case 2375 : return 16361;
+      case 2390 : return 15555;
     }
   }
   if (a==2450) {
@@ -1860,7 +1860,7 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2350 : return 15417;
       case 2400 : return 16991;
       case 2425 : return 19280;
-      case 2450 : return 19847;
+      case 2440 : return 19847;
     }
   }
   if (a==2500) {
@@ -1895,7 +1895,229 @@ unsigned long long get_total_events(pair<int,int> input) {
       case 2400 : return 19006;
       case 2450 : return 16844;
       case 2475 : return 19610;
-      case 2500 : return 18615;
+      case 2490 : return 18615;
+    }
+  }
+  if (a==2550) {
+    switch (b) {
+      case 127 : return 17498;
+      case 150 : return 21232;
+      case 175 : return 14192;
+      case 200 : return 18743;
+      case 300 : return 19422;
+      case 400 : return 16018;
+      case 500 : return 19127;
+      case 600 : return 20198;
+      case 700 : return 18818;
+      case 800 : return 18914;
+      case 900 : return 18769;
+      case 1000 : return 19493;
+      case 1100 : return 19788;
+      case 1200 : return 16793;
+      case 1300 : return 18412;
+      case 1400 : return 17164;
+      case 1500 : return 22010;
+      case 1600 : return 20287;
+      case 1700 : return 20260;
+      case 1800 : return 19017;
+      case 1900 : return 21187;
+      case 2000 : return 20308;
+      case 2100 : return 16165;
+      case 2200 : return 18666;
+      case 2250 : return 18179;
+      case 2300 : return 20282;
+      case 2350 : return 18932;
+      case 2400 : return 19365;
+      case 2450 : return 18685;
+      case 2500 : return 15340;
+      case 2525 : return 17440;
+      case 2540 : return 17339;
+    }
+  }
+  if (a==2600) {
+    switch (b) {
+      case 127 : return 17487;
+      case 150 : return 14894;
+      case 175 : return 17542;
+      case 200 : return 21194;
+      case 300 : return 20856;
+      case 400 : return 16451;
+      case 500 : return 17286;
+      case 600 : return 14934;
+      case 700 : return 20286;
+      case 800 : return 20879;
+      case 900 : return 17500;
+      case 1000 : return 22782;
+      case 1100 : return 17588;
+      case 1200 : return 19649;
+      case 1300 : return 21731;
+      case 1400 : return 18142;
+      case 1500 : return 15629;
+      case 1600 : return 16876;
+      case 1700 : return 22021;
+      case 1800 : return 18745;
+      case 1900 : return 16755;
+      case 2000 : return 19709;
+      case 2100 : return 19669;
+      case 2200 : return 20589;
+      case 2300 : return 19794;
+      case 2350 : return 20949;
+      case 2400 : return 14364;
+      case 2450 : return 16594;
+      case 2500 : return 18764;
+      case 2550 : return 14545;
+      case 2575 : return 19655;
+      case 2590 : return 18270;
+    }
+  }
+  if (a==2650) {
+    switch (b) {
+      case 127 : return 15117;
+      case 150 : return 15172;
+      case 175 : return 15532;
+      case 200 : return 17148;
+      case 300 : return 20149;
+      case 400 : return 19383;
+      case 500 : return 17454;
+      case 600 : return 16200;
+      case 700 : return 16558;
+      case 800 : return 13949;
+      case 900 : return 16699;
+      case 1000 : return 19134;
+      case 1100 : return 16944;
+      case 1200 : return 19970;
+      case 1300 : return 16699;
+      case 1400 : return 20923;
+      case 1500 : return 20888;
+      case 1600 : return 20059;
+      case 1700 : return 16488;
+      case 1800 : return 21318;
+      case 1900 : return 18061;
+      case 2000 : return 20681;
+      case 2100 : return 17448;
+      case 2200 : return 19032;
+      case 2300 : return 14511;
+      case 2350 : return 18033;
+      case 2400 : return 17285;
+      case 2450 : return 16776;
+      case 2500 : return 19552;
+      case 2550 : return 14017;
+      case 2600 : return 19693;
+      case 2625 : return 15980;
+      case 2640 : return 20828;
+    }
+  }
+  if (a==2700) {
+    switch (b) {
+      case 127 : return 18346;
+      case 150 : return 17312;
+      case 175 : return 15415;
+      case 200 : return 15321;
+      case 300 : return 17264;
+      case 400 : return 15330;
+      case 500 : return 19187;
+      case 600 : return 18733;
+      case 700 : return 18447;
+      case 800 : return 17683;
+      case 900 : return 17627;
+      case 1000 : return 17155;
+      case 1100 : return 15757;
+      case 1200 : return 15310;
+      case 1300 : return 18138;
+      case 1400 : return 14949;
+      case 1500 : return 19627;
+      case 1600 : return 17801;
+      case 1700 : return 18373;
+      case 1800 : return 19274;
+      case 1900 : return 16648;
+      case 2000 : return 18786;
+      case 2100 : return 15236;
+      case 2200 : return 17842;
+      case 2300 : return 14636;
+      case 2400 : return 14274;
+      case 2450 : return 18643;
+      case 2500 : return 19982;
+      case 2550 : return 17719;
+      case 2600 : return 17386;
+      case 2650 : return 22254;
+      case 2675 : return 19497;
+      case 2690 : return 16774;
+    }
+  }
+  if (a==2750) {
+    switch (b) {
+      case 127 : return 19079;
+      case 150 : return 19881;
+      case 175 : return 16421;
+      case 200 : return 19274;
+      case 300 : return 18399;
+      case 400 : return 15749;
+      case 500 : return 17859;
+      case 600 : return 17806;
+      case 700 : return 15308;
+      case 800 : return 15712;
+      case 900 : return 13398;
+      case 1000 : return 18388;
+      case 1100 : return 16630;
+      case 1200 : return 16366;
+      case 1300 : return 16881;
+      case 1400 : return 18232;
+      case 1500 : return 16845;
+      case 1600 : return 19890;
+      case 1700 : return 20414;
+      case 1800 : return 19630;
+      case 1900 : return 17810;
+      case 2000 : return 18358;
+      case 2100 : return 17388;
+      case 2200 : return 16754;
+      case 2300 : return 15045;
+      case 2400 : return 14272;
+      case 2450 : return 17931;
+      case 2500 : return 19468;
+      case 2550 : return 21305;
+      case 2600 : return 22196;
+      case 2650 : return 20843;
+      case 2700 : return 17436;
+      case 2725 : return 15954;
+      case 2740 : return 18630;
+    }
+  }
+  if (a==2800) {
+    switch (b) {
+      case 127 : return 17912;
+      case 150 : return 17073;
+      case 175 : return 17858;
+      case 200 : return 20276;
+      case 300 : return 19404;
+      case 400 : return 18796;
+      case 500 : return 19854;
+      case 600 : return 18969;
+      case 700 : return 22134;
+      case 800 : return 18835;
+      case 900 : return 14195;
+      case 1000 : return 19484;
+      case 1100 : return 14298;
+      case 1200 : return 19891;
+      case 1300 : return 20116;
+      case 1400 : return 14551;
+      case 1500 : return 17801;
+      case 1600 : return 16604;
+      case 1700 : return 19441;
+      case 1800 : return 15250;
+      case 1900 : return 18407;
+      case 2000 : return 19301;
+      case 2100 : return 21078;
+      case 2200 : return 19424;
+      case 2300 : return 15683;
+      case 2400 : return 16551;
+      case 2500 : return 16419;
+      case 2550 : return 16026;
+      case 2600 : return 17163;
+      case 2650 : return 16305;
+      case 2700 : return 22544;
+      case 2750 : return 18088;
+      case 2775 : return 15328;
+      case 2790 : return 19082;
     }
   }
   return 0;
@@ -1904,104 +2126,122 @@ unsigned long long get_total_events(pair<int,int> input) {
 std::map<pair<int,int>,int> init_signal_event() {
   std::map<pair<int,int>,int> output;
   std::vector<int> Yticks;
-  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800});
+  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 790});
   for (auto i : Yticks) {pair<int,int> p(800,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800, 900}); 
+  Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 800, 890}); 
   for (auto i : Yticks) {pair<int,int> p(900,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 975, 1000}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 975, 990}); 
   for (auto i : Yticks) {pair<int,int> p(1000,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 1000, 1025, 1050}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 750, 800, 850, 900, 950, 1000, 1025, 1040}); 
   for (auto i : Yticks) {pair<int,int> p(1050,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1075, 1100}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1075, 1090}); 
   for (auto i : Yticks) {pair<int,int> p(1100,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1100, 1125, 1150}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 850, 900, 950, 1000, 1050, 1100, 1125, 1140}); 
   for (auto i : Yticks) {pair<int,int> p(1150,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1175, 1200}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1175, 1190}); 
   for (auto i : Yticks) {pair<int,int> p(1200,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1200, 1225, 1250}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 950, 1000, 1050, 1100, 1150, 1200, 1225, 1240}); 
   for (auto i : Yticks) {pair<int,int> p(1250,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1275, 1300}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1275, 1290}); 
   for (auto i : Yticks) {pair<int,int> p(1300,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1325, 1350}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1050, 1100, 1150, 1200, 1250, 1300, 1325, 1340}); 
   for (auto i : Yticks) {pair<int,int> p(1350,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1375, 1400}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1375, 1390}); 
   for (auto i : Yticks) {pair<int,int> p(1400,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1425, 1450}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150, 1200, 1250, 1300, 1350, 1400, 1425, 1440}); 
   for (auto i : Yticks) {pair<int,int> p(1450,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1475, 1500}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1475, 1490}); 
   for (auto i : Yticks) {pair<int,int> p(1500,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1525, 1550}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1250, 1300, 1350, 1400, 1450, 1500, 1525, 1540}); 
   for (auto i : Yticks) {pair<int,int> p(1550,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1575, 1600}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1575, 1590}); 
   for (auto i : Yticks) {pair<int,int> p(1600,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1625, 1650}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1350, 1400, 1450, 1500, 1550, 1600, 1625, 1640}); 
   for (auto i : Yticks) {pair<int,int> p(1650,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1675, 1700}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1675, 1690}); 
   for (auto i : Yticks) {pair<int,int> p(1700,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1725, 1750}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1450, 1500, 1550, 1600, 1650, 1700, 1725, 1740}); 
   for (auto i : Yticks) {pair<int,int> p(1750,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1775, 1800}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1775, 1790}); 
   for (auto i : Yticks) {pair<int,int> p(1800,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1825, 1850}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1550, 1600, 1650, 1700, 1750, 1800, 1825, 1840}); 
   for (auto i : Yticks) {pair<int,int> p(1850,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1875, 1900}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1875, 1890}); 
   for (auto i : Yticks) {pair<int,int> p(1900,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1925, 1950}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1650, 1700, 1750, 1800, 1850, 1900, 1925, 1940}); 
   for (auto i : Yticks) {pair<int,int> p(1950,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 1975, 2000}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 1975, 1990}); 
   for (auto i : Yticks) {pair<int,int> p(2000,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2025, 2050}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1750, 1800, 1850, 1900, 1950, 2000, 2025, 2040}); 
   for (auto i : Yticks) {pair<int,int> p(2050,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2075, 2100}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2075, 2090}); 
   for (auto i : Yticks) {pair<int,int> p(2100,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2100, 2125, 2150}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1850, 1900, 1950, 2000, 2050, 2100, 2125, 2140}); 
   for (auto i : Yticks) {pair<int,int> p(2150,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2175, 2200}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2175, 2190}); 
   for (auto i : Yticks) {pair<int,int> p(2200,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2200, 2225, 2250}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 1950, 2000, 2050, 2100, 2150, 2200, 2225, 2240}); 
   for (auto i : Yticks) {pair<int,int> p(2250,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2275, 2300}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2275, 2290}); 
   for (auto i : Yticks) {pair<int,int> p(2300,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2300, 2325, 2350}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2050, 2100, 2150, 2200, 2250, 2300, 2325, 2340}); 
   for (auto i : Yticks) {pair<int,int> p(2350,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2375, 2400}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2375, 2390}); 
   for (auto i : Yticks) {pair<int,int> p(2400,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2400, 2425, 2450}); 
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2150, 2200, 2250, 2300, 2350, 2400, 2425, 2440}); 
   for (auto i : Yticks) {pair<int,int> p(2450,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
-  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2250, 2300, 2350, 2400, 2450, 2475, 2500});
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2250, 2300, 2350, 2400, 2450, 2475, 2490});
   for (auto i : Yticks) {pair<int,int> p(2500,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2250, 2300, 2350, 2400, 2450, 2500, 2525, 2540});
+  for (auto i : Yticks) {pair<int,int> p(2550,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2350, 2400, 2450, 2500, 2550, 2575, 2590});
+  for (auto i : Yticks) {pair<int,int> p(2600,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2350, 2400, 2450, 2500, 2550, 2600, 2625, 2640});
+  for (auto i : Yticks) {pair<int,int> p(2650,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2450, 2500, 2550, 2600, 2650, 2675, 2690});
+  for (auto i : Yticks) {pair<int,int> p(2700,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2450, 2500, 2550, 2600, 2650, 2700, 2725, 2740});
+  for (auto i : Yticks) {pair<int,int> p(2750,i); output.insert(pair<pair<int,int>,int>(p,0));}
+  Yticks.clear();
+  Yticks =  std::vector<int>({127, 150, 175, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800, 1900, 2000, 2100, 2200, 2300, 2400, 2500, 2550, 2600, 2650, 2700, 2750, 2775, 2790});
+  for (auto i : Yticks) {pair<int,int> p(2800,i); output.insert(pair<pair<int,int>,int>(p,0));}
   Yticks.clear();
   return output;
 }
