@@ -1209,7 +1209,7 @@ public :
    int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
    int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
-   int nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
+   int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
    int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={}, bcounterDeep[4]={};
@@ -2071,10 +2071,9 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
 // returns -1 otherwise.
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
-    //if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     bool HLTPho=0;
-    if (year==2016) HLTPho=HLT_Photon165_HE10;
-    else HLTPho=HLT_Photon200;
+    if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
+    else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
     if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="isPVGood") returnvalue*=Parser(PV_npvsGood,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
@@ -2108,12 +2107,120 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]; if (nPassMuM) w*=mu_SF[1]; if (nPassTauM) w*=tau_SF[1];}}
-    else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleT) w*=ele_SF[3]; if (nPassMuT) w*=mu_SF[2]; if (nPassTauT) w*=tau_SF[2];}}
-    else if (_cut_variable[i]=="nPassLepVLL") {returnvalue*=Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleV) w*=ele_SF[0]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
-    else if (_cut_variable[i]=="nPassLepMLL") {returnvalue*=Parser(nPassEleM+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleM) w*=ele_SF[2]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauL) w*=tau_SF[0];}}
-    else if (_cut_variable[i]=="nPassLepLML") {returnvalue*=Parser(nPassEleL+nPassMuM+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuM) w*=mu_SF[1]; if (nPassTauL) w*=tau_SF[0];}}
-    else if (_cut_variable[i]=="nPassLepLLM") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) {if (nPassEleL) w*=ele_SF[1]*ele_VETOSF; if (nPassMuL) w*=mu_SF[0]; if (nPassTauM) w*=tau_SF[1];}}
+    else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleM+nPassMuM+nPassTauM>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleM>0 && Electron_pt[nleadEleM]>max_pt) {max_pt=Electron_pt[nleadEleM]; whichLepton=1;}
+          if (nPassMuM>0 && Muon_pt[nleadMuM]>max_pt) {max_pt=Muon_pt[nleadMuM]; whichLepton=2;}
+          if (nPassTauM>0 && Tau_pt[nleadTauM]>max_pt) {max_pt=Tau_pt[nleadTauM]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[2];
+            break;
+            case 2 : w*=mu_SF[1];
+            break;
+            case 3 : w*=tau_SF[1];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
+    else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleT+nPassMuT+nPassTauT>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleT>0 && Electron_pt[nleadEleT]>max_pt) {max_pt=Electron_pt[nleadEleT]; whichLepton=1;}
+          if (nPassMuT>0 && Muon_pt[nleadMuT]>max_pt) {max_pt=Muon_pt[nleadMuT]; whichLepton=2;}
+          if (nPassTauT>0 && Tau_pt[nleadTauT]>max_pt) {max_pt=Tau_pt[nleadTauT]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[3];
+            break;
+            case 2 : w*=mu_SF[2];
+            break;
+            case 3 : w*=tau_SF[2];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
+    else if (_cut_variable[i]=="nPassLepVLL") {returnvalue*=Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleV+nPassMuL+nPassTauL>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleV>0 && Electron_pt[nleadEleV]>max_pt) {max_pt=Electron_pt[nleadEleV]; whichLepton=1;}
+          if (nPassMuL>0 && Muon_pt[nleadMuL]>max_pt) {max_pt=Muon_pt[nleadMuL]; whichLepton=2;}
+          if (nPassTauL>0 && Tau_pt[nleadTauL]>max_pt) {max_pt=Tau_pt[nleadTauL]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[0];
+            break;
+            case 2 : w*=mu_SF[0];
+            break;
+            case 3 : w*=tau_SF[0];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
+    else if (_cut_variable[i]=="nPassLepMLL") {returnvalue*=Parser(nPassEleM+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleM+nPassMuL+nPassTauL>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleM>0 && Electron_pt[nleadEleM]>max_pt) {max_pt=Electron_pt[nleadEleM]; whichLepton=1;}
+          if (nPassMuL>0 && Muon_pt[nleadMuL]>max_pt) {max_pt=Muon_pt[nleadMuL]; whichLepton=2;}
+          if (nPassTauL>0 && Tau_pt[nleadTauL]>max_pt) {max_pt=Tau_pt[nleadTauL]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[2];
+            break;
+            case 2 : w*=mu_SF[0];
+            break;
+            case 3 : w*=tau_SF[0];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
+    else if (_cut_variable[i]=="nPassLepLML") {returnvalue*=Parser(nPassEleL+nPassMuM+nPassTauL,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleL+nPassMuM+nPassTauL>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleL>0 && Electron_pt[nleadEleL]>max_pt) {max_pt=Electron_pt[nleadEleL]; whichLepton=1;}
+          if (nPassMuM>0 && Muon_pt[nleadMuM]>max_pt) {max_pt=Muon_pt[nleadMuM]; whichLepton=2;}
+          if (nPassTauL>0 && Tau_pt[nleadTauL]>max_pt) {max_pt=Tau_pt[nleadTauL]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[1];
+            break;
+            case 2 : w*=mu_SF[1];
+            break;
+            case 3 : w*=tau_SF[0];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
+    else if (_cut_variable[i]=="nPassLepLLM") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauM,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (nPassEleL+nPassMuL+nPassTauM>0) {
+          double max_pt=0; unsigned int whichLepton=0;
+          if (nPassEleL>0 && Electron_pt[nleadEleL]>max_pt) {max_pt=Electron_pt[nleadEleL]; whichLepton=1;}
+          if (nPassMuL>0 && Muon_pt[nleadMuL]>max_pt) {max_pt=Muon_pt[nleadMuL]; whichLepton=2;}
+          if (nPassTauM>0 && Tau_pt[nleadTauM]>max_pt) {max_pt=Tau_pt[nleadTauM]; whichLepton=3;}
+          switch (whichLepton) {
+            case 1 : w*=ele_SF[1];
+            break;
+            case 2 : w*=mu_SF[0];
+            break;
+            case 3 : w*=tau_SF[1];
+            break;
+          }
+        }
+        else if (_cut_value[i]==0) w*=ele_VETOSF;
+      }
+    }
     else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
     else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}

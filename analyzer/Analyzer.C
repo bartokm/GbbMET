@@ -172,8 +172,8 @@ void Analyzer::Loop()
    if (!_testRun) nentries = fChain->GetEntries();
    else nentries = _testRun;
    
-   double L_data=35867.06;
-   //double L_data=101270;
+   //double L_data=35867.06;
+   double L_data=101270;
    
    //Btag SF
    BTCalibration calib, calib_fs, calib_deep, calib_deep_fs;;
@@ -826,7 +826,7 @@ void Analyzer::Loop()
      nleadElePhoL=-1; nleadElePhoM=-1; nleadElePhoT=-1;
      nleadFREleL=-1; nleadFREleM=-1; nleadFREleT=-1;
      nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
-     nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
+     nleadEleV=-1; nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
      nleadMuL=-1; nleadMuM=-1; nleadMuT=-1, nleadMuNO=-1;
      nleadTauL=-1; nleadTauM=-1; nleadTauT=-1; nleadIso=-1;
      ele_VETOSF=1; mu_VETOSF=1;
@@ -969,6 +969,7 @@ void Analyzer::Loop()
      nPassEleM=passEleM.size();
      nPassEleT=passEleT.size();
      nPassEleNO=passEleNO.size();
+     if (nPassEleV != 0) nleadEleV=passEleV[0];
      if (nPassEleL != 0) nleadEleL=passEleL[0];
      if (nPassEleM != 0) nleadEleM=passEleM[0];
      if (nPassEleT != 0) nleadEleT=passEleT[0];
