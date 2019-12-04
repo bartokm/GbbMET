@@ -181,20 +181,6 @@ void Analyzer::Loop()
    BTCalibrationReader reader_deep_L, reader_deep_M, reader_deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
    if (btag_file.size()>0){
-     calib = *new BTCalibration("csvv1", "input/CSVv2_Moriond17_B_H.csv");
-     reader_L = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
-     reader_M = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
-     reader_T = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
-     reader_L.load(calib,BTEntry::FLAV_B,"comb");
-     reader_L.load(calib,BTEntry::FLAV_C,"comb");
-     reader_L.load(calib,BTEntry::FLAV_UDSG,"incl");
-     reader_M.load(calib,BTEntry::FLAV_B,"comb");
-     reader_M.load(calib,BTEntry::FLAV_C,"comb");
-     reader_M.load(calib,BTEntry::FLAV_UDSG,"incl");
-     reader_T.load(calib,BTEntry::FLAV_B,"comb");
-     reader_T.load(calib,BTEntry::FLAV_C,"comb");
-     reader_T.load(calib,BTEntry::FLAV_UDSG,"incl");
-     
      //fastsim
      calib_fs = *new BTCalibration("csvv1_fs", "input/fastsim_v2.csv");
      reader_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
@@ -258,7 +244,7 @@ void Analyzer::Loop()
    TH1::SetDefaultSumw2();
   
    //histograms
-   h_cuts = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,BDSV,Deep1,Deep2",15,0,15);
+   h_cuts = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,DDBvL,Deep1,Deep2",15,0,15);
    TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",2,-0.5,1.5);
    TH1D *h_nISR_jet = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
    TH1D *h_SR    = new TH1D("h_SR","",16,0.5,16.5);
@@ -437,9 +423,12 @@ void Analyzer::Loop()
      if (!SignalScan) {
        if (year==2016) {
          b_HLT_Photon165_HE10->GetEntry(ientry);
+         b_HLT_Photon175->GetEntry(ientry);
+         b_HLT_Photon250_NoHE->GetEntry(ientry);
        }
        else {
          b_HLT_Photon200->GetEntry(ientry);
+         b_HLT_Photon300_NoHE->GetEntry(ientry);
        }
      }
      b_Flag_goodVertices->GetEntry(ientry);
@@ -481,6 +470,8 @@ void Analyzer::Loop()
      b_Photon_pixelSeed->GetEntry(ientry);
      b_Photon_electronVeto->GetEntry(ientry);
      b_Photon_hoe->GetEntry(ientry);
+     b_Photon_isScEtaEB->GetEntry(ientry);
+     b_Photon_isScEtaEE->GetEntry(ientry);
      if (year==2016) b_Photon_cutBased17Bitmap->GetEntry(ientry);
      else b_Photon_cutBasedV1Bitmap->GetEntry(ientry);
      Int_t Photon_cutBased_versionFree[99]; for (unsigned int i=0; i<nPhoton;i++) (year==2016) ? Photon_cutBased_versionFree[i]=Photon_cutBased17Bitmap[i] : Photon_cutBased_versionFree[i]=Photon_cutBasedV1Bitmap[i];
@@ -510,9 +501,7 @@ void Analyzer::Loop()
      b_Jet_eta->GetEntry(ientry);
      b_Jet_mass->GetEntry(ientry);
      b_Jet_chHEF->GetEntry(ientry);
-     b_Jet_btagCSVV2->GetEntry(ientry);
-     b_Jet_btagCMVA->GetEntry(ientry);
-     b_Jet_btagDeepB->GetEntry(ientry);
+     b_Jet_btagDeepFlavB->GetEntry(ientry);
      b_Jet_jetId->GetEntry(ientry);
      b_Jet_puId->GetEntry(ientry);
      b_nFatJet->GetEntry(ientry);
@@ -736,15 +725,6 @@ void Analyzer::Loop()
          //Loading btag efficiency file, fill efficiency histograms
          if (btag_file.size()>0) {
            TFile f_btag(btag_file.c_str(),"read");
-           eff_b_CSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_CSV_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_b_CSV_M = new TEfficiency(*(TH2D*)f_btag.Get("h_b_CSV_M"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_b_CSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_CSV_T"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_c_CSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_c_CSV_L"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_c_CSV_M = new TEfficiency(*(TH2D*)f_btag.Get("h_c_CSV_M"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_c_CSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_c_CSV_T"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_l_CSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           eff_l_CSV_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           eff_l_CSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_CSV_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
            eff_b_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
            eff_b_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
@@ -762,14 +742,22 @@ void Analyzer::Loop()
          }
 
          //L1prefire maps
-         TFile f_L1_phomap("input/L1prefiring_photonpt_2016BtoH.root","read");
-         h_L1prefire_phoMap = (TH2D*)f_L1_phomap.Get("L1prefiring_photonpt_2016BtoH");
-         h_L1prefire_phoMap->SetDirectory(0);
-         f_L1_phomap.Close();
-         TFile f_L1_jetmap("input/L1prefiring_jetpt_2016BtoH.root","read");
-         h_L1prefire_jetMap = (TH2D*)f_L1_jetmap.Get("L1prefiring_jetpt_2016BtoH");
-         h_L1prefire_jetMap->SetDirectory(0);
-         f_L1_jetmap.Close();
+         TFile f_L1_phomap_2016("input/L1prefiring_photonpt_2016BtoH.root","read");
+         h_L1prefire_phoMap_2016 = (TH2D*)f_L1_phomap_2016.Get("L1prefiring_photonpt_2016BtoH");
+         h_L1prefire_phoMap_2016->SetDirectory(0);
+         f_L1_phomap_2016.Close();
+         TFile f_L1_phomap_2017("input/L1prefiring_photonpt_2017BtoF.root","read");
+         h_L1prefire_phoMap_2017 = (TH2D*)f_L1_phomap_2017.Get("L1prefiring_photonpt_2017BtoF");
+         h_L1prefire_phoMap_2017->SetDirectory(0);
+         f_L1_phomap_2017.Close();
+         TFile f_L1_jetmap_2016("input/L1prefiring_jetpt_2016BtoH.root","read");
+         h_L1prefire_jetMap_2016 = (TH2D*)f_L1_jetmap_2016.Get("L1prefiring_jetpt_2016BtoH");
+         h_L1prefire_jetMap_2016->SetDirectory(0);
+         f_L1_jetmap_2016.Close();
+         TFile f_L1_jetmap_2017("input/L1prefiring_jetpt_2017BtoF.root","read");
+         h_L1prefire_jetMap_2017 = (TH2D*)f_L1_jetmap_2017.Get("L1prefiring_jetpt_2017BtoF");
+         h_L1prefire_jetMap_2017->SetDirectory(0);
+         f_L1_jetmap_2017.Close();
        }
      }
 
@@ -789,7 +777,7 @@ void Analyzer::Loop()
            if (deltaR(Muon_phi[j],Jet_phi[i],Muon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
          }
          for (unsigned int j=0;j<nPhoton;j++){
-           if ((abs(Photon_eta[j])>1.4442 && 1.566>abs(Photon_eta[j])) || abs(Photon_eta[j])>2.5 || Photon_pixelSeed[j]!=0 || Photon_pt[j]<40 || (Photon_cutBased_versionFree[i]&1)==0) continue;
+           if (!Photon_isScEtaEB || !Photon_isScEtaEE || Photon_pixelSeed[j]!=0 || Photon_pt[j]<40 || (Photon_cutBased_versionFree[i]&1)==0) continue;
            if (deltaR(Photon_phi[j],Jet_phi[i],Photon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
          }
          if (lepton_photon_match) continue;
@@ -813,13 +801,13 @@ void Analyzer::Loop()
      }
 
      //object definitions
-     int leadpt_ak4=-1, leadpt_ak8=-1, highBDSV=-1, highCSV1=-1, highCSV2=-1, highcMVA1=-1, highcMVA2=-1;
+     int leadpt_ak4=-1, leadpt_ak8=-1, highDDBvL=-1;
      vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT, passMuNO;
      vector<int> passTauL, passTauM, passTauT, passIso;
      vector<int> passElePhoL, passElePhoM, passElePhoT, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
-     map<int,char> passCSV, passcMVA, passBDSV, passDeep;
+     map<int,char> passDDBvL, passDeep;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0; nonHiggsJet=-1;
@@ -832,14 +820,11 @@ void Analyzer::Loop()
      ele_VETOSF=1; mu_VETOSF=1;
      for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
-     memset(bcounterCSV,0,sizeof bcounterCSV);
-     memset(bcountercMVA,0,sizeof bcountercMVA);
-     memset(bcounterBDSV,0,sizeof bcounterBDSV);
+     memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
-     //double nonPrefiringProbability[3]={L1PreFiringWeight_Nom,L1PreFiringWeight_Up,L1PreFiringWeight_Dn};
      double nonPrefiringProbability[3]={1,1,1};
      if (!SignalScan) nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;
-     phoCalibET.clear();
+     phoET.clear();
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
        //Systematics for Egamma scaling
@@ -851,10 +836,8 @@ void Analyzer::Loop()
        (Egamma_Rhoresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_rho_up)[i]) : (Egamma_Rhoresol_whichSF==2) ? correction*=gen->Gaus(1,(*phoResol_rho_dn)[i]) : correction=correction;
        (Egamma_Phiresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_phi_up)[i]) : correction=correction;
        */
-       phoCalibET.push_back(Photon_pt[i]*correction);
-       //if (abs(Photon_eta[i])<1.4442 && (*phohasPixelSeed)[i]==0 && phoCalibET[i]>40) {
-       //if (1.566<abs(Photon_eta[i])<3 && (*phohasPixelSeed)[i]==0 && phoCalibET[i]>40) {
-       if ((abs(Photon_eta[i])<1.4442 || (1.566<abs(Photon_eta[i]) && abs(Photon_eta[i])<2.5)) && Photon_pixelSeed[i]==0 && phoCalibET[i]>40) {
+       phoET.push_back(Photon_pt[i]*correction);
+       if ((Photon_isScEtaEB || Photon_isScEtaEE) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
         if (Photon_cutBased_versionFree[i]>0) {
          passPhoL.push_back(i);
         }
@@ -865,7 +848,7 @@ void Analyzer::Loop()
          passPhoT.push_back(i);
         }
        }
-       if ((abs(Photon_eta[i])<1.4442 || (1.566<abs(Photon_eta[i]) && abs(Photon_eta[i])<2.5)) && Photon_pixelSeed[i]!=0) {
+       if ((Photon_isScEtaEB || Photon_isScEtaEE) && Photon_pixelSeed[i]!=0) {
         if (Photon_cutBased_versionFree[i]>>0&1) {
          passElePhoL.push_back(i);
         }
@@ -878,14 +861,14 @@ void Analyzer::Loop()
        }
      }
      for (auto i : passPhoL) {
-       if (phoCalibET[i]>phoCalibET[nleadPhoL]) nleadPhoL=i;
-       EMHT_before+=phoCalibET[i];
+       if (phoET[i]>phoET[nleadPhoL]) nleadPhoL=i;
+       EMHT_before+=phoET[i];
      }
-     for (auto i : passPhoM) if (phoCalibET[i]>phoCalibET[nleadPhoM]) nleadPhoM=i;
-     for (auto i : passPhoT) if (phoCalibET[i]>phoCalibET[nleadPhoT]) nleadPhoT=i;
-     for (auto i : passElePhoL) if (phoCalibET[i]>phoCalibET[nleadElePhoL]) nleadElePhoL=i;
-     for (auto i : passElePhoM) if (phoCalibET[i]>phoCalibET[nleadElePhoM]) nleadElePhoM=i;
-     for (auto i : passElePhoT) if (phoCalibET[i]>phoCalibET[nleadElePhoT]) nleadElePhoT=i;
+     for (auto i : passPhoM) if (phoET[i]>phoET[nleadPhoM]) nleadPhoM=i;
+     for (auto i : passPhoT) if (phoET[i]>phoET[nleadPhoT]) nleadPhoT=i;
+     for (auto i : passElePhoL) if (phoET[i]>phoET[nleadElePhoL]) nleadElePhoL=i;
+     for (auto i : passElePhoM) if (phoET[i]>phoET[nleadElePhoM]) nleadElePhoM=i;
+     for (auto i : passElePhoT) if (phoET[i]>phoET[nleadElePhoT]) nleadElePhoT=i;
      if (_fakeRate==2 && nPassElePhoL != 0) {nleadPhoL=nleadElePhoL; passPhoL.push_back(nleadElePhoL);}
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
@@ -901,8 +884,8 @@ void Analyzer::Loop()
        double id_sf=0, pix_sf=0, syst_id=0, syst_pix=0;
        int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
-         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoCalibET[nleadPhoL]));
-         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoCalibET[nleadPhoL]));
+         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoET[nleadPhoL]));
+         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoET[nleadPhoL]));
          if (Photon_r9[nleadPhoL]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[nleadPhoL]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[nleadPhoL]),100));
@@ -916,8 +899,8 @@ void Analyzer::Loop()
          pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoM!=0){
-         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoCalibET[passPhoM[0]]));
-         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoCalibET[passPhoM[0]]));
+         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoET[passPhoM[0]]));
+         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoET[passPhoM[0]]));
          if (Photon_r9[passPhoM[0]]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoM[0]]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoM[0]]),100));
@@ -931,8 +914,8 @@ void Analyzer::Loop()
          pho_SF[1]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoT!=0){
-         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoCalibET[passPhoT[0]]));
-         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoCalibET[passPhoT[0]]));
+         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoET[passPhoT[0]]));
+         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoET[passPhoT[0]]));
          if (Photon_r9[passPhoT[0]]>0.94) {
            pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoT[0]]),100));
            syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoT[0]]),100));
@@ -987,8 +970,7 @@ void Analyzer::Loop()
          w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        }
        if (_fakeRate==2 && nPassElePhoL != 0) {
-         //if (abs(Photon_eta[nleadElePhoL])>1.4442) continue;
-         if (abs(Photon_eta[nleadElePhoL])>2.5) continue;
+         if (!Photon_isScEtaEB || !Photon_isScEtaEE) continue;
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePhoL],Photon_phi[nleadElePhoL]));
          double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
          //cout<<"etaphi "<<Photon_eta[nleadElePhoL]<<" "<<Photon_phi[nleadElePhoL]<<endl;
@@ -1207,37 +1189,22 @@ void Analyzer::Loop()
      if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
      if (vetoFastSim) continue;
      //jet pt, btags
+     int BtagWP_chooser=(year==2016) ? 0 : (year==2017) ? 1 : 2;
      for (auto i : passJet) {
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
-       if (Jet_btagCSVV2[i]>Jet_btagCSVV2[highCSV1]) {highCSV2=highCSV1;highCSV1=i;}
-       else if (highCSV2!=-1) if (Jet_btagCSVV2[i]>Jet_btagCSVV2[highCSV2]) highCSV2=i;
-       if (Jet_btagCMVA[i]>Jet_btagCMVA[highcMVA1]) {highcMVA2=highcMVA1;highcMVA1=i;}
-       else if (highcMVA2!=-1) if (Jet_btagCMVA[i]>Jet_btagCMVA[highcMVA2]) highcMVA2=i;
-       if (Jet_btagCMVA[i]>BtagcMVAWP[2]) {passcMVA.insert(pair<int,char>(i,'T'));bcountercMVA[3]++;}
-       else if (Jet_btagCMVA[i]>BtagcMVAWP[1]) {passcMVA.insert(pair<int,char>(i,'M'));bcountercMVA[2]++;}
-       else if (Jet_btagCMVA[i]>BtagcMVAWP[0]) {passcMVA.insert(pair<int,char>(i,'L'));bcountercMVA[1]++;}
-       else {passcMVA.insert(pair<int,char>(i,'0'));bcountercMVA[0]++;}
-       if (Jet_btagCSVV2[i]>BtagCSVWP[2]) {passCSV.insert(pair<int,char>(i,'T'));bcounterCSV[3]++;}
-       else if (Jet_btagCSVV2[i]>BtagCSVWP[1]) {passCSV.insert(pair<int,char>(i,'M'));bcounterCSV[2]++;}
-       else if (Jet_btagCSVV2[i]>BtagCSVWP[0]) {passCSV.insert(pair<int,char>(i,'L'));bcounterCSV[1]++;}
-       else {passCSV.insert(pair<int,char>(i,'0'));bcounterCSV[0]++;}
-       if (Jet_btagDeepB[i]>BtagDeepWP[2]) {passDeep.insert(pair<int,char>(i,'T'));bcounterDeep[3]++;}
-       else if (Jet_btagDeepB[i]>BtagDeepWP[1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
-       else if (Jet_btagDeepB[i]>BtagDeepWP[0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
+       if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][2]) {passDeep.insert(pair<int,char>(i,'T'));bcounterDeep[3]++;}
+       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
+       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
        else {passDeep.insert(pair<int,char>(i,'0'));bcounterDeep[0]++;}
      }
-     bcounterCSV[2] += bcounterCSV[3];
-     bcounterCSV[1] += bcounterCSV[2];
-     bcountercMVA[2] += bcountercMVA[3];
-     bcountercMVA[1] += bcountercMVA[2];
      bcounterDeep[2] += bcounterDeep[3];
      bcounterDeep[1] += bcounterDeep[2];
-     //Sort passJet from highest DeepCSV btag to lowest
+     //Sort passJet from highest DeepJet btag to lowest
      for (unsigned int i=0;i<passJet.size();i++){
      int temp;
        for (unsigned int j=passJet.size()-1;j>i;j--){
-         if (Jet_btagDeepB[passJet[j]]>Jet_btagDeepB[passJet[j-1]]){
+         if (Jet_btagDeepFlavB[passJet[j]]>Jet_btagDeepFlavB[passJet[j-1]]){
            temp=passJet[j-1];
            passJet[j-1]=passJet[j];
            passJet[j]=temp;
@@ -1283,18 +1250,18 @@ void Analyzer::Loop()
        if (AK8JetSmearedPt[i]>AK8JetSmearedPt[leadpt_ak8]) leadpt_ak8=i;
        AK8HT_after+=AK8JetSmearedPt[i];
        double i_jetdB=FatJet_btagDDBvL[i], h_jetdB;
-       if (highBDSV==-1) h_jetdB=-10; else h_jetdB=FatJet_btagDDBvL[highBDSV];
-       if (i_jetdB>h_jetdB) highBDSV=i;
-       if (FatJet_btagDDBvL[i]>BtagBDSVWP[3]) {passBDSV.insert(pair<int,char>(i,'T'));bcounterBDSV[4]++;}
-       else if (FatJet_btagDDBvL[i]>BtagBDSVWP[2]) {passBDSV.insert(pair<int,char>(i,'H'));bcounterBDSV[3]++;}
-       else if (FatJet_btagDDBvL[i]>BtagBDSVWP[1]) {passBDSV.insert(pair<int,char>(i,'M'));bcounterBDSV[2]++;}
-       else if (FatJet_btagDDBvL[i]>BtagBDSVWP[0]) {passBDSV.insert(pair<int,char>(i,'L'));bcounterBDSV[1]++;}
-       else {passBDSV.insert(pair<int,char>(i,'0'));bcounterBDSV[0]++;}
+       if (highDDBvL==-1) h_jetdB=-10; else h_jetdB=FatJet_btagDDBvL[highDDBvL];
+       if (i_jetdB>h_jetdB) highDDBvL=i;
+       if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][3]) {passDDBvL.insert(pair<int,char>(i,'T'));bcounterDDBvL[4]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][2]) {passDDBvL.insert(pair<int,char>(i,'H'));bcounterDDBvL[3]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][1]) {passDDBvL.insert(pair<int,char>(i,'M'));bcounterDDBvL[2]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) {passDDBvL.insert(pair<int,char>(i,'L'));bcounterDDBvL[1]++;}
+       else {passDDBvL.insert(pair<int,char>(i,'0'));bcounterDDBvL[0]++;}
      }
-     bcounterBDSV[3] += bcounterBDSV[4];
-     bcounterBDSV[2] += bcounterBDSV[3];
-     bcounterBDSV[1] += bcounterBDSV[2];
-     //Sort passAK8Jet from highest BDSV btag to lowest
+     bcounterDDBvL[3] += bcounterDDBvL[4];
+     bcounterDDBvL[2] += bcounterDDBvL[3];
+     bcounterDDBvL[1] += bcounterDDBvL[2];
+     //Sort passAK8Jet from highest DDBvL btag to lowest
      for (unsigned int i=0;i<passAK8Jet.size();i++){
        int temp;
        for (unsigned int j=passAK8Jet.size()-1;j>i;j--){
@@ -1308,7 +1275,7 @@ void Analyzer::Loop()
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
      //MET variables
-     for (auto i : passPhoL) ST+=phoCalibET[i];
+     for (auto i : passPhoL) ST+=phoET[i];
      MET=MET_pt_nom; double METPhi=MET_phi_nom, METsumEt=MET_sumEt, METSig=MET_significance;
      (!isData && genMET_whichSF==1) ? MET=GenMET_pt : MET=MET;
      if (metJER_whichSF==1) {MET=MET_pt_jerUp; METPhi=MET_phi_jerUp;}
@@ -1322,7 +1289,7 @@ void Analyzer::Loop()
      for (auto i : passJet) ST+=jetSmearedPt[i];
      if (passPhoL.size()>0) {
        double dphi_MT=(Photon_phi[nleadPhoL]-METPhi)>M_PI ? 2*M_PI-(METPhi-Photon_phi[nleadPhoL]) : Photon_phi[nleadPhoL]-METPhi;
-       MT=sqrt(2*MET*phoCalibET[nleadPhoL]*(1-cos(abs(dphi_MT))));
+       MT=sqrt(2*MET*phoET[nleadPhoL]*(1-cos(abs(dphi_MT))));
      }
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) {
@@ -1358,7 +1325,7 @@ void Analyzer::Loop()
      //L1prefire
      //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0
      L1prefire=0;
-     for (auto i : passPhoL) if (phoCalibET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
+     for (auto i : passPhoL) if (phoET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
      for (auto i : passJet) if (jetSmearedPt[i]>100 && abs(Jet_eta[i])>2.25) L1prefire=1;
      //for (auto i : passAK8Jet) if (abs(FatJet_eta[i])>2.25) L1prefire=1; //should it be used for AK8 jets?
 
@@ -1366,17 +1333,17 @@ void Analyzer::Loop()
      //AK8
      passBtag=false; passHiggsMass=false;
      int SelectedAK8Jet=-1;
-     BDSV_selected=0; //BDSV btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
+     DDBvL_selected=0; //DDBvL btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
      for (auto i : passAK8Jet){
        if (FatJet_msoftdrop_nom[i]>70 && FatJet_msoftdrop_nom[i]<200) {
          passHiggsMass=true;
          SelectedAK8Jet=i;
-         if (FatJet_btagDDBvL[i]>BtagBDSVWP[3]) BDSV_selected=4;
-         else if (FatJet_btagDDBvL[i]>BtagBDSVWP[2]) BDSV_selected=3;
-         else if (FatJet_btagDDBvL[i]>BtagBDSVWP[1]) BDSV_selected=2;
-         else if (FatJet_btagDDBvL[i]>BtagBDSVWP[0]) BDSV_selected=1;
-         else BDSV_selected=0;
-         if (FatJet_btagDDBvL[i]>BtagBDSVWP[0]) passBtag=true;
+         if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][3]) DDBvL_selected=4;
+         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][2]) DDBvL_selected=3;
+         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][1]) DDBvL_selected=2;
+         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) DDBvL_selected=1;
+         else DDBvL_selected=0;
+         if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) passBtag=true;
          break;
        }
      }
@@ -1400,8 +1367,8 @@ void Analyzer::Loop()
            bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],Jet_mass[passJet.at(j)]);
            m_bb_deep=(bjet1+bjet2).M();
            if (m_bb_deep>70 && m_bb_deep<200) {
-             if (Jet_btagDeepB[passJet.at(i)]>BtagDeepWP[0]) Deep_selected++;
-             if (Jet_btagDeepB[passJet.at(j)]>BtagDeepWP[0]) Deep_selected++;
+             if (Jet_btagDeepFlavB[passJet.at(i)]>BtagDeepWP[BtagWP_chooser][0]) Deep_selected++;
+             if (Jet_btagDeepFlavB[passJet.at(j)]>BtagDeepWP[BtagWP_chooser][0]) Deep_selected++;
              SelectedAK4Jet1=passJet.at(i); SelectedAK4Jet2=passJet.at(j);
              passAK4DeepHiggsMass=true;
              break;
@@ -1414,19 +1381,19 @@ void Analyzer::Loop()
      }
 
      //Calculate BTag SFs
+     /*
      if (!isData && btag_file.size()>0) {
        //AK4
        if (!_fastSim) {
-         CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L, reader_M, reader_T, CSV_SF_L, CSV_SF_M, CSV_SF_T);
          CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L, reader_deep_M, reader_deep_T, Deep_SF_L, Deep_SF_M, Deep_SF_T);
        }
        else {
-         CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passCSV, eff_b_CSV_L, eff_c_CSV_L, eff_l_CSV_L, eff_b_CSV_M, eff_c_CSV_M, eff_l_CSV_M, eff_b_CSV_T, eff_c_CSV_T, eff_l_CSV_T, reader_L_fs, reader_M_fs, reader_T_fs, CSV_SF_L, CSV_SF_M, CSV_SF_T);
          CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs, Deep_SF_L, Deep_SF_M, Deep_SF_T);
          //AK8
-         //CalcBtagSF_AK8(FatJet_eta, AK8JetSmearedPt, GenJetAK8_hadronFlavour, passBDSV, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, BDSV_SF_L, BDSV_SF_M1, BDSV_SF_M2, BDSV_SF_T);
+         CalcBtagSF_AK8(FatJet_eta, AK8JetSmearedPt, GenJetAK8_hadronFlavour, passDDBvL, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T);
        }
      }
+     */
 
      //Region definitions
      double met = (MET<50) ? 1 : (MET<70) ? 2 : (MET<100) ? 3 : (MET<200) ? 4 : (MET<500) ? 5 : 6;
@@ -1436,11 +1403,11 @@ void Analyzer::Loop()
      //AK4-AK8 searchBins
      int AK4AK8=0, VR=0, boost=0;
      //Signal Region
-     if (BDSV_selected>0) {boost=1;AK4AK8=1;}
+     if (DDBvL_selected>0) {boost=1;AK4AK8=1;}
      else {if (Deep_selected==1) AK4AK8=1; if (Deep_selected==2) AK4AK8=2;}
      //Control and Validation regions
-     if (BDSV_selected==0 && Deep_selected==0) {
-       if (bcounterBDSV[1]>0) {boost=1; VR=1; AK4AK8=1;}
+     if (DDBvL_selected==0 && Deep_selected==0) {
+       if (bcounterDDBvL[1]>0) {boost=1; VR=1; AK4AK8=1;}
        else if (passHiggsMass) boost=1;
        if (!boost) {
          if (bcounterDeep[1]==1) {VR=1;AK4AK8=1;}
@@ -1477,13 +1444,13 @@ void Analyzer::Loop()
      //Filling histograms
      h_eff->Fill(1.,w);
      h_nISR_jet->Fill(n_isr_jets,w);
-     if (nleadPhoL!=-1) h_phoEtL->Fill(phoCalibET[nleadPhoL],w);
-     if (nleadPhoM!=-1) h_phoEtM->Fill(phoCalibET[nleadPhoM],w);
-     if (nleadPhoT!=-1) h_phoEtT->Fill(phoCalibET[nleadPhoT],w);
+     if (nleadPhoL!=-1) h_phoEtL->Fill(phoET[nleadPhoL],w);
+     if (nleadPhoM!=-1) h_phoEtM->Fill(phoET[nleadPhoM],w);
+     if (nleadPhoT!=-1) h_phoEtT->Fill(phoET[nleadPhoT],w);
      if (nleadPhoL!=-1) h_phoEtaL->Fill(Photon_eta[nleadPhoL],w);
      if (nleadPhoM!=-1) h_phoEtaM->Fill(Photon_eta[nleadPhoM],w);
      if (nleadPhoT!=-1) h_phoEtaT->Fill(Photon_eta[nleadPhoT],w);
-     if (nleadPhoL!=-1) h_phoPt->Fill(phoCalibET[nleadPhoL],w);
+     if (nleadPhoL!=-1) h_phoPt->Fill(phoET[nleadPhoL],w);
      
      h_pfMET->Fill(MET,w);
      h_pfMETsumEt->Fill(MET_sumEt,w);
@@ -1512,7 +1479,7 @@ void Analyzer::Loop()
 		
 
      if (m_bb_deep!=-1) h_mbbjet_select->Fill(m_bb_deep,w);
-     if (BDSV_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
+     if (DDBvL_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
      if (dR_ak4_Hcandidate!=-1) h_dR_ak4_Hcandidate->Fill(dR_ak4_Hcandidate,w);
      if (dphi_met_jet!=999) h_dphi_met_jet->Fill(dphi_met_jet,w);
      
@@ -1545,8 +1512,8 @@ void Analyzer::Loop()
      
      //AK4-AK8 searchbin fills
      double w_AK4searchBin=w, w_AK8searchBin=w;
-     if (boost==1 && AK4AK8==1) w_AK8searchBin*=BDSV_SF_L[BDSV_whichSF];
-     //if (boost==1 && AK4AK8==1) {w_AK8searchBin*=BDSV_SF_L[BDSV_whichSF];cout<<"ak8 w "<<BDSV_SF_L[BDSV_whichSF]<<endl;}
+     if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];
+     //if (boost==1 && AK4AK8==1) {w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];cout<<"ak8 w "<<DDBvL_SF_L[DDBvL_whichSF]<<endl;}
      else if (boost==0) {if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
      //else if (boost==0) {cout<<AK4AK8<<" ak4 w "<<Deep_SF_L[Deep_whichSF]<<" "<<Deep_SF_L[1]<<" "<<Deep_SF_L[2]<<" deep selected "<<Deep_selected<<" nbjet "<<bcounterDeep[1]<<endl;if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
        switch (boost) {
@@ -1568,15 +1535,15 @@ void Analyzer::Loop()
     
      if (SignalScan) {
        m_eff[mass_pair]->Fill(1.,w);
-       m_phoEtL[mass_pair]->Fill(phoCalibET[nleadPhoL],w);
+       m_phoEtL[mass_pair]->Fill(phoET[nleadPhoL],w);
        m_nISR_jet[mass_pair]->Fill(n_isr_jets,w);
-       if (nleadPhoL!=-1) m_phoEtL[mass_pair]->Fill(phoCalibET[nleadPhoL],w);
-       if (nleadPhoM!=-1) m_phoEtM[mass_pair]->Fill(phoCalibET[nleadPhoM],w);
-       if (nleadPhoT!=-1) m_phoEtT[mass_pair]->Fill(phoCalibET[nleadPhoT],w);
+       if (nleadPhoL!=-1) m_phoEtL[mass_pair]->Fill(phoET[nleadPhoL],w);
+       if (nleadPhoM!=-1) m_phoEtM[mass_pair]->Fill(phoET[nleadPhoM],w);
+       if (nleadPhoT!=-1) m_phoEtT[mass_pair]->Fill(phoET[nleadPhoT],w);
        if (nleadPhoL!=-1) m_phoEtaL[mass_pair]->Fill(Photon_eta[nleadPhoL],w);
        if (nleadPhoM!=-1) m_phoEtaM[mass_pair]->Fill(Photon_eta[nleadPhoM],w);
        if (nleadPhoT!=-1) m_phoEtaT[mass_pair]->Fill(Photon_eta[nleadPhoT],w);
-       if (nleadPhoL!=-1) m_phoPt[mass_pair]->Fill(phoCalibET[nleadPhoL],w);
+       if (nleadPhoL!=-1) m_phoPt[mass_pair]->Fill(phoET[nleadPhoL],w);
        
        m_pfMET[mass_pair]->Fill(MET,w);
        m_pfMETsumEt[mass_pair]->Fill(MET_sumEt,w);
@@ -1605,7 +1572,7 @@ void Analyzer::Loop()
 		  
        
        if (m_bb_deep!=-1) m_mbbjet_select[mass_pair]->Fill(m_bb_deep,w);
-       if (BDSV_selected>0) m_AK8mass_select[mass_pair]->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
+       if (DDBvL_selected>0) m_AK8mass_select[mass_pair]->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
        if (dR_ak4_Hcandidate!=-1) m_dR_ak4_Hcandidate[mass_pair]->Fill(dR_ak4_Hcandidate,w);
        if (dphi_met_jet!=999) m_dphi_met_jet[mass_pair]->Fill(dphi_met_jet,w);
        

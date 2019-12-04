@@ -1182,10 +1182,8 @@ public :
    TBranch        *b_L1_AlwaysTrue;
 
    //Added
-   double BtagCSVWP[3]={0.5426,0.8484,0.9535};
-   double BtagcMVAWP[3]={-0.5884,0.4432,0.9432};
-   double BtagBDSVWP[4]={0.7,0.86,0.89,0.91};
-   double BtagDeepWP[3]={0.2219,0.6324,0.8958};
+   double BtagDDBvLWP[3][4]={{0.7,0.86,0.89,0.91},{0.7,0.86,0.89,0.91},{0.7,0.86,0.89,0.91}};
+   double BtagDeepWP[3][3]={{0.0614,0.3093,0.7221},{0.0521,0.3033,0.7489},{0.0494,0.2770,0.7264}};
    std::string output_file="default", btag_file="", xsec_file="default";
    unsigned int nFiles=0;
    bool _fastSim=false;
@@ -1212,8 +1210,8 @@ public :
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
-   int bcounterCSV[4]={}, bcountercMVA[4]={}, bcounterBDSV[5]={}, bcounterDeep[4]={};
-   int BDSV_selected=0, CSV_selected=0, Deep_selected=0;
+   int bcounterDDBvL[5]={}, bcounterDeep[4]={};
+   int DDBvL_selected=0, Deep_selected=0;
    bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
@@ -1223,19 +1221,18 @@ public :
    int SignalHiggs=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
-   double CSV_SF_L[3]={1,1,1}, CSV_SF_M[3]={1,1,1}, CSV_SF_T[3]={1,1,1};
-   double BDSV_SF_L[3]={1,1,1}, BDSV_SF_M1[3]={1,1,1}, BDSV_SF_M2[3]={1,1,1}, BDSV_SF_T[3]={1,1,1};
+   double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
    double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};   //tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
    double ele_VETOSF=1, mu_VETOSF=1;
    int year=2016;
-   int BDSV_whichSF=0, CSV_whichSF=0, Deep_whichSF=0;
+   int DDBvL_whichSF=0, Deep_whichSF=0;
    int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
    int L1prefire_whichSF=0, genMET_whichSF=0;
    int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
-   vector<double> phoCalibET;
+   vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
    double e_pt=5, mu_pt=5, tau_pt=20;
@@ -1254,18 +1251,11 @@ public :
    TH2D *h_muID_SF2D[3];
    TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
-   TH2D *h_L1prefire_phoMap;
-   TH2D *h_L1prefire_jetMap;
+   TH2D *h_L1prefire_phoMap_2016;
+   TH2D *h_L1prefire_phoMap_2017;
+   TH2D *h_L1prefire_jetMap_2016;
+   TH2D *h_L1prefire_jetMap_2017;
    TGraph *h_muTrk_SF;
-   TEfficiency* eff_b_CSV_L;
-   TEfficiency* eff_b_CSV_M;
-   TEfficiency* eff_b_CSV_T;
-   TEfficiency* eff_c_CSV_L;
-   TEfficiency* eff_c_CSV_M;
-   TEfficiency* eff_c_CSV_T;
-   TEfficiency* eff_l_CSV_L;
-   TEfficiency* eff_l_CSV_M;
-   TEfficiency* eff_l_CSV_T;
    TEfficiency* eff_b_Deep_L;
    TEfficiency* eff_b_Deep_M;
    TEfficiency* eff_b_Deep_T;
@@ -2237,7 +2227,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(Photon_pt[nleadElePhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elephoPtM") returnvalue*=Parser_float(Photon_pt[nleadElePhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elephoPtT") returnvalue*=Parser_float(Photon_pt[nleadElePhoT],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoCalibET[nleadPhoL],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPhoL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float(Photon_pt[nleadPhoM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float(Photon_pt[nleadPhoT],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
@@ -2254,33 +2244,20 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nonHiggsJet") returnvalue*=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterCSV_L") {returnvalue*=Parser(bcounterCSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_L[CSV_whichSF];}
-    else if (_cut_variable[i]=="bcounterCSV_M") {returnvalue*=Parser(bcounterCSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_M[CSV_whichSF];}
-    else if (_cut_variable[i]=="bcounterCSV_T") {returnvalue*=Parser(bcounterCSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=CSV_SF_T[CSV_whichSF];}
-    else if (_cut_variable[i]=="bcountercMVA_L") returnvalue*=Parser(bcountercMVA[1],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcountercMVA_M") returnvalue*=Parser(bcountercMVA[2],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcountercMVA_T") returnvalue*=Parser(bcountercMVA[3],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_L") returnvalue*=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_M") returnvalue*=Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_T") returnvalue*=Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterBDSV_L") {returnvalue*=Parser(bcounterBDSV[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_L[BDSV_whichSF];}
-    else if (_cut_variable[i]=="bcounterBDSV_M1") {returnvalue*=Parser(bcounterBDSV[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M1[BDSV_whichSF];}
-    else if (_cut_variable[i]=="bcounterBDSV_M2") {returnvalue*=Parser(bcounterBDSV[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_M2[BDSV_whichSF];}
-    else if (_cut_variable[i]=="bcounterBDSV_T") {returnvalue*=Parser(bcounterBDSV[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=BDSV_SF_T[BDSV_whichSF];}
-    else if (_cut_variable[i]=="BDSV_selected") {
-      returnvalue*=Parser(BDSV_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_L") {returnvalue*=Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_L[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_M1") {returnvalue*=Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M1[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue*=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_T") {returnvalue*=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="DDBvL_selected") {
+      returnvalue*=Parser(DDBvL_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
-        if (_cut_value[i]==1) w*=BDSV_SF_L[BDSV_whichSF];
-        if (_cut_value[i]==2) w*=BDSV_SF_M1[BDSV_whichSF];
-        if (_cut_value[i]==3) w*=BDSV_SF_M2[BDSV_whichSF];
-        if (_cut_value[i]==4) w*=BDSV_SF_T[BDSV_whichSF];
-      }
-    }
-    else if (_cut_variable[i]=="CSV_selected") {
-      returnvalue*=Parser(CSV_selected,_cut_operator[i],_cut_value[i]);
-      if (!isData) {
-        if (_cut_value[i]==1) w*=CSV_SF_L[CSV_whichSF];
-        if (_cut_value[i]==2) w*=CSV_SF_L[CSV_whichSF]*CSV_SF_L[CSV_whichSF];
+        if (_cut_value[i]==1) w*=DDBvL_SF_L[DDBvL_whichSF];
+        if (_cut_value[i]==2) w*=DDBvL_SF_M1[DDBvL_whichSF];
+        if (_cut_value[i]==3) w*=DDBvL_SF_M2[DDBvL_whichSF];
+        if (_cut_value[i]==4) w*=DDBvL_SF_T[DDBvL_whichSF];
       }
     }
     else if (_cut_variable[i]=="Deep_selected") {
@@ -2290,7 +2267,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         if (_cut_value[i]==2) w*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];
       }
     }
-    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+BDSV_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+DDBvL_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
@@ -2520,8 +2497,7 @@ void Analyzer::CalcBtagSF_AK8(float v_eta[], vector<float> v_pt, int v_had[], ma
 
 void Analyzer::Systematics(map<string, int> systematics) {
   for (auto const& x : systematics) {
-    if (x.first=="BDSV") BDSV_whichSF=x.second;
-    else if (x.first=="CSV") CSV_whichSF=x.second;
+    if (x.first=="DDBvL") DDBvL_whichSF=x.second;
     else if (x.first=="Deep") Deep_whichSF=x.second;
     else if (x.first=="AK4Smear") AK4Smear_whichSF=x.second;
     else if (x.first=="AK8Smear") AK8Smear_whichSF=x.second;
@@ -2569,23 +2545,6 @@ void Analyzer::Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *b
         v[j]=temp;
       }
     }
-  }
-}
-void Analyzer::SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected){
-  for (auto i : v){
-    TLorentzVector bjet1, bjet2;
-    bjet1.SetPtEtaPhiE(pt[i.first],(*eta)[i.first],(*phi)[i.first],en[i.first]);
-    bjet2.SetPtEtaPhiE(pt[i.second],(*eta)[i.second],(*phi)[i.second],en[i.second]);
-    double mass=(bjet1+bjet2).M();
-    float DeepCSVTag_1=(*b)[i.first]+(*bb)[i.first];
-    //float DeepCSVTag_2=(*b)[i.second]+(*bb)[i.second];
-    //if (mass>70 && mass<200 && DeepCSVTag_1>BtagDeepWP[0] && DeepCSVTag_2>BtagDeepWP[0]) {
-    if (mass>70 && mass<200 && DeepCSVTag_1>BtagDeepWP[0]) {
-      ak4selected.push_back(1); int temp=0;
-      for (auto j : ak4_hjets) if (j==i.first || j==i.second) temp++;
-      ak4trueselected.push_back(temp);
-    }
-    else {ak4selected.push_back(0);ak4trueselected.push_back(0);}
   }
 }
 
@@ -2669,23 +2628,16 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
   {"nonHiggsJet","number of loose ak4 jets which are not Higgs candidates"},
-  {"bcounterCSV_L","number of loose CSV btagged jets"},
-  {"bcounterCSV_M","number of medium CSV btagged jets"},
-  {"bcounterCSV_T","number of tight CSV btagged jets"},
-  {"bcountercMVA_L","number of loose cMVA btagged jets"},
-  {"bcountercMVA_M","number of medium cMVA btagged jets"},
-  {"bcountercMVA_T","number of tight cMVA btagged jets"},
   {"bcounterDeep_L","number of loose Deep btagged jets"},
   {"bcounterDeep_M","number of medium Deep btagged jets"},
   {"bcounterDeep_T","number of tight Deep btagged jets"},
-  {"bcounterBDSV_L","number of loose BDSV btagged jets"},
-  {"bcounterBDSV_M1","number of medium 1 BDSV btagged jets"},
-  {"bcounterBDSV_M2","number of medium 2 BDSV btagged jets"},
-  {"bcounterBDSV_T","number of tight BDSV btagged jets"},
-  {"BDSV_selected","BDSV btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
-  {"CSV_selected","CSV btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
+  {"bcounterDDBvL_L","number of loose DDBvL btagged jets"},
+  {"bcounterDDBvL_M1","number of medium 1 DDBvL btagged jets"},
+  {"bcounterDDBvL_M2","number of medium 2 DDBvL btagged jets"},
+  {"bcounterDDBvL_T","number of tight DDBvL btagged jets"},
+  {"DDBvL_selected","DDBvL btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
-  {"sth_selected","Deep_selected+BDSV_selected"},
+  {"sth_selected","Deep_selected+DDBvL_selected"},
   {"passBtag","Higgs candidate ak8jet passes medium btag"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
   {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
