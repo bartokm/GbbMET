@@ -296,15 +296,6 @@ void Analyzer::Loop()
    TH1D *h_dR_ak4_Hcandidate = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
    TH1D *h_dphi_met_jet= new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",10,0,3.2);
 
-   /*
-   TH1D *h_dR_ak4_genJet = new TH1D("h_dR_ak4_genJet","",80,0,8);
-   TH1D *h_dphi_ak4_genJet = new TH1D("h_dphi_ak4_genJet","",40,0,4);
-   TH1D *h_deta_ak4_genJet = new TH1D("h_deta_ak4_genJet","",40,0,3);
-   TH1D *h_dpt_ak4_genJet = new TH1D("h_dpt_ak4_genJet","",40,-200,200);
-   TH1D *h_dpt_ak4_genJet_rel = new TH1D("h_dpt_ak4_genJet_rel","",40,-1,1);
-   TH1D *h_dR_ak8_genJet = new TH1D("h_dR_ak8_genJet","",40,0,8);
-   */
-
    //AK4 searchbins
    const int dim_ak4=4;
    int nbins_ak4[dim_ak4]={2,3,6,2};
@@ -464,6 +455,7 @@ void Analyzer::Loop()
      b_Muon_tightId->GetEntry(ientry);
      b_nPhoton->GetEntry(ientry);
      b_Photon_pt->GetEntry(ientry);
+     b_Photon_eCorr->GetEntry(ientry);
      b_Photon_eta->GetEntry(ientry);
      b_Photon_phi->GetEntry(ientry);
      b_Photon_r9->GetEntry(ientry);
@@ -497,6 +489,7 @@ void Analyzer::Loop()
      b_nJet->GetEntry(ientry);
      b_Jet_pt->GetEntry(ientry);
      b_Jet_pt_nom->GetEntry(ientry);
+     b_Jet_pt_raw->GetEntry(ientry);
      b_Jet_phi->GetEntry(ientry);
      b_Jet_eta->GetEntry(ientry);
      b_Jet_mass->GetEntry(ientry);
@@ -837,6 +830,18 @@ void Analyzer::Loop()
        (Egamma_Phiresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_phi_up)[i]) : correction=correction;
        */
        phoET.push_back(Photon_pt[i]*correction);
+       //L1prefire correction
+       if (SignalScan && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
+         TH2D *h_L1prefire_phoMap = (year==2016) ? (TH2D*)h_L1prefire_phoMap_2016->Clone() :  (TH2D*)h_L1prefire_phoMap_2017->Clone();
+         double max= h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
+         double pt = (Photon_pt[i]>max) ? max-0.01 : Photon_pt[i];
+         double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[i],pt));
+         double stat = h_L1prefire_phoMap->GetBinError(h_L1prefire_phoMap->FindBin(Photon_eta[i],pt));
+         double syst = prefireProb*0.2;
+         nonPrefiringProbability[0]*=(1-prefireProb);
+         nonPrefiringProbability[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
+         nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
+       }
        if ((Photon_isScEtaEB || Photon_isScEtaEE) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
         if (Photon_cutBased_versionFree[i]>0) {
          passPhoL.push_back(i);
@@ -1149,6 +1154,48 @@ void Analyzer::Loop()
      //jet ID
      bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (unsigned int i=0;i<nJet;i++) {
+       //L1prefire correction
+       if (SignalScan && year!=2018 && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
+         double nonPrefiringProb_overlapPho[3]={1,1,1};
+         for (int j=0;j<nPhoton;j++) {
+           if (!isData && Photon_pt[j]>20 && abs(Photon_eta[j])>2 && abs(Photon_eta[j])<3) {
+             if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])>0.4) continue;
+             TH2D *h_L1prefire_phoMap = (year==2016) ? (TH2D*)h_L1prefire_phoMap_2016->Clone() :  (TH2D*)h_L1prefire_phoMap_2017->Clone();
+             double max=h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
+             double pt = (Photon_pt[j]>max) ? max-0.01 : Photon_pt[j];
+             double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[j],pt));
+             double stat = h_L1prefire_phoMap->GetBinError(h_L1prefire_phoMap->FindBin(Photon_eta[j],pt));
+             double syst = prefireProb*0.2;
+             nonPrefiringProb_overlapPho[0]*=(1-prefireProb);
+             nonPrefiringProb_overlapPho[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
+             nonPrefiringProb_overlapPho[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
+           }
+         }
+         TH2D *h_L1prefire_jetMap = (year==2016) ? (TH2D*)h_L1prefire_jetMap_2016->Clone() :  (TH2D*)h_L1prefire_jetMap_2017->Clone();
+         double max=h_L1prefire_jetMap->GetYaxis()->GetBinLowEdge(h_L1prefire_jetMap->GetNbinsY());
+         double pt = (Jet_pt[i]>max) ? max-0.01 : Jet_pt[i];
+         double prefireProb_jet = h_L1prefire_jetMap->GetBinContent(h_L1prefire_jetMap->FindBin(Jet_eta[i],pt));
+         double stat = h_L1prefire_jetMap->GetBinError(h_L1prefire_jetMap->FindBin(Jet_eta[i],pt));
+         double syst = prefireProb_jet*0.2;
+         double nonPrefiringProb_overlapJet[3]={1,1,1};
+         nonPrefiringProb_overlapJet[0]*=(1-prefireProb_jet);
+         nonPrefiringProb_overlapJet[1]*=(1-std::min(1.,prefireProb_jet+sqrt(pow(stat,2)+pow(syst,2))));
+         nonPrefiringProb_overlapJet[2]*=(1-std::max(0.,prefireProb_jet-sqrt(pow(stat,2)+pow(syst,2))));
+         if (nonPrefiringProb_overlapPho[0] == 1) {
+           nonPrefiringProbability[0]*=nonPrefiringProb_overlapJet[0];
+           nonPrefiringProbability[1]*=nonPrefiringProb_overlapJet[1];
+           nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2];
+         }
+         else if (nonPrefiringProb_overlapPho[0] > nonPrefiringProb_overlapJet[0]) {
+           if (nonPrefiringProb_overlapPho[0]!=0) {
+             nonPrefiringProbability[0]*=nonPrefiringProb_overlapJet[0]/nonPrefiringProb_overlapPho[0];
+             nonPrefiringProbability[1]*=nonPrefiringProb_overlapJet[1]/nonPrefiringProb_overlapPho[1];
+             nonPrefiringProbability[2]*=nonPrefiringProb_overlapJet[2]/nonPrefiringProb_overlapPho[2];
+           }
+           else {nonPrefiringProbability[0]=0;nonPrefiringProbability[1]=0;nonPrefiringProbability[2]=0;}
+         }
+       }
+
        bool passcut=true;
        double jetpt=Jet_pt_nom[i];
        if (!isData) {
@@ -1274,6 +1321,38 @@ void Analyzer::Loop()
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
+     
+     //AK8 genjet matching -- use closest in dR, if more fatjet than genjet pair extra fatjet with -1
+     vector<int> FatJet_genJetIdx;
+     vector<int> matched_reco;
+     for (unsigned int i=0;i<nGenJetAK8;i++){
+       double mindr=999; int matched_id=-1;
+       for (unsigned int j=0;j<nFatJet;j++){
+         double dr=deltaR(FatJet_phi[j],GenJetAK8_phi[i],FatJet_eta[j],GenJetAK8_eta[i]);
+         if (dr<mindr) {mindr=dr;matched_id=j;}
+       }
+       matched_reco.push_back(matched_id);
+     }
+     
+     for (unsigned int i=0;i<nFatJet;i++) {
+       if (matched_reco.size()<=nFatJet) {
+         bool matched=0;
+         for (unsigned int j=0;j<matched_reco.size();j++) if (matched_reco[j]==i) {FatJet_genJetIdx.push_back(j); matched=1;}
+         if (!matched) FatJet_genJetIdx.push_back(-1);
+       }
+       else {
+         double mindr=999; int matched_id=-1;
+         for (unsigned int j=0;j<nGenJetAK8;j++) {
+           double dr=deltaR(FatJet_phi[i],GenJetAK8_phi[j],FatJet_eta[i],GenJetAK8_eta[j]);
+           if (dr<mindr) {mindr=dr;matched_id=j;}
+         }
+         FatJet_genJetIdx.push_back(matched_id);
+       }
+     }
+     //cout<<"njet "<<nJet<<" nGenJet "<<nGenJet;
+     //for (unsigned int i=0;i<nJet;i++) cout<<" idx "<<Jet_genJetIdx[i];
+     //cout<<endl;
+
      //MET variables
      for (auto i : passPhoL) ST+=phoET[i];
      MET=MET_pt_nom; double METPhi=MET_phi_nom, METsumEt=MET_sumEt, METSig=MET_significance;
@@ -1482,33 +1561,6 @@ void Analyzer::Loop()
      if (DDBvL_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
      if (dR_ak4_Hcandidate!=-1) h_dR_ak4_Hcandidate->Fill(dR_ak4_Hcandidate,w);
      if (dphi_met_jet!=999) h_dphi_met_jet->Fill(dphi_met_jet,w);
-     
-     /*
-     //AK8 genjet matching study
-     for (int i=0;i<nJet;i++){
-       if (Jet_genJetIdx[i]==-1) continue;
-       //cout<<"pt "<<Jet_pt_nom[i]<<" "<<GenJet_pt[Jet_genJetIdx[i]]<<" eta "<<Jet_eta[i]<<" "<<GenJet_eta[Jet_genJetIdx[i]]<<" phi "<<Jet_phi[i]<<" "<<GenJet_phi[Jet_genJetIdx[i]]<<endl;
-       //cout<<"nGenJet "<<nGenJet<<" genId "<<Jet_genJetIdx[i]<<" jethadron "<<Jet_hadronFlavour[i]<<" genjet hadron "<<int(GenJet_hadronFlavour[Jet_genJetIdx[i]])<<endl;
-       double phi1=Jet_phi[i], phi2=GenJet_phi[Jet_genJetIdx[i]];
-       double dr=deltaR(phi1,phi2,Jet_eta[i],GenJet_eta[Jet_genJetIdx[i]]);
-       double dphi=phi1-phi2;
-       if (abs(dphi)>M_PI) dphi=2*M_PI-(abs(phi2-phi1));
-       h_dR_ak4_genJet->Fill(dr,w);
-       h_dphi_ak4_genJet->Fill(dphi,w);
-       h_deta_ak4_genJet->Fill(abs(Jet_eta[i]-GenJet_eta[Jet_genJetIdx[i]]),w);
-       double dpt=GenJet_pt[Jet_genJetIdx[i]]-Jet_pt_nom[i];
-       double dpt_rel=(GenJet_pt[Jet_genJetIdx[i]]-Jet_pt_nom[i])/GenJet_pt[Jet_genJetIdx[i]];
-       h_dpt_ak4_genJet->Fill(dpt,w);
-       h_dpt_ak4_genJet_rel->Fill(dpt_rel,w);
-     }
-     for (int i=0;i<nFatJet;i++){
-       for (int j=0;j<nGenJetAK8;j++){
-         double dr=deltaR(FatJet_phi[i],GenJetAK8_phi[j],FatJet_eta[i],GenJetAK8_eta[j]);
-         h_dR_ak8_genJet->Fill(dr,w);
-       }
-     }
-     */
-     
      
      //AK4-AK8 searchbin fills
      double w_AK4searchBin=w, w_AK8searchBin=w;

@@ -273,6 +273,7 @@ public :
    Float_t         Jet_phi[99];   //[nJet]
    Float_t         Jet_pt[99];   //[nJet]
    Float_t         Jet_pt_nom[99];   //[nJet]
+   Float_t         Jet_pt_raw[99];   //[nJet]
    Float_t         Jet_pt_jerUp[99];   //[nJet]
    Float_t         Jet_pt_jerDown[99];   //[nJet]
    Float_t         Jet_pt_jesTotalUp[99];   //[nJet]
@@ -841,6 +842,7 @@ public :
    TBranch        *b_Jet_phi;   //!
    TBranch        *b_Jet_pt;   //!
    TBranch        *b_Jet_pt_nom;   //[nJet]
+   TBranch        *b_Jet_pt_raw;   //[nJet]
    TBranch        *b_Jet_pt_jerUp;   //[nJet]
    TBranch        *b_Jet_pt_jerDown;   //[nJet]
    TBranch        *b_Jet_pt_jesTotalUp;   //[nJet]
@@ -1633,6 +1635,7 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_phi", Jet_phi, &b_Jet_phi);
    fChain->SetBranchAddress("Jet_pt", Jet_pt, &b_Jet_pt);
    fChain->SetBranchAddress("Jet_pt_nom", Jet_pt_nom, &b_Jet_pt_nom);
+   fChain->SetBranchAddress("Jet_pt_raw", Jet_pt_raw, &b_Jet_pt_raw);
    if (fChain->GetBranch("Jet_pt_jerUp")) fChain->SetBranchAddress("Jet_pt_jerUp", Jet_pt_jerUp, &b_Jet_pt_jerUp);
    if (fChain->GetBranch("Jet_pt_jerDown")) fChain->SetBranchAddress("Jet_pt_jerDown", Jet_pt_jerDown, &b_Jet_pt_jerDown);
    if (fChain->GetBranch("Jet_pt_jesTotalUp")) fChain->SetBranchAddress("Jet_pt_jesTotalUp", Jet_pt_jesTotalUp, &b_Jet_pt_jesTotalUp);
