@@ -337,6 +337,31 @@ public :
    Float_t         MET_pt_unclustEnDown;
    Float_t         MET_significance;
    Float_t         MET_sumEt;
+   Float_t         METFixEE2017_MetUnclustEnUpDeltaX;
+   Float_t         METFixEE2017_MetUnclustEnUpDeltaY;
+   Float_t         METFixEE2017_covXX;
+   Float_t         METFixEE2017_covXY;
+   Float_t         METFixEE2017_covYY;
+   Float_t         METFixEE2017_phi;
+   Float_t         METFixEE2017_phi_nom;
+   Float_t         METFixEE2017_phi_jer;
+   Float_t         METFixEE2017_phi_jerUp;
+   Float_t         METFixEE2017_phi_jerDown;
+   Float_t         METFixEE2017_phi_jesTotalUp;
+   Float_t         METFixEE2017_phi_jesTotalDown;
+   Float_t         METFixEE2017_phi_unclustEnUp;
+   Float_t         METFixEE2017_phi_unclustEnDown;
+   Float_t         METFixEE2017_pt;
+   Float_t         METFixEE2017_pt_nom;
+   Float_t         METFixEE2017_pt_jer;
+   Float_t         METFixEE2017_pt_jerUp;
+   Float_t         METFixEE2017_pt_jerDown;
+   Float_t         METFixEE2017_pt_jesTotalUp;
+   Float_t         METFixEE2017_pt_jesTotalDown;
+   Float_t         METFixEE2017_pt_unclustEnUp;
+   Float_t         METFixEE2017_pt_unclustEnDown;
+   Float_t         METFixEE2017_significance;
+   Float_t         METFixEE2017_sumEt;
    UInt_t          nMuon;
    Float_t         Muon_dxy[99];   //[nMuon]
    Float_t         Muon_dxyErr[99];   //[nMuon]
@@ -906,6 +931,31 @@ public :
    TBranch        *b_MET_pt_unclustEnDown;
    TBranch        *b_MET_significance;   //!
    TBranch        *b_MET_sumEt;   //!
+   TBranch        *b_METFixEE2017_MetUnclustEnUpDeltaX;   //!
+   TBranch        *b_METFixEE2017_MetUnclustEnUpDeltaY;   //!
+   TBranch        *b_METFixEE2017_covXX;   //!
+   TBranch        *b_METFixEE2017_covXY;   //!
+   TBranch        *b_METFixEE2017_covYY;   //!
+   TBranch        *b_METFixEE2017_phi;   //!
+   TBranch        *b_METFixEE2017_phi_nom;
+   TBranch        *b_METFixEE2017_phi_jer;
+   TBranch        *b_METFixEE2017_phi_jerUp;
+   TBranch        *b_METFixEE2017_phi_jerDown;
+   TBranch        *b_METFixEE2017_phi_jesTotalUp;
+   TBranch        *b_METFixEE2017_phi_jesTotalDown;
+   TBranch        *b_METFixEE2017_phi_unclustEnUp;
+   TBranch        *b_METFixEE2017_phi_unclustEnDown;
+   TBranch        *b_METFixEE2017_pt;   //!
+   TBranch        *b_METFixEE2017_pt_nom;
+   TBranch        *b_METFixEE2017_pt_jer;
+   TBranch        *b_METFixEE2017_pt_jerUp;
+   TBranch        *b_METFixEE2017_pt_jerDown;
+   TBranch        *b_METFixEE2017_pt_jesTotalUp;
+   TBranch        *b_METFixEE2017_pt_jesTotalDown;
+   TBranch        *b_METFixEE2017_pt_unclustEnUp;
+   TBranch        *b_METFixEE2017_pt_unclustEnDown;
+   TBranch        *b_METFixEE2017_significance;   //!
+   TBranch        *b_METFixEE2017_sumEt;   //!
    TBranch        *b_nMuon;   //!
    TBranch        *b_Muon_dxy;   //!
    TBranch        *b_Muon_dxyErr;   //!
@@ -1253,10 +1303,8 @@ public :
    TH2D *h_muID_SF2D[3];
    TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
-   TH2D *h_L1prefire_phoMap_2016;
-   TH2D *h_L1prefire_phoMap_2017;
-   TH2D *h_L1prefire_jetMap_2016;
-   TH2D *h_L1prefire_jetMap_2017;
+   TH2D *h_L1prefire_phoMap;
+   TH2D *h_L1prefire_jetMap;
    TGraph *h_muTrk_SF;
    TEfficiency* eff_b_Deep_L;
    TEfficiency* eff_b_Deep_M;
@@ -1680,7 +1728,7 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("MET_covXY", &MET_covXY, &b_MET_covXY);
    fChain->SetBranchAddress("MET_covYY", &MET_covYY, &b_MET_covYY);
    fChain->SetBranchAddress("MET_phi", &MET_phi, &b_MET_phi);
-   fChain->SetBranchAddress("MET_phi_nom", &MET_phi_nom, &b_MET_phi_nom);
+   if (fChain->GetBranch("MET_phi_nom")) fChain->SetBranchAddress("MET_phi_nom", &MET_phi_nom, &b_MET_phi_nom);
    if (fChain->GetBranch("MET_phi_jer")) fChain->SetBranchAddress("MET_phi_jer", &MET_phi_jer, &b_MET_phi_jer);
    if (fChain->GetBranch("MET_phi_jerUp")) fChain->SetBranchAddress("MET_phi_jerUp", &MET_phi_jerUp, &b_MET_phi_jerUp);
    if (fChain->GetBranch("MET_phi_jerDown")) fChain->SetBranchAddress("MET_phi_jerDown", &MET_phi_jerDown, &b_MET_phi_jerDown);
@@ -1689,7 +1737,7 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("MET_phi_unclustEnUp")) fChain->SetBranchAddress("MET_phi_unclustEnUp", &MET_phi_unclustEnUp, &b_MET_phi_unclustEnUp);
    if (fChain->GetBranch("MET_phi_unclustEnDown")) fChain->SetBranchAddress("MET_phi_unclustEnDown", &MET_phi_unclustEnDown, &b_MET_phi_unclustEnDown);
    fChain->SetBranchAddress("MET_pt", &MET_pt, &b_MET_pt);
-   fChain->SetBranchAddress("MET_pt_nom", &MET_pt_nom, &b_MET_pt_nom);
+   if (fChain->GetBranch("MET_pt_nom")) fChain->SetBranchAddress("MET_pt_nom", &MET_pt_nom, &b_MET_pt_nom);
    if (fChain->GetBranch("MET_pt_jer")) fChain->SetBranchAddress("MET_pt_jer", &MET_pt_jer, &b_MET_pt_jer);
    if (fChain->GetBranch("MET_pt_jerUp")) fChain->SetBranchAddress("MET_pt_jerUp", &MET_pt_jerUp, &b_MET_pt_jerUp);
    if (fChain->GetBranch("MET_pt_jerDown")) fChain->SetBranchAddress("MET_pt_jerDown", &MET_pt_jerDown, &b_MET_pt_jerDown);
@@ -1697,8 +1745,33 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("MET_pt_jesTotalDown")) fChain->SetBranchAddress("MET_pt_jesTotalDown", &MET_pt_jesTotalDown, &b_MET_pt_jesTotalDown);
    if (fChain->GetBranch("MET_pt_unclustEnUp")) fChain->SetBranchAddress("MET_pt_unclustEnUp", &MET_pt_unclustEnUp, &b_MET_pt_unclustEnUp);
    if (fChain->GetBranch("MET_pt_unclustEnDown")) fChain->SetBranchAddress("MET_pt_unclustEnDown", &MET_pt_unclustEnDown, &b_MET_pt_unclustEnDown);
-   fChain->SetBranchAddress("MET_significance", &MET_significance, &b_MET_significance);
-   fChain->SetBranchAddress("MET_sumEt", &MET_sumEt, &b_MET_sumEt);
+   if (fChain->GetBranch("MET_significance")) fChain->SetBranchAddress("MET_significance", &MET_significance, &b_MET_significance);
+   if (fChain->GetBranch("MET_sumEt")) fChain->SetBranchAddress("MET_sumEt", &MET_sumEt, &b_MET_sumEt);
+   if (fChain->GetBranch("METFixEE2017_MetUnclustEnUpDeltaX")) fChain->SetBranchAddress("METFixEE2017_MetUnclustEnUpDeltaX", &METFixEE2017_MetUnclustEnUpDeltaX, &b_METFixEE2017_MetUnclustEnUpDeltaX);
+   if (fChain->GetBranch("METFixEE2017_MetUnclustEnUpDeltaY")) fChain->SetBranchAddress("METFixEE2017_MetUnclustEnUpDeltaY", &METFixEE2017_MetUnclustEnUpDeltaY, &b_METFixEE2017_MetUnclustEnUpDeltaY);
+   if (fChain->GetBranch("METFixEE2017_covXX")) fChain->SetBranchAddress("METFixEE2017_covXX", &METFixEE2017_covXX, &b_METFixEE2017_covXX);
+   if (fChain->GetBranch("METFixEE2017_covXY")) fChain->SetBranchAddress("METFixEE2017_covXY", &METFixEE2017_covXY, &b_METFixEE2017_covXY);
+   if (fChain->GetBranch("METFixEE2017_covYY")) fChain->SetBranchAddress("METFixEE2017_covYY", &METFixEE2017_covYY, &b_METFixEE2017_covYY);
+   if (fChain->GetBranch("METFixEE2017_phi")) fChain->SetBranchAddress("METFixEE2017_phi", &METFixEE2017_phi, &b_METFixEE2017_phi);
+   if (fChain->GetBranch("METFixEE2017_phi_nom")) fChain->SetBranchAddress("METFixEE2017_phi_nom", &METFixEE2017_phi_nom, &b_METFixEE2017_phi_nom);
+   if (fChain->GetBranch("METFixEE2017_phi_jer")) fChain->SetBranchAddress("METFixEE2017_phi_jer", &METFixEE2017_phi_jer, &b_METFixEE2017_phi_jer);
+   if (fChain->GetBranch("METFixEE2017_phi_jerUp")) fChain->SetBranchAddress("METFixEE2017_phi_jerUp", &METFixEE2017_phi_jerUp, &b_METFixEE2017_phi_jerUp);
+   if (fChain->GetBranch("METFixEE2017_phi_jerDown")) fChain->SetBranchAddress("METFixEE2017_phi_jerDown", &METFixEE2017_phi_jerDown, &b_METFixEE2017_phi_jerDown);
+   if (fChain->GetBranch("METFixEE2017_phi_jesTotalUp")) fChain->SetBranchAddress("METFixEE2017_phi_jesTotalUp", &METFixEE2017_phi_jesTotalUp, &b_METFixEE2017_phi_jesTotalUp);
+   if (fChain->GetBranch("METFixEE2017_phi_jesTotalDown")) fChain->SetBranchAddress("METFixEE2017_phi_jesTotalDown", &METFixEE2017_phi_jesTotalDown, &b_METFixEE2017_phi_jesTotalDown);
+   if (fChain->GetBranch("METFixEE2017_phi_unclustEnUp")) fChain->SetBranchAddress("METFixEE2017_phi_unclustEnUp", &METFixEE2017_phi_unclustEnUp, &b_METFixEE2017_phi_unclustEnUp);
+   if (fChain->GetBranch("METFixEE2017_phi_unclustEnDown")) fChain->SetBranchAddress("METFixEE2017_phi_unclustEnDown", &METFixEE2017_phi_unclustEnDown, &b_METFixEE2017_phi_unclustEnDown);
+   if (fChain->GetBranch("METFixEE2017_pt")) fChain->SetBranchAddress("METFixEE2017_pt", &METFixEE2017_pt, &b_METFixEE2017_pt);
+   if (fChain->GetBranch("METFixEE2017_pt_nom")) fChain->SetBranchAddress("METFixEE2017_pt_nom", &METFixEE2017_pt_nom, &b_METFixEE2017_pt_nom);
+   if (fChain->GetBranch("METFixEE2017_pt_jer")) fChain->SetBranchAddress("METFixEE2017_pt_jer", &METFixEE2017_pt_jer, &b_METFixEE2017_pt_jer);
+   if (fChain->GetBranch("METFixEE2017_pt_jerUp")) fChain->SetBranchAddress("METFixEE2017_pt_jerUp", &METFixEE2017_pt_jerUp, &b_METFixEE2017_pt_jerUp);
+   if (fChain->GetBranch("METFixEE2017_pt_jerDown")) fChain->SetBranchAddress("METFixEE2017_pt_jerDown", &METFixEE2017_pt_jerDown, &b_METFixEE2017_pt_jerDown);
+   if (fChain->GetBranch("METFixEE2017_pt_jesTotalUp")) fChain->SetBranchAddress("METFixEE2017_pt_jesTotalUp", &METFixEE2017_pt_jesTotalUp, &b_METFixEE2017_pt_jesTotalUp);
+   if (fChain->GetBranch("METFixEE2017_pt_jesTotalDown")) fChain->SetBranchAddress("METFixEE2017_pt_jesTotalDown", &METFixEE2017_pt_jesTotalDown, &b_METFixEE2017_pt_jesTotalDown);
+   if (fChain->GetBranch("METFixEE2017_pt_unclustEnUp")) fChain->SetBranchAddress("METFixEE2017_pt_unclustEnUp", &METFixEE2017_pt_unclustEnUp, &b_METFixEE2017_pt_unclustEnUp);
+   if (fChain->GetBranch("METFixEE2017_pt_unclustEnDown")) fChain->SetBranchAddress("METFixEE2017_pt_unclustEnDown", &METFixEE2017_pt_unclustEnDown, &b_METFixEE2017_pt_unclustEnDown);
+   if (fChain->GetBranch("METFixEE2017_significance")) fChain->SetBranchAddress("METFixEE2017_significance", &METFixEE2017_significance, &b_METFixEE2017_significance);
+   if (fChain->GetBranch("METFixEE2017_sumEt")) fChain->SetBranchAddress("METFixEE2017_sumEt", &METFixEE2017_sumEt, &b_METFixEE2017_sumEt);
    fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
    fChain->SetBranchAddress("Muon_dxy", Muon_dxy, &b_Muon_dxy);
    fChain->SetBranchAddress("Muon_dxyErr", Muon_dxyErr, &b_Muon_dxyErr);

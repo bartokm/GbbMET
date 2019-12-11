@@ -339,11 +339,47 @@ void Analyzer::Loop()
      b_event->GetEntry(ientry);
      b_run->GetEntry(ientry);
      if (run==1) isData=false;
+     bool newfile=false;
+     if (temp_f != fChain->GetCurrentFile()->GetName()) {
+       temp_f=fChain->GetCurrentFile()->GetName();
+       file_counter++;
+       //std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
+       newfile=true;
+     }
      //Set year from run number in data
-     if (isData) {
+     if (isData && (jentry==0 || newfile)) {
        if (run<=284044) year=2016;
        else if (run<=307082) year=2017;
        else if (run<=325273) year=2018;
+     }
+     //getting cross section & total number of events
+     if (!isData && (jentry==0 || newfile)){
+       TotalEvents=0;
+       TTree *Runs; fChain->GetCurrentFile()->GetObject("Runs",Runs);
+       TBranch *b_genEventSumw;
+       Double_t sub_TotalEvents=0;
+       Runs->SetBranchAddress("genEventSumw",&sub_TotalEvents,&b_genEventSumw);
+       for (int i=0; i<Runs->GetEntries();i++) {b_genEventSumw->GetEntry(i); TotalEvents+=sub_TotalEvents;}
+       if (Runs->GetBranch("year")) {
+         TBranch *b_year;
+         Runs->SetBranchAddress("year",&year,&b_year);
+         b_year->GetEntry();
+       }
+       //std::cout<<"Tot = "<<TotalEvents<<std::endl;
+       if (xsec_file!="default") {
+         ifstream f_xsec; f_xsec.open(xsec_file);
+         f_xsec>>xsec;
+         cout<<xsec<<endl;
+         f_xsec.close();
+       }
+       else if (!SignalScan) {
+         if (Runs->GetBranch("xsec")) {
+           TBranch *b_xsec;
+           Runs->SetBranchAddress("xsec",&xsec,&b_xsec);
+           b_xsec->GetEntry();
+         }
+         else std::cout<<"No xsec found. Using xsec = "<<xsec<<std::endl;
+       }
      }
      if (!isData) {
        b_puWeight->GetEntry(ientry);
@@ -390,20 +426,38 @@ void Analyzer::Loop()
        b_GenJetAK8_eta->GetEntry(ientry);
        b_GenJetAK8_phi->GetEntry(ientry);
        b_GenJetAK8_hadronFlavour->GetEntry(ientry);
-       b_MET_pt_jer->GetEntry(ientry);
-       b_MET_pt_jerUp->GetEntry(ientry);
-       b_MET_pt_jerDown->GetEntry(ientry);
-       b_MET_pt_jesTotalUp->GetEntry(ientry);
-       b_MET_pt_jesTotalDown->GetEntry(ientry);
-       b_MET_pt_unclustEnUp->GetEntry(ientry);
-       b_MET_pt_unclustEnDown->GetEntry(ientry);
-       b_MET_phi_jer->GetEntry(ientry);
-       b_MET_phi_jerUp->GetEntry(ientry);
-       b_MET_phi_jerDown->GetEntry(ientry);
-       b_MET_phi_jesTotalUp->GetEntry(ientry);
-       b_MET_phi_jesTotalDown->GetEntry(ientry);
-       b_MET_phi_unclustEnUp->GetEntry(ientry);
-       b_MET_phi_unclustEnDown->GetEntry(ientry);
+       if (year!=2017) {
+         b_MET_pt_jer->GetEntry(ientry);
+         b_MET_pt_jerUp->GetEntry(ientry);
+         b_MET_pt_jerDown->GetEntry(ientry);
+         b_MET_pt_jesTotalUp->GetEntry(ientry);
+         b_MET_pt_jesTotalDown->GetEntry(ientry);
+         b_MET_pt_unclustEnUp->GetEntry(ientry);
+         b_MET_pt_unclustEnDown->GetEntry(ientry);
+         b_MET_phi_jer->GetEntry(ientry);
+         b_MET_phi_jerUp->GetEntry(ientry);
+         b_MET_phi_jerDown->GetEntry(ientry);
+         b_MET_phi_jesTotalUp->GetEntry(ientry);
+         b_MET_phi_jesTotalDown->GetEntry(ientry);
+         b_MET_phi_unclustEnUp->GetEntry(ientry);
+         b_MET_phi_unclustEnDown->GetEntry(ientry);
+       }
+       else {
+         b_METFixEE2017_pt_jer->GetEntry(ientry);
+         b_METFixEE2017_pt_jerUp->GetEntry(ientry);
+         b_METFixEE2017_pt_jerDown->GetEntry(ientry);
+         b_METFixEE2017_pt_jesTotalUp->GetEntry(ientry);
+         b_METFixEE2017_pt_jesTotalDown->GetEntry(ientry);
+         b_METFixEE2017_pt_unclustEnUp->GetEntry(ientry);
+         b_METFixEE2017_pt_unclustEnDown->GetEntry(ientry);
+         b_METFixEE2017_phi_jer->GetEntry(ientry);
+         b_METFixEE2017_phi_jerUp->GetEntry(ientry);
+         b_METFixEE2017_phi_jerDown->GetEntry(ientry);
+         b_METFixEE2017_phi_jesTotalUp->GetEntry(ientry);
+         b_METFixEE2017_phi_jesTotalDown->GetEntry(ientry);
+         b_METFixEE2017_phi_unclustEnUp->GetEntry(ientry);
+         b_METFixEE2017_phi_unclustEnDown->GetEntry(ientry);
+       }
      }
      if (!SignalScan && !isData) b_L1PreFiringWeight_Dn->GetEntry(ientry);
      if (!SignalScan && !isData) b_L1PreFiringWeight_Nom->GetEntry(ientry);
@@ -430,12 +484,22 @@ void Analyzer::Loop()
      b_Flag_BadPFMuonFilter->GetEntry(ientry);
      b_Flag_eeBadScFilter->GetEntry(ientry);
      b_Flag_METFilters->GetEntry(ientry);
-     b_MET_pt->GetEntry(ientry);
-     b_MET_pt_nom->GetEntry(ientry);
-     b_MET_phi->GetEntry(ientry);
-     b_MET_phi_nom->GetEntry(ientry);
-     b_MET_sumEt->GetEntry(ientry);
-     b_MET_significance->GetEntry(ientry);
+     if (year !=2017) {
+       b_MET_pt->GetEntry(ientry);
+       b_MET_pt_nom->GetEntry(ientry);
+       b_MET_phi->GetEntry(ientry);
+       b_MET_phi_nom->GetEntry(ientry);
+       b_MET_sumEt->GetEntry(ientry);
+       b_MET_significance->GetEntry(ientry);
+     }
+     else {
+       b_METFixEE2017_pt->GetEntry(ientry);
+       b_METFixEE2017_pt_nom->GetEntry(ientry);
+       b_METFixEE2017_phi->GetEntry(ientry);
+       b_METFixEE2017_phi_nom->GetEntry(ientry);
+       b_METFixEE2017_sumEt->GetEntry(ientry);
+       b_METFixEE2017_significance->GetEntry(ientry);
+     }
      b_nElectron->GetEntry(ientry);
      b_Electron_eta->GetEntry(ientry);
      b_Electron_phi->GetEntry(ientry);
@@ -519,8 +583,6 @@ void Analyzer::Loop()
      b_IsoTrack_miniPFRelIso_chg->GetEntry(ientry);
      b_IsoTrack_pdgId->GetEntry(ientry);
       //nb = fChain->GetEntry(jentry);   nbytes += nb;
-     
-     bool newfile=false;
   
      //progress bar
      if (jentry==0 && !is_quiet) cout<<"Total number of events: "<<nentries<<endl;;
@@ -532,12 +594,6 @@ void Analyzer::Loop()
          std::cout << vmi/100 <<"."<< temp-vmi << " %\r";
          std::cout.flush();
        }
-     }
-     if (temp_f != fChain->GetCurrentFile()->GetName()) {
-       temp_f=fChain->GetCurrentFile()->GetName();
-       file_counter++;
-       //std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
-       newfile=true;
      }
      if (_fakeRate && jentry==0) {
        TFile f_FR("input/FakeRate_EGamma.root","read");
@@ -571,36 +627,7 @@ void Analyzer::Loop()
      w=1;
      //MC weights and scale factors
      if (!isData){
-     //getting cross section & total number of events
-       if (jentry==0 || newfile){
-         TotalEvents=0;
-         TTree *Runs; fChain->GetCurrentFile()->GetObject("Runs",Runs);
-         TBranch *b_genEventSumw;
-         Double_t sub_TotalEvents=0;
-         Runs->SetBranchAddress("genEventSumw",&sub_TotalEvents,&b_genEventSumw);
-         for (int i=0; i<Runs->GetEntries();i++) {b_genEventSumw->GetEntry(i); TotalEvents+=sub_TotalEvents;}
-         if (Runs->GetBranch("year")) {
-           TBranch *b_year;
-           Runs->SetBranchAddress("year",&year,&b_year);
-           b_year->GetEntry();
-         }
-         //std::cout<<"Tot = "<<TotalEvents<<std::endl;
-         if (xsec_file!="default") {
-           ifstream f_xsec; f_xsec.open(xsec_file);
-           f_xsec>>xsec;
-           cout<<xsec<<endl;
-           f_xsec.close();
-         }
-         else if (!SignalScan) {
-           if (Runs->GetBranch("xsec")) {
-             TBranch *b_xsec;
-             Runs->SetBranchAddress("xsec",&xsec,&b_xsec);
-             b_xsec->GetEntry();
-           }
-           else std::cout<<"No xsec found. Using xsec = "<<xsec<<std::endl;
-         }
-       }
-       if (SignalScan) {xsec=get_cross_section(mass_pair.first); TotalEvents=get_total_events(mass_pair);}
+       if (SignalScan) {xsec=get_cross_section(mass_pair.first); TotalEvents=get_total_events(mass_pair,year);}
      //weights
        double pu_weight=puWeight;
        if (_fastSim || SignalScan) pu_weight=1;
@@ -735,22 +762,26 @@ void Analyzer::Loop()
          }
 
          //L1prefire maps
-         TFile f_L1_phomap_2016("input/L1prefiring_photonpt_2016BtoH.root","read");
-         h_L1prefire_phoMap_2016 = (TH2D*)f_L1_phomap_2016.Get("L1prefiring_photonpt_2016BtoH");
-         h_L1prefire_phoMap_2016->SetDirectory(0);
-         f_L1_phomap_2016.Close();
-         TFile f_L1_phomap_2017("input/L1prefiring_photonpt_2017BtoF.root","read");
-         h_L1prefire_phoMap_2017 = (TH2D*)f_L1_phomap_2017.Get("L1prefiring_photonpt_2017BtoF");
-         h_L1prefire_phoMap_2017->SetDirectory(0);
-         f_L1_phomap_2017.Close();
-         TFile f_L1_jetmap_2016("input/L1prefiring_jetpt_2016BtoH.root","read");
-         h_L1prefire_jetMap_2016 = (TH2D*)f_L1_jetmap_2016.Get("L1prefiring_jetpt_2016BtoH");
-         h_L1prefire_jetMap_2016->SetDirectory(0);
-         f_L1_jetmap_2016.Close();
-         TFile f_L1_jetmap_2017("input/L1prefiring_jetpt_2017BtoF.root","read");
-         h_L1prefire_jetMap_2017 = (TH2D*)f_L1_jetmap_2017.Get("L1prefiring_jetpt_2017BtoF");
-         h_L1prefire_jetMap_2017->SetDirectory(0);
-         f_L1_jetmap_2017.Close();
+         if (year==2016) {
+           TFile f_L1_phomap_2016("input/L1prefiring_photonpt_2016BtoH.root","read");
+           h_L1prefire_phoMap = (TH2D*)f_L1_phomap_2016.Get("L1prefiring_photonpt_2016BtoH");
+           h_L1prefire_phoMap->SetDirectory(0);
+           f_L1_phomap_2016.Close();
+           TFile f_L1_jetmap_2016("input/L1prefiring_jetpt_2016BtoH.root","read");
+           h_L1prefire_jetMap = (TH2D*)f_L1_jetmap_2016.Get("L1prefiring_jetpt_2016BtoH");
+           h_L1prefire_jetMap->SetDirectory(0);
+           f_L1_jetmap_2016.Close();
+         }
+         else if (year==2017) {
+           TFile f_L1_phomap_2017("input/L1prefiring_photonpt_2017BtoF.root","read");
+           h_L1prefire_phoMap = (TH2D*)f_L1_phomap_2017.Get("L1prefiring_photonpt_2017BtoF");
+           h_L1prefire_phoMap->SetDirectory(0);
+           f_L1_phomap_2017.Close();
+           TFile f_L1_jetmap_2017("input/L1prefiring_jetpt_2017BtoF.root","read");
+           h_L1prefire_jetMap = (TH2D*)f_L1_jetmap_2017.Get("L1prefiring_jetpt_2017BtoF");
+           h_L1prefire_jetMap->SetDirectory(0);
+           f_L1_jetmap_2017.Close();
+         }
        }
      }
 
@@ -832,7 +863,6 @@ void Analyzer::Loop()
        phoET.push_back(Photon_pt[i]*correction);
        //L1prefire correction
        if (SignalScan && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
-         TH2D *h_L1prefire_phoMap = (year==2016) ? (TH2D*)h_L1prefire_phoMap_2016->Clone() :  (TH2D*)h_L1prefire_phoMap_2017->Clone();
          double max= h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
          double pt = (Photon_pt[i]>max) ? max-0.01 : Photon_pt[i];
          double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[i],pt));
@@ -1145,7 +1175,9 @@ void Analyzer::Loop()
        if (!passOverlap) continue;
        if (abs(IsoTrack_pdgId[i])==11 || abs(IsoTrack_pdgId[i])==13) {if (IsoTrack_pt[i]<5) continue;}
        else if (IsoTrack_pt[i]<10) continue;
-       double MT_iso=sqrt(2*MET_pt_nom*IsoTrack_pt[i]*(1-cos(abs(IsoTrack_phi[i]-MET_phi_nom))));
+       double MT_iso;
+       if (year==2017) MT_iso=sqrt(2*METFixEE2017_pt_nom*IsoTrack_pt[i]*(1-cos(abs(IsoTrack_phi[i]-METFixEE2017_phi_nom))));
+       else MT_iso=sqrt(2*MET_pt_nom*IsoTrack_pt[i]*(1-cos(abs(IsoTrack_phi[i]-MET_phi_nom))));
        if (MT_iso<100) passIso.push_back(i);
      }
      nPassIso=passIso.size();
@@ -1157,10 +1189,9 @@ void Analyzer::Loop()
        //L1prefire correction
        if (SignalScan && year!=2018 && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
          double nonPrefiringProb_overlapPho[3]={1,1,1};
-         for (int j=0;j<nPhoton;j++) {
+         for (unsigned int j=0;j<nPhoton;j++) {
            if (!isData && Photon_pt[j]>20 && abs(Photon_eta[j])>2 && abs(Photon_eta[j])<3) {
              if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])>0.4) continue;
-             TH2D *h_L1prefire_phoMap = (year==2016) ? (TH2D*)h_L1prefire_phoMap_2016->Clone() :  (TH2D*)h_L1prefire_phoMap_2017->Clone();
              double max=h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
              double pt = (Photon_pt[j]>max) ? max-0.01 : Photon_pt[j];
              double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[j],pt));
@@ -1171,7 +1202,6 @@ void Analyzer::Loop()
              nonPrefiringProb_overlapPho[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
            }
          }
-         TH2D *h_L1prefire_jetMap = (year==2016) ? (TH2D*)h_L1prefire_jetMap_2016->Clone() :  (TH2D*)h_L1prefire_jetMap_2017->Clone();
          double max=h_L1prefire_jetMap->GetYaxis()->GetBinLowEdge(h_L1prefire_jetMap->GetNbinsY());
          double pt = (Jet_pt[i]>max) ? max-0.01 : Jet_pt[i];
          double prefireProb_jet = h_L1prefire_jetMap->GetBinContent(h_L1prefire_jetMap->FindBin(Jet_eta[i],pt));
@@ -1355,14 +1385,26 @@ void Analyzer::Loop()
 
      //MET variables
      for (auto i : passPhoL) ST+=phoET[i];
-     MET=MET_pt_nom; double METPhi=MET_phi_nom, METsumEt=MET_sumEt, METSig=MET_significance;
      (!isData && genMET_whichSF==1) ? MET=GenMET_pt : MET=MET;
-     if (metJER_whichSF==1) {MET=MET_pt_jerUp; METPhi=MET_phi_jerUp;}
-     else if (metJER_whichSF==2) {MET=MET_pt_jerDown; METPhi=MET_phi_jerDown;}
-     if (metJES_whichSF==1) {MET=MET_pt_jesTotalUp; METPhi=MET_phi_jesTotalUp;}
-     else if (metJES_whichSF==2) {MET=MET_pt_jesTotalDown; METPhi=MET_phi_jesTotalDown;}
-     if (metUES_whichSF==1) {MET=MET_pt_unclustEnUp; METPhi=MET_phi_unclustEnUp;}
-     else if (metUES_whichSF==2) {MET=MET_pt_unclustEnDown; METPhi=MET_phi_unclustEnDown;}
+     double METPhi=0, METsumEt=0, METSig=0;
+     if (year!=2017) {
+       MET=MET_pt_nom; METPhi=MET_phi_nom; METsumEt=MET_sumEt; METSig=MET_significance;
+       if (metJER_whichSF==1) {MET=MET_pt_jerUp; METPhi=MET_phi_jerUp;}
+       else if (metJER_whichSF==2) {MET=MET_pt_jerDown; METPhi=MET_phi_jerDown;}
+       if (metJES_whichSF==1) {MET=MET_pt_jesTotalUp; METPhi=MET_phi_jesTotalUp;}
+       else if (metJES_whichSF==2) {MET=MET_pt_jesTotalDown; METPhi=MET_phi_jesTotalDown;}
+       if (metUES_whichSF==1) {MET=MET_pt_unclustEnUp; METPhi=MET_phi_unclustEnUp;}
+       else if (metUES_whichSF==2) {MET=MET_pt_unclustEnDown; METPhi=MET_phi_unclustEnDown;}
+     }
+     else {
+       MET=METFixEE2017_pt_nom; METPhi=METFixEE2017_phi_nom; METsumEt=METFixEE2017_sumEt; METSig=METFixEE2017_significance;
+       if (metJER_whichSF==1) {MET=METFixEE2017_pt_jerUp; METPhi=METFixEE2017_phi_jerUp;}
+       else if (metJER_whichSF==2) {MET=METFixEE2017_pt_jerDown; METPhi=METFixEE2017_phi_jerDown;}
+       if (metJES_whichSF==1) {MET=METFixEE2017_pt_jesTotalUp; METPhi=METFixEE2017_phi_jesTotalUp;}
+       else if (metJES_whichSF==2) {MET=METFixEE2017_pt_jesTotalDown; METPhi=METFixEE2017_phi_jesTotalDown;}
+       if (metUES_whichSF==1) {MET=METFixEE2017_pt_unclustEnUp; METPhi=METFixEE2017_phi_unclustEnUp;}
+       else if (metUES_whichSF==2) {MET=METFixEE2017_pt_unclustEnDown; METPhi=METFixEE2017_phi_unclustEnDown;}
+     }
      ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
@@ -1587,7 +1629,6 @@ void Analyzer::Loop()
     
      if (SignalScan) {
        m_eff[mass_pair]->Fill(1.,w);
-       m_phoEtL[mass_pair]->Fill(phoET[nleadPhoL],w);
        m_nISR_jet[mass_pair]->Fill(n_isr_jets,w);
        if (nleadPhoL!=-1) m_phoEtL[mass_pair]->Fill(phoET[nleadPhoL],w);
        if (nleadPhoM!=-1) m_phoEtM[mass_pair]->Fill(phoET[nleadPhoM],w);
