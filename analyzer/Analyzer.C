@@ -801,7 +801,7 @@ void Analyzer::Loop()
            if (deltaR(Muon_phi[j],Jet_phi[i],Muon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
          }
          for (unsigned int j=0;j<nPhoton;j++){
-           if (!Photon_isScEtaEB || !Photon_isScEtaEE || Photon_pixelSeed[j]!=0 || Photon_pt[j]<40 || (Photon_cutBased_versionFree[i]&1)==0) continue;
+           if (!Photon_isScEtaEB[j] || !Photon_isScEtaEE[j] || Photon_pixelSeed[j]!=0 || Photon_pt[j]<40 || (Photon_cutBased_versionFree[i]&1)==0) continue;
            if (deltaR(Photon_phi[j],Jet_phi[i],Photon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
          }
          if (lepton_photon_match) continue;
@@ -847,7 +847,7 @@ void Analyzer::Loop()
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
      double nonPrefiringProbability[3]={1,1,1};
-     if (!SignalScan) nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;
+     if (!SignalScan) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      phoET.clear();
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
@@ -872,7 +872,7 @@ void Analyzer::Loop()
          nonPrefiringProbability[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
          nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
        }
-       if ((Photon_isScEtaEB || Photon_isScEtaEE) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
+       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
         if (Photon_cutBased_versionFree[i]>0) {
          passPhoL.push_back(i);
         }
@@ -883,7 +883,7 @@ void Analyzer::Loop()
          passPhoT.push_back(i);
         }
        }
-       if ((Photon_isScEtaEB || Photon_isScEtaEE) && Photon_pixelSeed[i]!=0) {
+       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0) {
         if (Photon_cutBased_versionFree[i]>>0&1) {
          passElePhoL.push_back(i);
         }
@@ -1005,7 +1005,7 @@ void Analyzer::Loop()
          w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        }
        if (_fakeRate==2 && nPassElePhoL != 0) {
-         if (!Photon_isScEtaEB || !Photon_isScEtaEE) continue;
+         if (!Photon_isScEtaEB[nleadElePhoL] || !Photon_isScEtaEE[nleadElePhoL]) continue;
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePhoL],Photon_phi[nleadElePhoL]));
          double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
          //cout<<"etaphi "<<Photon_eta[nleadElePhoL]<<" "<<Photon_phi[nleadElePhoL]<<endl;
