@@ -172,59 +172,104 @@ void Analyzer::Loop()
    if (!_testRun) nentries = fChain->GetEntries();
    else nentries = _testRun;
    
-   //double L_data=35867.06;
-   double L_data=101270;
+   double L_data[3]={35920, 41530, 59740};
    
    //Btag SF
-   BTCalibration calib, calib_fs, calib_deep, calib_deep_fs;;
-   BTCalibrationReader reader_L, reader_M, reader_T, reader_L_fs, reader_M_fs, reader_T_fs;
-   BTCalibrationReader reader_deep_L, reader_deep_M, reader_deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs;
+   BTCalibration calib_2016deep, calib_2016fast, calib_2017deep, calib_2017fast, calib_2018deep, calib_2018fast;
+   BTCalibrationReader reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast;
+   BTCalibrationReader reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast;
+   BTCalibrationReader reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast;
    // setup calibration + reader https://twiki.cern.ch/twiki/bin/view/CMS/BTagCalibration#Standalone
    if (btag_file.size()>0){
-     //fastsim
-     calib_fs = *new BTCalibration("csvv1_fs", "input/fastsim_v2.csv");
-     reader_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
-     reader_M_fs = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
-     reader_T_fs = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
-     reader_L_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
-     reader_L_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
-     reader_L_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
-     reader_M_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
-     reader_M_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
-     reader_M_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
-     reader_T_fs.load(calib_fs,BTEntry::FLAV_B,"fastsim");
-     reader_T_fs.load(calib_fs,BTEntry::FLAV_C,"fastsim");
-     reader_T_fs.load(calib_fs,BTEntry::FLAV_UDSG,"fastsim");
-    
-     //DeepCSV
-     calib_deep = *new BTCalibration("deepcsv", "input/DeepCSV_Moriond17_B_H.csv");
-     reader_deep_L = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
-     reader_deep_M = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
-     reader_deep_T = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
-     reader_deep_L.load(calib_deep,BTEntry::FLAV_B,"comb");
-     reader_deep_L.load(calib_deep,BTEntry::FLAV_C,"comb");
-     reader_deep_L.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
-     reader_deep_M.load(calib_deep,BTEntry::FLAV_B,"comb");
-     reader_deep_M.load(calib_deep,BTEntry::FLAV_C,"comb");
-     reader_deep_M.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
-     reader_deep_T.load(calib_deep,BTEntry::FLAV_B,"comb");
-     reader_deep_T.load(calib_deep,BTEntry::FLAV_C,"comb");
-     reader_deep_T.load(calib_deep,BTEntry::FLAV_UDSG,"incl");
+     //2016 Deep
+     calib_2016deep = *new BTCalibration("2016deep", "input/btag/DeepJet_2016LegacySF_WP_V1.csv");
+     reader_L_2016deep = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2016deep = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2016deep = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2016deep.load(calib_2016deep,BTEntry::FLAV_B,"comb");
+     reader_L_2016deep.load(calib_2016deep,BTEntry::FLAV_C,"comb");
+     reader_L_2016deep.load(calib_2016deep,BTEntry::FLAV_UDSG,"incl");
+     reader_M_2016deep.load(calib_2016deep,BTEntry::FLAV_B,"comb");
+     reader_M_2016deep.load(calib_2016deep,BTEntry::FLAV_C,"comb");
+     reader_M_2016deep.load(calib_2016deep,BTEntry::FLAV_UDSG,"incl");
+     reader_T_2016deep.load(calib_2016deep,BTEntry::FLAV_B,"comb");
+     reader_T_2016deep.load(calib_2016deep,BTEntry::FLAV_C,"comb");
+     reader_T_2016deep.load(calib_2016deep,BTEntry::FLAV_UDSG,"incl");
      
-     //fastsim
-     calib_deep_fs = *new BTCalibration("deepcsv_fs", "input/fastsim_deepcsv_ttbar_26_1_2017.csv");
-     reader_deep_L_fs = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
-     reader_deep_M_fs = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
-     reader_deep_T_fs = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
-     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
-     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
-     reader_deep_L_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
-     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
-     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
-     reader_deep_M_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
-     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_B,"fastsim");
-     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_C,"fastsim");
-     reader_deep_T_fs.load(calib_deep_fs,BTEntry::FLAV_UDSG,"fastsim");
+     //2017 Deep
+     calib_2017deep = *new BTCalibration("2017deep", "input/btag/DeepFlavour_94XSF_WP_V3_B_F.csv");
+     reader_L_2017deep = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2017deep = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2017deep = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2017deep.load(calib_2017deep,BTEntry::FLAV_B,"comb");
+     reader_L_2017deep.load(calib_2017deep,BTEntry::FLAV_C,"comb");
+     reader_L_2017deep.load(calib_2017deep,BTEntry::FLAV_UDSG,"incl");
+     reader_M_2017deep.load(calib_2017deep,BTEntry::FLAV_B,"comb");
+     reader_M_2017deep.load(calib_2017deep,BTEntry::FLAV_C,"comb");
+     reader_M_2017deep.load(calib_2017deep,BTEntry::FLAV_UDSG,"incl");
+     reader_T_2017deep.load(calib_2017deep,BTEntry::FLAV_B,"comb");
+     reader_T_2017deep.load(calib_2017deep,BTEntry::FLAV_C,"comb");
+     reader_T_2017deep.load(calib_2017deep,BTEntry::FLAV_UDSG,"incl");
+     
+     //2018 Deep
+     calib_2018deep = *new BTCalibration("2018deep", "input/btag/DeepJet_102XSF_WP_V1.csv");
+     reader_L_2018deep = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2018deep = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2018deep = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2018deep.load(calib_2018deep,BTEntry::FLAV_B,"comb");
+     reader_L_2018deep.load(calib_2018deep,BTEntry::FLAV_C,"comb");
+     reader_L_2018deep.load(calib_2018deep,BTEntry::FLAV_UDSG,"incl");
+     reader_M_2018deep.load(calib_2018deep,BTEntry::FLAV_B,"comb");
+     reader_M_2018deep.load(calib_2018deep,BTEntry::FLAV_C,"comb");
+     reader_M_2018deep.load(calib_2018deep,BTEntry::FLAV_UDSG,"incl");
+     reader_T_2018deep.load(calib_2018deep,BTEntry::FLAV_B,"comb");
+     reader_T_2018deep.load(calib_2018deep,BTEntry::FLAV_C,"comb");
+     reader_T_2018deep.load(calib_2018deep,BTEntry::FLAV_UDSG,"incl");
+     
+     //2016 fastsim
+     calib_2016fast = *new BTCalibration("2016fast", "input/btag/DeepFlav_13TEV_16SL_18_3_2019.csv");
+     reader_L_2016fast = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2016fast = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2016fast = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2016fast.load(calib_2016fast,BTEntry::FLAV_B,"fastsim");
+     reader_L_2016fast.load(calib_2016fast,BTEntry::FLAV_C,"fastsim");
+     reader_L_2016fast.load(calib_2016fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_M_2016fast.load(calib_2016fast,BTEntry::FLAV_B,"fastsim");
+     reader_M_2016fast.load(calib_2016fast,BTEntry::FLAV_C,"fastsim");
+     reader_M_2016fast.load(calib_2016fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_T_2016fast.load(calib_2016fast,BTEntry::FLAV_B,"fastsim");
+     reader_T_2016fast.load(calib_2016fast,BTEntry::FLAV_C,"fastsim");
+     reader_T_2016fast.load(calib_2016fast,BTEntry::FLAV_UDSG,"fastsim");
+     
+     //2017 fastsim
+     calib_2017fast = *new BTCalibration("2017fast", "input/btag/DeepFlav_13TEV_17SL_18_3_2019.csv");
+     reader_L_2017fast = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2017fast = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2017fast = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2017fast.load(calib_2017fast,BTEntry::FLAV_B,"fastsim");
+     reader_L_2017fast.load(calib_2017fast,BTEntry::FLAV_C,"fastsim");
+     reader_L_2017fast.load(calib_2017fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_M_2017fast.load(calib_2017fast,BTEntry::FLAV_B,"fastsim");
+     reader_M_2017fast.load(calib_2017fast,BTEntry::FLAV_C,"fastsim");
+     reader_M_2017fast.load(calib_2017fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_T_2017fast.load(calib_2017fast,BTEntry::FLAV_B,"fastsim");
+     reader_T_2017fast.load(calib_2017fast,BTEntry::FLAV_C,"fastsim");
+     reader_T_2017fast.load(calib_2017fast,BTEntry::FLAV_UDSG,"fastsim");
+     
+     //2018 fastsim
+     calib_2018fast = *new BTCalibration("2018fast", "input/btag/DeepFlav_13TEV_18SL_7_5_2019.csv");
+     reader_L_2018fast = *new BTCalibrationReader(BTEntry::OP_LOOSE,"central",{"up", "down"});
+     reader_M_2018fast = *new BTCalibrationReader(BTEntry::OP_MEDIUM,"central",{"up", "down"});
+     reader_T_2018fast = *new BTCalibrationReader(BTEntry::OP_TIGHT,"central",{"up", "down"});
+     reader_L_2018fast.load(calib_2018fast,BTEntry::FLAV_B,"fastsim");
+     reader_L_2018fast.load(calib_2018fast,BTEntry::FLAV_C,"fastsim");
+     reader_L_2018fast.load(calib_2018fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_M_2018fast.load(calib_2018fast,BTEntry::FLAV_B,"fastsim");
+     reader_M_2018fast.load(calib_2018fast,BTEntry::FLAV_C,"fastsim");
+     reader_M_2018fast.load(calib_2018fast,BTEntry::FLAV_UDSG,"fastsim");
+     reader_T_2018fast.load(calib_2018fast,BTEntry::FLAV_B,"fastsim");
+     reader_T_2018fast.load(calib_2018fast,BTEntry::FLAV_C,"fastsim");
+     reader_T_2018fast.load(calib_2018fast,BTEntry::FLAV_UDSG,"fastsim");
    }
 
    std::string temp_fname="histos/Analyzer_histos"; 
@@ -240,9 +285,9 @@ void Analyzer::Loop()
    }
    else temp_fname+=".root";
    TFile *f = new TFile(temp_fname.c_str(),"recreate");
-   
+
    TH1::SetDefaultSumw2();
-  
+
    //histograms
    h_cuts = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,DDBvL,Deep1,Deep2",15,0,15);
    TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",2,-0.5,1.5);
@@ -255,7 +300,7 @@ void Analyzer::Loop()
    TH1D *h_phoEtaL    = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
    TH1D *h_phoEtaM    = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
    TH1D *h_phoEtaT    = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
-   
+
    const int nbins_photon=15;
    double xbins_photon[nbins_photon+1]={0,50,120,175,210,260,310,360,410,460,510,650,800,1000,1200,1500};
    TH1D *h_phoPt= new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",nbins_photon,xbins_photon);
@@ -265,7 +310,7 @@ void Analyzer::Loop()
    TH1D *h_pfMETsumEt    = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",20,-50,5000);
    TH1D *h_pfMETPhi    = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",20,-4,4);
    TH1D *h_pfMETSig    = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
-   
+
    const int nbins_ST=13;
    double xbins_ST[nbins_ST+1]={0, 200, 400, 600, 800, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5500};
    TH1D *h_ST    = new TH1D("h_ST",";S_{T} [GeV]",nbins_ST,xbins_ST);
@@ -275,7 +320,7 @@ void Analyzer::Loop()
    TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",nbins_MT,xbins_MT);
    TH1D *h_HT_after = new TH1D("h_HT_after","HT after cuts;HT",20,0,5000);
    TH1D *h_EMHT_after = new TH1D("h_EMHT_after","EMHT after cuts;EMHT",20,0,5000);
-  
+
    TH1D *h_nPho    = new TH1D("h_nPho",";# of #gamma",10,-0.5,9.5);
    TH1D *h_nEle    = new TH1D("h_nEle",";# of e_{loose}",10,-0.5,9.5);
    TH1D *h_nEleM    = new TH1D("h_nEleM",";# of e_{medium}",10,-0.5,9.5);
@@ -285,12 +330,12 @@ void Analyzer::Loop()
    TH1D *h_nMuT    = new TH1D("h_nMuT",";# of #mu_{tight}",10,-0.5,9.5);
    TH1D *h_nTau    = new TH1D("h_nTau",";# of #tau_{loose}",10,-0.5,9.5);
    TH1D *h_nIso    = new TH1D("h_nIso",";# of IsoTracks",10,-0.5,9.5);
-   
+
    TH1D *h_njets    = new TH1D("h_njets",";# of jets",15,-0.5,14.5);
    TH1D *h_jetpt    = new TH1D("h_jetpt","Leading jetpt;p_{T}^{Leading jet} [GeV]",10,30,2030);
    TH1D *h_nAK8jets    = new TH1D("h_nAK8jets",";# of AK8jets",15,-0.5,14.5);
    TH1D *h_AK8jetpt    = new TH1D("h_AK8jetpt","Leading AK8jetpt;p_{T}^{Leading AK8jet} [GeV]",10,30,2030);
-   
+
    TH1D *h_mbbjet_select    = new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",10,18,278);
    TH1D *h_AK8mass_select= new TH1D("h_AK8mass_select","PUPPI corrected softdrop mass of selected bjet;m_{AK8jet} [GeV]",20,5,655);
    TH1D *h_dR_ak4_Hcandidate = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
@@ -305,7 +350,7 @@ void Analyzer::Loop()
    hn_AK4searchBins->Sumw2();
    unsigned int nsbins_ak4=hn_AK4searchBins->GetNbins();
    TH1D *h_AK4searchBins= new TH1D("h_AK4searchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
-   
+
    //AK8 searchbins
    const int dim_ak8=4;
    int nbins_ak8[dim_ak8]={2,2,6,2};
@@ -315,7 +360,7 @@ void Analyzer::Loop()
    hn_AK8searchBins->Sumw2();
    unsigned int nsbins_ak8=hn_AK8searchBins->GetNbins();
    TH1D *h_AK8searchBins= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
-   
+
    //Histograms for signalstudy
    map<int,vector<int>> grid;
    if (SignalScan) {
@@ -326,7 +371,7 @@ void Analyzer::Loop()
    TDatime now;
    if (!is_quiet) now.Print();
    time.Start("time");
-       
+
    TRandom3 *gen = new TRandom3(0);
 
    std::map<pair<int,int>,int> signal_events;
@@ -335,7 +380,7 @@ void Analyzer::Loop()
    Double_t TotalEvents=0;
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
      Long64_t ientry = LoadTree(jentry);
-      if (ientry < 0) break;
+     if (ientry < 0) break;
      b_event->GetEntry(ientry);
      b_run->GetEntry(ientry);
      if (run==1) isData=false;
@@ -381,6 +426,7 @@ void Analyzer::Loop()
          else std::cout<<"No xsec found. Using xsec = "<<xsec<<std::endl;
        }
      }
+     int year_chooser=(year==2016) ? 0 : (year==2017) ? 1 : 2;
      if (!isData) {
        b_puWeight->GetEntry(ientry);
        b_puWeightUp->GetEntry(ientry);
@@ -459,9 +505,9 @@ void Analyzer::Loop()
          b_METFixEE2017_phi_unclustEnDown->GetEntry(ientry);
        }
      }
-     if (!SignalScan && !isData) b_L1PreFiringWeight_Dn->GetEntry(ientry);
-     if (!SignalScan && !isData) b_L1PreFiringWeight_Nom->GetEntry(ientry);
-     if (!SignalScan && !isData) b_L1PreFiringWeight_Up->GetEntry(ientry);
+     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Dn->GetEntry(ientry);
+     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Nom->GetEntry(ientry);
+     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Up->GetEntry(ientry);
      b_luminosityBlock->GetEntry(ientry);
      b_PV_npvsGood->GetEntry(ientry);
      b_PV_npvs->GetEntry(ientry);
@@ -532,17 +578,17 @@ void Analyzer::Loop()
      else b_Photon_cutBasedV1Bitmap->GetEntry(ientry);
      Int_t Photon_cutBased_versionFree[99]; for (unsigned int i=0; i<nPhoton;i++) (year==2016) ? Photon_cutBased_versionFree[i]=Photon_cutBased17Bitmap[i] : Photon_cutBased_versionFree[i]=Photon_cutBasedV1Bitmap[i];
      /*
-     b_phoScale_stat_up->GetEntry(ientry);
-     b_phoScale_stat_dn->GetEntry(ientry);
-     b_phoScale_syst_up->GetEntry(ientry);
-     b_phoScale_syst_dn->GetEntry(ientry);
-     b_phoScale_gain_up->GetEntry(ientry);
-     b_phoScale_gain_dn->GetEntry(ientry);
-     b_phoResol_rho_up->GetEntry(ientry);
-     b_phoResol_rho_dn->GetEntry(ientry);
-     b_phoResol_phi_up->GetEntry(ientry);
-     b_phoResol_phi_dn->GetEntry(ientry);
-     */
+        b_phoScale_stat_up->GetEntry(ientry);
+        b_phoScale_stat_dn->GetEntry(ientry);
+        b_phoScale_syst_up->GetEntry(ientry);
+        b_phoScale_syst_dn->GetEntry(ientry);
+        b_phoScale_gain_up->GetEntry(ientry);
+        b_phoScale_gain_dn->GetEntry(ientry);
+        b_phoResol_rho_up->GetEntry(ientry);
+        b_phoResol_rho_dn->GetEntry(ientry);
+        b_phoResol_phi_up->GetEntry(ientry);
+        b_phoResol_phi_dn->GetEntry(ientry);
+        */
      b_nTau->GetEntry(ientry);
      b_Tau_pt->GetEntry(ientry);
      b_Tau_eta->GetEntry(ientry);
@@ -582,8 +628,8 @@ void Analyzer::Loop()
      b_IsoTrack_dz->GetEntry(ientry);
      b_IsoTrack_miniPFRelIso_chg->GetEntry(ientry);
      b_IsoTrack_pdgId->GetEntry(ientry);
-      //nb = fChain->GetEntry(jentry);   nbytes += nb;
-  
+     //nb = fChain->GetEntry(jentry);   nbytes += nb;
+
      //progress bar
      if (jentry==0 && !is_quiet) cout<<"Total number of events: "<<nentries<<endl;;
      double progress=(jentry+1)/double(nentries);
@@ -628,13 +674,13 @@ void Analyzer::Loop()
      //MC weights and scale factors
      if (!isData){
        if (SignalScan) {xsec=get_cross_section(mass_pair.first); TotalEvents=get_total_events(mass_pair,year);}
-     //weights
+       //weights
        double pu_weight=puWeight;
        if (_fastSim || SignalScan) pu_weight=1;
-       double weight=L_data*xsec*genWeight/TotalEvents;
-       //if (newfile) std::cout<<"weight=L_data*genWeight*xsec/TotalEvents "<<weight<<"="<<L_data<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
+       double weight=L_data[year_chooser]*xsec*genWeight/TotalEvents;
+       //if (newfile) std::cout<<"weight=L_data[year_chooser]*genWeight*xsec/TotalEvents "<<weight<<"="<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
        w=weight*pu_weight;
-       //std::cout<<"event "<<event<<" w=weight*pu_weight"<<w<<"="<<weight<<"("<<L_data<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<")"<<"*"<<pu_weight<<std::endl;
+       //std::cout<<"event "<<event<<" w=weight*pu_weight"<<w<<"="<<weight<<"("<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<")"<<"*"<<pu_weight<<std::endl;
        //Scale factors
        if (jentry==0) {
          //photon cutbased loose
@@ -816,8 +862,8 @@ void Analyzer::Loop()
              if (GenPart_genPartIdxMother[k] != j) continue;
              if (!(GenPart_statusFlags[k]&int(pow(2,13)))) continue;
              if (deltaR(GenPart_phi[k],Jet_phi[i],GenPart_eta[k],Jet_eta[i])<0.3) {matched=true; 
-             //  printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-9s gmom %-8d\n",k,GenPart_pdgId[k],GenPart_pt[k],GenPart_eta[k],GenPart_phi[k],GenPart_pdgId[GenPart_genPartIdxMother[k]],GenPart_pt[GenPart_genPartIdxMother[k]],GenPart_eta[GenPart_genPartIdxMother[k]],GenPart_phi[GenPart_genPartIdxMother[k]],GenPart_status[k],bitset<9>(GenPart_statusFlags[k]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[k]]]);
-             break;}
+               //  printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-9s gmom %-8d\n",k,GenPart_pdgId[k],GenPart_pt[k],GenPart_eta[k],GenPart_phi[k],GenPart_pdgId[GenPart_genPartIdxMother[k]],GenPart_pt[GenPart_genPartIdxMother[k]],GenPart_eta[GenPart_genPartIdxMother[k]],GenPart_phi[GenPart_genPartIdxMother[k]],GenPart_status[k],bitset<9>(GenPart_statusFlags[k]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[k]]]);
+               break;}
            }
          }
          if (!matched) n_isr_jets++;
@@ -847,19 +893,19 @@ void Analyzer::Loop()
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
      double nonPrefiringProbability[3]={1,1,1};
-     if (!SignalScan) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
+     if (!SignalScan && year!=2018) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      phoET.clear();
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
        //Systematics for Egamma scaling
        double correction = 1;
        /*
-       (Egamma_Statscale_whichSF==1) ? correction*=(*phoScale_stat_up)[i] : (Egamma_Statscale_whichSF==2) ? correction*=(*phoScale_stat_dn)[i] : correction=correction;
-       (Egamma_Systscale_whichSF==1) ? correction*=(*phoScale_syst_up)[i] : (Egamma_Systscale_whichSF==2) ? correction*=(*phoScale_syst_dn)[i] : correction=correction;
-       (Egamma_Gainscale_whichSF==1) ? correction*=(*phoScale_gain_up)[i] : (Egamma_Gainscale_whichSF==2) ? correction*=(*phoScale_gain_dn)[i] : correction=correction;
-       (Egamma_Rhoresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_rho_up)[i]) : (Egamma_Rhoresol_whichSF==2) ? correction*=gen->Gaus(1,(*phoResol_rho_dn)[i]) : correction=correction;
-       (Egamma_Phiresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_phi_up)[i]) : correction=correction;
-       */
+          (Egamma_Statscale_whichSF==1) ? correction*=(*phoScale_stat_up)[i] : (Egamma_Statscale_whichSF==2) ? correction*=(*phoScale_stat_dn)[i] : correction=correction;
+          (Egamma_Systscale_whichSF==1) ? correction*=(*phoScale_syst_up)[i] : (Egamma_Systscale_whichSF==2) ? correction*=(*phoScale_syst_dn)[i] : correction=correction;
+          (Egamma_Gainscale_whichSF==1) ? correction*=(*phoScale_gain_up)[i] : (Egamma_Gainscale_whichSF==2) ? correction*=(*phoScale_gain_dn)[i] : correction=correction;
+          (Egamma_Rhoresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_rho_up)[i]) : (Egamma_Rhoresol_whichSF==2) ? correction*=gen->Gaus(1,(*phoResol_rho_dn)[i]) : correction=correction;
+          (Egamma_Phiresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_phi_up)[i]) : correction=correction;
+          */
        phoET.push_back(Photon_pt[i]*correction);
        //L1prefire correction
        if (SignalScan && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
@@ -873,26 +919,26 @@ void Analyzer::Loop()
          nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
        }
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
-        if (Photon_cutBased_versionFree[i]>0) {
-         passPhoL.push_back(i);
-        }
-        if (Photon_cutBased_versionFree[i]>>1&1) {
-         passPhoM.push_back(i);
-        }
-        if (Photon_cutBased_versionFree[i]>>2&1) {
-         passPhoT.push_back(i);
-        }
+         if (Photon_cutBased_versionFree[i]>0) {
+           passPhoL.push_back(i);
+         }
+         if (Photon_cutBased_versionFree[i]>>1&1) {
+           passPhoM.push_back(i);
+         }
+         if (Photon_cutBased_versionFree[i]>>2&1) {
+           passPhoT.push_back(i);
+         }
        }
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0) {
-        if (Photon_cutBased_versionFree[i]>>0&1) {
-         passElePhoL.push_back(i);
-        }
-        if (Photon_cutBased_versionFree[i]>>1&1) {
-         passElePhoM.push_back(i);
-        }
-        if (Photon_cutBased_versionFree[i]>>2&1) {
-         passElePhoT.push_back(i);
-        }
+         if (Photon_cutBased_versionFree[i]>0) {
+           passElePhoL.push_back(i);
+         }
+         if (Photon_cutBased_versionFree[i]>>1&1) {
+           passElePhoM.push_back(i);
+         }
+         if (Photon_cutBased_versionFree[i]>>2&1) {
+           passElePhoT.push_back(i);
+         }
        }
      }
      for (auto i : passPhoL) {
@@ -919,15 +965,21 @@ void Analyzer::Loop()
        double id_sf=0, pix_sf=0, syst_id=0, syst_pix=0;
        int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
-         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoET[nleadPhoL]));
-         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(Photon_eta[nleadPhoL],phoET[nleadPhoL]));
+         double photon_eta=Photon_eta[nleadPhoL]; //needed for difference between SCEta and photon_eta
+         if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
+         if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
+         if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
+         if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
+         double abs_photon_eta=(abs(Photon_eta[nleadPhoL])>1.5) ? 2 : 0.5;
+         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,phoET[nleadPhoL]));
+         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,phoET[nleadPhoL]));
          if (Photon_r9[nleadPhoL]>0.94) {
-           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[nleadPhoL]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[nleadPhoL]),100));
+           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
          }
          else {
-           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[nleadPhoL]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[nleadPhoL]),100));
+           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
          }
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
@@ -967,9 +1019,9 @@ void Analyzer::Loop()
      //electron
      for (unsigned int i=0;i<nElectron;i++) {
        bool passOverlap=true;
-         for (auto j : passPhoL) if (deltaR(Electron_phi[i],Photon_phi[j],Electron_eta[i],Photon_eta[j])<0.3) {
-           passOverlap=false;break;
-         }
+       for (auto j : passPhoL) if (deltaR(Electron_phi[i],Photon_phi[j],Electron_eta[i],Photon_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
        if (Electron_pt[i]>e_pt && abs(Electron_eta[i])<2.5 && Electron_miniPFRelIso_all[i]<0.2) {
          if (Electron_cutBased[i]>=2) passFREleL.push_back(i);
          if (Electron_cutBased[i]>=3) passFREleM.push_back(i);
@@ -1000,12 +1052,8 @@ void Analyzer::Loop()
      if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
      //Fake Rate
      if (_fakeRate) {
-       if (_fakeRate==1 && nPassFREleL != 0) {
-         if (abs(Electron_eta[nleadFREleL])>1.4442) continue;
-         w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
-       }
+       if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        if (_fakeRate==2 && nPassElePhoL != 0) {
-         if (!Photon_isScEtaEB[nleadElePhoL] || !Photon_isScEtaEE[nleadElePhoL]) continue;
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePhoL],Photon_phi[nleadElePhoL]));
          double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
          //cout<<"etaphi "<<Photon_eta[nleadElePhoL]<<" "<<Photon_phi[nleadElePhoL]<<endl;
@@ -1153,7 +1201,7 @@ void Analyzer::Loop()
      if (passTauM.size() != 0) nleadTauM=passTauM[0];
      if (passTauT.size() != 0) nleadTauT=passTauT[0];
      //if (passTauNO.size() != 0) nleadTauNO=passTauNO[0];
-     
+
      //Tau SF uncertainty
      if (!isData) for (unsigned int i=0;i<3;i++) (tau_whichSF==1) ? tau_SF[i]+=0.05 : (tau_whichSF==2) ? tau_SF[i]-=0.05 : tau_SF[i]+=0;
 
@@ -1182,7 +1230,7 @@ void Analyzer::Loop()
      }
      nPassIso=passIso.size();
      if (passIso.size() != 0) nleadIso=passIso[0];
-     
+
      //jet ID
      bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (unsigned int i=0;i<nJet;i++) {
@@ -1266,20 +1314,19 @@ void Analyzer::Loop()
      if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
      if (vetoFastSim) continue;
      //jet pt, btags
-     int BtagWP_chooser=(year==2016) ? 0 : (year==2017) ? 1 : 2;
      for (auto i : passJet) {
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
-       if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][2]) {passDeep.insert(pair<int,char>(i,'T'));bcounterDeep[3]++;}
-       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
-       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[BtagWP_chooser][0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
+       if (Jet_btagDeepFlavB[i]>BtagDeepWP[year_chooser][2]) {passDeep.insert(pair<int,char>(i,'T'));bcounterDeep[3]++;}
+       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[year_chooser][1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
+       else if (Jet_btagDeepFlavB[i]>BtagDeepWP[year_chooser][0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
        else {passDeep.insert(pair<int,char>(i,'0'));bcounterDeep[0]++;}
      }
      bcounterDeep[2] += bcounterDeep[3];
      bcounterDeep[1] += bcounterDeep[2];
      //Sort passJet from highest DeepJet btag to lowest
      for (unsigned int i=0;i<passJet.size();i++){
-     int temp;
+       int temp;
        for (unsigned int j=passJet.size()-1;j>i;j--){
          if (Jet_btagDeepFlavB[passJet[j]]>Jet_btagDeepFlavB[passJet[j-1]]){
            temp=passJet[j-1];
@@ -1329,10 +1376,10 @@ void Analyzer::Loop()
        double i_jetdB=FatJet_btagDDBvL[i], h_jetdB;
        if (highDDBvL==-1) h_jetdB=-10; else h_jetdB=FatJet_btagDDBvL[highDDBvL];
        if (i_jetdB>h_jetdB) highDDBvL=i;
-       if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][3]) {passDDBvL.insert(pair<int,char>(i,'T'));bcounterDDBvL[4]++;}
-       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][2]) {passDDBvL.insert(pair<int,char>(i,'H'));bcounterDDBvL[3]++;}
-       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][1]) {passDDBvL.insert(pair<int,char>(i,'M'));bcounterDDBvL[2]++;}
-       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) {passDDBvL.insert(pair<int,char>(i,'L'));bcounterDDBvL[1]++;}
+       if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) {passDDBvL.insert(pair<int,char>(i,'T'));bcounterDDBvL[4]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][2]) {passDDBvL.insert(pair<int,char>(i,'H'));bcounterDDBvL[3]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][1]) {passDDBvL.insert(pair<int,char>(i,'M'));bcounterDDBvL[2]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) {passDDBvL.insert(pair<int,char>(i,'L'));bcounterDDBvL[1]++;}
        else {passDDBvL.insert(pair<int,char>(i,'0'));bcounterDDBvL[0]++;}
      }
      bcounterDDBvL[3] += bcounterDDBvL[4];
@@ -1351,7 +1398,7 @@ void Analyzer::Loop()
      }
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
-     
+
      //AK8 genjet matching -- use closest in dR, if more fatjet than genjet pair extra fatjet with -1
      vector<int> FatJet_genJetIdx;
      vector<int> matched_reco;
@@ -1363,7 +1410,7 @@ void Analyzer::Loop()
        }
        matched_reco.push_back(matched_id);
      }
-     
+
      for (unsigned int i=0;i<nFatJet;i++) {
        if (matched_reco.size()<=nFatJet) {
          bool matched=0;
@@ -1435,176 +1482,177 @@ void Analyzer::Loop()
        mcLeptonFilter=false;
        for (unsigned int i=0; i<nGenPart; i++){
          if (abs(GenPart_pdgId[GenPart_genPartIdxMother[i]])==24 && (abs(GenPart_pdgId[i])== 11 ||abs(GenPart_pdgId[i])== 13 ||abs(GenPart_pdgId[i])== 15 )){
-         //if (abs(GenPart_pdgId[i])== 24 && GenPart_statusFlags[i] & 240 != 0){ //this status flag not works in nanoAOD
+           //if (abs(GenPart_pdgId[i])== 24 && GenPart_statusFlags[i] & 240 != 0){ //this status flag not works in nanoAOD
            mcLeptonFilter=true;
            //cout<<"pid "<<GenPart_pdgId[i]<<" pt "<<GenPart_pt[i]<<" statusflag "<<GenPart_statusFlags[i]<<" momPID "<<GenPart_pdgId[GenPart_genPartIdxMother[i]]<<endl;
          }
-       }
-       //cout<<"lepton "<<mcLeptonFilter<<endl;
-     }
-
-     //L1prefire
-     //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0
-     L1prefire=0;
-     for (auto i : passPhoL) if (phoET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
-     for (auto i : passJet) if (jetSmearedPt[i]>100 && abs(Jet_eta[i])>2.25) L1prefire=1;
-     //for (auto i : passAK8Jet) if (abs(FatJet_eta[i])>2.25) L1prefire=1; //should it be used for AK8 jets?
-
-     //find which btag jet to use for Higgs mass
-     //AK8
-     passBtag=false; passHiggsMass=false;
-     int SelectedAK8Jet=-1;
-     DDBvL_selected=0; //DDBvL btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
-     for (auto i : passAK8Jet){
-       if (FatJet_msoftdrop_nom[i]>70 && FatJet_msoftdrop_nom[i]<200) {
-         passHiggsMass=true;
-         SelectedAK8Jet=i;
-         if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][3]) DDBvL_selected=4;
-         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][2]) DDBvL_selected=3;
-         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][1]) DDBvL_selected=2;
-         else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) DDBvL_selected=1;
-         else DDBvL_selected=0;
-         if (FatJet_btagDDBvL[i]>BtagDDBvLWP[BtagWP_chooser][0]) passBtag=true;
-         break;
-       }
-     }
-     if (!passHiggsMass && nPassAK8>0) SelectedAK8Jet = passAK8Jet.at(0);
-
-     //AK4
-     double m_bb_deep=-1;
-     bool passAK4DeepHiggsMass=false;
-     Deep_selected=0; //Deep btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
-     int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
-     double dR_ak4_Hcandidate=-1;
-     if (passJet.size()>1){
-       for (unsigned int i=0;i<passJet.size();i++){
-         for (unsigned int j=i+1;j<passJet.size();j++){
-       //for (unsigned int i=0;i<2;i++){
-       //  for (unsigned int j=i+1;j<2;j++){
-           //double dR = deltaR(Jet_phi[passJet.at(i)],Jet_phi[passJet.at(j)],Jet_eta[passJet.at(i)],Jet_eta[passJet.at(j)]);
-           //if (dR>1.5) continue;
-           TLorentzVector bjet1, bjet2;
-           bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(i)],Jet_eta[passJet.at(i)],Jet_phi[passJet.at(i)],Jet_mass[passJet.at(i)]);
-           bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],Jet_mass[passJet.at(j)]);
-           m_bb_deep=(bjet1+bjet2).M();
-           if (m_bb_deep>70 && m_bb_deep<200) {
-             if (Jet_btagDeepFlavB[passJet.at(i)]>BtagDeepWP[BtagWP_chooser][0]) Deep_selected++;
-             if (Jet_btagDeepFlavB[passJet.at(j)]>BtagDeepWP[BtagWP_chooser][0]) Deep_selected++;
-             SelectedAK4Jet1=passJet.at(i); SelectedAK4Jet2=passJet.at(j);
-             passAK4DeepHiggsMass=true;
-             break;
-           }
          }
-         if (passAK4DeepHiggsMass) break;
+         //cout<<"lepton "<<mcLeptonFilter<<endl;
        }
-       if (!passAK4DeepHiggsMass) {SelectedAK4Jet1=passJet.at(0); SelectedAK4Jet2=passJet.at(1);};
-       dR_ak4_Hcandidate=deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
-     }
 
-     //Calculate BTag SFs
-     /*
-     if (!isData && btag_file.size()>0) {
+       //L1prefire
+       //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0
+       L1prefire=0;
+       for (auto i : passPhoL) if (phoET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
+       for (auto i : passJet) if (jetSmearedPt[i]>100 && abs(Jet_eta[i])>2.25) L1prefire=1;
+       //for (auto i : passAK8Jet) if (abs(FatJet_eta[i])>2.25) L1prefire=1; //should it be used for AK8 jets?
+
+       //find which btag jet to use for Higgs mass
+       //AK8
+       passBtag=false; passHiggsMass=false;
+       int SelectedAK8Jet=-1;
+       DDBvL_selected=0; //DDBvL btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
+       for (auto i : passAK8Jet){
+         if (FatJet_msoftdrop_nom[i]>70 && FatJet_msoftdrop_nom[i]<200) {
+           passHiggsMass=true;
+           SelectedAK8Jet=i;
+           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
+           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][2]) DDBvL_selected=3;
+           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][1]) DDBvL_selected=2;
+           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) DDBvL_selected=1;
+           else DDBvL_selected=0;
+           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) passBtag=true;
+           break;
+         }
+       }
+       if (!passHiggsMass && nPassAK8>0) SelectedAK8Jet = passAK8Jet.at(0);
+
        //AK4
-       if (!_fastSim) {
-         CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L, reader_deep_M, reader_deep_T, Deep_SF_L, Deep_SF_M, Deep_SF_T);
-       }
-       else {
-         CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs, Deep_SF_L, Deep_SF_M, Deep_SF_T);
-         //AK8
-         CalcBtagSF_AK8(FatJet_eta, AK8JetSmearedPt, GenJetAK8_hadronFlavour, passDDBvL, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T);
-       }
-     }
-     */
+       double m_bb_deep=-1;
+       bool passAK4DeepHiggsMass=false;
+       Deep_selected=0; //Deep btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
+       int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
+       double dR_ak4_Hcandidate=-1;
+       if (passJet.size()>1){
+         for (unsigned int i=0;i<passJet.size();i++){
+           for (unsigned int j=i+1;j<passJet.size();j++){
+             //for (unsigned int i=0;i<2;i++){
+             //  for (unsigned int j=i+1;j<2;j++){
+             //double dR = deltaR(Jet_phi[passJet.at(i)],Jet_phi[passJet.at(j)],Jet_eta[passJet.at(i)],Jet_eta[passJet.at(j)]);
+             //if (dR>1.5) continue;
+             TLorentzVector bjet1, bjet2;
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(i)],Jet_eta[passJet.at(i)],Jet_phi[passJet.at(i)],Jet_mass[passJet.at(i)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],Jet_mass[passJet.at(j)]);
+             m_bb_deep=(bjet1+bjet2).M();
+             if (m_bb_deep>70 && m_bb_deep<200) {
+               if (Jet_btagDeepFlavB[passJet.at(i)]>BtagDeepWP[year_chooser][0]) Deep_selected++;
+               if (Jet_btagDeepFlavB[passJet.at(j)]>BtagDeepWP[year_chooser][0]) Deep_selected++;
+               SelectedAK4Jet1=passJet.at(i); SelectedAK4Jet2=passJet.at(j);
+               passAK4DeepHiggsMass=true;
+               break;
+             }
+           }
+           if (passAK4DeepHiggsMass) break;
+           }
+           if (!passAK4DeepHiggsMass) {SelectedAK4Jet1=passJet.at(0); SelectedAK4Jet2=passJet.at(1);};
+           dR_ak4_Hcandidate=deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
+           }
 
-     //Region definitions
-     double met = (MET<50) ? 1 : (MET<70) ? 2 : (MET<100) ? 3 : (MET<200) ? 4 : (MET<500) ? 5 : 6;
-     //double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
-     //double njet = (passJet.size()<6) ? 1 : 2;
-     double njet;
-     //AK4-AK8 searchBins
-     int AK4AK8=0, VR=0, boost=0;
-     //Signal Region
-     if (DDBvL_selected>0) {boost=1;AK4AK8=1;}
-     else {if (Deep_selected==1) AK4AK8=1; if (Deep_selected==2) AK4AK8=2;}
-     //Control and Validation regions
-     if (DDBvL_selected==0 && Deep_selected==0) {
-       if (bcounterDDBvL[1]>0) {boost=1; VR=1; AK4AK8=1;}
-       else if (passHiggsMass) boost=1;
-       if (!boost) {
-         if (bcounterDeep[1]==1) {VR=1;AK4AK8=1;}
-         if (bcounterDeep[1]>1) {VR=1;AK4AK8=2;}
-         if (!passAK4DeepHiggsMass && bcounterDeep[1]==0) {
-           if (nPassAK8>0) {boost=1; VR=1;}
-           else VR=1;
-         }
-       }
-     }
-     //AK4 AK8 overlap
-     if (!boost) nonHiggsJet=passJet.size()-2;
-     else {
-       auto i = passJet.begin();
-       while (i!=passJet.end()) {
-         if (deltaR(FatJet_phi[SelectedAK8Jet],Jet_phi[*i],FatJet_eta[SelectedAK8Jet],Jet_eta[*i])<0.8) passJet.erase(i);
-         else i++;
-       }
-       nonHiggsJet=passJet.size();
-     }
-     njet = (nonHiggsJet<4) ? 1 : 2;
-     double sbFill_ak4ak8[dim_ak4]={double(VR),double(AK4AK8),met,njet};
-    
-     //Efficiency fill for no cuts bin
-     h_eff->Fill(0.,w);
-     //cuts with command line
-     if (_cut_variable.size()>0) {if (!(Cut(ientry,mass_pair))) continue;}
-     else { //Hardcoded cuts
-       if (!HLT_Photon165_HE10) continue;
-     }
-     
-     //Cut for high njet region (need to implement in Cut() if decided as standard)
-     //if (njet==1 && dphi_met_jet<0.3) continue; 
-     //Filling histograms
-     h_eff->Fill(1.,w);
-     h_nISR_jet->Fill(n_isr_jets,w);
-     if (nleadPhoL!=-1) h_phoEtL->Fill(phoET[nleadPhoL],w);
-     if (nleadPhoM!=-1) h_phoEtM->Fill(phoET[nleadPhoM],w);
-     if (nleadPhoT!=-1) h_phoEtT->Fill(phoET[nleadPhoT],w);
-     if (nleadPhoL!=-1) h_phoEtaL->Fill(Photon_eta[nleadPhoL],w);
-     if (nleadPhoM!=-1) h_phoEtaM->Fill(Photon_eta[nleadPhoM],w);
-     if (nleadPhoT!=-1) h_phoEtaT->Fill(Photon_eta[nleadPhoT],w);
-     if (nleadPhoL!=-1) h_phoPt->Fill(phoET[nleadPhoL],w);
-     
-     h_pfMET->Fill(MET,w);
-     h_pfMETsumEt->Fill(MET_sumEt,w);
-     h_pfMETPhi->Fill(METPhi,w);
-     h_pfMETSig->Fill(MET_significance,w);
-     h_ST->Fill(ST,w);
-     h_ST_G->Fill(ST_G,w);
-     h_MT->Fill(MT,w);
-     h_HT_after->Fill(HT_after,w);
-     h_EMHT_after->Fill(EMHT_after,w);
-    
-     h_nPho->Fill(nPassPhoL,w);
-     h_nEle->Fill(nPassEleL,w);
-     h_nEleM->Fill(nPassEleM,w);
-     h_nEleT->Fill(nPassEleT,w);
-     h_nMu->Fill(nPassEleL,w);
-     h_nMuM->Fill(nPassMuM,w);
-     h_nMuT->Fill(nPassMuT,w);
-     h_nTau->Fill(nPassTauL,w);
-     h_nIso->Fill(nPassIso,w);
-    
-     h_njets->Fill(nPassAK4,w);
-     if (leadpt_ak4!=-1) h_jetpt->Fill(Jet_pt_nom[leadpt_ak4],w);
-     h_nAK8jets->Fill(nPassAK8,w);
-     if (leadpt_ak8!=-1) h_AK8jetpt->Fill(FatJet_pt_nom[leadpt_ak8],w);
-		
+           //Calculate BTag SFs
+           //CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+           /*
+              if (!isData && btag_file.size()>0) {
+           //AK4
+           if (!_fastSim) {
+           CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L, reader_deep_M, reader_deep_T, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+           }
+           else {
+           CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+           //AK8
+           CalcBtagSF_AK8(FatJet_eta, AK8JetSmearedPt, GenJetAK8_hadronFlavour, passDDBvL, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T);
+           }
+           }
+           */
 
-     if (m_bb_deep!=-1) h_mbbjet_select->Fill(m_bb_deep,w);
-     if (DDBvL_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
-     if (dR_ak4_Hcandidate!=-1) h_dR_ak4_Hcandidate->Fill(dR_ak4_Hcandidate,w);
-     if (dphi_met_jet!=999) h_dphi_met_jet->Fill(dphi_met_jet,w);
-     
-     //AK4-AK8 searchbin fills
+           //Region definitions
+           double met = (MET<50) ? 1 : (MET<70) ? 2 : (MET<100) ? 3 : (MET<200) ? 4 : (MET<500) ? 5 : 6;
+           //double njet = (passJet.size()<6) ? 1 : (passJet.size()==6) ? 2 : 3;
+           //double njet = (passJet.size()<6) ? 1 : 2;
+           double njet;
+           //AK4-AK8 searchBins
+           int AK4AK8=0, VR=0, boost=0;
+           //Signal Region
+           if (DDBvL_selected>0) {boost=1;AK4AK8=1;}
+           else {if (Deep_selected==1) AK4AK8=1; if (Deep_selected==2) AK4AK8=2;}
+           //Control and Validation regions
+           if (DDBvL_selected==0 && Deep_selected==0) {
+             if (bcounterDDBvL[1]>0) {boost=1; VR=1; AK4AK8=1;}
+             else if (passHiggsMass) boost=1;
+             if (!boost) {
+               if (bcounterDeep[1]==1) {VR=1;AK4AK8=1;}
+               if (bcounterDeep[1]>1) {VR=1;AK4AK8=2;}
+               if (!passAK4DeepHiggsMass && bcounterDeep[1]==0) {
+                 if (nPassAK8>0) {boost=1; VR=1;}
+                 else VR=1;
+               }
+             }
+           }
+           //AK4 AK8 overlap
+           if (!boost) nonHiggsJet=passJet.size()-2;
+           else {
+             auto i = passJet.begin();
+             while (i!=passJet.end()) {
+               if (deltaR(FatJet_phi[SelectedAK8Jet],Jet_phi[*i],FatJet_eta[SelectedAK8Jet],Jet_eta[*i])<0.8) passJet.erase(i);
+               else i++;
+             }
+             nonHiggsJet=passJet.size();
+           }
+           njet = (nonHiggsJet<4) ? 1 : 2;
+           double sbFill_ak4ak8[dim_ak4]={double(VR),double(AK4AK8),met,njet};
+
+           //Efficiency fill for no cuts bin
+           h_eff->Fill(0.,w);
+           //cuts with command line
+           if (_cut_variable.size()>0) {if (!(Cut(ientry,mass_pair))) continue;}
+           else { //Hardcoded cuts
+             if (!HLT_Photon165_HE10) continue;
+           }
+
+           //Cut for high njet region (need to implement in Cut() if decided as standard)
+           //if (njet==1 && dphi_met_jet<0.3) continue; 
+           //Filling histograms
+           h_eff->Fill(1.,w);
+           h_nISR_jet->Fill(n_isr_jets,w);
+           if (nleadPhoL!=-1) h_phoEtL->Fill(phoET[nleadPhoL],w);
+           if (nleadPhoM!=-1) h_phoEtM->Fill(phoET[nleadPhoM],w);
+           if (nleadPhoT!=-1) h_phoEtT->Fill(phoET[nleadPhoT],w);
+           if (nleadPhoL!=-1) h_phoEtaL->Fill(Photon_eta[nleadPhoL],w);
+           if (nleadPhoM!=-1) h_phoEtaM->Fill(Photon_eta[nleadPhoM],w);
+           if (nleadPhoT!=-1) h_phoEtaT->Fill(Photon_eta[nleadPhoT],w);
+           if (nleadPhoL!=-1) h_phoPt->Fill(phoET[nleadPhoL],w);
+
+           h_pfMET->Fill(MET,w);
+           h_pfMETsumEt->Fill(MET_sumEt,w);
+           h_pfMETPhi->Fill(METPhi,w);
+           h_pfMETSig->Fill(MET_significance,w);
+           h_ST->Fill(ST,w);
+           h_ST_G->Fill(ST_G,w);
+           h_MT->Fill(MT,w);
+           h_HT_after->Fill(HT_after,w);
+           h_EMHT_after->Fill(EMHT_after,w);
+
+           h_nPho->Fill(nPassPhoL,w);
+           h_nEle->Fill(nPassEleL,w);
+           h_nEleM->Fill(nPassEleM,w);
+           h_nEleT->Fill(nPassEleT,w);
+           h_nMu->Fill(nPassEleL,w);
+           h_nMuM->Fill(nPassMuM,w);
+           h_nMuT->Fill(nPassMuT,w);
+           h_nTau->Fill(nPassTauL,w);
+           h_nIso->Fill(nPassIso,w);
+
+           h_njets->Fill(nPassAK4,w);
+           if (leadpt_ak4!=-1) h_jetpt->Fill(Jet_pt_nom[leadpt_ak4],w);
+           h_nAK8jets->Fill(nPassAK8,w);
+           if (leadpt_ak8!=-1) h_AK8jetpt->Fill(FatJet_pt_nom[leadpt_ak8],w);
+
+
+           if (m_bb_deep!=-1) h_mbbjet_select->Fill(m_bb_deep,w);
+           if (DDBvL_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
+           if (dR_ak4_Hcandidate!=-1) h_dR_ak4_Hcandidate->Fill(dR_ak4_Hcandidate,w);
+           if (dphi_met_jet!=999) h_dphi_met_jet->Fill(dphi_met_jet,w);
+
+           //AK4-AK8 searchbin fills
      double w_AK4searchBin=w, w_AK8searchBin=w;
      if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];
      //if (boost==1 && AK4AK8==1) {w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];cout<<"ak8 w "<<DDBvL_SF_L[DDBvL_whichSF]<<endl;}
