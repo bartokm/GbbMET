@@ -2082,7 +2082,6 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     if (year!=2016 && !isData && !_fastSim) filterValue=319;
     if (year!=2016 && !isData && _fastSim) filterValue=317;
     metFilters_hardcoded=(metFilters&filterValue)==filterValue;
-    cout<<"metFilters "<<metFilters<<" value "<<filterValue<<" hardcoded "<<metFilters_hardcoded<<endl;
     bool HLTPho=0;
     if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
