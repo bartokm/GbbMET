@@ -39,7 +39,6 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='q') is_quiet=1; 
       else if (arg[1]=='S') is_signalscan=1; 
       else if (arg[1]=='s') is_signalstudy=1;
-      else if (arg[1]=='c') is_c=1; 
       else if (arg[1]=='C') is_countSignal=1; 
       else if (arg[1]=='t') is_t=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
@@ -360,7 +359,7 @@ void Analyzer::Loop()
    hn_AK8searchBins->Sumw2();
    unsigned int nsbins_ak8=hn_AK8searchBins->GetNbins();
    TH1D *h_AK8searchBins= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
-
+  
    //Histograms for signalstudy
    map<int,vector<int>> grid;
    if (SignalScan) {
@@ -528,7 +527,9 @@ void Analyzer::Loop()
      b_Flag_HBHENoiseIsoFilter->GetEntry(ientry);
      b_Flag_EcalDeadCellTriggerPrimitiveFilter->GetEntry(ientry);
      b_Flag_BadPFMuonFilter->GetEntry(ientry);
+     b_Flag_BadChargedCandidateFilter->GetEntry(ientry);
      b_Flag_eeBadScFilter->GetEntry(ientry);
+     b_Flag_ecalBadCalibFilter->GetEntry(ientry);
      b_Flag_METFilters->GetEntry(ientry);
      if (year !=2017) {
        b_MET_pt->GetEntry(ientry);
@@ -575,8 +576,8 @@ void Analyzer::Loop()
      b_Photon_isScEtaEB->GetEntry(ientry);
      b_Photon_isScEtaEE->GetEntry(ientry);
      if (year==2016) b_Photon_cutBased17Bitmap->GetEntry(ientry);
-     else b_Photon_cutBasedV1Bitmap->GetEntry(ientry);
-     Int_t Photon_cutBased_versionFree[99]; for (unsigned int i=0; i<nPhoton;i++) (year==2016) ? Photon_cutBased_versionFree[i]=Photon_cutBased17Bitmap[i] : Photon_cutBased_versionFree[i]=Photon_cutBasedV1Bitmap[i];
+     else b_Photon_cutBasedBitmap->GetEntry(ientry);
+     Int_t Photon_cutBased_versionFree[99]; for (unsigned int i=0; i<nPhoton;i++) (year==2016) ? Photon_cutBased_versionFree[i]=Photon_cutBased17Bitmap[i] : Photon_cutBased_versionFree[i]=Photon_cutBasedBitmap[i];
      /*
         b_phoScale_stat_up->GetEntry(ientry);
         b_phoScale_stat_dn->GetEntry(ientry);
@@ -647,7 +648,6 @@ void Analyzer::Loop()
        h2_FR->SetDirectory(0);
        f_FR.Close();
      }
-
      //check data if inside Golden json file
      //if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
 
@@ -683,61 +683,184 @@ void Analyzer::Loop()
        //std::cout<<"event "<<event<<" w=weight*pu_weight"<<w<<"="<<weight<<"("<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<")"<<"*"<<pu_weight<<std::endl;
        //Scale factors
        if (jentry==0) {
-         //photon cutbased loose
-         TFile f_phoLooseSF("input/pho_looseSF_egammaEffi.txt_EGM2D.root","read");
-         h_pho_EGamma_SF2D[0] = (TH2F*)f_phoLooseSF.Get("EGamma_SF2D");
-         h_pho_EGamma_SF2D[0]->SetDirectory(0);
-         f_phoLooseSF.Close();
-         //photon cutbased medium
-         TFile f_phoMediumSF("input/pho_mediumSF_egammaEffi.txt_EGM2D.root","read");
-         h_pho_EGamma_SF2D[1] = (TH2F*)f_phoMediumSF.Get("EGamma_SF2D");
-         h_pho_EGamma_SF2D[1]->SetDirectory(0);
-         f_phoMediumSF.Close();
-         //photon cutbased tight
-         TFile f_phoTightSF("input/pho_tightSF_egammaEffi.txt_EGM2D.root","read");
-         h_pho_EGamma_SF2D[2] = (TH2F*)f_phoTightSF.Get("EGamma_SF2D");
-         h_pho_EGamma_SF2D[2]->SetDirectory(0);
-         f_phoTightSF.Close();
-         //photon haspixelseed SF
-         TFile f_phoPV("input/ScalingFactors_80X_Summer16.root","read");
-         h_Scaling_Factors_HasPix_R9_high = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 > 0.94");
-         h_Scaling_Factors_HasPix_R9_high->SetDirectory(0);
-         h_Scaling_Factors_HasPix_R9_low = (TH2D*)f_phoPV.Get("Scaling_Factors_HasPix_R9 < 0.94");
-         h_Scaling_Factors_HasPix_R9_low->SetDirectory(0);
-         f_phoPV.Close();
-         //electron reconstruction efficiency
-         TFile f_eleRecSF("input/ele_recEff_egammaEffi.txt_EGM2D.root","read");
-         h_eleRec_EGamma_SF2D = (TH2F*)f_eleRecSF.Get("EGamma_SF2D");
-         h_eleRec_EGamma_SF2D->SetDirectory(0);
-         f_eleRecSF.Close();
-         //electron cutbased veto
-         TFile f_eleVetoSF("input/ele_vetoSF_egammaEffi.txt_EGM2D.root","read");
-         h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
-         h_ele_EGamma_SF2D[0]->SetDirectory(0);
-         h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
-         h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
-         f_eleVetoSF.Close();
-         //electron cutbased loose
-         TFile f_eleLooseSF("input/ele_looseSF_egammaEffi.txt_EGM2D.root","read");
-         h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
-         h_ele_EGamma_SF2D[1]->SetDirectory(0);
-         h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
-         h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
-         f_eleLooseSF.Close();
-         //electron cutbased medium
-         TFile f_eleMediumSF("input/ele_mediumSF_egammaEffi.txt_EGM2D.root","read");
-         h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
-         h_ele_EGamma_SF2D[2]->SetDirectory(0);
-         h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
-         h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
-         f_eleMediumSF.Close();
-         //electron cutbased tight
-         TFile f_eleTightSF("input/ele_tightSF_egammaEffi.txt_EGM2D.root","read");
-         h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
-         h_ele_EGamma_SF2D[3]->SetDirectory(0);
-         h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
-         h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
-         f_eleTightSF.Close();
+         //photon cutbased 2016
+         if (year==2016) {
+           TFile f_2016phoLooseSF("input/egamma/photon/2016LegacyReReco_PhotonCutBasedLoose.root","read");
+           h_pho_EGamma_SF2D[0] = (TH2F*)f_2016phoLooseSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[0]->SetDirectory(0);
+           f_2016phoLooseSF.Close();
+           TFile f_2016phoMediumSF("input/egamma/photon/2016LegacyReReco_PhotonCutBasedMedium.root","read");
+           h_pho_EGamma_SF2D[1] = (TH2F*)f_2016phoMediumSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[1]->SetDirectory(0);
+           f_2016phoMediumSF.Close();
+           TFile f_2016phoTightSF("input/egamma/photon/2016LegacyReReco_PhotonCutBasedTight.root","read");
+           h_pho_EGamma_SF2D[2] = (TH2F*)f_2016phoTightSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[2]->SetDirectory(0);
+           f_2016phoTightSF.Close();
+           TFile f_phoPV_2016("input/egamma/photon/ScalingFactors_80X_Summer16.root","read");
+           h_Scaling_Factors_HasPix_R9_high = (TH2D*)f_phoPV_2016.Get("Scaling_Factors_HasPix_R9 > 0.94");
+           h_Scaling_Factors_HasPix_R9_high->SetDirectory(0);
+           h_Scaling_Factors_HasPix_R9_low = (TH2D*)f_phoPV_2016.Get("Scaling_Factors_HasPix_R9 < 0.94");
+           h_Scaling_Factors_HasPix_R9_low->SetDirectory(0);
+           f_phoPV_2016.Close();
+         }
+         else if (year==2017) {
+           TFile f_2017phoLooseSF("input/egamma/photon/2017_PhotonsLoose.root","read");
+           h_pho_EGamma_SF2D[0] = (TH2F*)f_2017phoLooseSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[0]->SetDirectory(0);
+           f_2017phoLooseSF.Close();
+           TFile f_2017phoMediumSF("input/egamma/photon/2017_PhotonsMedium.root","read");
+           h_pho_EGamma_SF2D[1] = (TH2F*)f_2017phoMediumSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[1]->SetDirectory(0);
+           f_2017phoMediumSF.Close();
+           TFile f_2017phoTightSF("input/egamma/photon/2017_PhotonsTight.root","read");
+           h_pho_EGamma_SF2D[2] = (TH2F*)f_2017phoTightSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[2]->SetDirectory(0);
+           f_2017phoTightSF.Close();
+           TFile f_phoPV_2017("input/egamma/photon/PixelSeed_ScaleFactors_2017.root","read");
+           h_PixelSeed_ScaleFactors_2017[0]= (TH1F*)f_phoPV_2017.Get("Loose_ID");
+           h_PixelSeed_ScaleFactors_2017[0]->SetDirectory(0);
+           h_PixelSeed_ScaleFactors_2017[1]= (TH1F*)f_phoPV_2017.Get("Medium_ID");
+           h_PixelSeed_ScaleFactors_2017[1]->SetDirectory(0);
+           h_PixelSeed_ScaleFactors_2017[2]= (TH1F*)f_phoPV_2017.Get("Tight_ID");
+           h_PixelSeed_ScaleFactors_2017[2]->SetDirectory(0);
+           f_phoPV_2017.Close();
+         }
+         else if (year==2018) {
+           TFile f_2018phoLooseSF("input/egamma/photon/2018_PhotonsLoose.root","read");
+           h_pho_EGamma_SF2D[0] = (TH2F*)f_2018phoLooseSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[0]->SetDirectory(0);
+           f_2018phoLooseSF.Close();
+           TFile f_2018phoMediumSF("input/egamma/photon/2018_PhotonsMedium.root","read");
+           h_pho_EGamma_SF2D[1] = (TH2F*)f_2018phoMediumSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[1]->SetDirectory(0);
+           f_2018phoMediumSF.Close();
+           TFile f_2018phoTightSF("input/egamma/photon/2018_PhotonsTight.root","read");
+           h_pho_EGamma_SF2D[2] = (TH2F*)f_2018phoTightSF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[2]->SetDirectory(0);
+           f_2018phoTightSF.Close();
+           TFile f_phoPV_2018("input/egamma/photon/HasPix_2018.root","read");
+           h_PixelSeed_ScaleFactors_2018= (TH2D*)f_phoPV_2018.Get("eleVeto_SF");
+           h_PixelSeed_ScaleFactors_2018->SetDirectory(0);
+           h_PixelSeed_ScaleFactors_2018_unc= (TH2D*)f_phoPV_2018.Get("eleVeto_Unc");
+           h_PixelSeed_ScaleFactors_2018_unc->SetDirectory(0);
+           f_phoPV_2018.Close();
+         }
+         if (year==2016) {
+           //electron reconstruction efficiency
+           TFile f_eleRecSF_low("input/egamma/electron/2016_Electron_EGM2D_BtoH_low_RecoSF_Legacy2016.root","read");
+           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
+           f_eleRecSF_low.Close();
+           TFile f_eleRecSF_high("input/egamma/electron/2016_Electron_EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root","read");
+           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_high.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
+           f_eleRecSF_high.Close();
+           //electron cutbased veto
+           TFile f_eleVetoSF("input/egamma/electron/2016_ElectronWPVeto_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[0]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
+           f_eleVetoSF.Close();
+           //electron cutbased loose
+           TFile f_eleLooseSF("input/egamma/electron/2016LegacyReReco_ElectronLoose_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[1]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
+           f_eleLooseSF.Close();
+           //electron cutbased medium
+           TFile f_eleMediumSF("input/egamma/electron/2016LegacyReReco_ElectronMedium_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[2]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
+           f_eleMediumSF.Close();
+           //electron cutbased tight
+           TFile f_eleTightSF("input/egamma/electron/2016LegacyReReco_ElectronTight_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[3]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
+           f_eleTightSF.Close();
+         }
+         else if (year==2017) {
+           //electron reconstruction efficiency
+           TFile f_eleRecSF_low("input/egamma/electron/2017_Electron_egammaEffi.txt_EGM2D_runBCDEF_passingRECO_lowEt.root","read");
+           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
+           f_eleRecSF_low.Close();
+           TFile f_eleRecSF_high("input/egamma/electron/2017_Electron_egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root","read");
+           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_high.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
+           f_eleRecSF_high.Close();
+           //electron cutbased veto
+           TFile f_eleVetoSF("input/egamma/electron/2017_ElectronWPVeto_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[0]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
+           f_eleVetoSF.Close();
+           //electron cutbased loose
+           TFile f_eleLooseSF("input/egamma/electron/2017_ElectronLoose.root","read");
+           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[1]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
+           f_eleLooseSF.Close();
+           //electron cutbased medium
+           TFile f_eleMediumSF("input/egamma/electron/2017_ElectronMedium.root","read");
+           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[2]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
+           f_eleMediumSF.Close();
+           //electron cutbased tight
+           TFile f_eleTightSF("input/egamma/electron/2017_ElectronTight.root","read");
+           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[3]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
+           f_eleTightSF.Close();
+         }
+         else if (year==2018) {
+           //electron reconstruction efficiency
+           TFile f_eleRecSF_low("input/egamma/electron/2018_Electron_egammaEffi.txt_EGM2D_updatedAll.root","read");
+           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
+           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
+           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
+           f_eleRecSF_low.Close();
+           //electron cutbased veto
+           TFile f_eleVetoSF("input/egamma/electron/2018_ElectronWPVeto_Fall17V2.root","read");
+           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[0]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
+           f_eleVetoSF.Close();
+           //electron cutbased loose
+           TFile f_eleLooseSF("input/egamma/electron/2018_ElectronLoose.root","read");
+           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[1]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
+           f_eleLooseSF.Close();
+           //electron cutbased medium
+           TFile f_eleMediumSF("input/egamma/electron/2018_ElectronMedium.root","read");
+           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[2]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
+           f_eleMediumSF.Close();
+           //electron cutbased tight
+           TFile f_eleTightSF("input/egamma/electron/2018_ElectronTight.root","read");
+           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
+           h_ele_EGamma_SF2D[3]->SetDirectory(0);
+           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
+           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
+           f_eleTightSF.Close();
+         }
          //Muon ID SF
          float lum_ratio_BCDEF = 0.5481;
          TH2D *h_temp[3], *h_temp_eff[3];
@@ -800,10 +923,6 @@ void Analyzer::Loop()
            eff_l_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
            eff_l_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           eff_b_BDSV_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_L"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
-           eff_b_BDSV_M1 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M1"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
-           eff_b_BDSV_M2 = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_M2"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
-           eff_b_BDSV_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_BDSV_T"),*(TH2D*)f_btag.Get("h_allAK8bjets"));
            f_btag.Close();
          }
 
@@ -860,7 +979,6 @@ void Analyzer::Loop()
            if (!(momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6)) continue;
            for (unsigned int k=0;k<nGenPart;k++){
              if (GenPart_genPartIdxMother[k] != j) continue;
-             if (!(GenPart_statusFlags[k]&int(pow(2,13)))) continue;
              if (deltaR(GenPart_phi[k],Jet_phi[i],GenPart_eta[k],Jet_eta[i])<0.3) {matched=true; 
                //  printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-9s gmom %-8d\n",k,GenPart_pdgId[k],GenPart_pt[k],GenPart_eta[k],GenPart_phi[k],GenPart_pdgId[GenPart_genPartIdxMother[k]],GenPart_pt[GenPart_genPartIdxMother[k]],GenPart_eta[GenPart_genPartIdxMother[k]],GenPart_phi[GenPart_genPartIdxMother[k]],GenPart_status[k],bitset<9>(GenPart_statusFlags[k]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[k]]]);
                break;}
@@ -966,50 +1084,120 @@ void Analyzer::Loop()
        int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
          double photon_eta=Photon_eta[nleadPhoL]; //needed for difference between SCEta and photon_eta
+         double photon_et=(phoET[nleadPhoL]>500) ? 499 : phoET[nleadPhoL]; //needed for maximum ET in SF histo
          if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
          if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
          if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
          if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
+         if (photon_eta<=-2.5)  photon_eta=-2.4;
+         if (photon_eta>=2.5)  photon_eta=2.4;
          double abs_photon_eta=(abs(Photon_eta[nleadPhoL])>1.5) ? 2 : 0.5;
-         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,phoET[nleadPhoL]));
-         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,phoET[nleadPhoL]));
-         if (Photon_r9[nleadPhoL]>0.94) {
-           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,photon_et));
+         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,photon_et));
+         if (year==2016) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+           }
+           else {
+             pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+           }
          }
-         else {
-           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+         else if (year==2017) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(5);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[0]->GetBinError(5);
+           }
+           else {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(6);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[0]->GetBinError(6);
+           }
+         }
+         else if (year==2018) {
+           pix_sf=h_PixelSeed_ScaleFactors_2018->GetBinContent(h_PixelSeed_ScaleFactors_2018->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
+           syst_pix=h_PixelSeed_ScaleFactors_2018_unc->GetBinContent(h_PixelSeed_ScaleFactors_2018_unc->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
          }
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
          pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
+         if (id_sf==0 || pix_sf==0) cout<<"pho Et "<<phoET[nleadPhoL]<<" pho eta "<<Photon_eta[nleadPhoL]<<" mod_eta "<<photon_eta<<" scEB "<<Photon_isScEtaEB[nleadPhoL]<<" scEE "<<Photon_isScEtaEE[nleadPhoL]<<" id sf "<<id_sf<<" +- "<<syst_id<<" pix sf "<<pix_sf<<" +- "<<syst_pix<<endl;
        }
        if (nPassPhoM!=0){
-         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoET[passPhoM[0]]));
-         syst_id=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(Photon_eta[passPhoM[0]],phoET[passPhoM[0]]));
-         if (Photon_r9[passPhoM[0]]>0.94) {
-           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoM[0]]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoM[0]]),100));
+         double photon_eta=Photon_eta[nleadPhoM]; //needed for difference between SCEta and photon_eta
+         double photon_et=(phoET[nleadPhoM]>500) ? 499 : phoET[nleadPhoM]; //needed for maximum ET in SF histo
+         if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
+         if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
+         if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
+         if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
+         if (photon_eta<=-2.5)  photon_eta=-2.4;
+         if (photon_eta>=2.5)  photon_eta=2.4;
+         double abs_photon_eta=(abs(Photon_eta[nleadPhoM])>1.5) ? 2 : 0.5;
+         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(photon_eta,photon_et));
+         syst_id=h_pho_EGamma_SF2D[1]->GetBinError(h_pho_EGamma_SF2D[1]->FindBin(photon_eta,photon_et));
+         if (year==2016) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+           }
+           else {
+             pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+           }
          }
-         else {
-           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[passPhoM[0]]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[passPhoM[0]]),100));
+         else if (year==2017) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(5);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[1]->GetBinError(5);
+           }
+           else {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(6);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[1]->GetBinError(6);
+           }
+         }
+         else if (year==2018) {
+           pix_sf=h_PixelSeed_ScaleFactors_2018->GetBinContent(h_PixelSeed_ScaleFactors_2018->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
+           syst_pix=h_PixelSeed_ScaleFactors_2018_unc->GetBinContent(h_PixelSeed_ScaleFactors_2018_unc->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
          }
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
          pho_SF[1]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
        }
        if (nPassPhoT!=0){
-         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoET[passPhoT[0]]));
-         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin(Photon_eta[passPhoT[0]],phoET[passPhoT[0]]));
-         if (Photon_r9[passPhoT[0]]>0.94) {
-           pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoT[0]]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs(Photon_eta[passPhoT[0]]),100));
+         double photon_eta=Photon_eta[nleadPhoT]; //needed for difference between SCEta and photon_eta
+         double photon_et=(phoET[nleadPhoT]>500) ? 499 : phoET[nleadPhoT]; //needed for maximum ET in SF histo
+         if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
+         if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
+         if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
+         if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
+         if (photon_eta<=-2.5)  photon_eta=-2.4;
+         if (photon_eta>=2.5)  photon_eta=2.4;
+         double abs_photon_eta=(abs(Photon_eta[nleadPhoT])>1.5) ? 2 : 0.5;
+         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin(photon_eta,photon_et));
+         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin(photon_eta,photon_et));
+         if (year==2016) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
+           }
+           else {
+             pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+             syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
+           }
          }
-         else {
-           pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[passPhoT[0]]),100));
-           syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs(Photon_eta[passPhoT[0]]),100));
+         else if (year==2017) {
+           if (Photon_r9[nleadPhoL]>0.94) {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(5);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[2]->GetBinError(5);
+           }
+           else {
+             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(6);
+             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[2]->GetBinError(6);
+           }
+         }
+         else if (year==2018) {
+           pix_sf=h_PixelSeed_ScaleFactors_2018->GetBinContent(h_PixelSeed_ScaleFactors_2018->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
+           syst_pix=h_PixelSeed_ScaleFactors_2018_unc->GetBinContent(h_PixelSeed_ScaleFactors_2018_unc->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
          }
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
@@ -1068,40 +1256,64 @@ void Analyzer::Loop()
        (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
        (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
        if (nPassEleV!=0){
-         double pt=Electron_pt[passEleV[0]], pt2=Electron_pt[passEleV[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10; pt2=(pt>30) ? pt : 31;
-         id_sf=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[0]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
-         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleV[0]],pt2));
-         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleV[0]],pt2));
+         double pt=Electron_pt[passEleV[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
+         id_sf=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+         syst_id=h_ele_EGamma_SF2D[0]->GetBinError(h_ele_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+         if (pt<20) {
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+         }
+         else {
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
+         }
          ele_SF[0]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
-         //cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
+         if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
        }
        if (nPassEleL!=0){
-         double pt=Electron_pt[passEleL[0]], pt2=Electron_pt[passEleL[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10; pt2=(pt>30) ? pt : 31;
+         double pt=Electron_pt[passEleL[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
          id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
          syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
-         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleL[0]],pt2));
-         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleL[0]],pt2));
+         if (pt<20) {
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleL[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleL[0]],pt));
+         }
+         else {
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
+         }
          ele_SF[1]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleM!=0){
-         double pt=Electron_pt[passEleM[0]], pt2=Electron_pt[passEleM[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10; pt2=(pt>30) ? pt : 31;
+         double pt=Electron_pt[passEleM[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
          id_sf=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin(Electron_eta[passEleM[0]],pt));
          syst_id=h_ele_EGamma_SF2D[2]->GetBinError(h_ele_EGamma_SF2D[2]->FindBin(Electron_eta[passEleM[0]],pt));
-         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleM[0]],pt2));
-         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleM[0]],pt2));
+         if (pt<20) {
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleM[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleM[0]],pt));
+         }
+         else {
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleM[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleM[0]],pt));
+         }
          ele_SF[2]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleT!=0){
-         double pt=Electron_pt[passEleT[0]], pt2=Electron_pt[passEleT[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10; pt2=(pt>30) ? pt : 31;
+         double pt=Electron_pt[passEleT[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
          id_sf=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin(Electron_eta[passEleT[0]],pt));
          syst_id=h_ele_EGamma_SF2D[3]->GetBinError(h_ele_EGamma_SF2D[3]->FindBin(Electron_eta[passEleT[0]],pt));
-         rec_sf=h_eleRec_EGamma_SF2D->GetBinContent(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleT[0]],pt2));
-         syst_rec=h_eleRec_EGamma_SF2D->GetBinError(h_eleRec_EGamma_SF2D->FindBin(Electron_eta[passEleT[0]],pt2));
+         if (pt<20) {
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleT[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleT[0]],pt));
+         }
+         else {
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleT[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleT[0]],pt));
+         }
          ele_SF[3]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleNO!=0){ //only for loose electrons so far
@@ -1284,7 +1496,8 @@ void Analyzer::Loop()
        }
        jetSmearedPt.push_back(jetpt);
        HT_before+=jetSmearedPt[i];
-       if (abs(Jet_eta[i])>2.4 || !(Jet_jetId[i]>>1&1) || jetSmearedPt[i]<30 || !(Jet_puId[i]&(1<<2))) passcut=false;
+       if (abs(Jet_eta[i])>2.4 || !(Jet_jetId[i]>>1&1) || jetSmearedPt[i]<30) passcut=false;
+       if (jetSmearedPt[i]<50 && !(Jet_puId[i]&(1<<2))) passcut=false;
        for (auto j : passPhoL) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {
          passcut=false;break;
        }
@@ -1376,12 +1589,14 @@ void Analyzer::Loop()
        double i_jetdB=FatJet_btagDDBvL[i], h_jetdB;
        if (highDDBvL==-1) h_jetdB=-10; else h_jetdB=FatJet_btagDDBvL[highDDBvL];
        if (i_jetdB>h_jetdB) highDDBvL=i;
-       if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) {passDDBvL.insert(pair<int,char>(i,'T'));bcounterDDBvL[4]++;}
+       if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][4]) {passDDBvL.insert(pair<int,char>(i,'C'));bcounterDDBvL[5]++;}
+       else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) {passDDBvL.insert(pair<int,char>(i,'T'));bcounterDDBvL[4]++;}
        else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][2]) {passDDBvL.insert(pair<int,char>(i,'H'));bcounterDDBvL[3]++;}
        else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][1]) {passDDBvL.insert(pair<int,char>(i,'M'));bcounterDDBvL[2]++;}
        else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) {passDDBvL.insert(pair<int,char>(i,'L'));bcounterDDBvL[1]++;}
        else {passDDBvL.insert(pair<int,char>(i,'0'));bcounterDDBvL[0]++;}
      }
+     bcounterDDBvL[4] += bcounterDDBvL[5];
      bcounterDDBvL[3] += bcounterDDBvL[4];
      bcounterDDBvL[2] += bcounterDDBvL[3];
      bcounterDDBvL[1] += bcounterDDBvL[2];
@@ -1506,7 +1721,8 @@ void Analyzer::Loop()
          if (FatJet_msoftdrop_nom[i]>70 && FatJet_msoftdrop_nom[i]<200) {
            passHiggsMass=true;
            SelectedAK8Jet=i;
-           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
+           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][4]) DDBvL_selected=5;
+           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
            else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][2]) DDBvL_selected=3;
            else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][1]) DDBvL_selected=2;
            else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) DDBvL_selected=1;
@@ -1549,20 +1765,35 @@ void Analyzer::Loop()
            }
 
            //Calculate BTag SFs
-           //CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, Deep_SF_L, Deep_SF_M, Deep_SF_T);
-           /*
-              if (!isData && btag_file.size()>0) {
-           //AK4
-           if (!_fastSim) {
-           CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L, reader_deep_M, reader_deep_T, Deep_SF_L, Deep_SF_M, Deep_SF_T);
-           }
-           else {
-           CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_deep_L_fs, reader_deep_M_fs, reader_deep_T_fs, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+           if (!isData && btag_file.size()>0) {
+             if (year==2016) {
+               if (!_fastSim) CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+               else CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+             }
+             else if (year==2017) {
+               if (!_fastSim) CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+               else CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+             }
+             else if (year==2018) {
+               if (!_fastSim) CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+               else CalcBtagSF(Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+             }
            //AK8
-           CalcBtagSF_AK8(FatJet_eta, AK8JetSmearedPt, GenJetAK8_hadronFlavour, passDDBvL, eff_b_BDSV_L, eff_b_BDSV_M1, eff_b_BDSV_M2, eff_b_BDSV_T, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T);
+           if (_fastSim) CalcBtagSF_AK8(year, AK8JetSmearedPt, passDDBvL, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T1, DDBvL_SF_T2);
            }
+
+           //SignalStudy
+           if (SignalScan) {
+             int nHiggs=0, ib1=-1, ib2=-1;
+             for (unsigned int i=0;i<nGenPart;i++){
+               if (GenPart_pdgId[i]==25 && GenPart_statusFlags[i]&int(pow(2,13))) nHiggs++;
+               if (GenPart_pdgId[i]==5 && GenPart_pdgId[GenPart_genPartIdxMother[i]]==25) ib1=i;
+               if (GenPart_pdgId[i]==-5 && GenPart_pdgId[GenPart_genPartIdxMother[i]]==25) ib2=i;
+             }
+             SignalHiggs=nHiggs;
+             (ib1!=-1 && ib2!=-1) ? Hbb=true : Hbb=false;
+             if (SignalHiggs>2) cout<<"too many higgs in "<<fChain->GetCurrentFile()->GetName()<<" event "<<event<<endl;
            }
-           */
 
            //Region definitions
            double met = (MET<50) ? 1 : (MET<70) ? 2 : (MET<100) ? 3 : (MET<200) ? 4 : (MET<500) ? 5 : 6;
@@ -1723,7 +1954,6 @@ void Analyzer::Loop()
          case 1 : mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
          break;
        }
-
      }
    }
    for (unsigned int i=1;i<nsbins_ak4+1;i++) {

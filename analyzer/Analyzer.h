@@ -228,13 +228,6 @@ public :
    Float_t         puWeight;
    Float_t         puWeightUp;
    Float_t         puWeightDown;
-   Float_t         LHEWeight_originalXWGTUP;
-   UInt_t          nLHEPdfWeight;
-   Float_t         LHEPdfWeight[999];   //[nLHEPdfWeight]
-   UInt_t          nLHEReweightingWeight;
-   Float_t         LHEReweightingWeight[99];   //[nLHEReweightingWeight]
-   UInt_t          nLHEScaleWeight;
-   Float_t         LHEScaleWeight[99];   //[nLHEScaleWeight]
    UInt_t          nPSWeight;
    Float_t         PSWeight[99];   //[nPSWeight]
    UInt_t          nIsoTrack;
@@ -294,22 +287,6 @@ public :
    Float_t         L1PreFiringWeight_Dn;
    Float_t         L1PreFiringWeight_Nom;
    Float_t         L1PreFiringWeight_Up;
-   Float_t         LHE_HT;
-   Float_t         LHE_HTIncoming;
-   Float_t         LHE_Vpt;
-   UChar_t         LHE_Njets;
-   UChar_t         LHE_Nb;
-   UChar_t         LHE_Nc;
-   UChar_t         LHE_Nuds;
-   UChar_t         LHE_Nglu;
-   UChar_t         LHE_NpNLO;
-   UChar_t         LHE_NpLO;
-   UInt_t          nLHEPart;
-   Float_t         LHEPart_pt[4];   //[nLHEPart]
-   Float_t         LHEPart_eta[4];   //[nLHEPart]
-   Float_t         LHEPart_phi[4];   //[nLHEPart]
-   Float_t         LHEPart_mass[4];   //[nLHEPart]
-   Int_t           LHEPart_pdgId[4];   //[nLHEPart]
    Float_t         GenMET_phi;
    Float_t         GenMET_pt;
    Float_t         MET_MetUnclustEnUpDeltaX;
@@ -615,7 +592,6 @@ public :
    Bool_t          Flag_trkPOG_toomanystripclus53X;
    Bool_t          Flag_trkPOG_logErrorTooManyClusters;
    Bool_t          Flag_METFilters;
-   Bool_t          HLTriggerFirstPath;
    Bool_t          HLT_Ele27_WPTight_Gsf;
    Bool_t          HLT_ECALHT800;
    Bool_t          HLT_Photon165_HE10;
@@ -822,13 +798,6 @@ public :
    TBranch        *b_puWeight;
    TBranch        *b_puWeightUp;
    TBranch        *b_puWeightDown;
-   TBranch        *b_LHEWeight_originalXWGTUP;   //!
-   TBranch        *b_nLHEPdfWeight;   //!
-   TBranch        *b_LHEPdfWeight;   //!
-   TBranch        *b_nLHEReweightingWeight;   //!
-   TBranch        *b_LHEReweightingWeight;   //!
-   TBranch        *b_nLHEScaleWeight;   //!
-   TBranch        *b_LHEScaleWeight;   //!
    TBranch        *b_nPSWeight;   //!
    TBranch        *b_PSWeight;   //!
    TBranch        *b_nIsoTrack;   //!
@@ -888,22 +857,6 @@ public :
    TBranch        *b_L1PreFiringWeight_Dn;   //!
    TBranch        *b_L1PreFiringWeight_Nom;   //!
    TBranch        *b_L1PreFiringWeight_Up;   //!
-   TBranch        *b_LHE_HT;   //!
-   TBranch        *b_LHE_HTIncoming;   //!
-   TBranch        *b_LHE_Vpt;   //!
-   TBranch        *b_LHE_Njets;   //!
-   TBranch        *b_LHE_Nb;   //!
-   TBranch        *b_LHE_Nc;   //!
-   TBranch        *b_LHE_Nuds;   //!
-   TBranch        *b_LHE_Nglu;   //!
-   TBranch        *b_LHE_NpNLO;   //!
-   TBranch        *b_LHE_NpLO;   //!
-   TBranch        *b_nLHEPart;   //!
-   TBranch        *b_LHEPart_pt;   //!
-   TBranch        *b_LHEPart_eta;   //!
-   TBranch        *b_LHEPart_phi;   //!
-   TBranch        *b_LHEPart_mass;   //!
-   TBranch        *b_LHEPart_pdgId;   //!
    TBranch        *b_GenMET_phi;   //!
    TBranch        *b_GenMET_pt;   //!
    TBranch        *b_MET_MetUnclustEnUpDeltaX;   //!
@@ -1209,7 +1162,6 @@ public :
    TBranch        *b_Flag_trkPOG_toomanystripclus53X;   //!
    TBranch        *b_Flag_trkPOG_logErrorTooManyClusters;   //!
    TBranch        *b_Flag_METFilters;   //!
-   TBranch        *b_HLTriggerFirstPath;   //!
    TBranch        *b_HLT_Ele27_WPTight_Gsf;
    TBranch        *b_HLT_ECALHT800;
    TBranch        *b_HLT_Photon165_HE10;
@@ -1234,7 +1186,7 @@ public :
    TBranch        *b_L1_AlwaysTrue;
 
    //Added
-   double BtagDDBvLWP[3][4]={{0.7,0.86,0.89,0.91},{0.7,0.86,0.89,0.91},{0.7,0.86,0.89,0.91}};
+   double BtagDDBvLWP[3][5]={{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92}};
    double BtagDeepWP[3][3]={{0.0614,0.3093,0.7221},{0.0521,0.3033,0.7489},{0.0494,0.2770,0.7264}};
    std::string output_file="default", btag_file="", xsec_file="default";
    unsigned int nFiles=0;
@@ -1262,7 +1214,7 @@ public :
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
-   int bcounterDDBvL[5]={}, bcounterDeep[4]={};
+   int bcounterDDBvL[6]={}, bcounterDeep[4]={};
    int DDBvL_selected=0, Deep_selected=0;
    bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
@@ -1273,7 +1225,7 @@ public :
    int SignalHiggs=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
-   double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T[3]={1,1,1};
+   double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
    double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};   //tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
    double ele_VETOSF=1, mu_VETOSF=1;
@@ -1297,9 +1249,12 @@ public :
    TH2F *h_pho_EGamma_SF2D[3];
    TH2F *h_ele_EGamma_SF2D[4];
    TH2F *h_ele_EGamma_EffMC2D[4];
-   TH2F *h_eleRec_EGamma_SF2D;
+   TH2F *h_eleRec_EGamma_SF2D[2];
    TH2D *h_Scaling_Factors_HasPix_R9_high;
    TH2D *h_Scaling_Factors_HasPix_R9_low;
+   TH1F *h_PixelSeed_ScaleFactors_2017[3];
+   TH2D *h_PixelSeed_ScaleFactors_2018;
+   TH2D *h_PixelSeed_ScaleFactors_2018_unc;
    TH2D *h_muID_SF2D[3];
    TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
@@ -1315,10 +1270,6 @@ public :
    TEfficiency* eff_l_Deep_L;
    TEfficiency* eff_l_Deep_M;
    TEfficiency* eff_l_Deep_T;
-   TEfficiency* eff_b_BDSV_L;
-   TEfficiency* eff_b_BDSV_M1;
-   TEfficiency* eff_b_BDSV_M2;
-   TEfficiency* eff_b_BDSV_T;
    //histogram for Fake Rate
    TH2D *h2_FR;
    //hardcoded values for FR
@@ -1338,7 +1289,7 @@ public :
    void             Systematics(map<string, int> systematics);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    void             CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
-   void             CalcBtagSF_AK8(float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]);
+   void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
    void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
@@ -1350,15 +1301,15 @@ public :
 #ifdef Analyzer_cxx
 Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string xsec_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts) : fChain(0) 
 {
-// if parameter tree is not specified (or zero), connect the file
-// used to generate this class and read the Tree.
+  // if parameter tree is not specified (or zero), connect the file
+  // used to generate this class and read the Tree.
 
   _cut_variable=cut_variable;
   _cut_operator=cut_operator;
   _cut_value=cut_value;
   Systematics(systematics);
   //Determine lepton pt cuts
-  
+
   for (auto const& x : leptonpts) {
     if (x.first=="e") e_pt=x.second;
     else if (x.first=="m") mu_pt=x.second;
@@ -1380,7 +1331,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
   if (outname!="") output_file=outname;
   if (arg.size()==0) {
-    const char* fdefault = "/big_data/SUSYNANO/Nano1June2019/Data/2016/SinglePhoton_Run2016B_ver2/88877510-EB32-DD4C-ACAB-A8B99C65E6A3.root/Events";
+    const char* fdefault = "/data/SUSYNANO/Nano1June2019/Data/2016/SinglePhoton_Run2016B_ver2/88877510-EB32-DD4C-ACAB-A8B99C65E6A3.root/Events";
     if (!is_quiet) std::cout<<"No input files are defined, using: "<<fdefault<<std::endl;
     ch->Add(fdefault);
     tree = ch;
@@ -1391,7 +1342,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
       std::string temp=i;
       if (temp.find("*") != std::string::npos) {
         if (!is_quiet){
-          std::cout<<"Wildcard found in input argument, assuming ntuple structure: /ggNtuplizer/EventTree"<<std::endl;
+          std::cout<<"Wildcard found in input argument."<<std::endl;
         }
         temp+="/Events";
         ch->Add(temp.c_str());
@@ -1401,8 +1352,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
       if (!f || !f->IsOpen()) {
         f = new TFile(cstr_i);
       }
-      if (f->GetDirectory("ggNtuplizer") !=0) temp+="/Events";
-      else temp+="/Events";
+      temp+="/Events";
       ch->Add(temp.c_str());
       f->Close();
     }
@@ -1411,21 +1361,21 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
       std::cout<<nFiles<<" trees are read."<<std::endl; 
     }
     tree = ch;
-   }
-   Init(tree);
+  }
+  Init(tree);
 }
 
 Analyzer::~Analyzer()
 {
-   if (!fChain) return;
-   delete fChain->GetCurrentFile();
+  if (!fChain) return;
+  delete fChain->GetCurrentFile();
 }
 
 Int_t Analyzer::GetEntry(Long64_t entry)
 {
-// Read contents of entry.
-   if (!fChain) return 0;
-   return fChain->GetEntry(entry);
+  // Read contents of entry.
+  if (!fChain) return 0;
+  return fChain->GetEntry(entry);
 }
 Long64_t Analyzer::LoadTree(Long64_t entry)
 {
@@ -1449,13 +1399,13 @@ void Analyzer::Init(TTree *tree)
    // code, but the routine can be extended by the user if needed.
    // Init() will be called many times when running on PROOF
    // (once per file to be processed).
-
+   
    // Set branch addresses and branch pointers
    if (!tree) return;
    fChain = tree;
    fCurrent = -1;
    fChain->SetMakeClass(1);
-
+   
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("luminosityBlock", &luminosityBlock, &b_luminosityBlock);
    fChain->SetBranchAddress("event", &event, &b_event);
@@ -1638,13 +1588,6 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("puWeight")) fChain->SetBranchAddress("puWeight", &puWeight, &b_puWeight);
    if (fChain->GetBranch("puWeightUp")) fChain->SetBranchAddress("puWeightUp", &puWeightUp, &b_puWeightUp);
    if (fChain->GetBranch("puWeightDown")) fChain->SetBranchAddress("puWeightDown", &puWeightDown, &b_puWeightDown);
-   if (fChain->GetBranch("LHEWeight_originalXWGTUP")) fChain->SetBranchAddress("LHEWeight_originalXWGTUP", &LHEWeight_originalXWGTUP, &b_LHEWeight_originalXWGTUP);
-   if (fChain->GetBranch("nLHEPdfWeight")) fChain->SetBranchAddress("nLHEPdfWeight", &nLHEPdfWeight, &b_nLHEPdfWeight);
-   if (fChain->GetBranch("LHEPdfWeight")) fChain->SetBranchAddress("LHEPdfWeight", LHEPdfWeight, &b_LHEPdfWeight);
-   if (fChain->GetBranch("nLHEReweightingWeight")) fChain->SetBranchAddress("nLHEReweightingWeight", &nLHEReweightingWeight, &b_nLHEReweightingWeight);
-   if (fChain->GetBranch("LHEReweightingWeight")) fChain->SetBranchAddress("LHEReweightingWeight", &LHEReweightingWeight, &b_LHEReweightingWeight);
-   if (fChain->GetBranch("nLHEScaleWeight")) fChain->SetBranchAddress("nLHEScaleWeight", &nLHEScaleWeight, &b_nLHEScaleWeight);
-   if (fChain->GetBranch("LHEScaleWeight")) fChain->SetBranchAddress("LHEScaleWeight", LHEScaleWeight, &b_LHEScaleWeight);
    if (fChain->GetBranch("nPSWeight")) fChain->SetBranchAddress("nPSWeight", &nPSWeight, &b_nPSWeight);
    if (fChain->GetBranch("PSWeight")) fChain->SetBranchAddress("PSWeight", PSWeight, &b_PSWeight);
    fChain->SetBranchAddress("nIsoTrack", &nIsoTrack, &b_nIsoTrack);
@@ -1704,22 +1647,6 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("L1PreFiringWeight_Dn")) fChain->SetBranchAddress("L1PreFiringWeight_Dn", &L1PreFiringWeight_Dn, &b_L1PreFiringWeight_Dn);
    if (fChain->GetBranch("L1PreFiringWeight_Nom")) fChain->SetBranchAddress("L1PreFiringWeight_Nom", &L1PreFiringWeight_Nom, &b_L1PreFiringWeight_Nom);
    if (fChain->GetBranch("L1PreFiringWeight_Up")) fChain->SetBranchAddress("L1PreFiringWeight_Up", &L1PreFiringWeight_Up, &b_L1PreFiringWeight_Up);
-   if (fChain->GetBranch("LHE_HT")) fChain->SetBranchAddress("LHE_HT", &LHE_HT, &b_LHE_HT);
-   if (fChain->GetBranch("LHE_HTIncoming")) fChain->SetBranchAddress("LHE_HTIncoming", &LHE_HTIncoming, &b_LHE_HTIncoming);
-   if (fChain->GetBranch("LHE_Vpt")) fChain->SetBranchAddress("LHE_Vpt", &LHE_Vpt, &b_LHE_Vpt);
-   if (fChain->GetBranch("LHE_Njets")) fChain->SetBranchAddress("LHE_Njets", &LHE_Njets, &b_LHE_Njets);
-   if (fChain->GetBranch("LHE_Nb")) fChain->SetBranchAddress("LHE_Nb", &LHE_Nb, &b_LHE_Nb);
-   if (fChain->GetBranch("LHE_Nc")) fChain->SetBranchAddress("LHE_Nc", &LHE_Nc, &b_LHE_Nc);
-   if (fChain->GetBranch("LHE_Nuds")) fChain->SetBranchAddress("LHE_Nuds", &LHE_Nuds, &b_LHE_Nuds);
-   if (fChain->GetBranch("LHE_Nglu")) fChain->SetBranchAddress("LHE_Nglu", &LHE_Nglu, &b_LHE_Nglu);
-   if (fChain->GetBranch("LHE_NpNLO")) fChain->SetBranchAddress("LHE_NpNLO", &LHE_NpNLO, &b_LHE_NpNLO);
-   if (fChain->GetBranch("LHE_NpLO")) fChain->SetBranchAddress("LHE_NpLO", &LHE_NpLO, &b_LHE_NpLO);
-   if (fChain->GetBranch("nLHEPart")) fChain->SetBranchAddress("nLHEPart", &nLHEPart, &b_nLHEPart);
-   if (fChain->GetBranch("LHEPart_pt")) fChain->SetBranchAddress("LHEPart_pt", LHEPart_pt, &b_LHEPart_pt);
-   if (fChain->GetBranch("LHEPart_eta")) fChain->SetBranchAddress("LHEPart_eta", LHEPart_eta, &b_LHEPart_eta);
-   if (fChain->GetBranch("LHEPart_phi")) fChain->SetBranchAddress("LHEPart_phi", LHEPart_phi, &b_LHEPart_phi);
-   if (fChain->GetBranch("LHEPart_mass")) fChain->SetBranchAddress("LHEPart_mass", LHEPart_mass, &b_LHEPart_mass);
-   if (fChain->GetBranch("LHEPart_pdgId")) fChain->SetBranchAddress("LHEPart_pdgId", LHEPart_pdgId, &b_LHEPart_pdgId);
    if (fChain->GetBranch("GenMET_phi")) fChain->SetBranchAddress("GenMET_phi", &GenMET_phi, &b_GenMET_phi);
    if (fChain->GetBranch("GenMET_pt")) fChain->SetBranchAddress("GenMET_pt", &GenMET_pt, &b_GenMET_pt);
    fChain->SetBranchAddress("MET_MetUnclustEnUpDeltaX", &MET_MetUnclustEnUpDeltaX, &b_MET_MetUnclustEnUpDeltaX);
@@ -2025,7 +1952,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Flag_trkPOG_toomanystripclus53X", &Flag_trkPOG_toomanystripclus53X, &b_Flag_trkPOG_toomanystripclus53X);
    fChain->SetBranchAddress("Flag_trkPOG_logErrorTooManyClusters", &Flag_trkPOG_logErrorTooManyClusters, &b_Flag_trkPOG_logErrorTooManyClusters);
    fChain->SetBranchAddress("Flag_METFilters", &Flag_METFilters, &b_Flag_METFilters);
-   fChain->SetBranchAddress("HLTriggerFirstPath", &HLTriggerFirstPath, &b_HLTriggerFirstPath);
    if (fChain->GetBranch("HLT_Ele27_WPTight_Gsf")) fChain->SetBranchAddress("HLT_Ele27_WPTight_Gsf", &HLT_Ele27_WPTight_Gsf, &b_HLT_Ele27_WPTight_Gsf);
    if (fChain->GetBranch("HLT_ECALHT800")) fChain->SetBranchAddress("HLT_ECALHT800", &HLT_ECALHT800, &b_HLT_ECALHT800);
    if (fChain->GetBranch("HLT_Photon165_HE10")) fChain->SetBranchAddress("HLT_Photon165_HE10", &HLT_Photon165_HE10, &b_HLT_Photon165_HE10);
@@ -2049,16 +1975,16 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("L1Reco_step")) fChain->SetBranchAddress("L1Reco_step", &L1Reco_step, &b_L1Reco_step);
    if (fChain->GetBranch("L1_AlwaysTrue")) fChain->SetBranchAddress("L1_AlwaysTrue", &L1_AlwaysTrue, &b_L1_AlwaysTrue);
    Notify();
-}
-
+} 
+   
 Bool_t Analyzer::Notify()
-{
+{ 
    // The Notify() function is called when a new file is opened. This
    // can be either for a new TTree in a TChain or when when a new TTree
    // is started when using PROOF. It is normally not necessary to make changes
    // to the generated code, but the routine can be extended by the
    // user if needed. The return value is currently not used.
-
+   
    return kTRUE;
 }
 
@@ -2137,6 +2063,16 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
 // returns -1 otherwise.
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
+    unsigned int metFilters=0;
+    metFilters += (Flag_goodVertices) ? pow(2,0) : 0;
+    metFilters += (Flag_globalSuperTightHalo2016Filter) ? pow(2,1) : 0;
+    metFilters += (Flag_HBHENoiseFilter) ? pow(2,2) : 0;
+    metFilters += (Flag_HBHENoiseIsoFilter) ? pow(2,3) : 0;
+    metFilters += (Flag_EcalDeadCellTriggerPrimitiveFilter) ? pow(2,4) : 0;
+    metFilters += (Flag_BadPFMuonFilter) ? pow(2,5) : 0;
+    metFilters += (Flag_BadChargedCandidateFilter) ? pow(2,6) : 0;
+    metFilters += (Flag_eeBadScFilter) ? pow(2,7) : 0;
+    metFilters += (Flag_ecalBadCalibFilter) ? pow(2,8) : 0;
     bool HLTPho=0;
     if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
@@ -2311,9 +2247,8 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="MT") returnvalue*=Parser_float(MT,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="ST") returnvalue*=Parser_float(ST,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="ST_G") returnvalue*=Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
-    //else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters,_cut_operator[i],_cut_value[i]);
-    //else if (_cut_variable[i]=="NOTmetFilters") returnvalue*= !(Parser(metFilters,_cut_operator[i],_cut_value[i]));
+    else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters&(int)_cut_value[i],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Flag_METFilters") returnvalue*=Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(MET,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
@@ -2326,14 +2261,16 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="bcounterDDBvL_L") {returnvalue*=Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_L[DDBvL_whichSF];}
     else if (_cut_variable[i]=="bcounterDDBvL_M1") {returnvalue*=Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M1[DDBvL_whichSF];}
     else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue*=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_T") {returnvalue*=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_T1") {returnvalue*=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T1[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_T2") {returnvalue*=Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T2[DDBvL_whichSF];}
     else if (_cut_variable[i]=="DDBvL_selected") {
       returnvalue*=Parser(DDBvL_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
         if (_cut_value[i]==1) w*=DDBvL_SF_L[DDBvL_whichSF];
         if (_cut_value[i]==2) w*=DDBvL_SF_M1[DDBvL_whichSF];
         if (_cut_value[i]==3) w*=DDBvL_SF_M2[DDBvL_whichSF];
-        if (_cut_value[i]==4) w*=DDBvL_SF_T[DDBvL_whichSF];
+        if (_cut_value[i]==4) w*=DDBvL_SF_T1[DDBvL_whichSF];
+        if (_cut_value[i]==5) w*=DDBvL_SF_T2[DDBvL_whichSF];
       }
     }
     else if (_cut_variable[i]=="Deep_selected") {
@@ -2408,6 +2345,7 @@ void Analyzer::CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<in
     SF_do[1] = reader_M.eval_auto_bounds("down", FLAV, eta, pt);
     SF_up[2] = reader_T.eval_auto_bounds("up", FLAV, eta, pt);
     SF_do[2] = reader_T.eval_auto_bounds("down", FLAV, eta, pt);
+    //cout<<"SF L "<<SF[0]<<" + "<<SF_up[0]<<" - "<<SF_do[0]<<" M "<<SF[1]<<" + "<<SF_up[1]<<" - "<<SF_do[1]<<" T "<<SF[2]<<" + "<<SF_up[2]<<" - "<<SF_do[2]<<endl;
 
     if (it->second == '0') {
       for (int i=0;i<3;i++){
@@ -2450,6 +2388,7 @@ void Analyzer::CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<in
       }
     } 
   }
+  //cout<<"p_data "<<p_data[0]<<" p_mc "<<p_mc[0]<<endl;
   SF_L[0] = p_data[0]/p_mc[0];
   SF_M[0] = p_data[1]/p_mc[1];
   SF_T[0] = p_data[2]/p_mc[2];
@@ -2461,114 +2400,81 @@ void Analyzer::CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<in
   SF_T[2] = p_data_do[2]/p_mc[2];
 }
 
-void Analyzer::CalcBtagSF_AK8(float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_b_M1, TEfficiency *eff_b_M2, TEfficiency *eff_b_T, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T)[3]){
-  double p_data[4] = {1,1,1,1}, p_mc[4] = {1,1,1,1}, p_data_up[4] = {1,1,1,1}, p_data_do[4] = {1,1,1,1};
+void Analyzer::CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]){
+  for (unsigned int i=0;i<3;i++) {SF_L[i]=1; SF_M1[i]=1; SF_M2[i]=1; SF_T1[i]=1; SF_T2[i]=1;}
   for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
-    double mc_eff[4]={0}, eta=0, pt=0;
-    eta=v_eta[it->first];
-    pt=v_pt[it->first];
-    if (pt>=2000) pt=1999;
-    if (v_had[it->first]==5) {
-      mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
-      mc_eff[1] = eff_b_M1->GetEfficiency(eff_b_M1->FindFixBin(eta,pt));
-      mc_eff[2] = eff_b_M2->GetEfficiency(eff_b_M2->FindFixBin(eta,pt));
-      mc_eff[3] = eff_b_T->GetEfficiency(eff_b_T->FindFixBin(eta,pt));
-    }
-    else {
-      continue; 
-    }
-    double SF[4], SF_up[4], SF_do[4];
-    if (pt<350) {SF[0] = 0.96; SF[1] = 0.93; SF[2] = 0.92; SF[3] = 0.85;
-      SF_up[0] = SF[0]+0.03; SF_do[0] = SF[0]-0.02;
-      SF_up[1] = SF[1]+0.03; SF_do[1] = SF[1]-0.02;
-      SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.03;
-      SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.03;
-    }
-    else if (pt<430) {SF[0] = 1.00; SF[1] = 1.01; SF[2] = 1.01; SF[3] = 0.91;
-      SF_up[0] = SF[0]+0.04; SF_do[0] = SF[0]-0.03;
-      SF_up[1] = SF[1]+0.03; SF_do[1] = SF[1]-0.03;
-      SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.04;
-      SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.04;
-    }
-    else if (pt<840) {SF[0] = 1.01; SF[1] = 0.99; SF[2] = 0.92; SF[3] = 0.91;
-      SF_up[0] = SF[0]+0.02; SF_do[0] = SF[0]-0.04;
-      SF_up[1] = SF[1]+0.02; SF_do[1] = SF[1]-0.04;
-      SF_up[2] = SF[2]+0.03; SF_do[2] = SF[2]-0.05;
-      SF_up[3] = SF[3]+0.03; SF_do[3] = SF[3]-0.04;
-    }
-    else {SF[0] = 1.01; SF[1] = 0.99; SF[2] = 0.92; SF[3] = 0.91;
-      SF_up[0] = SF[0]+2*0.02; SF_do[0] = SF[0]-2*0.04;
-      SF_up[1] = SF[1]+2*0.02; SF_do[1] = SF[1]-2*0.04;
-      SF_up[2] = SF[2]+2*0.03; SF_do[2] = SF[2]-2*0.05;
-      SF_up[3] = SF[3]+2*0.03; SF_do[3] = SF[3]-2*0.04;
-    }
-    if (it->second == '0') {
-      for (int i=0;i<4;i++){
-        p_mc[i]*=(1-mc_eff[i]);
-        p_data[i]*=(1-SF[i]*mc_eff[i]);
-        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
-        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+    double pt=v_pt[it->first];
+    //cout<<it->second<<" pt "<<pt<<endl;
+    if (year==2016) {
+      if (pt>350 && pt<850) {
+        if (it->second != '0') {SF_L[0] = 0.95; SF_L[1] = SF_L[0]+0.10; SF_L[2] = SF_L[0]-0.04;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.86; SF_M1[1] = SF_M1[0]+0.11; SF_M1[2] = SF_M1[0]-0.04;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.77; SF_M2[1] = SF_M2[0]+0.11; SF_M2[2] = SF_M2[0]-0.04;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.74; SF_T1[1] = SF_T1[0]+0.10; SF_T1[2] = SF_T1[0]-0.08;}
+        if (it->second == 'C') {SF_T2[0] = 0.68; SF_T2[1] = SF_T2[0]+0.20; SF_T2[2] = SF_T2[0]-0.10;}
       }
-    } 
-    else if (it->second == 'L') {
-      p_mc[0]*=mc_eff[0];
-      p_data[0]*=SF[0]*mc_eff[0];
-      p_data_up[0]*=SF_up[0]*mc_eff[0];
-      p_data_do[0]*=SF_do[0]*mc_eff[0];
-      for (int i=1;i<4;i++){
-        p_mc[i]*=(1-mc_eff[i]);
-        p_data[i]*=(1-SF[i]*mc_eff[i]);
-        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
-        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      else {
+        if (it->second != '0') {SF_L[0] = 0.95; SF_L[1] = SF_L[0]+2*0.10; SF_L[2] = SF_L[0]-2*0.04;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.86; SF_M1[1] = SF_M1[0]+2*0.11; SF_M1[2] = SF_M1[0]-2*0.04;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.77; SF_M2[1] = SF_M2[0]+2*0.11; SF_M2[2] = SF_M2[0]-2*0.04;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.74; SF_T1[1] = SF_T1[0]+2*0.10; SF_T1[2] = SF_T1[0]-2*0.08;}
+        if (it->second == 'C') {SF_T2[0] = 0.68; SF_T2[1] = SF_T2[0]+2*0.20; SF_T2[2] = SF_T2[0]-2*0.10;}
       }
-    } 
-    else if (it->second == 'M') {
-      for (int i=0;i<2;i++){
-        p_mc[i]*=mc_eff[i];
-        p_data[i]*=SF[i]*mc_eff[i];
-        p_data_up[i]*=SF_up[i]*mc_eff[i];
-        p_data_do[i]*=SF_do[i]*mc_eff[i];
+    }
+    if (year==2017) {
+      if (pt<350) {
+        if (it->second != '0') {SF_L[0] = 0.92; SF_L[1] = SF_L[0]+0.04; SF_L[2] = SF_L[0]-0.04;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[1] = 0.82; SF_M1[1] = SF_M1[0]+0.04; SF_M1[2] = SF_M1[0]-0.05;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.72; SF_M2[1] = SF_M2[0]+0.05; SF_M2[2] = SF_M2[0]-0.05;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.62; SF_T1[1] = SF_T1[0]+0.04; SF_T1[2] = SF_T1[0]-0.05;}
+        if (it->second == 'C') {SF_T2[0] = 0.57; SF_T2[1] = SF_T2[0]+0.05; SF_T2[2] = SF_T2[0]-0.05;}
       }
-      for (int i=2;i<4;i++){
-        p_mc[i]*=(1-mc_eff[i]);
-        p_data[i]*=(1-SF[i]*mc_eff[i]);
-        p_data_up[i]*=(1-SF_up[i]*mc_eff[i]);
-        p_data_do[i]*=(1-SF_do[i]*mc_eff[i]);
+      else if (pt<850) {
+        if (it->second != '0') {SF_L[0] = 1.01; SF_L[1] = SF_L[0]+0.07; SF_L[2] = SF_L[0]-0.12;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.77; SF_M1[1] = SF_M1[0]+0.06; SF_M1[2] = SF_M1[0]-0.10;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.68; SF_M2[1] = SF_M2[0]+0.05; SF_M2[2] = SF_M2[0]-0.07;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.65; SF_T1[1] = SF_T1[0]+0.06; SF_T1[2] = SF_T1[0]-0.11;}
+        if (it->second == 'C') {SF_T2[0] = 0.54; SF_T2[1] = SF_T2[0]+0.15; SF_T2[2] = SF_T2[0]-0.23;}
       }
-    } 
-    else if (it->second == 'H') {
-      for (int i=0;i<3;i++){
-        p_mc[i]*=mc_eff[i];
-        p_data[i]*=SF[i]*mc_eff[i];
-        p_data_up[i]*=SF_up[i]*mc_eff[i];
-        p_data_do[i]*=SF_do[i]*mc_eff[i];
+      else {
+        if (it->second != '0') {SF_L[0] = 1.01; SF_L[1] = SF_L[0]+2*0.07; SF_L[2] = SF_L[0]-2*0.12;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.77; SF_M1[1] = SF_M1[0]+2*0.06; SF_M1[2] = SF_M1[0]-2*0.10;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.68; SF_M2[1] = SF_M2[0]+2*0.05; SF_M2[2] = SF_M2[0]-2*0.07;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.65; SF_T1[1] = SF_T1[0]+2*0.06; SF_T1[2] = SF_T1[0]-2*0.11;}
+        if (it->second == 'C') {SF_T2[0] = 0.54; SF_T2[1] = SF_T2[0]+2*0.15; SF_T2[2] = SF_T2[0]-2*0.23;}
       }
-      p_mc[3]*=(1-mc_eff[3]);
-      p_data[3]*=(1-SF[3]*mc_eff[3]);
-      p_data_up[3]*=(1-SF_up[3]*mc_eff[3]);
-      p_data_do[3]*=(1-SF_do[3]*mc_eff[3]);
-    } 
-    else if (it->second == 'T') {
-      for (int i=0;i<4;i++){
-        p_mc[i]*=mc_eff[i];
-        p_data[i]*=SF[i]*mc_eff[i];
-        p_data_up[i]*=SF_up[i]*mc_eff[i];
-        p_data_do[i]*=SF_do[i]*mc_eff[i];
+    }
+    if (year==2018) {
+      if (pt<350) {
+        if (it->second != '0') {SF_L[0] = 0.97; SF_L[1] = SF_L[0]+0.04; SF_L[2] = SF_L[0]-0.05;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.81; SF_M1[1] = SF_M1[0]+0.07; SF_M1[2] = SF_M1[2]-0.05;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.74; SF_M2[1] = SF_M2[0]+0.06; SF_M2[2] = SF_M2[0]-0.05;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.65; SF_T1[1] = SF_T1[0]+0.07; SF_T1[2] = SF_T1[0]-0.05;}
+        if (it->second == 'C') {SF_T2[0] = 0.61; SF_T2[1] = SF_T2[0]+0.05; SF_T2[2] = SF_T2[0]-0.05;}
       }
-    } 
+      else if (pt<850) {
+        if (it->second != '0') {SF_L[0] = 0.96; SF_L[1] = SF_L[0]+0.07; SF_L[2] = SF_L[0]-0.06;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.76; SF_M1[1] = SF_M1[0]+0.06; SF_M1[2] = SF_M1[0]-0.05;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.70; SF_M2[1] = SF_M2[0]+0.07; SF_M2[2] = SF_M2[0]-0.06;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.67; SF_T1[1] = SF_T1[0]+0.10; SF_T1[2] = SF_T1[0]-0.05;}
+        if (it->second == 'C') {SF_T2[0] = 0.69; SF_T2[1] = SF_T2[0]+0.07; SF_T2[2] = SF_T2[0]-0.09;}
+      }
+      else {
+        if (it->second != '0') {SF_L[0] = 0.96; SF_L[1] = SF_L[0]+2*0.07; SF_L[2] = SF_L[0]-2*0.06;}
+        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.76; SF_M1[1] = SF_M1[0]+2*0.06; SF_M1[2] = SF_M1[0]-2*0.05;}
+        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.70; SF_M2[1] = SF_M2[0]+2*0.07; SF_M2[2] = SF_M2[0]-2*0.06;}
+        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.67; SF_T1[1] = SF_T1[0]+2*0.10; SF_T1[2] = SF_T1[0]-2*0.05;}
+        if (it->second == 'C') {SF_T2[0] = 0.69; SF_T2[1] = SF_T2[0]+2*0.07; SF_T2[2] = SF_T2[0]-2*0.09;}
+      }
+    }
   }
-  SF_L[0] = p_data[0]/p_mc[0];
-  SF_M1[0] = p_data[1]/p_mc[1];
-  SF_M2[0] = p_data[2]/p_mc[2];
-  SF_T[0] = p_data[3]/p_mc[3];
-  SF_L[1] = p_data_up[0]/p_mc[0];
-  SF_L[2] = p_data_do[0]/p_mc[0];
-  SF_M1[1] = p_data_up[1]/p_mc[1];
-  SF_M1[2] = p_data_do[1]/p_mc[1];
-  SF_M2[1] = p_data_up[2]/p_mc[2];
-  SF_M2[2] = p_data_do[2]/p_mc[2];
-  SF_T[1] = p_data_up[3]/p_mc[3];
-  SF_T[2] = p_data_do[3]/p_mc[3];
+  /*
+  cout<<"SF_L "<<SF_L[0]<<" + "<<SF_L[1]<<" - "<<SF_L[2]<<endl;
+  cout<<"SF_M1 "<<SF_M1[0]<<" + "<<SF_M1[1]<<" - "<<SF_M1[2]<<endl;
+  cout<<"SF_M2 "<<SF_M2[0]<<" + "<<SF_M2[1]<<" - "<<SF_M2[2]<<endl;
+  cout<<"SF_T1 "<<SF_T1[0]<<" + "<<SF_T1[1]<<" - "<<SF_T1[2]<<endl;
+  cout<<"SF_T2 "<<SF_T2[0]<<" + "<<SF_T2[1]<<" - "<<SF_T2[2]<<endl;
+  */
 }
 
 void Analyzer::Systematics(map<string, int> systematics) {
@@ -2696,8 +2602,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"MT","invariant mass of leading loose photon and MET"},
   {"ST","HT+MET+Et of loose photons"},
   {"ST_G","MET+Et of loose photons"},
-  {"metFilters","metFilters"},
-  {"NOTmetFilters","Inverse of metFilters"},
+  {"metFilters","Recommended metFilters in a bitmap. Cuts on this means metFilters&cut operator cut. 2^0: goodVertices, 1: globalSuperTightHalo2016Filter, 2: HBHENoiseFilter, 3: HBHENoiseIsoFilter, 4: EcalDeadCellTriggerPrimitiveFilter, 5: BadPFMuonFilter, 6: BadChargedCandidateFilter, 7: eeBadScFilter, 8: ecalBadCalibFilter"},
+  {"Flag_METFilters","Flag_METFilters in nanoAOD"},
   {"MET","pfMET"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
   {"L1prefire","True if event could be affected by L1prefire"},
@@ -2710,7 +2616,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"bcounterDDBvL_L","number of loose DDBvL btagged jets"},
   {"bcounterDDBvL_M1","number of medium 1 DDBvL btagged jets"},
   {"bcounterDDBvL_M2","number of medium 2 DDBvL btagged jets"},
-  {"bcounterDDBvL_T","number of tight DDBvL btagged jets"},
+  {"bcounterDDBvL_T1","number of tight 1 DDBvL btagged jets"},
+  {"bcounterDDBvL_T2","number of tight 2 DDBvL btagged jets"},
   {"DDBvL_selected","DDBvL btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
   {"sth_selected","Deep_selected+DDBvL_selected"},
@@ -2720,7 +2627,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"passHiggsMass","At least 1 ak8jet exist with mass 70 to 200GeV"},
   {"passAK4HiggsMass","At least 1 pair of ak4jets exist with mass 70 to 200GeV"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
-  {"Hbb","1 detectable (bquark pt>30, eta<2.4) Higgs to bb found in the event (only for Signal...)"},
+  {"Hbb","Higgs to bb found in the event (only for Signal...)"},
   {"SignalHiggs","Neutralinos decay to 0,1 or 2 Higgs. Cut on number of Higgs bosons."},
   {"truePU","Cut on number of true pileup."},
   {"nVtx","Cut on number of vertices."},
