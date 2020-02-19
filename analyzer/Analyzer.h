@@ -2073,6 +2073,16 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     metFilters += (Flag_BadChargedCandidateFilter) ? pow(2,6) : 0;
     metFilters += (Flag_eeBadScFilter) ? pow(2,7) : 0;
     metFilters += (Flag_ecalBadCalibFilter) ? pow(2,8) : 0;
+    //current metfilter recommendations: year/data/mc/fastsim: 2016/191/63/61, 2017/447/319/317, 2018/447/319/317
+    bool metFilters_hardcoded=0; unsigned int filterValue=0;
+    if (year==2016 && isData) filterValue=191;
+    if (year==2016 && !isData && !_fastSim) filterValue=63;
+    if (year==2016 && !isData && _fastSim) filterValue=61;
+    if (year!=2016 && isData) filterValue=447;
+    if (year!=2016 && !isData && !_fastSim) filterValue=319;
+    if (year!=2016 && !isData && _fastSim) filterValue=317;
+    metFilters_hardcoded=(metFilters&filterValue)==filterValue;
+    cout<<"metFilters "<<metFilters<<" value "<<filterValue<<" hardcoded "<<metFilters_hardcoded<<endl;
     bool HLTPho=0;
     if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
@@ -2248,6 +2258,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="ST") returnvalue*=Parser_float(ST,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="ST_G") returnvalue*=Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters&(int)_cut_value[i],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="metFilters_hardcoded") returnvalue*=Parser(metFilters_hardcoded,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="Flag_METFilters") returnvalue*=Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(MET,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
@@ -2603,6 +2614,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"ST","HT+MET+Et of loose photons"},
   {"ST_G","MET+Et of loose photons"},
   {"metFilters","Recommended metFilters in a bitmap. Cuts on this means metFilters&cut operator cut. 2^0: goodVertices, 1: globalSuperTightHalo2016Filter, 2: HBHENoiseFilter, 3: HBHENoiseIsoFilter, 4: EcalDeadCellTriggerPrimitiveFilter, 5: BadPFMuonFilter, 6: BadChargedCandidateFilter, 7: eeBadScFilter, 8: ecalBadCalibFilter"},
+  {"metFilters_hardcoded","Hardcoded recommended metFilters"},
   {"Flag_METFilters","Flag_METFilters in nanoAOD"},
   {"MET","pfMET"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
