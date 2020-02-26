@@ -1227,15 +1227,16 @@ public :
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};   //tau_SF[3]={0.99,0.97,0.95};//tau: 5% unceartainty
-   double ele_VETOSF=1, mu_VETOSF=1;
+   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
+   double ele_VETOSF=1;
    int year=2016;
    int DDBvL_whichSF=0, Deep_whichSF=0;
    int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
-   int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0; 
+   int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0, ISR_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0;
    int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
+   unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999;
@@ -1256,11 +1257,10 @@ public :
    TH2D *h_PixelSeed_ScaleFactors_2018;
    TH2D *h_PixelSeed_ScaleFactors_2018_unc;
    TH2D *h_muID_SF2D[3];
-   TH2D *h_muID_EffMC2D[3];
    TH2D *h_muISO_SF2D[3];
+   TF1  *tf1_tau_ID_SF[3];
    TH2D *h_L1prefire_phoMap;
    TH2D *h_L1prefire_jetMap;
-   TGraph *h_muTrk_SF;
    TEfficiency* eff_b_Deep_L;
    TEfficiency* eff_b_Deep_M;
    TEfficiency* eff_b_Deep_T;
@@ -1270,6 +1270,8 @@ public :
    TEfficiency* eff_l_Deep_L;
    TEfficiency* eff_l_Deep_M;
    TEfficiency* eff_l_Deep_T;
+   TH1D *h_ISR_D;
+   map< pair<int, int>, TH1D* > m_ISR_D;
    //histogram for Fake Rate
    TH2D *h2_FR;
    //hardcoded values for FR
@@ -2090,8 +2092,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
     else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
-    //else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0]*mu_VETOSF;}
-    else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];} //mu_VETOSF not yet appliead because of dubious results
+    else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];}
     else if (_cut_variable[i]=="nPassMuM") {returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[1];}
     else if (_cut_variable[i]=="nPassMuT") {returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[2];}
     else if (_cut_variable[i]=="nPassTauL") {returnvalue*=Parser(nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[0];}
@@ -2512,6 +2513,7 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="Egamma_resol_rho") Egamma_Rhoresol_whichSF=x.second;
     else if (x.first=="Egamma_resol_phi") Egamma_Phiresol_whichSF=x.second;
     else if (x.first=="genMET") genMET_whichSF=x.second;
+    else if (x.first=="ISR") ISR_whichSF=x.second;
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
 }
@@ -2666,7 +2668,7 @@ void PrintHelp(){
   cout<<"Options:"<<endl;
   cout<<"-o outname \t\t Output filename will be set: histos/Analyzer_histos_+outname"<<endl;
   cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
-  cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC)"<<endl;
+  cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC). Write 'hardcoded' to use predefined values."<<endl;
   cout<<"-x xname \t\t Xsec file location and name"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
   cout<<"-F 1 or 2\t\t Turn on FakeRate weights. 1->for electrons 2->\"pixelseed\" electrons. Needs input file \"input/FakeRate_EGamma.root\""<<endl;

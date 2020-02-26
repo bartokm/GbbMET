@@ -682,7 +682,7 @@ void Analyzer::Loop()
        w=weight*pu_weight;
        //std::cout<<"event "<<event<<" w=weight*pu_weight"<<w<<"="<<weight<<"("<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<")"<<"*"<<pu_weight<<std::endl;
        //Scale factors
-       if (jentry==0) {
+       if (jentry==0 || newfile) {
          //photon cutbased 2016
          if (year==2016) {
            TFile f_2016phoLooseSF("input/egamma/photon/2016LegacyReReco_PhotonCutBasedLoose.root","read");
@@ -861,59 +861,180 @@ void Analyzer::Loop()
            h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
            f_eleTightSF.Close();
          }
-         //Muon ID SF
-         float lum_ratio_BCDEF = 0.5481;
-         TH2D *h_temp[3], *h_temp_eff[3];
-         TFile f_muID_BCDEF("input/EfficienciesAndSF_BCDEF.root","read");
-         h_temp[0] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_temp[1] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_temp[2] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_temp_eff[0] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         h_temp_eff[1] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         h_temp_eff[2] = (TH2D*)f_muID_BCDEF.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         for (auto i : h_temp) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
-         for (auto i : h_temp_eff) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
-         f_muID_BCDEF.Close();
-         TFile f_muID_GH("input/EfficienciesAndSF_GH.root","read");
-         h_muID_SF2D[0] = (TH2D*)f_muID_GH.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_muID_SF2D[1] = (TH2D*)f_muID_GH.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_muID_SF2D[2] = (TH2D*)f_muID_GH.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/pt_abseta_ratio");
-         h_muID_EffMC2D[0] = (TH2D*)f_muID_GH.Get("MC_NUM_LooseID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         h_muID_EffMC2D[1] = (TH2D*)f_muID_GH.Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         h_muID_EffMC2D[2] = (TH2D*)f_muID_GH.Get("MC_NUM_TightID_DEN_genTracks_PAR_pt_eta/efficienciesMC/pt_abseta_MC");
-         for (auto i : h_muID_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
-         for (auto i : h_muID_EffMC2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
-         f_muID_GH.Close();
-         h_muID_SF2D[0]->Add(h_temp[0]);
-         h_muID_SF2D[1]->Add(h_temp[1]);
-         h_muID_SF2D[2]->Add(h_temp[2]);
-         h_muID_EffMC2D[0]->Add(h_temp_eff[0]);
-         h_muID_EffMC2D[1]->Add(h_temp_eff[1]);
-         h_muID_EffMC2D[2]->Add(h_temp_eff[2]);
-         //Muon ISO SF
-         TFile f_muISO_BCDEF("input/EfficienciesAndSF_ISO_BCDEF.root","read");
-         h_temp[0] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_LooseID_pt_eta/pt_abseta_ratio");
-         h_temp[1] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_MediumID_pt_eta/pt_abseta_ratio");
-         h_temp[2] = (TH2D*)f_muISO_BCDEF.Get("LooseISO_TightID_pt_eta/pt_abseta_ratio");
-         for (auto i : h_temp) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
-         f_muISO_BCDEF.Close();
-         TFile f_muISO_GH("input/EfficienciesAndSF_ISO_GH.root","read");
-         h_muISO_SF2D[0] = (TH2D*)f_muISO_GH.Get("LooseISO_LooseID_pt_eta/pt_abseta_ratio");
-         h_muISO_SF2D[1] = (TH2D*)f_muISO_GH.Get("LooseISO_MediumID_pt_eta/pt_abseta_ratio");
-         h_muISO_SF2D[2] = (TH2D*)f_muISO_GH.Get("LooseISO_TightID_pt_eta/pt_abseta_ratio");
-         for (auto i : h_muISO_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
-         f_muISO_GH.Close();
-         h_muISO_SF2D[0]->Add(h_temp[0]);
-         h_muISO_SF2D[1]->Add(h_temp[1]);
-         h_muISO_SF2D[2]->Add(h_temp[2]);
-         //Muon Tracking SF
-         TFile f_muTrk("input/Tracking_EfficienciesAndSF_BCDEFGH.root","read");
-         h_muTrk_SF = (TGraph*)f_muTrk.Get("ratio_eff_eta3_dr030e030_corr");
-         f_muTrk.Close();
+         if (year==2016){
+           //Muon ID SF
+           float lum_ratio_BCDEF = 0.5481;
+           TH2D *h_temp_BCDEF[3];
+           TFile f_muID_BCDEF("input/muon_SF/2016/RunBCDEF_SF_ID_syst_muon2016.root","read");
+           h_temp_BCDEF[0] = (TH2D*)f_muID_BCDEF.Get("NUM_LooseID_DEN_genTracks_eta_pt");
+           h_temp_BCDEF[1] = (TH2D*)f_muID_BCDEF.Get("NUM_MediumID_DEN_genTracks_eta_pt");
+           h_temp_BCDEF[2] = (TH2D*)f_muID_BCDEF.Get("NUM_TightID_DEN_genTracks_eta_pt");
+           for (auto i : h_temp_BCDEF) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
+           f_muID_BCDEF.Close();
+           TFile f_muID_GH("input/muon_SF/2016/RunGH_SF_ID_syst_muon2016.root","read");
+           h_muID_SF2D[0] = (TH2D*)f_muID_GH.Get("NUM_LooseID_DEN_genTracks_eta_pt");
+           h_muID_SF2D[1] = (TH2D*)f_muID_GH.Get("NUM_MediumID_DEN_genTracks_eta_pt");
+           h_muID_SF2D[2] = (TH2D*)f_muID_GH.Get("NUM_TightID_DEN_genTracks_eta_pt");
+           for (auto i : h_muID_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
+           f_muID_GH.Close();
+           h_muID_SF2D[0]->Add(h_temp_BCDEF[0]);
+           h_muID_SF2D[1]->Add(h_temp_BCDEF[1]);
+           h_muID_SF2D[2]->Add(h_temp_BCDEF[2]);
+
+           //Muon ISO SF
+           TFile f_muISO_BCDEF("input/muon_SF/2016/RunBCDEF_SF_ISO_syst_muon2016.root","read");
+           h_temp_BCDEF[0] = (TH2D*)f_muISO_BCDEF.Get("NUM_LooseRelIso_DEN_LooseID_eta_pt");
+           h_temp_BCDEF[1] = (TH2D*)f_muISO_BCDEF.Get("NUM_LooseRelIso_DEN_MediumID_eta_pt");
+           h_temp_BCDEF[2] = (TH2D*)f_muISO_BCDEF.Get("NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt");
+           for (auto i : h_temp_BCDEF) {i->SetDirectory(0); i->Scale(lum_ratio_BCDEF);}
+           f_muISO_BCDEF.Close();
+           TFile f_muISO_GH("input/muon_SF/2016/RunGH_SF_ISO_syst_muon2016.root","read");
+           h_muISO_SF2D[0] = (TH2D*)f_muISO_GH.Get("NUM_LooseRelIso_DEN_LooseID_eta_pt");
+           h_muISO_SF2D[1] = (TH2D*)f_muISO_GH.Get("NUM_LooseRelIso_DEN_MediumID_eta_pt");
+           h_muISO_SF2D[2] = (TH2D*)f_muISO_GH.Get("NUM_LooseRelIso_DEN_TightIDandIPCut_eta_pt");
+           for (auto i : h_muISO_SF2D) {i->SetDirectory(0); i->Scale(1-lum_ratio_BCDEF);}
+           f_muISO_GH.Close();
+           h_muISO_SF2D[0]->Add(h_temp_BCDEF[0]);
+           h_muISO_SF2D[1]->Add(h_temp_BCDEF[1]);
+           h_muISO_SF2D[2]->Add(h_temp_BCDEF[2]);
+            
+           // transpose histograms
+           for (int i = 0; i<3; i++){
+             std::string name    = std::string(h_muID_SF2D[i]->GetName()) + "_transposed";
+             std::string title   = name;
+             std::string name_iso = std::string(h_muISO_SF2D[i]->GetName()) + "_transposed";
+             std::string title_iso= name_iso;
+
+             unsigned int nbinsx          = h_muID_SF2D[i]->GetNbinsX();
+             double *xbins        = (double*)((TAxis*)h_muID_SF2D[i]->GetXaxis())->GetXbins()->GetArray();
+             unsigned int nbinsy          = h_muID_SF2D[i]->GetNbinsY();
+             double *ybins        = (double*)((TAxis*)h_muID_SF2D[i]->GetYaxis())->GetXbins()->GetArray();
+             TH2D *h_temp        = new TH2D(name.c_str(), title.c_str(), nbinsy, ybins, nbinsx, xbins);
+             unsigned int nbinsx_iso      = h_muISO_SF2D[i]->GetNbinsX();
+             double *xbins_iso    = (double*)((TAxis*)h_muISO_SF2D[i]->GetXaxis())->GetXbins()->GetArray();
+             unsigned int nbinsy_iso      = h_muISO_SF2D[i]->GetNbinsY();
+             double *ybins_iso    = (double*)((TAxis*)h_muISO_SF2D[i]->GetYaxis())->GetXbins()->GetArray();
+             TH2D *h_temp_iso    = new TH2D(name_iso.c_str(), title_iso.c_str(), nbinsy_iso, ybins_iso, nbinsx_iso, xbins_iso);
+
+             for (unsigned int ix=0;ix<nbinsx;ix++){
+               double x=xbins[ix];
+               for (unsigned int iy=0;iy<nbinsy;iy++){
+                 double y=ybins[iy];
+                 int i_bin               = h_muID_SF2D[i]->FindBin(x,y);
+                 int i_bin_transposed    = h_temp->FindBin(y,x);
+
+                 h_temp->SetBinContent(i_bin_transposed, h_muID_SF2D[i]->GetBinContent(i_bin));
+                 h_temp->SetBinError(  i_bin_transposed, h_muID_SF2D[i]->GetBinError(i_bin));
+               }
+             }
+
+             for (unsigned int ix=0;ix<nbinsx_iso;ix++){
+               double x=xbins_iso[ix];
+               for (unsigned int iy=0;iy<nbinsy_iso;iy++){
+                 double y=ybins_iso[iy];
+                 int i_bin               = h_muISO_SF2D[i]->FindBin(x,y);
+                 int i_bin_transposed    = h_temp_iso->FindBin(y,x);
+
+                 h_temp_iso->SetBinContent(i_bin_transposed, h_muISO_SF2D[i]->GetBinContent(i_bin));
+                 h_temp_iso->SetBinError(  i_bin_transposed, h_muISO_SF2D[i]->GetBinError(i_bin));
+               }
+             }
+
+             h_muID_SF2D[i] = h_temp;
+             h_muID_SF2D[i]->SetDirectory(0);
+             h_muISO_SF2D[i] = h_temp_iso;
+             h_muISO_SF2D[i]->SetDirectory(0);
+           }
+         }
+         else if (year==2017){
+           // preliminary sys unc. available!
+           TFile f_muID("input/muon_SF/2017/RunBCDEF_SF_ID_syst_muon2017_TOBEUPDATED.root","read");
+           h_muID_SF2D[0] = (TH2D*)f_muID.Get("NUM_LooseID_DEN_genTracks_pt_abseta");
+           h_muID_SF2D[1] = (TH2D*)f_muID.Get("NUM_MediumID_DEN_genTracks_pt_abseta");
+           h_muID_SF2D[2] = (TH2D*)f_muID.Get("NUM_TightID_DEN_genTracks_pt_abseta");
+           for (auto i : h_muID_SF2D) i->SetDirectory(0);
+           f_muID.Close();
+           
+           //Muon ISO SF
+           // preliminary sys unc. available!
+           TFile f_muISO("input/muon_SF/2017/RunBCDEF_SF_ISO_syst_muon_2017_TOBEUPDATED.root","read");
+           h_muISO_SF2D[0] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_LooseID_pt_abseta");
+           h_muISO_SF2D[1] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_MediumID_pt_abseta");
+           h_muISO_SF2D[2] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta");
+           for (auto i : h_muISO_SF2D) i->SetDirectory(0);
+           f_muISO.Close();
+         }
+         else if (year==2018){
+           //contains stat and sys uncertainty too! 
+           TFile f_muID("input/muon_SF/2018/RunABCD_SF_ID_muon2018.root","read");
+           h_muID_SF2D[0] = (TH2D*)f_muID.Get("NUM_LooseID_DEN_TrackerMuons_pt_abseta");
+           h_muID_SF2D[1] = (TH2D*)f_muID.Get("NUM_MediumID_DEN_TrackerMuons_pt_abseta");
+           h_muID_SF2D[2] = (TH2D*)f_muID.Get("NUM_TightID_DEN_TrackerMuons_pt_abseta");
+           for (auto i : h_muID_SF2D) i->SetDirectory(0);
+           f_muID.Close();
+           
+           //Muon ISO SF
+           //contains stat and sys uncertainty too! 
+           TFile f_muISO("input/muon_SF/2018/RunABCD_SF_ISO_muon2018.root","read");
+           h_muISO_SF2D[0] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_LooseID_pt_abseta");
+           h_muISO_SF2D[1] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_MediumID_pt_abseta");
+           h_muISO_SF2D[2] = (TH2D*)f_muISO.Get("NUM_LooseRelIso_DEN_TightIDandIPCut_pt_abseta");
+           for (auto i : h_muISO_SF2D) i->SetDirectory(0);
+           f_muISO.Close();
+         }
+
+         //Tau SF
+         string f_tau="";
+         if (year==2016) f_tau="input/tau_SF/TauID_SF_pt_MVAoldDM2017v2_2016Legacy.root";
+         if (year==2017) f_tau="input/tau_SF/TauID_SF_pt_MVAoldDM2017v2_2017ReReco.root";
+         if (year==2018) f_tau="input/tau_SF/TauID_SF_pt_MVAoldDM2017v2_2018ReReco.root";
+         string sys_key="";
+         switch(tau_whichSF){
+           case 0: sys_key= "_cent";
+                   break;
+           case 1: sys_key= "_up";
+                   break;
+           case 2: sys_key= "_down";
+                   break;
+         }
+         TFile f_TauID(f_tau.c_str(),"read");
+         tf1_tau_ID_SF[0]=(TF1*)f_TauID.Get(("Loose"+sys_key).c_str());
+         tf1_tau_ID_SF[1]=(TF1*)f_TauID.Get(("Medium"+sys_key).c_str());
+         tf1_tau_ID_SF[2]=(TF1*)f_TauID.Get(("Tight"+sys_key).c_str());
+         f_TauID.Close();
 
          //Loading btag efficiency file, fill efficiency histograms
          if (btag_file.size()>0) {
-           TFile f_btag(btag_file.c_str(),"read");
+           string btag_fname=btag_file;
+           if (btag_file.compare("hardcoded")==0) {
+             string pretag="/data/BTagEff/nanoAODv5/";
+             string tag="BTagEff_";
+             if (temp_f.find("DYJetsToLL")!=std::string::npos) tag+="DYJetsToLL";
+             else if (temp_f.find("GJets")!=std::string::npos) tag+="GJets_HT_merged";
+             else if (temp_f.find("QCD")!=std::string::npos) tag+="QCD_HT_merged";
+             else if (temp_f.find("ST_s-channel")!=std::string::npos) tag+="ST_s-channel";
+             else if (temp_f.find("ST_t-channel_antitop")!=std::string::npos) tag+="ST_t-channel_antitop";
+             else if (temp_f.find("ST_t-channel_top")!=std::string::npos) tag+="ST_t-channel_top";
+             else if (temp_f.find("ST_tW_antitop")!=std::string::npos) tag+="ST_tW_antitop";
+             else if (temp_f.find("ST_tW_top")!=std::string::npos) tag+="ST_tW_top";
+             else if (temp_f.find("TTGJets")!=std::string::npos) tag+="TTGJets";
+             else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) tag+="TTGamma_Hadronic";
+             else if (temp_f.find("TTJets")!=std::string::npos) tag+="TTJets";
+             else if (temp_f.find("WGJets")!=std::string::npos) tag+="WGJets";
+             else if (temp_f.find("WJetsToLNu")!=std::string::npos) tag+="WJetsToLNu_HT_merged";
+             else if (temp_f.find("WJetsToQQ")!=std::string::npos) tag+="WJetsToQQ";
+             else if (temp_f.find("WW")!=std::string::npos) tag+="WW";
+             else if (temp_f.find("WZ")!=std::string::npos) tag+="WZ";
+             else if (temp_f.find("ZGTo2LG")!=std::string::npos) tag+="ZGTo2LG";
+             else if (temp_f.find("ZGTo2NuG")!=std::string::npos) tag+="ZGTo2NuG";
+             else if (temp_f.find("ZJetsToNuNu")!=std::string::npos) tag+="ZJetsToNuNu_HT_merged";
+             else if (temp_f.find("ZJetsToQQ")!=std::string::npos) tag+="ZJetsToQQ";
+             else if (temp_f.find("ZZ")!=std::string::npos) tag+="ZZ";
+             else if (temp_f.find("T5qqqqHg")==std::string::npos) cout<<"No btag eff file found for file "<<temp_f<<endl;;
+             btag_fname=pretag+"hadded/"+to_string(year)+"/"+tag+".root";
+             if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+to_string(year)+"_all_out.root";
+           }
+           TFile f_btag(btag_fname.c_str(),"read");
            eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
            eff_b_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
            eff_b_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
@@ -947,12 +1068,50 @@ void Analyzer::Loop()
            h_L1prefire_jetMap->SetDirectory(0);
            f_L1_jetmap_2017.Close();
          }
+         //ISR MC
+         if (year==2016) {
+           if (temp_f.find("TTJets")!=std::string::npos) ISR_MC=1;
+           else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) ISR_MC=2;
+           else if (temp_f.find("TTGJets")!=std::string::npos) ISR_MC=3;
+           else if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
+           else ISR_MC=0;
+         }
+         else if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
+         else ISR_MC=0;
+         if (ISR_MC){
+           //ISR reweight files
+           string isr_file="";
+           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+to_string(year)+"_nophotonmatch.root";
+           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+to_string(year)+"_nophotonmatch.root";
+           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+to_string(year)+"_nophotonmatch.root";
+           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+to_string(year)+"_nophotonmatch.root";
+           TFile f_ISR(isr_file.c_str(),"read");
+           if (ISR_MC!=4) {
+             h_ISR_D = (TH1D*)f_ISR.Get("h_Dfactor");
+             h_ISR_D->SetDirectory(0);
+           }
+           else {
+             TIter next(f_ISR.GetDirectory("singleBin_noPU")->GetListOfKeys());
+             TKey *key;
+             while ((key = (TKey*)next())) {
+               TH1D *h=(TH1D*)key->ReadObj();
+               h->SetDirectory(0);
+               string s =h->GetName(); //h_Dfactor_2800_2550
+               size_t g_first =  s.find("_",3);
+               size_t g_last = s.find("_",g_first+1);
+               string g = s.substr(g_first+1,g_last-g_first-1);
+               string n = s.substr(g_last+1,n.size()-g_last);
+               m_ISR_D[pair<int,int> (stoi(g),stoi(n))] = h;
+             }
+           }
+           f_ISR.Close();
+         }
        }
      }
-
+     
      //ISR jet counting (https://github.com/manuelfs/babymaker/blob/0136340602ee28caab14e3f6b064d1db81544a0a/bmaker/plugins/bmaker_full.cc#L1268-L1295)
      int n_isr_jets=0;
-     if (!isData) {
+     if (!isData && ISR_MC) {
        for (unsigned int i=0;i<nJet;i++) {
          if (abs(Jet_eta[i])>2.4 ||  !(Jet_jetId[i]>>1&1) || Jet_pt_nom[i]<30 ) continue;
          //cleaning jet from electrons, muons  and photons
@@ -986,6 +1145,33 @@ void Analyzer::Loop()
          }
          if (!matched) n_isr_jets++;
        }
+
+       //ISR reweight
+       vector<double> nISRjet2correction;
+       vector<double> nISRjet2unceratinty;
+       if (year==2016) {
+         nISRjet2correction = {1.0, 0.920, 0.821, 0.715, 0.662, 0.561, 0.511};
+         nISRjet2unceratinty= {0.0, 0.040, 0.090, 0.143, 0.169, 0.219, 0.244};
+       }
+       else {
+         nISRjet2correction = {1.0, 0.914, 0.796, 0.698, 0.602, 0.579, 0.580};
+         nISRjet2unceratinty= {0.0, 0.043, 0.102, 0.151, 0.199, 0.211, 0.210};
+       }
+       int njets=(n_isr_jets<6) ? n_isr_jets : 6;
+       double D=1;
+       double D_err=0;
+       if (ISR_MC!=4) {
+         D=h_ISR_D->GetBinContent(1);
+         D_err=h_ISR_D->GetBinError(1);
+       }
+       else {
+         D=m_ISR_D[mass_pair]->GetBinContent(1);
+         D_err=m_ISR_D[mass_pair]->GetBinError(1);
+       }
+       int sign=(ISR_whichSF==1) ? 1 : (ISR_whichSF==2) ? -1 : 0;
+       double w_isr=(nISRjet2correction[njets]+sign*nISRjet2unceratinty[njets])*(D+sign*D_err);
+       w*=w_isr;
+       //cout<<"nisr "<<njets<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[njets]<<" * "<<D<<endl;
      }
 
      //object definitions
@@ -1005,8 +1191,8 @@ void Analyzer::Loop()
      nleadEleV=-1; nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
      nleadMuL=-1; nleadMuM=-1; nleadMuT=-1, nleadMuNO=-1;
      nleadTauL=-1; nleadTauM=-1; nleadTauT=-1; nleadIso=-1;
-     ele_VETOSF=1; mu_VETOSF=1;
-     for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1;}
+     ele_VETOSF=1;
+     for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1; tau_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
@@ -1359,30 +1545,18 @@ void Analyzer::Loop()
        for (int i=0;i<3;i++) {
          if (iter[i]!=-1){
            float pt = ( Muon_pt[iter[i]]< 20)? 20 : (Muon_pt[iter[i]]< 100) ? Muon_pt[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
+           float eta = (year==2016) ? Muon_eta[iter[i]] : abs(Muon_eta[iter[i]]);
            double id_sf=0, iso_sf=0, syst_id=0, syst_iso=0;
            int sign_id=0, sign_iso=0;
-           id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,abs(Muon_eta[iter[i]])));
-           syst_id=h_muID_SF2D[i]->GetBinError(h_muID_SF2D[i]->FindBin(pt,abs(Muon_eta[iter[i]])));
-           iso_sf=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,abs(Muon_eta[iter[i]])));
-           syst_iso=h_muISO_SF2D[i]->GetBinError(h_muISO_SF2D[i]->FindBin(pt,abs(Muon_eta[iter[i]])));
+           id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,eta));
+           syst_id=h_muID_SF2D[i]->GetBinError(h_muID_SF2D[i]->FindBin(pt,eta));
+           iso_sf=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,eta));
+           syst_iso=h_muISO_SF2D[i]->GetBinError(h_muISO_SF2D[i]->FindBin(pt,eta));
            (muID_whichSF==1) ? sign_id=1 : (muID_whichSF==2) ? sign_id=-1 : sign_id=0;
            (muISO_whichSF==1) ? sign_iso=1 : (muISO_whichSF==2) ? sign_iso=-1 : sign_iso=0;
            mu_SF[i]=(id_sf+sign_id*syst_id)*(iso_sf+sign_iso*syst_iso);
-           double *y = h_muTrk_SF->GetY(); double *x = h_muTrk_SF->GetX(); int whichx=0;
-           for (int j=0;;j++) {
-             double xdo=h_muTrk_SF->GetErrorXlow(j); double xup=h_muTrk_SF->GetErrorXhigh(j);
-             if (Muon_eta[iter[i]] >= (x[j]-xdo) && Muon_eta[iter[i]] <= (x[j]+xup)) {whichx=j;break;}
-           }
-           mu_SF[i]*=y[whichx];
+           if (id_sf==0 || iso_sf==0) cout<<i<<" id_sf "<<id_sf<<" iso_sf "<<iso_sf<<" mu_SF "<<mu_SF[i]<<endl;
          }
-       }
-       //muon vetoSF (only for vetoing loose muons)
-       if (nPassMuNO>0) {
-         int i=passMuNO.at(0);
-         float pt = ( Muon_pt[i]< 20)? 20 : (Muon_pt[i]< 100) ? Muon_pt[i] : 100 ; //Histo range is: 20-120, highest bin 60-120
-         double epsilon=h_muID_EffMC2D[0]->GetBinContent(h_muID_EffMC2D[0]->FindBin(pt,abs(Muon_eta[i])));
-         double sf=h_muID_SF2D[0]->GetBinContent(h_muID_SF2D[0]->FindBin(pt,abs(Muon_eta[i])));
-         mu_VETOSF = (1-sf*epsilon)/(1-epsilon);
        }
      }
 
@@ -1414,8 +1588,13 @@ void Analyzer::Loop()
      if (passTauT.size() != 0) nleadTauT=passTauT[0];
      //if (passTauNO.size() != 0) nleadTauNO=passTauNO[0];
 
-     //Tau SF uncertainty
-     if (!isData) for (unsigned int i=0;i<3;i++) (tau_whichSF==1) ? tau_SF[i]+=0.05 : (tau_whichSF==2) ? tau_SF[i]-=0.05 : tau_SF[i]+=0;
+     //Tau SF
+     if (!isData) {
+       if (passTauL.size() != 0) tau_SF[0]=tf1_tau_ID_SF[0]->Eval(Tau_pt[nleadTauL]);
+       if (passTauM.size() != 0) tau_SF[1]=tf1_tau_ID_SF[1]->Eval(Tau_pt[nleadTauM]);
+       if (passTauT.size() != 0) tau_SF[2]=tf1_tau_ID_SF[2]->Eval(Tau_pt[nleadTauT]);
+       if (tau_SF[0]==0 || tau_SF[1]==0 || tau_SF[2]==0) cout<<"nPassTauL "<<nPassTauL<<" nPassTauM "<<nPassTauM<<" nPassTauT "<<nPassTauT<<" tau L SF "<<tau_SF[0]<<" tau M SF "<<tau_SF[1]<<" tau T SF "<<tau_SF[2]<<endl;
+     }
 
      //IsoTrack
      for (unsigned int i=0;i<nIsoTrack;i++) {
@@ -1513,7 +1692,7 @@ void Analyzer::Loop()
        //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {
        //  passcut=false;break;
        //}
-       if (_fastSim && passcut && Jet_chHEF[i]<0.1) {
+       if (_fastSim && year==2016 && passcut && Jet_chHEF[i]<0.1) {
          bool match=0;
          for (unsigned int j=0;j<nJet;j++){
            if (Jet_genJetIdx[i]==-1) continue;
