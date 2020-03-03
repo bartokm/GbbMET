@@ -50,6 +50,11 @@
   map< pair<int, int>, TH1D* > m_dphi_met_jet;
   map< pair<int, int>, TH1D* > m_dR_ak4_Hcandidate;
 	
+  map< pair<int, int>, TH1D* > m_mHAK8;
+  map< pair<int, int>, TH1D* > m_mHAK4;
+  map< pair<int, int>, TH2D* > m2_mHAK8;
+  map< pair<int, int>, TH2D* > m2_mHAK4;
+	
   map< pair<int, int>, THnD* > mn_AK4searchBins;
   map< pair<int, int>, TH1D* > m_AK4searchBins;
   map< pair<int, int>, THnD* > mn_AK8searchBins;
@@ -243,6 +248,11 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
 			m_AK8mass_select[MassPair] = new TH1D("h_AK8PrunedCorrjetmass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",10,18,278);
       m_dR_ak4_Hcandidate[MassPair] = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
       m_dphi_met_jet[MassPair] = new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",10,0,3.2);
+			
+      m_mHAK8[MassPair] = new TH1D("h_mHAK8",";M_{AK8}[GeV]",10,18,278);
+      m_mHAK4[MassPair] = new TH1D("h_mHAK4",";M_{bb}[GeV]",10,18,278);
+      m2_mHAK8[MassPair] = new TH2D("h2_mHAK8",";Unrolled bins;M_{AK8}[GeV]",6,0.5,6.5,10,18,278);
+      m2_mHAK4[MassPair] = new TH2D("h2_mHAK4",";Unrolled bins;M_{bb}[GeV]",12,0.5,12.5,10,18,278);
       
       //AK4 searchbins
       const int dim_ak4=4;

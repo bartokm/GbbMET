@@ -340,6 +340,11 @@ void Analyzer::Loop()
    TH1D *h_dR_ak4_Hcandidate = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
    TH1D *h_dphi_met_jet= new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",10,0,3.2);
 
+   TH1D *h_mHAK8= new TH1D("h_mHAK8",";M_{AK8}[GeV]",10,18,278);
+   TH1D *h_mHAK4= new TH1D("h_mHAK4",";M_{bb}[GeV]",10,18,278);
+   TH2D *h2_mHAK8= new TH2D("h2_mHAK8",";Unrolled bins;M_{AK8}[GeV]",6,0.5,6.5,10,18,278);
+   TH2D *h2_mHAK4= new TH2D("h2_mHAK4",";Unrolled bins;M_{bb}[GeV]",12,0.5,12.5,10,18,278);
+
    //AK4 searchbins
    const int dim_ak4=4;
    int nbins_ak4[dim_ak4]={2,3,6,2};
@@ -597,7 +602,7 @@ void Analyzer::Loop()
      b_Tau_idMVAoldDM->GetEntry(ientry);
      b_Tau_idMVAoldDM2017v2->GetEntry(ientry);
      b_Tau_idMVAnewDM2017v2->GetEntry(ientry);
-     b_nJet->GetEntry(ientry);
+     b_nJet->GetEntry(ientry); if (nJet>99) continue;
      b_Jet_pt->GetEntry(ientry);
      b_Jet_pt_nom->GetEntry(ientry);
      b_Jet_pt_raw->GetEntry(ientry);
@@ -1010,24 +1015,28 @@ void Analyzer::Loop()
              string pretag="/data/BTagEff/nanoAODv5/";
              string tag="BTagEff_";
              if (temp_f.find("DYJetsToLL")!=std::string::npos) tag+="DYJetsToLL";
+             else if (temp_f.find("TTGJets")!=std::string::npos) tag+="TTGJets";
              else if (temp_f.find("GJets")!=std::string::npos) tag+="GJets_HT_merged";
              else if (temp_f.find("QCD")!=std::string::npos) tag+="QCD_HT_merged";
+             else if (temp_f.find("ST_s-channel_hadronicDecays")!=std::string::npos) tag+="ST_s-channel_hadronicDecays";
+             else if (temp_f.find("ST_s-channel_leptonDecays")!=std::string::npos) tag+="ST_s-channel_leptonDecays";
              else if (temp_f.find("ST_s-channel")!=std::string::npos) tag+="ST_s-channel";
              else if (temp_f.find("ST_t-channel_antitop")!=std::string::npos) tag+="ST_t-channel_antitop";
              else if (temp_f.find("ST_t-channel_top")!=std::string::npos) tag+="ST_t-channel_top";
              else if (temp_f.find("ST_tW_antitop")!=std::string::npos) tag+="ST_tW_antitop";
              else if (temp_f.find("ST_tW_top")!=std::string::npos) tag+="ST_tW_top";
-             else if (temp_f.find("TTGJets")!=std::string::npos) tag+="TTGJets";
              else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) tag+="TTGamma_Hadronic";
              else if (temp_f.find("TTJets")!=std::string::npos) tag+="TTJets";
              else if (temp_f.find("WGJets")!=std::string::npos) tag+="WGJets";
              else if (temp_f.find("WJetsToLNu")!=std::string::npos) tag+="WJetsToLNu_HT_merged";
+             else if (temp_f.find("WJetsToQQ_HT")!=std::string::npos) tag+="WJetsToQQ_HT_merged";
              else if (temp_f.find("WJetsToQQ")!=std::string::npos) tag+="WJetsToQQ";
              else if (temp_f.find("WW")!=std::string::npos) tag+="WW";
              else if (temp_f.find("WZ")!=std::string::npos) tag+="WZ";
              else if (temp_f.find("ZGTo2LG")!=std::string::npos) tag+="ZGTo2LG";
              else if (temp_f.find("ZGTo2NuG")!=std::string::npos) tag+="ZGTo2NuG";
              else if (temp_f.find("ZJetsToNuNu")!=std::string::npos) tag+="ZJetsToNuNu_HT_merged";
+             else if (temp_f.find("ZJetsToQQ_HT")!=std::string::npos) tag+="ZJetsToQQ_HT_merged";
              else if (temp_f.find("ZJetsToQQ")!=std::string::npos) tag+="ZJetsToQQ";
              else if (temp_f.find("ZZ")!=std::string::npos) tag+="ZZ";
              else if (temp_f.find("T5qqqqHg")==std::string::npos) cout<<"No btag eff file found for file "<<temp_f<<endl;;
@@ -1169,7 +1178,7 @@ void Analyzer::Loop()
          D_err=m_ISR_D[mass_pair]->GetBinError(1);
        }
        int sign=(ISR_whichSF==1) ? 1 : (ISR_whichSF==2) ? -1 : 0;
-       double w_isr=(nISRjet2correction[njets]+sign*nISRjet2unceratinty[njets])*(D+sign*D_err);
+       double w_isr=(nISRjet2correction[njets]+sign*nISRjet2unceratinty[njets])*(D-sign*D_err);
        w*=w_isr;
        //cout<<"nisr "<<njets<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[njets]<<" * "<<D<<endl;
      }
@@ -1270,7 +1279,7 @@ void Analyzer::Loop()
        int sign_id=0, sign_pix=0;
        if (nPassPhoL!=0){
          double photon_eta=Photon_eta[nleadPhoL]; //needed for difference between SCEta and photon_eta
-         double photon_et=(phoET[nleadPhoL]>500) ? 499 : phoET[nleadPhoL]; //needed for maximum ET in SF histo
+         double photon_et=(phoET[nleadPhoL]>499) ? 499 : phoET[nleadPhoL]; //needed for maximum ET in SF histo
          if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
          if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
          if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
@@ -1508,7 +1517,8 @@ void Analyzer::Loop()
          double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
          id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
          syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         ele_VETOSF = (1-(id_sf+sign_id*syst_id)*epsilon)/(1-epsilon);
+         ele_VETOSF = (epsilon == 1) ? 1 : (1-(id_sf+sign_id*syst_id)*epsilon)/(1-epsilon);
+         if (ele_VETOSF==0 || ::isnan(ele_VETOSF)) cout<<"ele veto id "<<id_sf<<" epsilon "<<epsilon<<" sf "<<ele_VETOSF<<endl;
        }
      }
      //muon
@@ -2063,17 +2073,51 @@ void Analyzer::Loop()
            if (dphi_met_jet!=999) h_dphi_met_jet->Fill(dphi_met_jet,w);
 
            //AK4-AK8 searchbin fills
-     double w_AK4searchBin=w, w_AK8searchBin=w;
-     if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];
-     //if (boost==1 && AK4AK8==1) {w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];cout<<"ak8 w "<<DDBvL_SF_L[DDBvL_whichSF]<<endl;}
-     else if (boost==0) {if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
-     //else if (boost==0) {cout<<AK4AK8<<" ak4 w "<<Deep_SF_L[Deep_whichSF]<<" "<<Deep_SF_L[1]<<" "<<Deep_SF_L[2]<<" deep selected "<<Deep_selected<<" nbjet "<<bcounterDeep[1]<<endl;if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
-       switch (boost) {
-         case 0 : hn_AK4searchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
-         break;
-         case 1 : hn_AK8searchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
-         break;
-       }
+           double w_AK4searchBin=w, w_AK8searchBin=w;
+           if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];
+           //if (boost==1 && AK4AK8==1) {w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];cout<<"ak8 w "<<DDBvL_SF_L[DDBvL_whichSF]<<endl;}
+           else if (boost==0) {if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
+           //else if (boost==0) {cout<<AK4AK8<<" ak4 w "<<Deep_SF_L[Deep_whichSF]<<" "<<Deep_SF_L[1]<<" "<<Deep_SF_L[2]<<" deep selected "<<Deep_selected<<" nbjet "<<bcounterDeep[1]<<endl;if (AK4AK8==1) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}
+           switch (boost) {
+             case 0 : hn_AK4searchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
+                      break;
+             case 1 : hn_AK8searchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
+                      break;
+           }
+           //cout<<jentry<<" "<<event<<" "<<w_AK4searchBin<<" "<<w_AK8searchBin<<endl;
+
+           //higgs mass distribution plot fills
+           if (boost && met>3 && AK4AK8>0) {
+             int massRegion = (met-4)*2+njet;
+             double m=FatJet_msoftdrop_nom[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             double m2=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+             if (VR) h2_mHAK8->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
+             else if (!isData) h2_mHAK8->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
+           }
+           if (!boost && met>3 && AK4AK8>0) {
+             int massRegion = (AK4AK8-1)*6+(met-4)*2+njet;
+             double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             double wtemp=w*Deep_SF_L[Deep_whichSF]*(AK4AK8==2) ? Deep_SF_L[Deep_whichSF] : 1;
+             TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+             double m2=(bjet1+bjet2).M(); (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2;
+             if (VR) h2_mHAK4->Fill(massRegion,m2,wtemp);
+             else if (!isData) h2_mHAK4->Fill(massRegion,m,wtemp);
+           }
+           if (VR==1 && boost==1 && AK4AK8>0) {
+             double m=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             h_mHAK8->Fill(m,w*DDBvL_SF_L[DDBvL_whichSF]);
+           }
+           if (VR==1 && boost==0 && passJet.size()>1 && AK4AK8>0) {
+             TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+             double m=(bjet1+bjet2).M();  (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             h_mHAK4->Fill(m,w*Deep_SF_L[Deep_whichSF]);
+           }
+           if (!isData && AK4AK8>0 && boost==1 && VR==0) h_mHAK8->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
+           if (!isData && AK4AK8>0 && boost==0 && VR==0) h_mHAK4->Fill(m_bb_deep,w*Deep_SF_L[Deep_whichSF]);
      
      //SignalRegion -- not the real SR, but almost
      int SignalRegion=0;
@@ -2133,14 +2177,48 @@ void Analyzer::Loop()
          case 1 : mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
          break;
        }
+       //higgs mass distribution plot fills
+       if (boost && met>3 && AK4AK8>0) {
+         int massRegion = (met-4)*2+njet;
+         double m=FatJet_msoftdrop_nom[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         double m2=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+         if (VR) m2_mHAK8[mass_pair]->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
+         else if (!isData) m2_mHAK8[mass_pair]->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
+       }
+       if (!boost && met>3 && AK4AK8>0) {
+         int massRegion = (AK4AK8-1)*6+(met-4)*2+njet;
+         double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         double wtemp=w*Deep_SF_L[Deep_whichSF]*(AK4AK8==2) ? Deep_SF_L[Deep_whichSF] : 1;
+         TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
+         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+         double m2=(bjet1+bjet2).M(); (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2;
+         if (VR) m2_mHAK4[mass_pair]->Fill(massRegion,m2,wtemp);
+         else if (!isData) m2_mHAK4[mass_pair]->Fill(massRegion,m,wtemp);
+       }
+       if (VR==1 && boost==1 && AK4AK8>0) {
+         double m=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         m_mHAK8[mass_pair]->Fill(m,w*DDBvL_SF_L[DDBvL_whichSF]);
+       }
+       if (VR==1 && boost==0 && passJet.size()>1 && AK4AK8>0) {
+         TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
+         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+         double m=(bjet1+bjet2).M(); (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         m_mHAK4[mass_pair]->Fill(m,w*Deep_SF_L[Deep_whichSF]);
+       }
+       if (!isData && AK4AK8>0 && boost==1 && VR==0) m_mHAK8[mass_pair]->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
+       if (!isData && AK4AK8>0 && boost==0 && VR==0) m_mHAK4[mass_pair]->Fill(m_bb_deep,w*Deep_SF_L[Deep_whichSF]);
      }
    }
-   for (unsigned int i=1;i<nsbins_ak4+1;i++) {
-     h_AK4searchBins->SetBinContent(i,hn_AK4searchBins->GetBinContent(i));
-     h_AK4searchBins->SetBinError(i,hn_AK4searchBins->GetBinError(i));
-     h_AK8searchBins->SetBinContent(i,hn_AK8searchBins->GetBinContent(i));
-     h_AK8searchBins->SetBinError(i,hn_AK8searchBins->GetBinError(i));
-   }
+
+         for (unsigned int i=1;i<nsbins_ak4+1;i++) {
+           h_AK4searchBins->SetBinContent(i,hn_AK4searchBins->GetBinContent(i));
+           h_AK4searchBins->SetBinError(i,hn_AK4searchBins->GetBinError(i));
+           h_AK8searchBins->SetBinContent(i,hn_AK8searchBins->GetBinContent(i));
+           h_AK8searchBins->SetBinError(i,hn_AK8searchBins->GetBinError(i));
+         }
+
    if (SignalScan) {
      for (auto const&i : grid) {
        for (auto j : i.second) {
