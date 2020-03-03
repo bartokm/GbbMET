@@ -1830,9 +1830,6 @@ void Analyzer::Loop()
          FatJet_genJetIdx.push_back(matched_id);
        }
      }
-     //cout<<"njet "<<nJet<<" nGenJet "<<nGenJet;
-     //for (unsigned int i=0;i<nJet;i++) cout<<" idx "<<Jet_genJetIdx[i];
-     //cout<<endl;
 
      //MET variables
      for (auto i : passPhoL) ST+=phoET[i];
@@ -2094,7 +2091,7 @@ void Analyzer::Loop()
              if (VR) h2_mHAK8->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
              else if (!isData) h2_mHAK8->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
            }
-           if (!boost && met>3 && AK4AK8>0) {
+           if (!boost && met>3 && AK4AK8>0 && passJet.size()>1) {
              int massRegion = (AK4AK8-1)*6+(met-4)*2+njet;
              double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
              double wtemp=w*Deep_SF_L[Deep_whichSF]*(AK4AK8==2) ? Deep_SF_L[Deep_whichSF] : 1;
@@ -2185,7 +2182,7 @@ void Analyzer::Loop()
          if (VR) m2_mHAK8[mass_pair]->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
          else if (!isData) m2_mHAK8[mass_pair]->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
        }
-       if (!boost && met>3 && AK4AK8>0) {
+       if (!boost && met>3 && AK4AK8>0 && passJet.size()>1) {
          int massRegion = (AK4AK8-1)*6+(met-4)*2+njet;
          double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
          double wtemp=w*Deep_SF_L[Deep_whichSF]*(AK4AK8==2) ? Deep_SF_L[Deep_whichSF] : 1;
