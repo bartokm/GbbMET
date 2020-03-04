@@ -2291,7 +2291,13 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         if (_cut_value[i]==2) w*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];
       }
     }
-    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+DDBvL_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="sth_selected") {
+      returnvalue*=Parser(Deep_selected+DDBvL_selected,_cut_operator[i],_cut_value[i]);
+      if (_cut_variable[i]>0) {
+        if (Deep_selected==1) w*=Deep_SF_L[Deep_whichSF];
+        if (Deep_selected==2) w*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];
+      }
+    }
     else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
