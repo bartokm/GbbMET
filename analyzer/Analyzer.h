@@ -1198,6 +1198,7 @@ public :
    bool signalstudy=false;
    bool SignalScan=false;
    bool CountSignal=false;
+   int SignalScenario=0;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -1281,7 +1282,7 @@ public :
    virtual ~Analyzer();
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string xsec_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={});
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
-   map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy);
+   map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
@@ -1290,7 +1291,7 @@ public :
    virtual void     Show(Long64_t entry = -1);
    void             Systematics(map<string, int> systematics);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
-   void             CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
+   void             CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
    void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
@@ -1365,6 +1366,9 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
     tree = ch;
   }
   Init(tree);
+  string temp=tree->GetCurrentFile()->GetName();
+  if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
+  else if (temp.find("TChiNG")!=std::string::npos) SignalScenario=2;
 }
 
 Analyzer::~Analyzer()
@@ -2262,6 +2266,8 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="Flag_METFilters") returnvalue*=Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(MET,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_jet_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_jet_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
@@ -2326,13 +2332,14 @@ double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
   return dR;
 }
 
-void Analyzer::CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
+void Analyzer::CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
   double p_data[3] = {1,1,1}, p_mc[3] = {1,1,1}, p_data_up[3] = {1,1,1}, p_data_do[3] = {1,1,1};
   for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
     BTEntry::JetFlavor FLAV;
     double mc_eff[3]={0}, eta=0, pt=0;
     eta=v_eta[it->first];
     pt=v_pt[it->first];
+    //cout<<"pt "<<pt<<" eta "<<eta<<" flav "<<v_had[it->first]<<" tag "<<it->second<<endl;
     if (pt>=2000) pt=1999;
     if (v_had[it->first]==5) {
       FLAV = BTEntry::FLAV_B;
@@ -2353,17 +2360,17 @@ void Analyzer::CalcBtagSF(float v_eta[], vector<float> v_pt, int v_had[], map<in
       mc_eff[2] = eff_l_T->GetEfficiency(eff_l_T->FindFixBin(eta,pt));
     }
     double SF[3], SF_up[3], SF_do[3];
-    SF[0] = reader_L.eval_auto_bounds("central",FLAV,eta,pt);
-    SF[1] = reader_M.eval_auto_bounds("central",FLAV,eta,pt);
-    SF[2] = reader_T.eval_auto_bounds("central",FLAV,eta,pt);
-    SF_up[0] = reader_L.eval_auto_bounds("up", FLAV, eta, pt);
-    SF_do[0] = reader_L.eval_auto_bounds("down", FLAV, eta, pt);
-    SF_up[1] = reader_M.eval_auto_bounds("up", FLAV, eta, pt);
-    SF_do[1] = reader_M.eval_auto_bounds("down", FLAV, eta, pt);
-    SF_up[2] = reader_T.eval_auto_bounds("up", FLAV, eta, pt);
-    SF_do[2] = reader_T.eval_auto_bounds("down", FLAV, eta, pt);
+    SF[0] = reader_L.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[0]*=fastreader_L.eval_auto_bounds("central",FLAV,eta,pt);
+    SF[1] = reader_M.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[1]*=fastreader_M.eval_auto_bounds("central",FLAV,eta,pt) ;
+    SF[2] = reader_T.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[2]*=fastreader_T.eval_auto_bounds("central",FLAV,eta,pt);
+    SF_up[0] = reader_L.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF_up[0]*=fastreader_L.eval_auto_bounds("up",FLAV,eta,pt);
+    SF_do[0] = reader_L.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF_do[0]*=fastreader_L.eval_auto_bounds("down",FLAV,eta,pt);
+    SF_up[1] = reader_M.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF_up[1]*=fastreader_M.eval_auto_bounds("up",FLAV,eta,pt);
+    SF_do[1] = reader_M.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF_do[1]*=fastreader_M.eval_auto_bounds("down",FLAV,eta,pt);
+    SF_up[2] = reader_T.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF_up[2]*=fastreader_T.eval_auto_bounds("up",FLAV,eta,pt);
+    SF_do[2] = reader_T.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF_do[2]*=fastreader_T.eval_auto_bounds("down",FLAV,eta,pt);
+    //cout<<"mc eff "<<mc_eff[0]<<" "<<mc_eff[1]<<" "<<mc_eff[2]<<endl;
     //cout<<"SF L "<<SF[0]<<" + "<<SF_up[0]<<" - "<<SF_do[0]<<" M "<<SF[1]<<" + "<<SF_up[1]<<" - "<<SF_do[1]<<" T "<<SF[2]<<" + "<<SF_up[2]<<" - "<<SF_do[2]<<endl;
-
     if (it->second == '0') {
       for (int i=0;i<3;i++){
         p_mc[i]*=(1-mc_eff[i]);
@@ -2570,7 +2577,7 @@ void Analyzer::FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselec
 }
 
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
-  {"isPVGood","Presence of any good vertices, 0 or 1"},
+  {"isPVGood","Number of good vertices"},
   {"nPassEleL","number of loose electrons"},
   {"nPassEleM","number of medium electrons"},
   {"nPassEleT","number of tight electrons"},
@@ -2625,6 +2632,8 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"Flag_METFilters","Flag_METFilters in nanoAOD"},
   {"MET","pfMET"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
+  {"dphi_met_jet_at_high_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet>=4"},
+  {"dphi_met_jet_at_low_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet<4"},
   {"L1prefire","True if event could be affected by L1prefire"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},

@@ -1,9 +1,9 @@
 #ifndef whichGridpoint_h
 #define whichGridpoint_h
 
-std::pair<int, int> whichGridpoint(std::pair<double, double> in)
+std::pair<int, int> whichGridpoint(std::pair<double, double> in, int SignalScenario)
 {
-
+  if (SignalScenario==1) {
     std::vector<int> Yticks;
 
     std::vector<int> Xticks = {800,900,1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,2000,2050,2100,2150,2200,2250,2300,2350,2400,2450,2500,2550,2600,2650,2700,2750,2800};
@@ -115,7 +115,20 @@ std::pair<int, int> whichGridpoint(std::pair<double, double> in)
 
     std::pair<int,int> a(mG,Yticks[Yind]);
     return a;
+  }
 
+  if (SignalScenario==2) {
+    //TChiNG 300 to 1600 GeV in steps of 25 GeV.
+    double diff=999; int mass=-1;
+    for (unsigned int i=0; i<53; i++) {
+      int m=(300+i*25);
+      if (abs(in.second-m)<diff) {diff=abs(in.second-m); mass=m;}
+    }
+    std::pair<int,int> a(mass,1);
+    return a;
+  }
+  std::pair<int,int> a;
+  return a;
 }
 
 #endif
