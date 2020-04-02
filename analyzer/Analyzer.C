@@ -298,12 +298,8 @@ void Analyzer::Loop()
    TH1D *h_btag_sf_b_2017 = new TH1D("h_btag_sf_b_2017",";SF(fullsim/fastsim)",20,0,5);
    TH1D *h_btag_sf_l_2017 = new TH1D("h_btag_sf_l_2017",";SF(fullsim/fastsim)",20,0,5);
 
-   TH1D *h_phoEtL    = new TH1D("h_phoEtL",";E_{T}^{#gamma_L} [GeV]",10,25,1525);
-   TH1D *h_phoEtM    = new TH1D("h_phoEtM",";E_{T}^{#gamma_M} [GeV]",10,25,1525);
-   TH1D *h_phoEtT    = new TH1D("h_phoEtT",";E_{T}^{#gamma_T} [GeV]",10,25,1525);
-   TH1D *h_phoEtaL    = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
-   TH1D *h_phoEtaM    = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
-   TH1D *h_phoEtaT    = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
+   TH1D *h_phoEt    = new TH1D("h_phoEt",";E_{T}^{#gamma} [GeV]",10,25,1525);
+   TH1D *h_phoEta    = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
 
    const int nbins_photon=15;
    double xbins_photon[nbins_photon+1]={0,50,120,175,210,260,310,360,410,460,510,650,800,1000,1200,1500};
@@ -1207,18 +1203,19 @@ void Analyzer::Loop()
 
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highDDBvL=-1;
-     vector<int> passPhoL, passPhoM, passPhoT, passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT, passMuNO;
+     vector<int> passPhoL, passPhoM, passPhoT, passPhotons;
+     vector<int> passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT, passMuNO;
      vector<int> passTauL, passTauM, passTauT, passIso;
-     vector<int> passElePhoL, passElePhoM, passElePhoT, passEleNO;
+     vector<int> passElePhoL, passElePhoM, passElePhoT, passElePhotons, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
      map<int,char> passDDBvL, passDeep;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
      ST=0; ST_G=0; MT=0; nonHiggsJet=-1;
-     nleadElePhoL=-1; nleadElePhoM=-1; nleadElePhoT=-1;
+     nleadElePho=-1;
      nleadFREleL=-1; nleadFREleM=-1; nleadFREleT=-1;
-     nleadPhoL=-1; nleadPhoM=-1; nleadPhoT=-1;
+     nleadPho=-1;
      nleadEleV=-1; nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
      nleadMuL=-1; nleadMuM=-1; nleadMuT=-1, nleadMuNO=-1;
      nleadTauL=-1; nleadTauM=-1; nleadTauT=-1; nleadIso=-1;
@@ -1276,16 +1273,14 @@ void Analyzer::Loop()
          }
        }
      }
-     for (auto i : passPhoL) {
-       if (phoET[i]>phoET[nleadPhoL]) nleadPhoL=i;
+     (whichPhoton==0) ? passPhotons=passPhoL : (whichPhoton==1) ? passPhotons=passPhoM : passPhotons=passPhoT;
+     (whichPhoton==0) ? passElePhotons=passElePhoL : (whichPhoton==1) ? passElePhotons=passElePhoM : passElePhotons=passElePhoT;
+     for (auto i : passPhotons) {
+       if (phoET[i]>phoET[nleadPho]) nleadPho=i;
        EMHT_before+=phoET[i];
      }
-     for (auto i : passPhoM) if (phoET[i]>phoET[nleadPhoM]) nleadPhoM=i;
-     for (auto i : passPhoT) if (phoET[i]>phoET[nleadPhoT]) nleadPhoT=i;
-     for (auto i : passElePhoL) if (phoET[i]>phoET[nleadElePhoL]) nleadElePhoL=i;
-     for (auto i : passElePhoM) if (phoET[i]>phoET[nleadElePhoM]) nleadElePhoM=i;
-     for (auto i : passElePhoT) if (phoET[i]>phoET[nleadElePhoT]) nleadElePhoT=i;
-     if (_fakeRate==2 && nPassElePhoL != 0) {nleadPhoL=nleadElePhoL; passPhoL.push_back(nleadElePhoL);}
+     for (auto i : passElePhotons) if (phoET[i]>phoET[nleadElePho]) nleadElePho=i;
+     if (_fakeRate==2 && passElePhotons.size() != 0) {nleadPho=nleadElePho; passPhotons=passElePhotons;}
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
      nPassElePhoT=passElePhoT.size();
@@ -1299,20 +1294,20 @@ void Analyzer::Loop()
      if (!isData) {
        double id_sf=0, pix_sf=0, syst_id=0, syst_pix=0;
        int sign_id=0, sign_pix=0;
-       if (nPassPhoL!=0){
-         double photon_eta=Photon_eta[nleadPhoL]; //needed for difference between SCEta and photon_eta
-         double photon_et=(phoET[nleadPhoL]>499) ? 499 : phoET[nleadPhoL]; //needed for maximum ET in SF histo
+       if (passPhotons.size()!=0){
+         double photon_eta=Photon_eta[nleadPho]; //needed for difference between SCEta and photon_eta
+         double photon_et=(phoET[nleadPho]>499) ? 499 : phoET[nleadPho]; //needed for maximum ET in SF histo
          if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
          if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
          if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
          if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
          if (photon_eta<=-2.5)  photon_eta=-2.4;
          if (photon_eta>=2.5)  photon_eta=2.4;
-         double abs_photon_eta=(abs(Photon_eta[nleadPhoL])>1.5) ? 2 : 0.5;
-         id_sf=h_pho_EGamma_SF2D[0]->GetBinContent(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,photon_et));
-         syst_id=h_pho_EGamma_SF2D[0]->GetBinError(h_pho_EGamma_SF2D[0]->FindBin(photon_eta,photon_et));
+         double abs_photon_eta=(abs(Photon_eta[nleadPho])>1.5) ? 2 : 0.5;
+         id_sf=h_pho_EGamma_SF2D[whichPhoton]->GetBinContent(h_pho_EGamma_SF2D[whichPhoton]->FindBin(photon_eta,photon_et));
+         syst_id=h_pho_EGamma_SF2D[whichPhoton]->GetBinError(h_pho_EGamma_SF2D[whichPhoton]->FindBin(photon_eta,photon_et));
          if (year==2016) {
-           if (Photon_r9[nleadPhoL]>0.94) {
+           if (Photon_r9[nleadPho]>0.94) {
              pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
              syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
            }
@@ -1322,13 +1317,13 @@ void Analyzer::Loop()
            }
          }
          else if (year==2017) {
-           if (Photon_r9[nleadPhoL]>0.94) {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(5);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[0]->GetBinError(5);
+           if (Photon_r9[nleadPho]>0.94) {
+             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(5);
+             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(5);
            }
            else {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[0]->GetBinContent(6);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[0]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[0]->GetBinError(6);
+             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(6);
+             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(6);
            }
          }
          else if (year==2018) {
@@ -1338,93 +1333,13 @@ void Analyzer::Loop()
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
          pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
-         if (id_sf==0 || pix_sf==0) cout<<"pho Et "<<phoET[nleadPhoL]<<" pho eta "<<Photon_eta[nleadPhoL]<<" mod_eta "<<photon_eta<<" scEB "<<Photon_isScEtaEB[nleadPhoL]<<" scEE "<<Photon_isScEtaEE[nleadPhoL]<<" id sf "<<id_sf<<" +- "<<syst_id<<" pix sf "<<pix_sf<<" +- "<<syst_pix<<endl;
-       }
-       if (nPassPhoM!=0){
-         double photon_eta=Photon_eta[nleadPhoM]; //needed for difference between SCEta and photon_eta
-         double photon_et=(phoET[nleadPhoM]>500) ? 499 : phoET[nleadPhoM]; //needed for maximum ET in SF histo
-         if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
-         if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
-         if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
-         if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
-         if (photon_eta<=-2.5)  photon_eta=-2.4;
-         if (photon_eta>=2.5)  photon_eta=2.4;
-         double abs_photon_eta=(abs(Photon_eta[nleadPhoM])>1.5) ? 2 : 0.5;
-         id_sf=h_pho_EGamma_SF2D[1]->GetBinContent(h_pho_EGamma_SF2D[1]->FindBin(photon_eta,photon_et));
-         syst_id=h_pho_EGamma_SF2D[1]->GetBinError(h_pho_EGamma_SF2D[1]->FindBin(photon_eta,photon_et));
-         if (year==2016) {
-           if (Photon_r9[nleadPhoL]>0.94) {
-             pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
-             syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
-           }
-           else {
-             pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
-             syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
-           }
-         }
-         else if (year==2017) {
-           if (Photon_r9[nleadPhoL]>0.94) {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(5);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[1]->GetBinError(5);
-           }
-           else {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[1]->GetBinContent(6);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[1]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[1]->GetBinError(6);
-           }
-         }
-         else if (year==2018) {
-           pix_sf=h_PixelSeed_ScaleFactors_2018->GetBinContent(h_PixelSeed_ScaleFactors_2018->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
-           syst_pix=h_PixelSeed_ScaleFactors_2018_unc->GetBinContent(h_PixelSeed_ScaleFactors_2018_unc->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
-         }
-         (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
-         pho_SF[1]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
-       }
-       if (nPassPhoT!=0){
-         double photon_eta=Photon_eta[nleadPhoT]; //needed for difference between SCEta and photon_eta
-         double photon_et=(phoET[nleadPhoT]>500) ? 499 : phoET[nleadPhoT]; //needed for maximum ET in SF histo
-         if (photon_eta>1.2 && photon_eta<1.5)  photon_eta=1.2;
-         if (photon_eta>1.5 && photon_eta<1.7)  photon_eta=1.7;
-         if (photon_eta<-1.2 && photon_eta>-1.5)  photon_eta=-1.2;
-         if (photon_eta<-1.5 && photon_eta>-1.7)  photon_eta=-1.7;
-         if (photon_eta<=-2.5)  photon_eta=-2.4;
-         if (photon_eta>=2.5)  photon_eta=2.4;
-         double abs_photon_eta=(abs(Photon_eta[nleadPhoT])>1.5) ? 2 : 0.5;
-         id_sf=h_pho_EGamma_SF2D[2]->GetBinContent(h_pho_EGamma_SF2D[2]->FindBin(photon_eta,photon_et));
-         syst_id=h_pho_EGamma_SF2D[2]->GetBinError(h_pho_EGamma_SF2D[2]->FindBin(photon_eta,photon_et));
-         if (year==2016) {
-           if (Photon_r9[nleadPhoL]>0.94) {
-             pix_sf=h_Scaling_Factors_HasPix_R9_high->GetBinContent(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
-             syst_pix=h_Scaling_Factors_HasPix_R9_high->GetBinError(h_Scaling_Factors_HasPix_R9_high->FindBin(abs_photon_eta,100));
-           }
-           else {
-             pix_sf=h_Scaling_Factors_HasPix_R9_low->GetBinContent(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
-             syst_pix=h_Scaling_Factors_HasPix_R9_low->GetBinError(h_Scaling_Factors_HasPix_R9_low->FindBin(abs_photon_eta,100));
-           }
-         }
-         else if (year==2017) {
-           if (Photon_r9[nleadPhoL]>0.94) {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(5);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[2]->GetBinError(5);
-           }
-           else {
-             pix_sf=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[2]->GetBinContent(6);
-             syst_pix=(Photon_isScEtaEB[nleadPhoL]) ? h_PixelSeed_ScaleFactors_2017[2]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[2]->GetBinError(6);
-           }
-         }
-         else if (year==2018) {
-           pix_sf=h_PixelSeed_ScaleFactors_2018->GetBinContent(h_PixelSeed_ScaleFactors_2018->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
-           syst_pix=h_PixelSeed_ScaleFactors_2018_unc->GetBinContent(h_PixelSeed_ScaleFactors_2018_unc->FindBin((photon_et>200) ? 150 : photon_et,abs_photon_eta));
-         }
-         (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
-         (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
-         pho_SF[2]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
+         if (id_sf==0 || pix_sf==0) cout<<"pho Et "<<phoET[nleadPho]<<" pho eta "<<Photon_eta[nleadPho]<<" mod_eta "<<photon_eta<<" scEB "<<Photon_isScEtaEB[nleadPho]<<" scEE "<<Photon_isScEtaEE[nleadPho]<<" id sf "<<id_sf<<" +- "<<syst_id<<" pix sf "<<pix_sf<<" +- "<<syst_pix<<endl;
        }
      }
      //electron
      for (unsigned int i=0;i<nElectron;i++) {
        bool passOverlap=true;
-       for (auto j : passPhoL) if (deltaR(Electron_phi[i],Photon_phi[j],Electron_eta[i],Photon_eta[j])<0.3) {
+       for (auto j : passPhotons) if (deltaR(Electron_phi[i],Photon_phi[j],Electron_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
        if (Electron_pt[i]>e_pt && abs(Electron_eta[i])<2.5 && Electron_miniPFRelIso_all[i]<0.2) {
@@ -1459,9 +1374,9 @@ void Analyzer::Loop()
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        if (_fakeRate==2 && nPassElePhoL != 0) {
-         double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePhoL],Photon_phi[nleadElePhoL]));
+         double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePho],Photon_phi[nleadElePho]));
          double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
-         //cout<<"etaphi "<<Photon_eta[nleadElePhoL]<<" "<<Photon_phi[nleadElePhoL]<<endl;
+         //cout<<"etaphi "<<Photon_eta[nleadElePho]<<" "<<Photon_phi[nleadElePho]<<endl;
          //cout<<FRvalue<<" = "<<FRetaphi<<" * "<<_C<<" *("<<_A<<" * "<<PV_npvsGood<<" + "<<_B<<")"<<endl;
          w*=FRvalue;
        }
@@ -1546,7 +1461,7 @@ void Analyzer::Loop()
      //muon
      for (unsigned int i=0;i<nMuon;i++) {
        bool passOverlap=true;
-       for (auto j : passPhoL) if (deltaR(Muon_phi[i],Photon_phi[j],Muon_eta[i],Photon_eta[j])<0.3) {
+       for (auto j : passPhotons) if (deltaR(Muon_phi[i],Photon_phi[j],Muon_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
        for (auto j : passEleL) if (deltaR(Muon_phi[i],Electron_phi[j],Muon_eta[i],Electron_eta[j])<0.3) {
@@ -1595,7 +1510,7 @@ void Analyzer::Loop()
      //Tau
      for (unsigned int i=0;i<nTau;i++) {
        bool passOverlap=true;
-       for (auto j : passPhoL) if (deltaR(Tau_phi[i],Photon_phi[j],Tau_eta[i],Photon_eta[j])<0.3) {
+       for (auto j : passPhotons) if (deltaR(Tau_phi[i],Photon_phi[j],Tau_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
        for (auto j : passEleL) if (deltaR(Tau_phi[i],Electron_phi[j],Tau_eta[i],Electron_eta[j])<0.3) {
@@ -1631,7 +1546,7 @@ void Analyzer::Loop()
      //IsoTrack
      for (unsigned int i=0;i<nIsoTrack;i++) {
        bool passOverlap=true;
-       for (auto j : passPhoL) if (deltaR(IsoTrack_phi[i],Photon_phi[j],IsoTrack_eta[i],Photon_eta[j])<0.3) {
+       for (auto j : passPhotons) if (deltaR(IsoTrack_phi[i],Photon_phi[j],IsoTrack_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
        for (auto j : passEleL) if (deltaR(IsoTrack_phi[i],Electron_phi[j],IsoTrack_eta[i],Electron_eta[j])<0.3) {
@@ -1709,7 +1624,7 @@ void Analyzer::Loop()
        HT_before+=jetSmearedPt[i];
        if (abs(Jet_eta[i])>2.4 || !(Jet_jetId[i]>>1&1) || jetSmearedPt[i]<30) passcut=false;
        if (jetSmearedPt[i]<50 && !(Jet_puId[i]&(1<<2))) passcut=false;
-       for (auto j : passPhoL) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {
+       for (auto j : passPhotons) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {
          passcut=false;break;
        }
        for (auto j : passEleL) if (deltaR(Jet_phi[i],Electron_phi[j],Jet_eta[i],Electron_eta[j])<0.4) {
@@ -1775,7 +1690,7 @@ void Analyzer::Loop()
        AK8JetSmearedPt.push_back(jetpt);
        AK8HT_before+=AK8JetSmearedPt[i];
        if (abs(FatJet_eta[i])>2.4 || !(FatJet_jetId[i]>>1&1) || AK8JetSmearedPt[i]<300) passcut=false;
-       for (auto j : passPhoL) if (deltaR(FatJet_phi[i],Photon_phi[j],FatJet_eta[i],Photon_eta[j])<0.8) {
+       for (auto j : passPhotons) if (deltaR(FatJet_phi[i],Photon_phi[j],FatJet_eta[i],Photon_eta[j])<0.8) {
          passcut=false;break;
        }
        for (auto j : passEleL) if (deltaR(FatJet_phi[i],Electron_phi[j],FatJet_eta[i],Electron_eta[j])<0.8) {
@@ -1854,7 +1769,7 @@ void Analyzer::Loop()
      }
 
      //MET variables
-     for (auto i : passPhoL) ST+=phoET[i];
+     for (auto i : passPhotons) ST+=phoET[i];
      (!isData && genMET_whichSF==1) ? MET=GenMET_pt : MET=MET;
      double METPhi=0, METsumEt=0, METSig=0;
      if (year!=2017) {
@@ -1878,9 +1793,9 @@ void Analyzer::Loop()
      ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
-     if (passPhoL.size()>0) {
-       double dphi_MT=(Photon_phi[nleadPhoL]-METPhi)>M_PI ? 2*M_PI-(METPhi-Photon_phi[nleadPhoL]) : Photon_phi[nleadPhoL]-METPhi;
-       MT=sqrt(2*MET*phoET[nleadPhoL]*(1-cos(abs(dphi_MT))));
+     if (passPhotons.size()>0) {
+       double dphi_MT=(Photon_phi[nleadPho]-METPhi)>M_PI ? 2*M_PI-(METPhi-Photon_phi[nleadPho]) : Photon_phi[nleadPho]-METPhi;
+       MT=sqrt(2*MET*phoET[nleadPho]*(1-cos(abs(dphi_MT))));
      }
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) {
@@ -1895,7 +1810,7 @@ void Analyzer::Loop()
        if (abs(dphi)<dphi_met_jet) dphi_met_jet=abs(dphi);
      }
      double dphi_pho=999;
-     for (auto i : passPhoL) {
+     for (auto i : passPhotons) {
        double dphi=(Photon_phi[i]-METPhi>M_PI) ? 2*M_PI-abs(METPhi-Photon_phi[i]) : Photon_phi[i]-METPhi;
        if (abs(dphi)<dphi_pho) dphi_pho=abs(dphi);
      }
@@ -1916,7 +1831,7 @@ void Analyzer::Loop()
        //L1prefire
        //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0
        L1prefire=0;
-       for (auto i : passPhoL) if (phoET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
+       for (auto i : passPhotons) if (phoET[i]>50 && abs(Photon_eta[i])>2.25) L1prefire=1;
        for (auto i : passJet) if (jetSmearedPt[i]>100 && abs(Jet_eta[i])>2.25) L1prefire=1;
 
        //find which btag jet to use for Higgs mass
@@ -2127,13 +2042,9 @@ void Analyzer::Loop()
            double bw=(Deep_SF_L[0]>200) ? 199 : Deep_SF_L[0];
            h2_btag_weight->Fill(bw,countb);
 
-           if (nleadPhoL!=-1) h_phoEtL->Fill(phoET[nleadPhoL],w);
-           if (nleadPhoM!=-1) h_phoEtM->Fill(phoET[nleadPhoM],w);
-           if (nleadPhoT!=-1) h_phoEtT->Fill(phoET[nleadPhoT],w);
-           if (nleadPhoL!=-1) h_phoEtaL->Fill(Photon_eta[nleadPhoL],w);
-           if (nleadPhoM!=-1) h_phoEtaM->Fill(Photon_eta[nleadPhoM],w);
-           if (nleadPhoT!=-1) h_phoEtaT->Fill(Photon_eta[nleadPhoT],w);
-           if (nleadPhoL!=-1) h_phoPt->Fill(phoET[nleadPhoL],w);
+           if (nleadPho!=-1) h_phoEt->Fill(phoET[nleadPho],w);
+           if (nleadPho!=-1) h_phoEta->Fill(Photon_eta[nleadPho],w);
+           if (nleadPho!=-1) h_phoPt->Fill(phoET[nleadPho],w);
 
            h_pfMET->Fill(MET,w);
            (METsumEt<5000) ? h_pfMETsumEt->Fill(METsumEt,w) : h_pfMETsumEt->Fill(4999,w);
@@ -2148,7 +2059,7 @@ void Analyzer::Loop()
            h2_ST_MET->Fill(ST,MET,w);
            h2_MET_HT->Fill(MET,HT_after,w);
            h2_MET_extrajets->Fill(MET,nonHiggsJet,w);
-           if (nleadPhoL!=-1) h2_MET_phoPt->Fill(MET,phoET[nleadPhoL],w);
+           if (nleadPho!=-1) h2_MET_phoPt->Fill(MET,phoET[nleadPho],w);
            h2_extrajets_HT->Fill(nonHiggsJet,HT_after,w);
 
            h_nPho->Fill(nPassPhoL,w);
@@ -2249,13 +2160,9 @@ void Analyzer::Loop()
      if (SignalScan) {
        m_eff[mass_pair]->Fill(1.,w);
        m_nISR_jet[mass_pair]->Fill(n_isr_jets,w);
-       if (nleadPhoL!=-1) m_phoEtL[mass_pair]->Fill(phoET[nleadPhoL],w);
-       if (nleadPhoM!=-1) m_phoEtM[mass_pair]->Fill(phoET[nleadPhoM],w);
-       if (nleadPhoT!=-1) m_phoEtT[mass_pair]->Fill(phoET[nleadPhoT],w);
-       if (nleadPhoL!=-1) m_phoEtaL[mass_pair]->Fill(Photon_eta[nleadPhoL],w);
-       if (nleadPhoM!=-1) m_phoEtaM[mass_pair]->Fill(Photon_eta[nleadPhoM],w);
-       if (nleadPhoT!=-1) m_phoEtaT[mass_pair]->Fill(Photon_eta[nleadPhoT],w);
-       if (nleadPhoL!=-1) m_phoPt[mass_pair]->Fill(phoET[nleadPhoL],w);
+       if (nleadPho!=-1) m_phoEt[mass_pair]->Fill(phoET[nleadPho],w);
+       if (nleadPho!=-1) m_phoEta[mass_pair]->Fill(Photon_eta[nleadPho],w);
+       if (nleadPho!=-1) m_phoPt[mass_pair]->Fill(phoET[nleadPho],w);
        
        m_pfMET[mass_pair]->Fill(MET,w);
        (METsumEt<5000) ? m_pfMETsumEt[mass_pair]->Fill(METsumEt,w) : m_pfMETsumEt[mass_pair]->Fill(4999,w);
@@ -2269,7 +2176,7 @@ void Analyzer::Loop()
        m2_ST_HT[mass_pair]->Fill(ST,HT_after,w);
        m2_ST_MET[mass_pair]->Fill(ST,MET,w);
        m2_MET_HT[mass_pair]->Fill(MET,HT_after,w);
-       if (nleadPhoL!=-1) m2_MET_phoPt[mass_pair]->Fill(MET,phoET[nleadPhoL],w);
+       if (nleadPho!=-1) m2_MET_phoPt[mass_pair]->Fill(MET,phoET[nleadPho],w);
        m2_MET_extrajets[mass_pair]->Fill(MET,nonHiggsJet,w);
        m2_extrajets_HT[mass_pair]->Fill(nonHiggsJet,HT_after,w);
       

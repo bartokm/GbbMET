@@ -1209,9 +1209,9 @@ public :
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
    int nPassTauL=-1, nPassTauM=-1, nPassTauT=-1, nPassIso=-1;
    int nPassLepL=-1, nPassLepM=-1, nPassLepT=-1;
-   int nleadElePhoL=-1, nleadElePhoM=-1, nleadElePhoT=-1;
+   int nleadElePho=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
-   int nleadPhoL=-1, nleadPhoM=-1, nleadPhoT=-1;
+   int nleadPho=-1;
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
@@ -1237,6 +1237,7 @@ public :
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0, ISR_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0;
    int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
+   unsigned int whichPhoton=0;
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
@@ -1308,6 +1309,11 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   // used to generate this class and read the Tree.
 
   _cut_variable=cut_variable;
+  //determine which WP photons are cut on
+  for (auto i : _cut_variable) {
+    if (i=="nPassPhoM" || i=="nPassElePhoM") whichPhoton=1;
+    if (i=="nPassPhoT" || i=="nPassElePhoT") whichPhoton=2;
+  }
   _cut_operator=cut_operator;
   _cut_value=cut_value;
   Systematics(systematics);
@@ -2250,12 +2256,8 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float(Electron_pt[nleadEleL],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elePtM") returnvalue*=Parser_float(Electron_pt[nleadEleM],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elePtT") returnvalue*=Parser_float(Electron_pt[nleadEleT],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(Photon_pt[nleadElePhoL],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elephoPtM") returnvalue*=Parser_float(Photon_pt[nleadElePhoM],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elephoPtT") returnvalue*=Parser_float(Photon_pt[nleadElePhoT],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPhoL],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoEtM") returnvalue*=Parser_float(Photon_pt[nleadPhoM],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoEtT") returnvalue*=Parser_float(Photon_pt[nleadPhoT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(phoET[nleadElePho],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPho],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="EMHT") returnvalue*=Parser_float(EMHT_after,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="MT") returnvalue*=Parser_float(MT,_cut_operator[i],_cut_value[i]);
@@ -2598,30 +2600,17 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassFREleL","number of loose FRele (no overlap removal with photons)"},
   {"nPassFREleM","number of medium FRele (no overlap removal with photons)"},
   {"nPassFREleT","number of tight FRele (no overlap removal with photons)"},
-  {"nPassElePhoL","number of loose elephotons (electrons as inverted pixelseed photons)"},
-  {"nPassElePhoM","number of medium elephotons (electrons as inverted pixelseed photons)"},
-  {"nPassElePhoT","number of tight elephotons (electrons as inverted pixelseed photons)"},
-  {"nPassPhoL","number of loose photons"},
-  {"nPassPhoM","number of medium photons"},
-  {"nPassPhoT","number of tight photons"},
+  {"nPassElePhoL","number of loose elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to LOOSE"},
+  {"nPassElePhoM","number of medium elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to MEDIUM"},
+  {"nPassElePhoT","number of tight elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to TIGHT"},
+  {"nPassPhoL","number of loose photons, also sets the working point for photons to LOOSE"},
+  {"nPassPhoM","number of medium photons, also sets the working point for photons to MEDIUM"},
+  {"nPassPhoT","number of tight photons, also sets the working point for photons to TIGHT"},
   {"elePt","Pt of leading loose electron"},
   {"elePtM","Pt of leading medium electron"},
   {"elePtT","Pt of leading tight electron"},
-  {"FReleCalibPt","CalibPt of leading loose FRelectron"},
-  {"FReleCalibPtM","CalibPt of leading medium FRelectron"},
-  {"FReleCalibPtT","CalibPt of leading tight FRelectron"},
-  {"eleCalibPt","CalibPt of leading loose electron"},
-  {"eleCalibPtM","CalibPt of leading medium electron"},
-  {"eleCalibPtT","CalibPt of leading tight electron"},
   {"elephoPt","Pt of leading loose electronphoton"},
-  {"elephoPtM","Pt of leading medium electronphoton"},
-  {"elephoPtT","Pt of leading tight electronphoton"},
   {"phoEt","Et of leading loose photon"},
-  {"phoEtM","Et of leading medium photon"},
-  {"phoEtT","Et of leading tight photon"},
-  {"phoCalibEt","CalibEt of leading loose photon"},
-  {"phoCalibEtM","CalibEt of leading medium photon"},
-  {"phoCalibEtT","CalibEt of leading tight photon"},
   {"HT","pt sum of loose jets"},
   {"EMHT","HT + Et of loose photons"},
   {"MT","invariant mass of leading loose photon and MET"},
@@ -2714,11 +2703,11 @@ void PrintHelp(){
   cout<<"or\tWhich is | "<<endl; 
   cout<<"xor\tWhich is ^ "<<endl;
   cout<<"\nExamples:"<<endl;
-  cout<<"./Analyzer -i /foo/bar/ggntuple_data.root -o test.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
-  cout<<"./Analyzer -i /foo/bar/ggntuple_mc.root -o test.root -b /foo/bar/ggntuple_mc_BTagEff.root --cuts HLTPho and 4096 nPassPhoL great 0 phoCalibEt great 175"<<endl;
+  cout<<"./Analyzer -i /foo/bar/ggntuple_data.root -o test.root --cuts HLTPho and 4096 nPassPhoL great 0 phoEt great 175"<<endl;
+  cout<<"./Analyzer -i /foo/bar/ggntuple_mc.root -o test.root -b /foo/bar/ggntuple_mc_BTagEff.root --cuts HLTPho and 4096 nPassPhoL great 0 phoEt great 175"<<endl;
   cout<<"NOTE: if you want to cut on object's (electron, photon, ...) variable (Pt, Et, ...) first cut on the # of object itself!"<<endl;
-  cout<<"E.g.: --cuts phoCalibEtM great 175\t might BREAK the code! (if there's an event with no photons in ntuple)"<<endl;
-  cout<<"Instead use: --cuts nPassPhoM great 0 phoCalibEtM great 175\t"<<endl;
+  cout<<"E.g.: --cuts phoEt great 175\t might BREAK the code! (if there's an event with no photons in ntuple)"<<endl;
+  cout<<"Instead use: --cuts nPassPhoM great 0 phoEtM great 175\t"<<endl;
   cout<<"\nHave fun!"<<endl;
 }
 #endif // #ifdef Analyzer_cxx

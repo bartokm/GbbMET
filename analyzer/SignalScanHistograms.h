@@ -11,12 +11,8 @@
   map< pair<int, int>, TH1D* > m_nISR_jet;
   map< pair<int, int>, TH1D* > m_SR;
  
-  map< pair<int, int>, TH1D* > m_phoEtL;
-  map< pair<int, int>, TH1D* > m_phoEtM;
-  map< pair<int, int>, TH1D* > m_phoEtT;
-  map< pair<int, int>, TH1D* > m_phoEtaL;
-  map< pair<int, int>, TH1D* > m_phoEtaM;
-  map< pair<int, int>, TH1D* > m_phoEtaT;
+  map< pair<int, int>, TH1D* > m_phoEt;
+  map< pair<int, int>, TH1D* > m_phoEta;
 
   map< pair<int, int>, TH1D* > m_phoPt;
   map< pair<int, int>, TH1D* > m_pfMET;
@@ -236,12 +232,8 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_nISR_jet[MassPair] = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
       m_SR[MassPair] = new TH1D("h_SR","",16,0.5,16.5);
   
-      m_phoEtL[MassPair] = new TH1D("h_phoEtL",";E_{T}^{#gamma_L} [GeV]",10,25,1525);
-      m_phoEtM[MassPair] = new TH1D("h_phoEtM",";E_{T}^{#gamma_M} [GeV]",10,25,1525);
-      m_phoEtT[MassPair] = new TH1D("h_phoEtT",";E_{T}^{#gamma_T} [GeV]",10,25,1525);
-      m_phoEtaL[MassPair] = new TH1D("h_phoEtaL",";#eta^{#gamma_{L}}",30,-3,3);
-      m_phoEtaM[MassPair] = new TH1D("h_phoEtaM",";#eta^{#gamma_{M}}",30,-3,3);
-      m_phoEtaT[MassPair] = new TH1D("h_phoEtaT",";#eta^{#gamma_{T}}",30,-3,3);
+      m_phoEt[MassPair] = new TH1D("h_phoEt",";E_{T}^{#gamma} [GeV]",10,25,1525);
+      m_phoEta[MassPair] = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
       m_phoPt[MassPair] = new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",nbins_photon,xbins_photon);
   
       m_pfMET[MassPair] = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
