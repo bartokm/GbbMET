@@ -1204,8 +1204,10 @@ void Analyzer::Loop()
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highDDBvL=-1;
      vector<int> passPhoL, passPhoM, passPhoT, passPhotons;
-     vector<int> passJet, passAK8Jet, passEleV, passEleL, passEleM, passEleT, passMuL, passMuM, passMuT, passMuNO;
-     vector<int> passTauL, passTauM, passTauT, passIso;
+     vector<int> passJet, passAK8Jet;
+     vector<int> passEleV, passEleL, passEleM, passEleT, passElectrons;
+     vector<int> passMuL, passMuM, passMuT, passMuNO, passMuons;
+     vector<int> passTauL, passTauM, passTauT, passTaus, passIso;
      vector<int> passElePhoL, passElePhoM, passElePhoT, passElePhotons, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
@@ -1215,10 +1217,10 @@ void Analyzer::Loop()
      ST=0; ST_G=0; MT=0; nonHiggsJet=-1;
      nleadElePho=-1;
      nleadFREleL=-1; nleadFREleM=-1; nleadFREleT=-1;
-     nleadPho=-1;
-     nleadEleV=-1; nleadEleL=-1; nleadEleM=-1; nleadEleT=-1, nleadEleNO=-1;
-     nleadMuL=-1; nleadMuM=-1; nleadMuT=-1, nleadMuNO=-1;
-     nleadTauL=-1; nleadTauM=-1; nleadTauT=-1; nleadIso=-1;
+     nleadPho=-1; nleadEle=-1; nleadMu=-1; nleadTau=-1;
+     nleadEleV=-1; nleadEleL=-1; nleadEleM=-1; nleadEleT=-1;
+     nleadMuL=-1; nleadMuM=-1; nleadMuT=-1;
+     nleadTauL=-1; nleadTauM=-1; nleadTauT=-1;
      ele_VETOSF=1;
      for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1; tau_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
@@ -1354,23 +1356,25 @@ void Analyzer::Loop()
          if (Electron_cutBased[i]<=1) passEleNO.push_back(i); //vetoElectron is also considered no electron
        }
      }
+     (whichElectron==0) ? passElectrons=passEleV : (whichElectron==1) ? passElectrons=passEleL : (whichElectron==2) ? passElectrons=passEleM : passElectrons=passEleT;
      nPassEleV=passEleV.size();
      nPassEleL=passEleL.size();
      nPassEleM=passEleM.size();
      nPassEleT=passEleT.size();
      nPassEleNO=passEleNO.size();
-     if (nPassEleV != 0) nleadEleV=passEleV[0];
-     if (nPassEleL != 0) nleadEleL=passEleL[0];
-     if (nPassEleM != 0) nleadEleM=passEleM[0];
-     if (nPassEleT != 0) nleadEleT=passEleT[0];
-     if (nPassEleNO != 0) nleadEleNO=passEleNO[0];
+     if (passElectrons.size() != 0) nleadEle=passElectrons[0];
+     if (passEleV.size() != 0) nleadEleV=passEleV[0];
+     if (passEleL.size() != 0) nleadEleL=passEleL[0];
+     if (passEleM.size() != 0) nleadEleM=passEleM[0];
+     if (passEleT.size() != 0) nleadEleT=passEleT[0];
      nPassFREleL=passFREleL.size();
      nPassFREleM=passFREleM.size();
      nPassFREleT=passFREleT.size();
      if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
      if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
      if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
-     //Fake Rate
+     
+     //Applying Fake Rate
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        if (_fakeRate==2 && nPassElePhoL != 0) {
@@ -1387,66 +1391,21 @@ void Analyzer::Loop()
        int sign_id=0, sign_rec=0;
        (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
        (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
-       if (nPassEleV!=0){
-         double pt=Electron_pt[passEleV[0]];
+       if (passElectrons.size()!=0){
+         double pt=Electron_pt[passElectrons[0]];
          pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
-         id_sf=h_ele_EGamma_SF2D[0]->GetBinContent(h_ele_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[0]->GetBinError(h_ele_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+         id_sf=h_ele_EGamma_SF2D[whichElectron]->GetBinContent(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
+         syst_id=h_ele_EGamma_SF2D[whichElectron]->GetBinError(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
          if (pt<20) {
-           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleV[0]],pt));
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
          }
          else {
-           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleV[0]],pt));
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
          }
-         ele_SF[0]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
+         ele_SF[whichElectron]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
          if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
-       }
-       if (nPassEleL!=0){
-         double pt=Electron_pt[passEleL[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
-         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
-         if (pt<20) {
-           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleL[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleL[0]],pt));
-         }
-         else {
-           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleL[0]],pt));
-         }
-         ele_SF[1]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
-       }
-       if (nPassEleM!=0){
-         double pt=Electron_pt[passEleM[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
-         id_sf=h_ele_EGamma_SF2D[2]->GetBinContent(h_ele_EGamma_SF2D[2]->FindBin(Electron_eta[passEleM[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[2]->GetBinError(h_ele_EGamma_SF2D[2]->FindBin(Electron_eta[passEleM[0]],pt));
-         if (pt<20) {
-           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleM[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleM[0]],pt));
-         }
-         else {
-           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleM[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleM[0]],pt));
-         }
-         ele_SF[2]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
-       }
-       if (nPassEleT!=0){
-         double pt=Electron_pt[passEleT[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
-         id_sf=h_ele_EGamma_SF2D[3]->GetBinContent(h_ele_EGamma_SF2D[3]->FindBin(Electron_eta[passEleT[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[3]->GetBinError(h_ele_EGamma_SF2D[3]->FindBin(Electron_eta[passEleT[0]],pt));
-         if (pt<20) {
-           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleT[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passEleT[0]],pt));
-         }
-         else {
-           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleT[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passEleT[0]],pt));
-         }
-         ele_SF[3]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
        }
        if (nPassEleNO!=0){ //only for loose electrons so far
          double pt=Electron_pt[passEleNO[0]];//, pt2=Electron_pt[passEleNO[0]];
@@ -1464,7 +1423,7 @@ void Analyzer::Loop()
        for (auto j : passPhotons) if (deltaR(Muon_phi[i],Photon_phi[j],Muon_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passEleL) if (deltaR(Muon_phi[i],Electron_phi[j],Muon_eta[i],Electron_eta[j])<0.3) {
+       for (auto j : passElectrons) if (deltaR(Muon_phi[i],Electron_phi[j],Muon_eta[i],Electron_eta[j])<0.3) {
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
@@ -1475,14 +1434,15 @@ void Analyzer::Loop()
          if (!Muon_looseId[i]) passMuNO.push_back(i);
        }
      }
+     (whichMuon==0) ? passMuons=passMuL : (whichMuon==1) ? passMuons=passMuM : passMuons=passMuT;
      nPassMuL=passMuL.size();
      nPassMuM=passMuM.size();
      nPassMuT=passMuT.size();
      nPassMuNO=passMuNO.size();
+     if (passMuons.size() != 0) nleadMu=passMuons[0];
      if (passMuL.size() != 0) nleadMuL=passMuL[0];
      if (passMuM.size() != 0) nleadMuM=passMuM[0];
      if (passMuT.size() != 0) nleadMuT=passMuT[0];
-     if (passMuNO.size() != 0) nleadMuNO=passMuNO[0];
      //muon SF
      if (!isData){
        int iter[3]={-1,-1,-1};
@@ -1513,10 +1473,10 @@ void Analyzer::Loop()
        for (auto j : passPhotons) if (deltaR(Tau_phi[i],Photon_phi[j],Tau_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passEleL) if (deltaR(Tau_phi[i],Electron_phi[j],Tau_eta[i],Electron_eta[j])<0.3) {
+       for (auto j : passElectrons) if (deltaR(Tau_phi[i],Electron_phi[j],Tau_eta[i],Electron_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passMuL) if (deltaR(Tau_phi[i],Muon_phi[j],Tau_eta[i],Muon_eta[j])<0.3) {
+       for (auto j : passMuons) if (deltaR(Tau_phi[i],Muon_phi[j],Tau_eta[i],Muon_eta[j])<0.3) {
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
@@ -1526,14 +1486,15 @@ void Analyzer::Loop()
          if (Tau_idMVAoldDM2017v2[i]>>4&1) passTauT.push_back(i);
        }
      }
+     (whichTau==0) ? passTaus=passTauL : (whichTau==1) ? passTaus=passTauM : passTaus=passTauT;
      nPassTauL=passTauL.size();
      nPassTauM=passTauM.size();
      nPassTauT=passTauT.size();
      //nPassTauNO=passTauNO.size();
+     if (passTaus.size() != 0) nleadTau=passTaus[0];
      if (passTauL.size() != 0) nleadTauL=passTauL[0];
      if (passTauM.size() != 0) nleadTauM=passTauM[0];
      if (passTauT.size() != 0) nleadTauT=passTauT[0];
-     //if (passTauNO.size() != 0) nleadTauNO=passTauNO[0];
 
      //Tau SF
      if (!isData) {
@@ -1549,13 +1510,13 @@ void Analyzer::Loop()
        for (auto j : passPhotons) if (deltaR(IsoTrack_phi[i],Photon_phi[j],IsoTrack_eta[i],Photon_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passEleL) if (deltaR(IsoTrack_phi[i],Electron_phi[j],IsoTrack_eta[i],Electron_eta[j])<0.3) {
+       for (auto j : passElectrons) if (deltaR(IsoTrack_phi[i],Electron_phi[j],IsoTrack_eta[i],Electron_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passMuL) if (deltaR(IsoTrack_phi[i],Muon_phi[j],IsoTrack_eta[i],Muon_eta[j])<0.3) {
+       for (auto j : passMuons) if (deltaR(IsoTrack_phi[i],Muon_phi[j],IsoTrack_eta[i],Muon_eta[j])<0.3) {
          passOverlap=false;break;
        }
-       for (auto j : passTauL) if (deltaR(IsoTrack_phi[i],Tau_phi[j],IsoTrack_eta[i],Tau_eta[j])<0.3) {
+       for (auto j : passTaus) if (deltaR(IsoTrack_phi[i],Tau_phi[j],IsoTrack_eta[i],Tau_eta[j])<0.3) {
          passOverlap=false;break;
        }
        if (!passOverlap) continue;
@@ -1627,13 +1588,13 @@ void Analyzer::Loop()
        for (auto j : passPhotons) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passEleL) if (deltaR(Jet_phi[i],Electron_phi[j],Jet_eta[i],Electron_eta[j])<0.4) {
+       for (auto j : passElectrons) if (deltaR(Jet_phi[i],Electron_phi[j],Jet_eta[i],Electron_eta[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passMuL) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {
+       for (auto j : passMuons) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {
          passcut=false;break;
        }
-       for (auto j : passTauL) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.4) {
+       for (auto j : passTaus) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.4) {
          passcut=false;break;
        }
        //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {
@@ -1693,13 +1654,13 @@ void Analyzer::Loop()
        for (auto j : passPhotons) if (deltaR(FatJet_phi[i],Photon_phi[j],FatJet_eta[i],Photon_eta[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passEleL) if (deltaR(FatJet_phi[i],Electron_phi[j],FatJet_eta[i],Electron_eta[j])<0.8) {
+       for (auto j : passElectrons) if (deltaR(FatJet_phi[i],Electron_phi[j],FatJet_eta[i],Electron_eta[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passMuL) if (deltaR(FatJet_phi[i],Muon_phi[j],FatJet_eta[i],Muon_eta[j])<0.8) {
+       for (auto j : passMuons) if (deltaR(FatJet_phi[i],Muon_phi[j],FatJet_eta[i],Muon_eta[j])<0.8) {
          passcut=false;break;
        }
-       for (auto j : passTauL) if (deltaR(FatJet_phi[i],Tau_phi[j],FatJet_eta[i],Tau_eta[j])<0.8) {
+       for (auto j : passTaus) if (deltaR(FatJet_phi[i],Tau_phi[j],FatJet_eta[i],Tau_eta[j])<0.8) {
          passcut=false;break;
        }
        //for (auto j : passIso) if (deltaR(FatJet_phi[i],IsoTrack_phi[j],FatJet_eta[i],IsoTrack_eta[j])<0.8) {
@@ -1824,9 +1785,9 @@ void Analyzer::Loop()
            mcLeptonFilter=true;
            //cout<<"pid "<<GenPart_pdgId[i]<<" pt "<<GenPart_pt[i]<<" statusflag "<<GenPart_statusFlags[i]<<" momPID "<<GenPart_pdgId[GenPart_genPartIdxMother[i]]<<endl;
          }
-         }
-         //cout<<"lepton "<<mcLeptonFilter<<endl;
        }
+       //cout<<"lepton "<<mcLeptonFilter<<endl;
+     }
 
        //L1prefire
        //check events if there's a jet (photon) with pt>100 (>50) and 2.25<|eta|<3.0

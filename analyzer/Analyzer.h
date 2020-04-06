@@ -1209,9 +1209,8 @@ public :
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
    int nPassTauL=-1, nPassTauM=-1, nPassTauT=-1, nPassIso=-1;
    int nPassLepL=-1, nPassLepM=-1, nPassLepT=-1;
-   int nleadElePho=-1;
+   int nleadPho=-1, nleadElePho=-1, nleadEle=-1, nleadMu=-1, nleadTau=-1;
    int nleadFREleL=-1, nleadFREleM=-1, nleadFREleT=-1;
-   int nleadPho=-1;
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
@@ -1237,7 +1236,7 @@ public :
    int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0, ISR_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0;
    int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
-   unsigned int whichPhoton=0;
+   unsigned int whichPhoton=0, whichElectron=1, whichMuon=0, whichTau=0;
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
@@ -1313,6 +1312,19 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   for (auto i : _cut_variable) {
     if (i=="nPassPhoM" || i=="nPassElePhoM") whichPhoton=1;
     if (i=="nPassPhoT" || i=="nPassElePhoT") whichPhoton=2;
+    if (i=="nPassEleM") whichElectron=2;
+    if (i=="nPassEleT") whichElectron=3;
+    if (i=="nPassMuM") whichMuon=1;
+    if (i=="nPassMuT") whichMuon=2;
+    if (i=="nPassTauM") whichTau=1;
+    if (i=="nPassTauT") whichTau=2;
+    if (i=="nPassLepVLL") {whichElectron=0; whichMuon=0; whichTau=0;}
+    if (i=="nPassLepMLL") {whichElectron=2; whichMuon=0; whichTau=0;}
+    if (i=="nPassLepLLM") {whichElectron=1; whichMuon=0; whichTau=1;}
+    if (i=="nPassLepLML") {whichElectron=1; whichMuon=1; whichTau=0;}
+    if (i=="nPassLepL") {whichElectron=1; whichMuon=0; whichTau=0;}
+    if (i=="nPassLepM") {whichElectron=2; whichMuon=1; whichTau=1;}
+    if (i=="nPassLepT") {whichElectron=3; whichMuon=2; whichTau=2;}
   }
   _cut_operator=cut_operator;
   _cut_value=cut_value;
@@ -2253,9 +2265,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
     else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
     else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
-    else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float(Electron_pt[nleadEleL],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elePtM") returnvalue*=Parser_float(Electron_pt[nleadEleM],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elePtT") returnvalue*=Parser_float(Electron_pt[nleadEleT],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float(Electron_pt[nleadEle],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(phoET[nleadElePho],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPho],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
@@ -2580,22 +2590,22 @@ void Analyzer::FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselec
 
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"isPVGood","Number of good vertices"},
-  {"nPassEleL","number of loose electrons"},
-  {"nPassEleM","number of medium electrons"},
-  {"nPassEleT","number of tight electrons"},
-  {"nPassMuL","number of loose muons"},
-  {"nPassMuM","number of medium muons"},
-  {"nPassMuT","number of tight muons"},
-  {"nPassTauL","number of loose taus"},
-  {"nPassTauM","number of medium taus"},
-  {"nPassTauT","number of tight taus"},
-  {"nPassLepL","number of loose leptons (e+mu+tau)"},
-  {"nPassLepM","number of medium leptons (e+mu+tau)"},
-  {"nPassLepT","number of tight leptons (e+mu+tau)"},
-  {"nPassLepVLL","number of veto e + loose mu + loose tau"},
-  {"nPassLepMLL","number of medium e + loose mu + loose tau"},
-  {"nPassLepLML","number of loose e + medium mu + loose tau"},
-  {"nPassLepLLM","number of loose e + loose mu + medium tau"},
+  {"nPassEleL","number of loose electrons, also sets the working point for electrons to LOOSE"},
+  {"nPassEleM","number of medium electrons, also sets the working point for electrons to MEDIUM"},
+  {"nPassEleT","number of tight electrons, also sets the working point for electrons to TIGHT"},
+  {"nPassMuL","number of loose muons, also sets the working point for muons to LOOSE"},
+  {"nPassMuM","number of medium muons, also sets the working point for muons to MEDIUM"},
+  {"nPassMuT","number of tight muons, also sets the working point for muons to TIGHT"},
+  {"nPassTauL","number of loose taus, also sets the working point for taus to LOOSE"},
+  {"nPassTauM","number of medium taus, also sets the working point for taus to MEDIUM"},
+  {"nPassTauT","number of tight taus, also sets the working point for taus to TIGHT"},
+  {"nPassLepL","number of loose leptons (e+mu+tau), also sets the working point for leptons to LOOSE"},
+  {"nPassLepM","number of medium leptons (e+mu+tau), also sets the working point for leptons to MEDIUM"},
+  {"nPassLepT","number of tight leptons (e+mu+tau), also sets the working point for leptons to TIGHT"},
+  {"nPassLepVLL","number of veto e + loose mu + loose tau, also sets the working point for leptons"},
+  {"nPassLepMLL","number of medium e + loose mu + loose tau, also sets the working point for leptons"},
+  {"nPassLepLML","number of loose e + medium mu + loose tau, also sets the working point for leptons"},
+  {"nPassLepLLM","number of loose e + loose mu + medium tau, also sets the working point for leptons"},
   {"nPassIso","number of isolated tracks"},
   {"nPassFREleL","number of loose FRele (no overlap removal with photons)"},
   {"nPassFREleM","number of medium FRele (no overlap removal with photons)"},
@@ -2607,8 +2617,6 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassPhoM","number of medium photons, also sets the working point for photons to MEDIUM"},
   {"nPassPhoT","number of tight photons, also sets the working point for photons to TIGHT"},
   {"elePt","Pt of leading loose electron"},
-  {"elePtM","Pt of leading medium electron"},
-  {"elePtT","Pt of leading tight electron"},
   {"elephoPt","Pt of leading loose electronphoton"},
   {"phoEt","Et of leading loose photon"},
   {"HT","pt sum of loose jets"},
