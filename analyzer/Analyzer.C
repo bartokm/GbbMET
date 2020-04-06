@@ -523,13 +523,13 @@ void Analyzer::Loop()
          b_METFixEE2017_phi_unclustEnDown->GetEntry(ientry);
        }
      }
-     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Dn->GetEntry(ientry);
-     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Nom->GetEntry(ientry);
-     if (!SignalScan && !isData && year!=2018) b_L1PreFiringWeight_Up->GetEntry(ientry);
+     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Dn->GetEntry(ientry);
+     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Nom->GetEntry(ientry);
+     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Up->GetEntry(ientry);
      b_luminosityBlock->GetEntry(ientry);
      b_PV_npvsGood->GetEntry(ientry);
      b_PV_npvs->GetEntry(ientry);
-     if (!SignalScan) {
+     if (!_fastSim) {
        if (year==2016) {
          b_HLT_Photon165_HE10->GetEntry(ientry);
          b_HLT_Photon175->GetEntry(ientry);
@@ -1227,7 +1227,7 @@ void Analyzer::Loop()
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
      double nonPrefiringProbability[3]={1,1,1};
-     if (!SignalScan && year!=2018) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
+     if (!_fastSim && year!=2018) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      phoET.clear();
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
@@ -1242,7 +1242,7 @@ void Analyzer::Loop()
           */
        phoET.push_back(Photon_pt[i]*correction);
        //L1prefire correction
-       if (SignalScan && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
+       if (_fastSim && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
          double max= h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
          double pt = (Photon_pt[i]>max) ? max-0.01 : Photon_pt[i];
          double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[i],pt));
@@ -1534,7 +1534,7 @@ void Analyzer::Loop()
      bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (unsigned int i=0;i<nJet;i++) {
        //L1prefire correction
-       if (SignalScan && year!=2018 && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
+       if (_fastSim && year!=2018 && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
          double nonPrefiringProb_overlapPho[3]={1,1,1};
          for (unsigned int j=0;j<nPhoton;j++) {
            if (!isData && Photon_pt[j]>20 && abs(Photon_eta[j])>2 && abs(Photon_eta[j])<3) {
