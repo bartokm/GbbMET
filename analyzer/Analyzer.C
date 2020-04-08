@@ -763,6 +763,8 @@ void Analyzer::Loop()
            h_PixelSeed_ScaleFactors_2017[1]->SetDirectory(0);
            h_PixelSeed_ScaleFactors_2017[2]= (TH1F*)f_phoPV_2017.Get("Tight_ID");
            h_PixelSeed_ScaleFactors_2017[2]->SetDirectory(0);
+           h_PixelSeed_ScaleFactors_2017[3]= (TH1F*)f_phoPV_2017.Get("MVA_ID");
+           h_PixelSeed_ScaleFactors_2017[3]->SetDirectory(0);
            f_phoPV_2017.Close();
          }
          else if (year==2018) {
@@ -1343,13 +1345,14 @@ void Analyzer::Loop()
            }
          }
          else if (year==2017) {
+           unsigned int wpchooser=(whichPhoton<3) ? whichPhoton : 3;
            if (Photon_r9[nleadPho]>0.94) {
-             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(5);
-             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(5);
+             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinContent(2) : h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinContent(5);
+             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinError(2) : h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinError(5);
            }
            else {
-             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinContent(6);
-             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[whichPhoton]->GetBinError(6);
+             pix_sf=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinContent(3) : h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinContent(6);
+             syst_pix=(Photon_isScEtaEB[nleadPho]) ? h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinError(3) : h_PixelSeed_ScaleFactors_2017[wpchooser]->GetBinError(6);
            }
          }
          else if (year==2018) {

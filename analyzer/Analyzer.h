@@ -1255,7 +1255,7 @@ public :
    TH2F *h_eleRec_EGamma_SF2D[2];
    TH2D *h_Scaling_Factors_HasPix_R9_high;
    TH2D *h_Scaling_Factors_HasPix_R9_low;
-   TH1F *h_PixelSeed_ScaleFactors_2017[3];
+   TH1F *h_PixelSeed_ScaleFactors_2017[4];
    TH2D *h_PixelSeed_ScaleFactors_2018;
    TH2D *h_PixelSeed_ScaleFactors_2018_unc;
    TH2D *h_muID_SF2D[3];
