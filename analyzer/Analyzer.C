@@ -597,6 +597,8 @@ void Analyzer::Loop()
      if (year==2016) b_Photon_cutBased17Bitmap->GetEntry(ientry);
      else b_Photon_cutBasedBitmap->GetEntry(ientry);
      Int_t Photon_cutBased_versionFree[99]; for (unsigned int i=0; i<nPhoton;i++) (year==2016) ? Photon_cutBased_versionFree[i]=Photon_cutBased17Bitmap[i] : Photon_cutBased_versionFree[i]=Photon_cutBasedBitmap[i];
+     b_Photon_mvaID_WP80->GetEntry(ientry);
+     b_Photon_mvaID_WP90->GetEntry(ientry);
      /*
         b_phoScale_stat_up->GetEntry(ientry);
         b_phoScale_stat_dn->GetEntry(ientry);
@@ -718,6 +720,14 @@ void Analyzer::Loop()
            h_pho_EGamma_SF2D[2] = (TH2F*)f_2016phoTightSF.Get("EGamma_SF2D");
            h_pho_EGamma_SF2D[2]->SetDirectory(0);
            f_2016phoTightSF.Close();
+           TFile f_2016phoMVA80SF("input/egamma/photon/2016LegacyReReco_PhotonMVAWP80.root","read");
+           h_pho_EGamma_SF2D[3] = (TH2F*)f_2016phoMVA80SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[3]->SetDirectory(0);
+           f_2016phoMVA80SF.Close();
+           TFile f_2016phoMVA90SF("input/egamma/photon/2016LegacyReReco_PhotonMVAWP90.root","read");
+           h_pho_EGamma_SF2D[4] = (TH2F*)f_2016phoMVA90SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[4]->SetDirectory(0);
+           f_2016phoMVA90SF.Close();
            TFile f_phoPV_2016("input/egamma/photon/ScalingFactors_80X_Summer16.root","read");
            h_Scaling_Factors_HasPix_R9_high = (TH2D*)f_phoPV_2016.Get("Scaling_Factors_HasPix_R9 > 0.94");
            h_Scaling_Factors_HasPix_R9_high->SetDirectory(0);
@@ -738,6 +748,14 @@ void Analyzer::Loop()
            h_pho_EGamma_SF2D[2] = (TH2F*)f_2017phoTightSF.Get("EGamma_SF2D");
            h_pho_EGamma_SF2D[2]->SetDirectory(0);
            f_2017phoTightSF.Close();
+           TFile f_2017phoMVA80SF("input/egamma/photon/2017_PhotonsMVAwp80.root","read");
+           h_pho_EGamma_SF2D[3] = (TH2F*)f_2017phoMVA80SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[3]->SetDirectory(0);
+           f_2017phoMVA80SF.Close();
+           TFile f_2017phoMVA90SF("input/egamma/photon/2017_PhotonsMVAwp90.root","read");
+           h_pho_EGamma_SF2D[4] = (TH2F*)f_2017phoMVA90SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[4]->SetDirectory(0);
+           f_2017phoMVA90SF.Close();
            TFile f_phoPV_2017("input/egamma/photon/PixelSeed_ScaleFactors_2017.root","read");
            h_PixelSeed_ScaleFactors_2017[0]= (TH1F*)f_phoPV_2017.Get("Loose_ID");
            h_PixelSeed_ScaleFactors_2017[0]->SetDirectory(0);
@@ -760,6 +778,14 @@ void Analyzer::Loop()
            h_pho_EGamma_SF2D[2] = (TH2F*)f_2018phoTightSF.Get("EGamma_SF2D");
            h_pho_EGamma_SF2D[2]->SetDirectory(0);
            f_2018phoTightSF.Close();
+           TFile f_2018phoMVA80SF("input/egamma/photon/2018_PhotonsMVAwp80.root","read");
+           h_pho_EGamma_SF2D[3] = (TH2F*)f_2018phoMVA80SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[3]->SetDirectory(0);
+           f_2018phoMVA80SF.Close();
+           TFile f_2018phoMVA90SF("input/egamma/photon/2018_PhotonsMVAwp90.root","read");
+           h_pho_EGamma_SF2D[4] = (TH2F*)f_2018phoMVA90SF.Get("EGamma_SF2D");
+           h_pho_EGamma_SF2D[4]->SetDirectory(0);
+           f_2018phoMVA90SF.Close();
            TFile f_phoPV_2018("input/egamma/photon/HasPix_2018.root","read");
            h_PixelSeed_ScaleFactors_2018= (TH2D*)f_phoPV_2018.Get("eleVeto_SF");
            h_PixelSeed_ScaleFactors_2018->SetDirectory(0);
@@ -1203,12 +1229,12 @@ void Analyzer::Loop()
 
      //object definitions
      int leadpt_ak4=-1, leadpt_ak8=-1, highDDBvL=-1;
-     vector<int> passPhoL, passPhoM, passPhoT, passPhotons;
+     vector<int> passPhoL, passPhoM, passPhoT, passPhoMVA80, passPhoMVA90, passPhotons;
      vector<int> passJet, passAK8Jet;
      vector<int> passEleV, passEleL, passEleM, passEleT, passElectrons;
      vector<int> passMuL, passMuM, passMuT, passMuNO, passMuons;
      vector<int> passTauL, passTauM, passTauT, passTaus, passIso;
-     vector<int> passElePhoL, passElePhoM, passElePhoT, passElePhotons, passEleNO;
+     vector<int> passElePhoL, passElePhoM, passElePhoT, passElePhoMVA80, passElePhoMVA90, passElePhotons, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
      vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
      map<int,char> passDDBvL, passDeep;
@@ -1253,30 +1279,24 @@ void Analyzer::Loop()
          nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
        }
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
-         if (Photon_cutBased_versionFree[i]>0) {
-           passPhoL.push_back(i);
-         }
-         if (Photon_cutBased_versionFree[i]>>1&1) {
-           passPhoM.push_back(i);
-         }
-         if (Photon_cutBased_versionFree[i]>>2&1) {
-           passPhoT.push_back(i);
-         }
+         if (Photon_cutBased_versionFree[i]>0) passPhoL.push_back(i);
+         if (Photon_cutBased_versionFree[i]>>1&1) passPhoM.push_back(i);
+         if (Photon_cutBased_versionFree[i]>>2&1) passPhoT.push_back(i);
+         if (Photon_mvaID_WP80) passPhoMVA80.push_back(i);
+         if (Photon_mvaID_WP90) passPhoMVA90.push_back(i);
        }
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0) {
-         if (Photon_cutBased_versionFree[i]>0) {
-           passElePhoL.push_back(i);
-         }
-         if (Photon_cutBased_versionFree[i]>>1&1) {
-           passElePhoM.push_back(i);
-         }
-         if (Photon_cutBased_versionFree[i]>>2&1) {
-           passElePhoT.push_back(i);
-         }
+         if (Photon_cutBased_versionFree[i]>0) passElePhoL.push_back(i);
+         if (Photon_cutBased_versionFree[i]>>1&1) passElePhoM.push_back(i);
+         if (Photon_cutBased_versionFree[i]>>2&1) passElePhoT.push_back(i);
+         if (Photon_mvaID_WP80) passElePhoMVA80.push_back(i);
+         if (Photon_mvaID_WP90) passElePhoMVA90.push_back(i);
        }
      }
-     (whichPhoton==0) ? passPhotons=passPhoL : (whichPhoton==1) ? passPhotons=passPhoM : passPhotons=passPhoT;
-     (whichPhoton==0) ? passElePhotons=passElePhoL : (whichPhoton==1) ? passElePhotons=passElePhoM : passElePhotons=passElePhoT;
+     (whichPhoton==0) ? passPhotons=passPhoL : (whichPhoton==1) ? passPhotons=passPhoM : (whichPhoton==2) ? passPhotons=passPhoT :
+     (whichPhoton==3) ? passPhotons=passPhoMVA80 : passPhotons=passPhoMVA90;
+     (whichPhoton==0) ? passElePhotons=passElePhoL : (whichPhoton==1) ? passElePhotons=passElePhoM : (whichPhoton==2) ? passElePhotons=passElePhoT :
+     (whichPhoton==3) ? passElePhotons=passElePhoMVA80 : passElePhotons=passElePhoMVA90;
      for (auto i : passPhotons) {
        if (phoET[i]>phoET[nleadPho]) nleadPho=i;
        EMHT_before+=phoET[i];
@@ -1286,9 +1306,13 @@ void Analyzer::Loop()
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
      nPassElePhoT=passElePhoT.size();
+     nPassElePhoMVA80=passElePhoMVA80.size();
+     nPassElePhoMVA90=passElePhoMVA90.size();
      nPassPhoL=passPhoL.size();
      nPassPhoM=passPhoM.size();
      nPassPhoT=passPhoT.size();
+     nPassPhoMVA80=passPhoMVA80.size();
+     nPassPhoMVA90=passPhoMVA90.size();
      EMHT_after=EMHT_before;
      AK8EMHT_before=EMHT_before;
      AK8EMHT_after=EMHT_before;
@@ -1800,24 +1824,19 @@ void Analyzer::Loop()
        passBtag=false; passHiggsMass=false;
        int SelectedAK8Jet=-1;
        DDBvL_selected=0; //DDBvL btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
-       int iterator=0;
-       for (auto i : passAK8Jet){
-         //if (iterator==1) break;
-         if (FatJet_msoftdrop_nom[i]>70 && FatJet_msoftdrop_nom[i]<200) {
+       if (passAK8Jet.size()>0){
+         SelectedAK8Jet=passAK8Jet[0];
+         if (FatJet_msoftdrop_nom[passAK8Jet[0]]>70 && FatJet_msoftdrop_nom[passAK8Jet[0]]<200) {
            passHiggsMass=true;
-           SelectedAK8Jet=i;
-           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][4]) DDBvL_selected=5;
-           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
-           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][2]) DDBvL_selected=3;
-           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][1]) DDBvL_selected=2;
-           else if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) DDBvL_selected=1;
+           if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][4]) DDBvL_selected=5;
+           else if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
+           else if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][2]) DDBvL_selected=3;
+           else if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][1]) DDBvL_selected=2;
+           else if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][0]) DDBvL_selected=1;
            else DDBvL_selected=0;
-           if (FatJet_btagDDBvL[i]>BtagDDBvLWP[year_chooser][0]) passBtag=true;
-           break;
+           if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][0]) passBtag=true;
          }
-         iterator++;
        }
-       if (!passHiggsMass && nPassAK8>0) SelectedAK8Jet = passAK8Jet.at(0);
 
        //AK4
        double m_bb_deep=-1;

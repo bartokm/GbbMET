@@ -1202,10 +1202,11 @@ public :
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
-   int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassAK4=-1, nPassAK8=-1, nonHiggsJet=-1;
+   int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassPhoMVA80=-1, nPassPhoMVA90=-1;
+   int nPassAK4=-1, nPassAK8=-1, nonHiggsJet=-1;
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1, nPassEleNO=-1;
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
-   int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0;
+   int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0, nPassElePhoMVA80=-1, nPassElePhoMVA90=-1;
    int nPassMuL=-1, nPassMuM=-1, nPassMuT=-1, nPassMuNO=-1;
    int nPassTauL=-1, nPassTauM=-1, nPassTauT=-1, nPassIso=-1;
    int nPassLepL=-1, nPassLepM=-1, nPassLepT=-1;
@@ -1227,7 +1228,7 @@ public :
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double Deep_SF_L[3]={1,1,1}, Deep_SF_M[3]={1,1,1}, Deep_SF_T[3]={1,1,1};
-   double pho_SF[3]={1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
+   double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
    double ele_VETOSF=1;
    int year=2016;
    int DDBvL_whichSF=0, Deep_whichSF=0;
@@ -1248,7 +1249,7 @@ public :
    map< pair<int, int>, TH1D* > m_cuts;
    TH1D *h_PUweight;
    //histograms needed for SFs
-   TH2F *h_pho_EGamma_SF2D[3];
+   TH2F *h_pho_EGamma_SF2D[5];
    TH2F *h_ele_EGamma_SF2D[4];
    TH2F *h_ele_EGamma_EffMC2D[4];
    TH2F *h_eleRec_EGamma_SF2D[2];
@@ -1312,6 +1313,8 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   for (auto i : _cut_variable) {
     if (i=="nPassPhoM" || i=="nPassElePhoM") whichPhoton=1;
     if (i=="nPassPhoT" || i=="nPassElePhoT") whichPhoton=2;
+    if (i=="nPassPhoMVA80" || i=="nPassElePhoMVA80") whichPhoton=3;
+    if (i=="nPassPhoMVA90" || i=="nPassElePhoMVA90") whichPhoton=4;
     if (i=="nPassEleM") whichElectron=2;
     if (i=="nPassEleT") whichElectron=3;
     if (i=="nPassMuM") whichMuon=1;
@@ -2261,10 +2264,13 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassElePhoL") returnvalue*=Parser(nPassElePhoL,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassElePhoM") returnvalue*=Parser(nPassElePhoM,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassElePhoT") returnvalue*=Parser(nPassElePhoT,_cut_operator[i],_cut_value[i]);
-    //else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0]; cout<<"photon w "<<pho_SF[0]<<endl;}
+    else if (_cut_variable[i]=="nPassElePhoMVA80") returnvalue*=Parser(nPassElePhoMVA80,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoMVA90") returnvalue*=Parser(nPassElePhoMVA90,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
     else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
     else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
+    else if (_cut_variable[i]=="nPassPhoMVA80") {returnvalue*=Parser(nPassPhoMVA80,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[3];}
+    else if (_cut_variable[i]=="nPassPhoMVA90") {returnvalue*=Parser(nPassPhoMVA90,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[4];}
     else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float(Electron_pt[nleadEle],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(phoET[nleadElePho],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPho],_cut_operator[i],_cut_value[i]);
@@ -2613,9 +2619,13 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassElePhoL","number of loose elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to LOOSE"},
   {"nPassElePhoM","number of medium elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to MEDIUM"},
   {"nPassElePhoT","number of tight elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to TIGHT"},
+  {"nPassElePhoMVA80","number of MVA80 elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to MVA80"},
+  {"nPassElePhoMVA90","number of MVA90 elephotons (electrons as inverted pixelseed photons), also sets the working point for photons to MVA90"},
   {"nPassPhoL","number of loose photons, also sets the working point for photons to LOOSE"},
   {"nPassPhoM","number of medium photons, also sets the working point for photons to MEDIUM"},
   {"nPassPhoT","number of tight photons, also sets the working point for photons to TIGHT"},
+  {"nPassPhoMVA80","number of MVA80 photons, also sets the working point for photons to MVA80"},
+  {"nPassPhoMVA90","number of MVA90 photons, also sets the working point for photons to MVA90"},
   {"elePt","Pt of leading loose electron"},
   {"elephoPt","Pt of leading loose electronphoton"},
   {"phoEt","Et of leading loose photon"},
