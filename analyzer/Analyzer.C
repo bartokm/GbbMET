@@ -1284,15 +1284,15 @@ void Analyzer::Loop()
          if (Photon_cutBased_versionFree[i]>0) passPhoL.push_back(i);
          if (Photon_cutBased_versionFree[i]>>1&1) passPhoM.push_back(i);
          if (Photon_cutBased_versionFree[i]>>2&1) passPhoT.push_back(i);
-         if (Photon_mvaID_WP80) passPhoMVA80.push_back(i);
-         if (Photon_mvaID_WP90) passPhoMVA90.push_back(i);
+         if (Photon_mvaID_WP80[i]) passPhoMVA80.push_back(i);
+         if (Photon_mvaID_WP90[i]) passPhoMVA90.push_back(i);
        }
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0) {
          if (Photon_cutBased_versionFree[i]>0) passElePhoL.push_back(i);
          if (Photon_cutBased_versionFree[i]>>1&1) passElePhoM.push_back(i);
          if (Photon_cutBased_versionFree[i]>>2&1) passElePhoT.push_back(i);
-         if (Photon_mvaID_WP80) passElePhoMVA80.push_back(i);
-         if (Photon_mvaID_WP90) passElePhoMVA90.push_back(i);
+         if (Photon_mvaID_WP80[i]) passElePhoMVA80.push_back(i);
+         if (Photon_mvaID_WP90[i]) passElePhoMVA90.push_back(i);
        }
      }
      (whichPhoton==0) ? passPhotons=passPhoL : (whichPhoton==1) ? passPhotons=passPhoM : (whichPhoton==2) ? passPhotons=passPhoT :
