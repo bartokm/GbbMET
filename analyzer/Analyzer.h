@@ -2340,7 +2340,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
-      if (_fastSim) {h_cuts->Fill(i,w); m_cuts[mass_pair]->Fill(i,w);}
+      if (SignalScan) {h_cuts->Fill(i,w); m_cuts[mass_pair]->Fill(i,w);}
       else h_cuts->Fill(i,w);
     }
     else break;
