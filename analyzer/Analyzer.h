@@ -1241,7 +1241,7 @@ public :
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
-   double dphi_met_jet=999;
+   double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999;
    double e_pt=5, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
    //histograms
@@ -1292,6 +1292,7 @@ public :
    virtual void     Show(Long64_t entry = -1);
    void             Systematics(map<string, int> systematics);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
+   double           deltaPhi(double phi1, double phi2);
    void             CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
    void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
@@ -2286,6 +2287,10 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_jet_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_H_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_Hmin_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_H_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_Hmin_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_Hmin_candidate,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
@@ -2350,8 +2355,13 @@ double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
   return dR;
 }
 
+double Analyzer::deltaPhi(double phi1, double phi2){
+  return (abs(phi1-phi2)>M_PI) ? 2*M_PI-abs(phi2-phi1) : abs(phi1-phi2);
+}
+
 void Analyzer::CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
   double p_data[3] = {1,1,1}, p_mc[3] = {1,1,1}, p_data_up[3] = {1,1,1}, p_data_do[3] = {1,1,1};
+  //cout<<"njets "<<passCut.size()<<endl;
   for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
     BTEntry::JetFlavor FLAV;
     double mc_eff[3]={0}, eta=0, pt=0;
@@ -2430,7 +2440,8 @@ void Analyzer::CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v
       }
     } 
   }
-  //cout<<"p_data "<<p_data[0]<<" p_mc "<<p_mc[0]<<endl;
+  //cout<<"LOOSE p_data "<<p_data[0]<<" p_mc "<<p_mc[0]<<" w="<<p_data[0]/p_mc[0]<<endl;
+  //if (p_data[0]/p_mc[0]>20) cout<<"HAHO"<<endl;
   SF_L[0] = p_data[0]/p_mc[0];
   SF_M[0] = p_data[1]/p_mc[1];
   SF_T[0] = p_data[2]/p_mc[2];
@@ -2641,6 +2652,10 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
   {"dphi_met_jet_at_high_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet>=4"},
   {"dphi_met_jet_at_low_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet<4"},
+  {"dphi_met_H_candidate","Dphi of met and Higgs candidate"},
+  {"dphi_met_Hmin_candidate","Dphi of met and minimum of Higgs candidate jets"},
+  {"dphi_met_H_candidate_at_low_njet","Dphi of met and Higgs candidate, only if nonHiggsJet<4"},
+  {"dphi_met_Hmin_candidate_at_low_njet","Dphi of met and minimum of Higgs candidate jets, only if nonHiggsJet<4"},
   {"L1prefire","True if event could be affected by L1prefire"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
