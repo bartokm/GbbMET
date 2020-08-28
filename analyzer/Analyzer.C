@@ -386,10 +386,12 @@ void Analyzer::Loop()
    double xmin_ak4[dim_ak4]={-0.5,-0.5,0.5,0.5};
    double xmax_ak4[dim_ak4]={1.5,2.5,5.5,2.5};
    THnD *hn_AK4searchBins = new THnD("hn_AK4searchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
+   THnD *hn_AK4searchBins_noweight = new THnD("hn_AK4searchBins_noweight",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
    THnD *hn_AK4HTsearchBins = new THnD("hn_AK4HTsearchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
    hn_AK4searchBins->Sumw2(); hn_AK4HTsearchBins->Sumw2();
    unsigned int nsbins_ak4=hn_AK4searchBins->GetNbins();
    TH1D *h_AK4searchBins= new TH1D("h_AK4searchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
+   TH1D *h_AK4searchBins_noweight= new TH1D("h_AK4searchBins_noweight",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
    TH1D *h_AK4HTsearchBins= new TH1D("h_AK4HTsearchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
 
    //AK8 searchbins
@@ -398,10 +400,12 @@ void Analyzer::Loop()
    double xmin_ak8[dim_ak8]={-0.5,-0.5,0.5,0.5};
    double xmax_ak8[dim_ak8]={1.5,1.5,5.5,2.5};
    THnD *hn_AK8searchBins = new THnD("hn_AK8searchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
+   THnD *hn_AK8searchBins_noweight = new THnD("hn_AK8searchBins_noweight",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
    THnD *hn_AK8HTsearchBins = new THnD("hn_AK8HTsearchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
    hn_AK8searchBins->Sumw2(); hn_AK8HTsearchBins->Sumw2();
    unsigned int nsbins_ak8=hn_AK8searchBins->GetNbins();
    TH1D *h_AK8searchBins= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
+   TH1D *h_AK8searchBins_noweight= new TH1D("h_AK8searchBins_noweight",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
    TH1D *h_AK8HTsearchBins= new TH1D("h_AK8HTsearchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
   
    //Histograms for signalstudy
@@ -503,6 +507,10 @@ void Analyzer::Loop()
        b_Jet_pt_jesTotalUp->GetEntry(ientry);
        b_Jet_pt_jesTotalDown->GetEntry(ientry);
        b_Jet_hadronFlavour->GetEntry(ientry);
+       //b_Jet_mass_jesTotalUp->GetEntry(ientry);
+       //b_Jet_mass_jesTotalDown->GetEntry(ientry);
+       //b_Jet_mass_jerUp->GetEntry(ientry);
+       //b_Jet_mass_jerDown->GetEntry(ientry);
        b_Jet_genJetIdx->GetEntry(ientry);
        b_FatJet_pt_jerUp->GetEntry(ientry);
        b_FatJet_pt_jerDown->GetEntry(ientry);
@@ -560,6 +568,9 @@ void Analyzer::Loop()
      b_luminosityBlock->GetEntry(ientry);
      b_PV_npvsGood->GetEntry(ientry);
      b_PV_npvs->GetEntry(ientry);
+     b_PV_x->GetEntry(ientry);
+     b_PV_y->GetEntry(ientry);
+     b_PV_z->GetEntry(ientry);
      if (!_fastSim) {
        if (year==2016) {
          b_HLT_Photon165_HE10->GetEntry(ientry);
@@ -614,12 +625,13 @@ void Analyzer::Loop()
      b_Muon_looseId->GetEntry(ientry);
      b_Muon_mediumId->GetEntry(ientry);
      b_Muon_tightId->GetEntry(ientry);
-     b_nPhoton->GetEntry(ientry);
+     b_nPhoton->GetEntry(ientry); if (nPhoton>99) continue;
      b_Photon_pt->GetEntry(ientry);
      b_Photon_eCorr->GetEntry(ientry);
      b_Photon_eta->GetEntry(ientry);
      b_Photon_phi->GetEntry(ientry);
      b_Photon_r9->GetEntry(ientry);
+     b_Photon_seedGain->GetEntry(ientry);
      b_Photon_pixelSeed->GetEntry(ientry);
      b_Photon_electronVeto->GetEntry(ientry);
      b_Photon_hoe->GetEntry(ientry);
@@ -656,6 +668,7 @@ void Analyzer::Loop()
      b_Jet_phi->GetEntry(ientry);
      b_Jet_eta->GetEntry(ientry);
      b_Jet_mass->GetEntry(ientry);
+     //b_Jet_mass_nom->GetEntry(ientry);
      b_Jet_chHEF->GetEntry(ientry);
      b_Jet_btagDeepFlavB->GetEntry(ientry);
      b_Jet_jetId->GetEntry(ientry);
@@ -707,10 +720,11 @@ void Analyzer::Loop()
      //SignalScan variables
      pair<int,int> mass_pair;
      if (SignalScan) {
-       int neutralino=-1, gluino=-1;
+       int neutralino=-1, gluino=-1; bool foundG=0, foundX=0;
        for (unsigned int i=0;i<nGenPart;i++) {
-         if (GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) neutralino=i;
-         if (GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) gluino=i;
+         if (!foundX && GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) {neutralino=i; foundX=1;}
+         if (!foundG && GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) {gluino=i; foundG=1;}
+         if (foundX && foundG) break;
        }
        int m_Gluino=1;
        if (SignalScenario==1) m_Gluino = GenPart_mass[gluino];
@@ -723,6 +737,24 @@ void Analyzer::Loop()
          if (search!=signal_events.end()) search->second +=1;
        }
      }
+     if (jentry==0 || newfile) {
+       //Egamma scaling & smearing systematic fluctuations
+       std::map<int, std::map<std::string, std::string > > pathTo_photon_Scaling = {
+         {2016,{{"v1","input/egamma/syst/Legacy2016_07Aug2017_FineEtaR9_v3_ele_unc_scales.dat"},}},
+         {2017,{{"v1","input/egamma/syst/Run2017_17Nov2017_v1_ele_unc_scales.dat"},{"v2","input/egamma/syst/Run2017_24Feb2020_runEtaR9Gain_v2_scales.dat"},}},
+         {2018,{{"v1","input/egamma/syst/Run2018_Step2Closure_CoarseEtaR9Gain_v2_scales.dat"},}},
+       };
+     
+       std::map<int, std::map<std::string, std::string > > pathTo_photon_Smearing = {
+         {2016,{{"v1","input/egamma/syst/Legacy2016_07Aug2017_FineEtaR9_v3_ele_unc_smearings.dat"},}},
+         {2017,{{"v1","input/egamma/syst/Run2017_17Nov2017_v1_ele_unc_smearings.dat"},{"v2","input/egamma/syst/Run2017_24Feb2020_runEtaR9Gain_v2_smearings.dat"},}},
+         {2018,{{"v1","input/egamma/syst/Run2018_Step2Closure_CoarseEtaR9Gain_v2_smearings.dat"},}},
+       };
+       std::string version = (year==2017) ? "v2" : "v1";
+       EgammaScaling  = EgammaScalingReader(pathTo_photon_Scaling.at(year).at(version), year, version);
+       EgammaSmearing = EgammaSmearingReader(pathTo_photon_Smearing.at(year).at(version), year);
+     }
+
      w=1;
      //MC weights and scale factors
      double pu_weight=1, weight=1;
@@ -731,13 +763,24 @@ void Analyzer::Loop()
        else if (SignalScan && temp_f.find("NanoAODv6")!=std::string::npos) {
          TBranch *b_genEventSumw;
          Double_t sub_TotalEvents=0; TotalEvents=0;
-         string eventsum="genEventSumw_T5qqqqHg_"+to_string(mass_pair.first)+"_"+to_string(mass_pair.second);
          TTree *Runs; fChain->GetCurrentFile()->GetObject("Runs",Runs);
+         TObjArray *leaves=Runs->GetListOfLeaves();
+         int dm_g=999, dm_n=999, re_mg=0, re_mn=0;
+         for (int i = 0; i <= leaves->GetLast(); i++) {
+           string name=leaves->At(i)->GetName();
+           if (name.find("genEventCount_T5qqqqHg")==string::npos) continue;
+           size_t found = name.find("T5qqqqHg");
+           int mg=stoi(name.substr(name.find("_",found)+1,name.find_last_of("_")-name.find("_",found)-1));
+           int mn=stoi(name.substr(name.find_last_of("_")+1));
+           if (dm_g>abs(mg-mass_pair.first)) re_mg=mg;
+           if (dm_n>abs(mn-mass_pair.second)) re_mn=mn;
+         }
+         string eventsum="genEventSumw_T5qqqqHg_"+to_string(re_mg)+"_"+to_string(re_mn);
          Runs->SetBranchAddress(eventsum.c_str(),&sub_TotalEvents,&b_genEventSumw);
          for (int i=0; i<Runs->GetEntries();i++) {b_genEventSumw->GetEntry(i); TotalEvents+=sub_TotalEvents;}
        }
        //weights
-       pu_weight=puWeight;
+       (PUweight_whichSF==1) ? pu_weight=puWeightUp : (PUweight_whichSF==2) ? pu_weight=puWeightDown : pu_weight=puWeight;
        if (_fastSim || SignalScan) pu_weight=1;
        weight=L_data[year_chooser]*xsec*genWeight/TotalEvents;
        //if (newfile) std::cout<<"weight=L_data[year_chooser]*genWeight*xsec/TotalEvents "<<weight<<"="<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
@@ -1280,7 +1323,7 @@ void Analyzer::Loop()
      vector<int> passTauL, passTauM, passTauT, passTaus, passIso;
      vector<int> passElePhoL, passElePhoM, passElePhoT, passElePhoMVA80, passElePhoMVA90, passElePhotons, passEleNO;
      vector<int> passFREleL, passFREleM, passFREleT;
-     vector<float> jetSmearedPt, jetSmearedEn, AK8JetSmearedPt, AK8JetSmearedEn;
+     vector<float> jetSmearedPt, jetSmearedMass, AK8JetSmearedPt, AK8JetSmearedMass;
      map<int,char> passDDBvL, passDeep;
      HT_before=0; EMHT_before=0; HT_after=0; EMHT_after=0;
      AK8HT_before=0; AK8EMHT_before=0; AK8HT_after=0; AK8EMHT_after=0;
@@ -1302,15 +1345,53 @@ void Analyzer::Loop()
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
        //Systematics for Egamma scaling
-       double correction = 1;
-       /*
-          (Egamma_Statscale_whichSF==1) ? correction*=(*phoScale_stat_up)[i] : (Egamma_Statscale_whichSF==2) ? correction*=(*phoScale_stat_dn)[i] : correction=correction;
-          (Egamma_Systscale_whichSF==1) ? correction*=(*phoScale_syst_up)[i] : (Egamma_Systscale_whichSF==2) ? correction*=(*phoScale_syst_dn)[i] : correction=correction;
-          (Egamma_Gainscale_whichSF==1) ? correction*=(*phoScale_gain_up)[i] : (Egamma_Gainscale_whichSF==2) ? correction*=(*phoScale_gain_dn)[i] : correction=correction;
-          (Egamma_Rhoresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_rho_up)[i]) : (Egamma_Rhoresol_whichSF==2) ? correction*=gen->Gaus(1,(*phoResol_rho_dn)[i]) : correction=correction;
-          (Egamma_Phiresol_whichSF==1) ? correction*=gen->Gaus(1,(*phoResol_phi_up)[i]) : correction=correction;
-          */
-       phoET.push_back(Photon_pt[i]*correction);
+       float scale = 1;
+       float smear = 0;
+       float SCEta  = Photon_SCEta(i);
+     
+       if (isData){
+         // scaling only
+         int   trueGain;
+         // the seed gain on the endcaps is saved erroneously.
+         // try to figure out based on the correction the value.
+         // since we care bout high energy photons only only 1 and 6 are considered.
+         // especially because the entry belonging to 12 is often a direct copy of 1 or 6
+         if (Photon_isScEtaEE[i]){
+           //float scale12 = EgammaScaling.get_energyScale(SCEta, Photon_r9[i], 12,  run);
+           float scale6  = EgammaScaling.get_energyScale(SCEta, Photon_r9[i], 6,  run);
+           float scale1  = EgammaScaling.get_energyScale(SCEta, Photon_r9[i], 1,  run);
+
+           if ( abs(Photon_eCorr[i]-scale1)/scale1<0.0001 && abs(Photon_eCorr[i]-scale6)/scale6>0.0001 ) {trueGain=1; scale = scale1;}
+           else if ( abs(Photon_eCorr[i]-scale1)/scale1>0.0001 && abs(Photon_eCorr[i]-scale6)/scale6<0.0001) {trueGain=6; scale  = scale6;}
+           else { trueGain = -1; scale = (scale6+scale1)/2;}
+           // some weird thing: both r9=0.919941a and r9=0.93994 are taking their corrections from the 0.92-0.94 bin in the nanoAOD implelentation. no idea why this is.
+         }
+         else {
+           scale    = EgammaScaling.get_energyScale(SCEta,Photon_r9[i], static_cast<int>(Photon_seedGain[i]) , run);
+           trueGain = static_cast<int>(Photon_seedGain[i]);
+         }
+
+         if (Egamma_Statscale_whichSF || Egamma_Systscale_whichSF || Egamma_Gainscale_whichSF){
+           if (trueGain>0) scale = EgammaScaling.get_energyScale(SCEta,Photon_r9[i], trueGain , run,
+               Egamma_Statscale_whichSF, Egamma_Systscale_whichSF, Egamma_Gainscale_whichSF);
+           else {
+             float scale6    = EgammaScaling.get_energyScale(SCEta,Photon_r9[i], 6 , run,
+               Egamma_Statscale_whichSF, Egamma_Systscale_whichSF, Egamma_Gainscale_whichSF);
+
+             float scale1    = EgammaScaling.get_energyScale(SCEta,Photon_r9[i], 1 , run,
+               Egamma_Statscale_whichSF, Egamma_Systscale_whichSF, Egamma_Gainscale_whichSF);
+
+             scale    = (scale6+scale1)/2;
+
+             //if (systematic_switches[ "EGamma_gain61" ] == 1) scale = max(scale6, scale1);
+             //if (systematic_switches[ "EGamma_gain61" ] == 2) scale = min(scale6, scale1);
+           }
+         }
+       }
+       else smear = EgammaSmearing.get_Semar(SCEta, Photon_r9[i],  Photon_pt[i],Egamma_Rhoresol_whichSF,Egamma_Phiresol_whichSF);
+     
+       float corr = scale + smear * gen->Gaus(1, 1);
+       phoET.push_back(Photon_pt[i] / Photon_eCorr[i] * corr);
        //L1prefire correction
        if (_fastSim && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
          double max= h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
@@ -1643,14 +1724,14 @@ void Analyzer::Loop()
        }
 
        bool passcut=true;
-       double jetpt=Jet_pt_nom[i];
+       double jetpt=Jet_pt_nom[i], jetmass=Jet_mass[i]; //jetmass=Jet_mass_nom[i];
        if (!isData) {
-         if (AK4Smear_whichSF==1) jetpt=Jet_pt_jerUp[i];
-         else if (AK4Smear_whichSF==2) jetpt=Jet_pt_jerDown[i];
-         if (AK4jetJEC_whichSF==1) jetpt=Jet_pt_jesTotalUp[i];
-         else if (AK4jetJEC_whichSF==2) jetpt=Jet_pt_jesTotalDown[i];
+         if (JER_whichSF==1) {jetpt=Jet_pt_jerUp[i];} //jetmass=Jet_mass_jerUp[i];}
+         else if (JER_whichSF==2) {jetpt=Jet_pt_jerDown[i];} //jetmass=Jet_mass_jerDown[i];}
+         if (JES_whichSF==1) {jetpt=Jet_pt_jesTotalUp[i];} //jetmass=Jet_mass_jesTotalUp[i];}
+         else if (JES_whichSF==2) {jetpt=Jet_pt_jesTotalDown[i];} //jetmass=Jet_mass_jesTotalDown[i];}
        }
-       jetSmearedPt.push_back(jetpt);
+       jetSmearedPt.push_back(jetpt); jetSmearedMass.push_back(jetmass);
        HT_before+=jetSmearedPt[i];
        if (abs(Jet_eta[i])>2.4 || !(Jet_jetId[i]>>1&1) || jetSmearedPt[i]<30) passcut=false;
        if (jetSmearedPt[i]<50 && !(Jet_puId[i]&(1<<2))) passcut=false;
@@ -1710,14 +1791,18 @@ void Analyzer::Loop()
      //AK8Jet ID
      for (unsigned int i=0;i<nFatJet;i++) {
        bool passcut=true;
-       double jetpt=FatJet_pt_nom[i];
+       double jetpt=FatJet_pt_nom[i], jetmass=FatJet_msoftdrop_nom[i];
        if (!isData) {
-         if (AK8Smear_whichSF==1) jetpt=FatJet_pt_jerUp[i];
-         else if (AK8Smear_whichSF==2) jetpt=FatJet_pt_jerDown[i];
-         if (AK8jetJEC_whichSF==1) jetpt=FatJet_pt_jesTotalUp[i];
-         else if (AK8jetJEC_whichSF==2) jetpt=FatJet_pt_jesTotalDown[i];
+         if (JER_whichSF==1) {jetpt=FatJet_pt_jerUp[i]; jetmass=FatJet_msoftdrop_jerUp[i];}
+         else if (JER_whichSF==2) {jetpt=FatJet_pt_jerDown[i]; jetmass=FatJet_msoftdrop_jerDown[i];}
+         if (JES_whichSF==1) {jetpt=FatJet_pt_jesTotalUp[i]; jetmass=FatJet_msoftdrop_jesTotalUp[i];}
+         else if (JES_whichSF==2) {jetpt=FatJet_pt_jesTotalDown[i]; jetmass=FatJet_msoftdrop_jesTotalUp[i];}
+         if (JMR_whichSF==1) jetmass=FatJet_msoftdrop_jmrUp[i];
+         else if (JMR_whichSF==2) jetmass=FatJet_msoftdrop_jmrDown[i];
+         if (JMS_whichSF==1) jetmass=FatJet_msoftdrop_jmsUp[i];
+         else if (JMS_whichSF==2) jetmass=FatJet_msoftdrop_jmsDown[i];
        }
-       AK8JetSmearedPt.push_back(jetpt);
+       AK8JetSmearedPt.push_back(jetpt); AK8JetSmearedMass.push_back(jetmass);
        AK8HT_before+=AK8JetSmearedPt[i];
        if (abs(FatJet_eta[i])>2.4 || !(FatJet_jetId[i]>>1&1) || AK8JetSmearedPt[i]<300) passcut=false;
        for (auto j : passPhotons) if (deltaR(FatJet_phi[i],Photon_phi[j],FatJet_eta[i],Photon_eta[j])<0.8) {
@@ -1799,27 +1884,27 @@ void Analyzer::Loop()
      }
 
      //MET variables
-     for (auto i : passPhotons) ST+=phoET[i];
-     (!isData && genMET_whichSF==1) ? MET=GenMET_pt : MET=MET;
      double METPhi=0, METsumEt=0, METSig=0;
+     for (auto i : passPhotons) ST+=phoET[i];
      if (year!=2017) {
        MET=MET_pt_nom; METPhi=MET_phi_nom; METsumEt=MET_sumEt; METSig=MET_significance;
-       if (metJER_whichSF==1) {MET=MET_pt_jerUp; METPhi=MET_phi_jerUp;}
-       else if (metJER_whichSF==2) {MET=MET_pt_jerDown; METPhi=MET_phi_jerDown;}
-       if (metJES_whichSF==1) {MET=MET_pt_jesTotalUp; METPhi=MET_phi_jesTotalUp;}
-       else if (metJES_whichSF==2) {MET=MET_pt_jesTotalDown; METPhi=MET_phi_jesTotalDown;}
-       if (metUES_whichSF==1) {MET=MET_pt_unclustEnUp; METPhi=MET_phi_unclustEnUp;}
-       else if (metUES_whichSF==2) {MET=MET_pt_unclustEnDown; METPhi=MET_phi_unclustEnDown;}
+       if (JER_whichSF==1) {MET=MET_pt_jerUp; METPhi=MET_phi_jerUp;}
+       else if (JER_whichSF==2) {MET=MET_pt_jerDown; METPhi=MET_phi_jerDown;}
+       if (JES_whichSF==1) {MET=MET_pt_jesTotalUp; METPhi=MET_phi_jesTotalUp;}
+       else if (JES_whichSF==2) {MET=MET_pt_jesTotalDown; METPhi=MET_phi_jesTotalDown;}
+       if (UES_whichSF==1) {MET=MET_pt_unclustEnUp; METPhi=MET_phi_unclustEnUp;}
+       else if (UES_whichSF==2) {MET=MET_pt_unclustEnDown; METPhi=MET_phi_unclustEnDown;}
      }
      else {
        MET=METFixEE2017_pt_nom; METPhi=METFixEE2017_phi_nom; METsumEt=METFixEE2017_sumEt; METSig=METFixEE2017_significance;
-       if (metJER_whichSF==1) {MET=METFixEE2017_pt_jerUp; METPhi=METFixEE2017_phi_jerUp;}
-       else if (metJER_whichSF==2) {MET=METFixEE2017_pt_jerDown; METPhi=METFixEE2017_phi_jerDown;}
-       if (metJES_whichSF==1) {MET=METFixEE2017_pt_jesTotalUp; METPhi=METFixEE2017_phi_jesTotalUp;}
-       else if (metJES_whichSF==2) {MET=METFixEE2017_pt_jesTotalDown; METPhi=METFixEE2017_phi_jesTotalDown;}
-       if (metUES_whichSF==1) {MET=METFixEE2017_pt_unclustEnUp; METPhi=METFixEE2017_phi_unclustEnUp;}
-       else if (metUES_whichSF==2) {MET=METFixEE2017_pt_unclustEnDown; METPhi=METFixEE2017_phi_unclustEnDown;}
+       if (JER_whichSF==1) {MET=METFixEE2017_pt_jerUp; METPhi=METFixEE2017_phi_jerUp;}
+       else if (JER_whichSF==2) {MET=METFixEE2017_pt_jerDown; METPhi=METFixEE2017_phi_jerDown;}
+       if (JES_whichSF==1) {MET=METFixEE2017_pt_jesTotalUp; METPhi=METFixEE2017_phi_jesTotalUp;}
+       else if (JES_whichSF==2) {MET=METFixEE2017_pt_jesTotalDown; METPhi=METFixEE2017_phi_jesTotalDown;}
+       if (UES_whichSF==1) {MET=METFixEE2017_pt_unclustEnUp; METPhi=METFixEE2017_phi_unclustEnUp;}
+       else if (UES_whichSF==2) {MET=METFixEE2017_pt_unclustEnDown; METPhi=METFixEE2017_phi_unclustEnDown;}
      }
+     if (!isData && genMET_whichSF==1) {MET=GenMET_pt; METPhi=GenMET_phi;}
      ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
@@ -1875,7 +1960,7 @@ void Analyzer::Loop()
        DDBvL_selected=0; //DDBvL btag value of higgs candidate jet. 0-Nobtag, 1-loose, 2-medium 3-medium2 4-tight
        if (passAK8Jet.size()>0){
          SelectedAK8Jet=passAK8Jet[0];
-         if (FatJet_msoftdrop_nom[passAK8Jet[0]]>70 && FatJet_msoftdrop_nom[passAK8Jet[0]]<200) {
+         if (AK8JetSmearedMass[passAK8Jet[0]]>70 && AK8JetSmearedMass[passAK8Jet[0]]<200) {
            passHiggsMass=true;
            if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][4]) DDBvL_selected=5;
            else if (FatJet_btagDDBvL[passAK8Jet[0]]>BtagDDBvLWP[year_chooser][3]) DDBvL_selected=4;
@@ -1902,8 +1987,8 @@ void Analyzer::Loop()
              //double dR = deltaR(Jet_phi[passJet.at(i)],Jet_phi[passJet.at(j)],Jet_eta[passJet.at(i)],Jet_eta[passJet.at(j)]);
              //if (dR>1.5) continue;
              TLorentzVector bjet1, bjet2;
-             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(i)],Jet_eta[passJet.at(i)],Jet_phi[passJet.at(i)],Jet_mass[passJet.at(i)]);
-             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],Jet_mass[passJet.at(j)]);
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(i)],Jet_eta[passJet.at(i)],Jet_phi[passJet.at(i)],jetSmearedMass[passJet.at(i)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],jetSmearedMass[passJet.at(j)]);
              m_bb_deep=(bjet1+bjet2).M();
              phi_H_candidate=(bjet1+bjet2).Phi();
              pt_H_candidate=(bjet1+bjet2).Pt();
@@ -1932,6 +2017,11 @@ void Analyzer::Loop()
              //if (year==2016) CalcBtagSF(_fastSim, Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
              else if (year==2017) CalcBtagSF(_fastSim, Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
              else if (year==2018) CalcBtagSF(_fastSim, Jet_eta, jetSmearedPt, Jet_hadronFlavour, passDeep, eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, Deep_SF_L, Deep_SF_M, Deep_SF_T);
+             //BTEntry::JetFlavor flavour=BTEntry::FLAV_UDSG;
+             //vector<double> v_eta={-2,-1.5,-0.5,0.5,1.5,2}, v_pt={100,200,300,600,1200};
+             //for (auto i : v_eta) for (auto j : v_pt) {
+             //cout<<"eta "<<i<<" pt "<<j<<" SF fast "<<reader_M_2016fast.eval_auto_bounds("central",flavour,i,j)<<" SF full "<<reader_M_2016deep.eval_auto_bounds("central",flavour,i,j)<<endl;
+             //}
              if (bcounterDeep[1]>0) {
                for (map<int,char>::iterator it=passDeep.begin(); it!=passDeep.end(); ++it) {
                  if (Jet_hadronFlavour[it->first]==0 && it->second != '0') countb++;
@@ -2044,8 +2134,8 @@ void Analyzer::Loop()
 
                  if (Higgs_jet_b!=-1 && Higgs_jet_antib!=-1) {
                    TLorentzVector bjet1, bjet2;
-                   bjet1.SetPtEtaPhiM(jetSmearedPt[Higgs_jet_b],Jet_eta[Higgs_jet_b],Jet_phi[Higgs_jet_b],Jet_mass[Higgs_jet_b]);
-                   bjet2.SetPtEtaPhiM(jetSmearedPt[Higgs_jet_antib],Jet_eta[Higgs_jet_antib],Jet_phi[Higgs_jet_antib],Jet_mass[Higgs_jet_antib]);
+                   bjet1.SetPtEtaPhiM(jetSmearedPt[Higgs_jet_b],Jet_eta[Higgs_jet_b],Jet_phi[Higgs_jet_b],jetSmearedMass[Higgs_jet_b]);
+                   bjet2.SetPtEtaPhiM(jetSmearedPt[Higgs_jet_antib],Jet_eta[Higgs_jet_antib],Jet_phi[Higgs_jet_antib],jetSmearedMass[Higgs_jet_antib]);
                    AK4Hmass=(bjet1+bjet2).M();
                    dR_trueHbb=deltaR(Jet_phi[Higgs_jet_b],Jet_phi[Higgs_jet_antib],Jet_eta[Higgs_jet_b],Jet_eta[Higgs_jet_antib]);
                    double dphi1=deltaPhi(Jet_phi[Higgs_jet_b],METPhi);
@@ -2220,7 +2310,7 @@ void Analyzer::Loop()
 
 
            if (m_bb_deep!=-1) h_mbbjet_select->Fill(m_bb_deep,w);
-           if (DDBvL_selected>0) h_AK8mass_select->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
+           if (DDBvL_selected>0) h_AK8mass_select->Fill(AK8JetSmearedMass[SelectedAK8Jet],w);
            if (dR_ak4_Hcandidate!=-1) h_dR_ak4_Hcandidate->Fill(dR_ak4_Hcandidate,w);
            if (pt_ak4_Hcandidate1!=-1) h_pt_ak4_Hcandidate->Fill(pt_ak4_Hcandidate1,w);
            if (pt_ak4_Hcandidate2!=-1) h_pt_ak4_Hcandidate->Fill(pt_ak4_Hcandidate2,w);
@@ -2243,11 +2333,16 @@ void Analyzer::Loop()
            //else if (boost==0) {if (AK4AK8==1) w_AK4searchBin*=Deep_SF_M[Deep_whichSF]; if (AK4AK8==2) w_AK4searchBin*=Deep_SF_M[Deep_whichSF]*Deep_SF_L[Deep_whichSF];}//medium-loose
            switch (boost) {
              case 0 :
+               {
+               //double check= hn_AK4searchBins->GetBinContent(230);
                hn_AK4searchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
+               hn_AK4searchBins_noweight->Fill(sbFill_ak4ak8);
                if (HT_after>1500) hn_AK4HTsearchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
                break;
+               }
              case 1 :
                hn_AK8searchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
+               hn_AK8searchBins_noweight->Fill(sbFill_ak4ak8);
                if (HT_after>1500) hn_AK8HTsearchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
                break;
            }
@@ -2259,8 +2354,8 @@ void Analyzer::Loop()
            //higgs mass distribution plot fills
            if (boost && met>3 && AK4AK8>0) {
              int massRegion = (met-4)*2+njet;
-             double m=FatJet_msoftdrop_nom[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
-             double m2=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+             double m=AK8JetSmearedMass[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             double m2=AK8JetSmearedMass[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
              if (VR) h2_mHAK8->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
              else if (!isData) h2_mHAK8->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
              if (!VR) h2_dphi_met_h_ak8->Fill(massRegion,dphi_H_ak8,w*DDBvL_SF_L[DDBvL_whichSF]);
@@ -2270,8 +2365,8 @@ void Analyzer::Loop()
              double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
              double wtemp=w*Deep_SF_L[Deep_whichSF]; (AK4AK8==2) ? wtemp*=Deep_SF_L[Deep_whichSF] : wtemp=wtemp;
              TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
-             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
-             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],jetSmearedMass[passJet.at(0)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],jetSmearedMass[passJet.at(1)]);
              double m2=(bjet1+bjet2).M(); (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2;
              double dR = deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
              double dR2= deltaR(Jet_phi[passJet.at(0)],Jet_phi[passJet.at(1)],Jet_eta[passJet.at(0)],Jet_eta[passJet.at(1)]);
@@ -2290,17 +2385,17 @@ void Analyzer::Loop()
              if (!VR) h2_dphi_met_ak4btag->Fill(massRegion,dphi_AK4btag,wtemp);
            }
            if (VR==1 && boost==1 && AK4AK8>0 && met>3) {
-             double m=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+             double m=AK8JetSmearedMass[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
              h_mHAK8->Fill(m,w*DDBvL_SF_L[DDBvL_whichSF]);
            }
            if (VR==1 && boost==0 && passJet.size()>1 && AK4AK8>0 && met>3) {
              TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
-             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
-             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+             bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],jetSmearedMass[passJet.at(0)]);
+             bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],jetSmearedMass[passJet.at(1)]);
              double m=(bjet1+bjet2).M();  (m<18) ? m=19 : (m>278) ? m=277 : m=m;
              h_mHAK4->Fill(m,w*Deep_SF_L[Deep_whichSF]);
            }
-           if (!isData && AK4AK8>0 && boost==1 && VR==0 && met>3) h_mHAK8->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
+           if (!isData && AK4AK8>0 && boost==1 && VR==0 && met>3) h_mHAK8->Fill(AK8JetSmearedMass[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
            if (!isData && AK4AK8>0 && boost==0 && VR==0 && met>3) h_mHAK4->Fill(m_bb_deep,w*Deep_SF_L[Deep_whichSF]);
      
      //SignalRegion -- not the real SR, but almost
@@ -2359,7 +2454,7 @@ void Analyzer::Loop()
 		  
        
        if (m_bb_deep!=-1) m_mbbjet_select[mass_pair]->Fill(m_bb_deep,w);
-       if (DDBvL_selected>0) m_AK8mass_select[mass_pair]->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w);
+       if (DDBvL_selected>0) m_AK8mass_select[mass_pair]->Fill(AK8JetSmearedMass[SelectedAK8Jet],w);
        if (dR_ak4_Hcandidate!=-1) m_dR_ak4_Hcandidate[mass_pair]->Fill(dR_ak4_Hcandidate,w);
        if (pt_ak4_Hcandidate1!=-1) m_pt_ak4_Hcandidate[mass_pair]->Fill(pt_ak4_Hcandidate1,w);
        if (pt_ak4_Hcandidate2!=-1) m_pt_ak4_Hcandidate[mass_pair]->Fill(pt_ak4_Hcandidate2,w);
@@ -2402,10 +2497,12 @@ void Analyzer::Loop()
        switch (boost) {
          case 0 : 
            mn_AK4searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK4searchBin);
+           mn_AK4searchBins_noweight[mass_pair]->Fill(sbFill_ak4ak8);
            if (HT_after>1500) mn_AK4HTsearchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK4searchBin);
            break;
          case 1 :
            mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
+           mn_AK8searchBins_noweight[mass_pair]->Fill(sbFill_ak4ak8);
            if (HT_after>1500) mn_AK8HTsearchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
          break;
        }
@@ -2435,8 +2532,8 @@ void Analyzer::Loop()
        //higgs mass distribution plot fills
        if (boost && met>3 && AK4AK8>0) {
          int massRegion = (met-4)*2+njet;
-         double m=FatJet_msoftdrop_nom[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
-         double m2=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
+         double m=AK8JetSmearedMass[SelectedAK8Jet]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         double m2=AK8JetSmearedMass[passAK8Jet.at(0)]; (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
          if (VR) m2_mHAK8[mass_pair]->Fill(massRegion,m2,w*DDBvL_SF_L[DDBvL_whichSF]);
          else if (!isData) m2_mHAK8[mass_pair]->Fill(massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
          if (!VR) m2_dphi_met_h_ak8[mass_pair]->Fill(massRegion,dphi_H_ak8,w*DDBvL_SF_L[DDBvL_whichSF]);
@@ -2446,8 +2543,8 @@ void Analyzer::Loop()
          double m=m_bb_deep; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
          double wtemp=w*Deep_SF_L[Deep_whichSF]; (AK4AK8==2) ? wtemp*=Deep_SF_L[Deep_whichSF] : wtemp=wtemp;
          TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
-         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
-         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],jetSmearedMass[passJet.at(0)]);
+         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],jetSmearedMass[passJet.at(1)]);
          double m2=(bjet1+bjet2).M(); (m2<18) ? m2=19 : (m2>278) ? m2=277 : m2=m2;
          double dR = deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
          double dR2= deltaR(Jet_phi[passJet.at(0)],Jet_phi[passJet.at(1)],Jet_eta[passJet.at(0)],Jet_eta[passJet.at(1)]);
@@ -2466,17 +2563,17 @@ void Analyzer::Loop()
          if (!VR) m2_dphi_met_ak4btag[mass_pair]->Fill(massRegion,dphi_AK4btag,wtemp);
        }
        if (VR==1 && boost==1 && AK4AK8>0 && met>3) {
-         double m=FatJet_msoftdrop_nom[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
+         double m=AK8JetSmearedMass[passAK8Jet.at(0)]; (m<18) ? m=19 : (m>278) ? m=277 : m=m;
          m_mHAK8[mass_pair]->Fill(m,w*DDBvL_SF_L[DDBvL_whichSF]);
        }
        if (VR==1 && boost==0 && passJet.size()>1 && AK4AK8>0 && met>3) {
          TLorentzVector bjet1, bjet2; //Needed because, in VR there can be passHiggsmass w/o btag AND a btagged jet
-         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],Jet_mass[passJet.at(0)]);
-         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],Jet_mass[passJet.at(1)]);
+         bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(0)],Jet_eta[passJet.at(0)],Jet_phi[passJet.at(0)],jetSmearedMass[passJet.at(0)]);
+         bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(1)],Jet_eta[passJet.at(1)],Jet_phi[passJet.at(1)],jetSmearedMass[passJet.at(1)]);
          double m=(bjet1+bjet2).M(); (m<18) ? m=19 : (m>278) ? m=277 : m=m;
          m_mHAK4[mass_pair]->Fill(m,w*Deep_SF_L[Deep_whichSF]);
        }
-       if (!isData && AK4AK8>0 && boost==1 && VR==0 && met>3) m_mHAK8[mass_pair]->Fill(FatJet_msoftdrop_nom[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
+       if (!isData && AK4AK8>0 && boost==1 && VR==0 && met>3) m_mHAK8[mass_pair]->Fill(AK8JetSmearedMass[SelectedAK8Jet],w*DDBvL_SF_L[DDBvL_whichSF]);
        if (!isData && AK4AK8>0 && boost==0 && VR==0 && met>3) m_mHAK4[mass_pair]->Fill(m_bb_deep,w*Deep_SF_L[Deep_whichSF]);
      }
    }
@@ -2484,8 +2581,12 @@ void Analyzer::Loop()
          for (unsigned int i=1;i<nsbins_ak4+1;i++) {
            h_AK4searchBins->SetBinContent(i,hn_AK4searchBins->GetBinContent(i));
            h_AK4searchBins->SetBinError(i,hn_AK4searchBins->GetBinError(i));
+           h_AK4searchBins_noweight->SetBinContent(i,hn_AK4searchBins_noweight->GetBinContent(i));
+           h_AK4searchBins_noweight->SetBinError(i,hn_AK4searchBins_noweight->GetBinError(i));
            h_AK8searchBins->SetBinContent(i,hn_AK8searchBins->GetBinContent(i));
            h_AK8searchBins->SetBinError(i,hn_AK8searchBins->GetBinError(i));
+           h_AK8searchBins_noweight->SetBinContent(i,hn_AK8searchBins_noweight->GetBinContent(i));
+           h_AK8searchBins_noweight->SetBinError(i,hn_AK8searchBins_noweight->GetBinError(i));
            h_AK4HTsearchBins->SetBinContent(i,hn_AK4HTsearchBins->GetBinContent(i));
            h_AK4HTsearchBins->SetBinError(i,hn_AK4HTsearchBins->GetBinError(i));
            h_AK8HTsearchBins->SetBinContent(i,hn_AK8HTsearchBins->GetBinContent(i));
@@ -2499,8 +2600,12 @@ void Analyzer::Loop()
          for (unsigned int k=1;k<nsbins_ak4+1;k++) {
            m_AK4searchBins[MassPair]->SetBinContent(k,mn_AK4searchBins[MassPair]->GetBinContent(k));
            m_AK4searchBins[MassPair]->SetBinError(k,mn_AK4searchBins[MassPair]->GetBinError(k));
+           m_AK4searchBins_noweight[MassPair]->SetBinContent(k,mn_AK4searchBins_noweight[MassPair]->GetBinContent(k));
+           m_AK4searchBins_noweight[MassPair]->SetBinError(k,mn_AK4searchBins_noweight[MassPair]->GetBinError(k));
            m_AK8searchBins[MassPair]->SetBinContent(k,mn_AK8searchBins[MassPair]->GetBinContent(k));
            m_AK8searchBins[MassPair]->SetBinError(k,mn_AK8searchBins[MassPair]->GetBinError(k));
+           m_AK8searchBins_noweight[MassPair]->SetBinContent(k,mn_AK8searchBins_noweight[MassPair]->GetBinContent(k));
+           m_AK8searchBins_noweight[MassPair]->SetBinError(k,mn_AK8searchBins_noweight[MassPair]->GetBinError(k));
            m_AK4HTsearchBins[MassPair]->SetBinContent(k,mn_AK4HTsearchBins[MassPair]->GetBinContent(k));
            m_AK4HTsearchBins[MassPair]->SetBinError(k,mn_AK4HTsearchBins[MassPair]->GetBinError(k));
            m_AK8HTsearchBins[MassPair]->SetBinContent(k,mn_AK8HTsearchBins[MassPair]->GetBinContent(k));

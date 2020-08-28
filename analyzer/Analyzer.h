@@ -24,6 +24,7 @@
 #include "TLorentzVector.h"
 //BTagSF
 #include "input/BTCalibrationStandalone.cpp"
+#include "EgammaReader.h"
 
 #ifndef Analyzer_h
 #define Analyzer_h
@@ -259,6 +260,11 @@ public :
    Float_t         Jet_jercCHF[99];   //[nJet]
    Float_t         Jet_jercCHPUF[99];   //[nJet]
    Float_t         Jet_mass[99];   //[nJet]
+   Float_t         Jet_mass_nom[99];//[nJet]
+   Float_t         Jet_mass_jerUp[99];   //[nJet]
+   Float_t         Jet_mass_jerDown[99];  //[nJet]
+   Float_t         Jet_mass_jesTotalUp[99];   //[nJet]
+   Float_t         Jet_mass_jesTotalDown[99];   //[nJet]
    Float_t         Jet_muEF[99];   //[nJet]
    Float_t         Jet_muonSubtrFactor[99];   //[nJet]
    Float_t         Jet_neEmEF[99];   //[nJet]
@@ -829,6 +835,11 @@ public :
    TBranch        *b_Jet_jercCHF;   //!
    TBranch        *b_Jet_jercCHPUF;   //!
    TBranch        *b_Jet_mass;   //!
+   TBranch        *b_Jet_mass_nom;   //!
+   TBranch        *b_Jet_mass_jerUp;   //[nJet]
+   TBranch        *b_Jet_mass_jerDown;   //[nJet]
+   TBranch        *b_Jet_mass_jesTotalUp;   //[nJet]
+   TBranch        *b_Jet_mass_jesTotalDown;   //[nJet]
    TBranch        *b_Jet_muEF;   //!
    TBranch        *b_Jet_muonSubtrFactor;   //!
    TBranch        *b_Jet_neEmEF;   //!
@@ -1232,10 +1243,9 @@ public :
    double ele_VETOSF=1;
    int year=2016;
    int DDBvL_whichSF=0, Deep_whichSF=0;
-   int AK4Smear_whichSF=0, AK8Smear_whichSF=0;
+   int JES_whichSF=0, JER_whichSF=0, UES_whichSF=0, JMR_whichSF=0, JMS_whichSF=0, ISR_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
-   int metJER_whichSF=0, metJES_whichSF=0, metUES_whichSF=0, AK4jetJEC_whichSF=0, AK8jetJEC_whichSF=0, ISR_whichSF=0;
-   int L1prefire_whichSF=0, genMET_whichSF=0;
+   int L1prefire_whichSF=0, genMET_whichSF=0, PUweight_whichSF=0;
    int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
    unsigned int whichPhoton=0, whichElectron=1, whichMuon=0, whichTau=0;
    unsigned int ISR_MC=0;
@@ -1278,6 +1288,8 @@ public :
    TH2D *h2_FR;
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
+   EgammaScalingReader  EgammaScaling;
+   EgammaSmearingReader EgammaSmearing;
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
@@ -1293,6 +1305,8 @@ public :
    void             Systematics(map<string, int> systematics);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    double           deltaPhi(double phi1, double phi2);
+   float            Photon_SCEta(const int);
+   float            Photon_SCEta_Zonly(const int);
    void             CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]);
    void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
@@ -1647,6 +1661,11 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Jet_jercCHF", Jet_jercCHF, &b_Jet_jercCHF);
    fChain->SetBranchAddress("Jet_jercCHPUF", Jet_jercCHPUF, &b_Jet_jercCHPUF);
    fChain->SetBranchAddress("Jet_mass", Jet_mass, &b_Jet_mass);
+   //fChain->SetBranchAddress("Jet_mass_nom", Jet_mass_nom, &b_Jet_mass_nom);
+   if (fChain->GetBranch("Jet_mass_jerUp")) fChain->SetBranchAddress("Jet_mass_jerUp", Jet_mass_jerUp, &b_Jet_mass_jerUp);
+   if (fChain->GetBranch("Jet_mass_jerDown")) fChain->SetBranchAddress("Jet_mass_jerDown", Jet_mass_jerDown, &b_Jet_mass_jerDown);
+   if (fChain->GetBranch("Jet_mass_jesTotalUp")) fChain->SetBranchAddress("Jet_mass_jesTotalUp", Jet_mass_jesTotalUp, &b_Jet_mass_jesTotalUp);
+   if (fChain->GetBranch("Jet_mass_jesTotalDown")) fChain->SetBranchAddress("Jet_mass_jesTotalDown", Jet_mass_jesTotalDown, &b_Jet_mass_jesTotalDown);
    fChain->SetBranchAddress("Jet_muEF", Jet_muEF, &b_Jet_muEF);
    fChain->SetBranchAddress("Jet_muonSubtrFactor", Jet_muonSubtrFactor, &b_Jet_muonSubtrFactor);
    fChain->SetBranchAddress("Jet_neEmEF", Jet_neEmEF, &b_Jet_neEmEF);
@@ -2359,6 +2378,82 @@ double Analyzer::deltaPhi(double phi1, double phi2){
   return (abs(phi1-phi2)>M_PI) ? 2*M_PI-abs(phi2-phi1) : abs(phi1-phi2);
 }
 
+float Analyzer::Photon_SCEta_Zonly(const int i){
+  float tg_theta_over_2   = exp(-Photon_eta[i]);
+  float tg_theta          = 2 * tg_theta_over_2 / (1-tg_theta_over_2*tg_theta_over_2);//tan(atan(tg_theta_over_2)*2);//
+  float tg_sctheta;
+
+  if (Photon_isScEtaEB[i]){//barrel
+    float height         = 130;
+    float base           = height / tg_theta;
+    float intersection_z = base + PV_z;//10;
+    tg_sctheta           = height / intersection_z;
+  } else if ( Photon_isScEtaEE[i]){
+    float intersection_z = (Photon_eta[i]>0)?310:-310;
+    float base           = intersection_z - PV_z;//10;
+    float height         = base * tg_theta;
+    tg_sctheta           = height/intersection_z;
+  }
+  else return Photon_eta[i];
+
+  float sctheta = atan(tg_sctheta);
+  if (sctheta<0) sctheta += M_PI;
+  float tg_sctheta_over_2 = tan(sctheta/2);//-sqrt(tg_sctheta*tg_sctheta+1)/tg_sctheta -1/tg_sctheta;
+  float SCEta = -log(tg_sctheta_over_2);
+
+  return SCEta;
+}
+
+float Analyzer::Photon_SCEta(const int i){
+  float tg_theta_over_2   = exp(-Photon_eta[i]);
+  float tg_theta          = 2 * tg_theta_over_2 / (1-tg_theta_over_2*tg_theta_over_2);//tan(atan(tg_theta_over_2)*2);//
+  float tg_sctheta;
+
+  if (Photon_isScEtaEB[i]){//barrel
+    float R              = 130;
+    float angle_x0_y0    = 0;
+    if      (PV_x>0) angle_x0_y0 = atan(PV_y/PV_x);
+    else if (PV_x<0) angle_x0_y0 = M_PI + atan(PV_y/PV_x);
+    else if (PV_y>0) angle_x0_y0 = M_PI / 2;
+    else             angle_x0_y0 = - M_PI / 2;
+
+    float alpha      = angle_x0_y0 + (M_PI - Photon_phi[i]);
+    float sin_beta   = sqrt(PV_x*PV_x + PV_y*PV_y) / R * sin(alpha);
+    float beta       = abs( asin( sin_beta ) );
+    float gamma      = M_PI/2 - alpha - beta;
+    float l          = sqrt(R*R + (PV_x*PV_x + PV_y*PV_y) - 2*R*sqrt(PV_x*PV_x + PV_y*PV_y)*cos(gamma));
+
+    // cout<<"angle_x0_y0 "<<angle_x0_y0/M_PI*360<<endl;
+    // cout<<"alpha "<<alpha/M_PI*360<<endl;
+    // cout<<"sin_beta "<<sin_beta<<endl;
+    // cout<<"beta "<<beta/M_PI*360<<endl;
+    // cout<<"gamma "<<gamma/M_PI*360<<endl;
+    // cout<<"l "<<l<<endl;
+
+    float z0_zSC    = l / tg_theta;
+    tg_sctheta      = R / (PV_z + z0_zSC);
+
+   
+  } else if ( Photon_isScEtaEE[i]){//endcap
+
+      float intersection_z = (Photon_eta[i]>0)?310:-310;
+      float base           = intersection_z - PV_z;//10;
+      float r              = base * tg_theta;
+
+      float crystalX       = PV_x + r * cos(Photon_phi[i]);
+      float crystalY       = PV_y + r * sin(Photon_phi[i]);
+      tg_sctheta           = sqrt( crystalX*crystalX + crystalY*crystalY ) /intersection_z;
+  }
+  else return Photon_eta[i];
+
+  float sctheta = atan(tg_sctheta);
+  if (sctheta<0) sctheta += M_PI;
+  float tg_sctheta_over_2 = tan(sctheta/2);//-sqrt(tg_sctheta*tg_sctheta+1)/tg_sctheta -1/tg_sctheta;
+  float SCEta = -log(tg_sctheta_over_2);
+
+  return SCEta;
+}
+
 void Analyzer::CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v_had[], map<int,char> passCut, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, double (&SF_L)[3], double (&SF_M)[3], double (&SF_T)[3]){
   double p_data[3] = {1,1,1}, p_mc[3] = {1,1,1}, p_data_up[3] = {1,1,1}, p_data_do[3] = {1,1,1};
   //cout<<"njets "<<passCut.size()<<endl;
@@ -2534,10 +2629,11 @@ void Analyzer::Systematics(map<string, int> systematics) {
   for (auto const& x : systematics) {
     if (x.first=="DDBvL") DDBvL_whichSF=x.second;
     else if (x.first=="Deep") Deep_whichSF=x.second;
-    else if (x.first=="AK4Smear") AK4Smear_whichSF=x.second;
-    else if (x.first=="AK8Smear") AK8Smear_whichSF=x.second;
-    else if (x.first=="AK4JEC") AK4jetJEC_whichSF=x.second;
-    else if (x.first=="AK8JEC") AK8jetJEC_whichSF=x.second;
+    else if (x.first=="JER") JER_whichSF=x.second;
+    else if (x.first=="JES") JES_whichSF=x.second;
+    else if (x.first=="UES") UES_whichSF=x.second;
+    else if (x.first=="JMS") JMS_whichSF=x.second;
+    else if (x.first=="JMR") JMR_whichSF=x.second;
     else if (x.first=="phoID") phoID_whichSF=x.second;
     else if (x.first=="phoPix") phoPix_whichSF=x.second;
     else if (x.first=="eleID") eleID_whichSF=x.second;
@@ -2545,9 +2641,6 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="muID") muID_whichSF=x.second;
     else if (x.first=="muISO") muISO_whichSF=x.second;
     else if (x.first=="tau") tau_whichSF=x.second;
-    else if (x.first=="metJER") metJER_whichSF=x.second;
-    else if (x.first=="metJES") metJES_whichSF=x.second;
-    else if (x.first=="metUES") metUES_whichSF=x.second;
     else if (x.first=="L1prefire") L1prefire_whichSF=x.second;
     else if (x.first=="Egamma_scale_stat") Egamma_Statscale_whichSF=x.second;
     else if (x.first=="Egamma_scale_syst") Egamma_Systscale_whichSF=x.second;
@@ -2556,6 +2649,7 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="Egamma_resol_phi") Egamma_Phiresol_whichSF=x.second;
     else if (x.first=="genMET") genMET_whichSF=x.second;
     else if (x.first=="ISR") ISR_whichSF=x.second;
+    else if (x.first=="PUweight") PUweight_whichSF=x.second;
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
 }

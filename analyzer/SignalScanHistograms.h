@@ -87,12 +87,16 @@
   map< pair<int, int>, TH3D* > m3_mHAK4_dr_Higgs;
   
   map< pair<int, int>, THnD* > mn_AK4searchBins;
+  map< pair<int, int>, THnD* > mn_AK4searchBins_noweight;
   map< pair<int, int>, THnD* > mn_AK4HTsearchBins;
   map< pair<int, int>, TH1D* > m_AK4searchBins;
+  map< pair<int, int>, TH1D* > m_AK4searchBins_noweight;
   map< pair<int, int>, TH1D* > m_AK4HTsearchBins;
   map< pair<int, int>, THnD* > mn_AK8searchBins;
+  map< pair<int, int>, THnD* > mn_AK8searchBins_noweight;
   map< pair<int, int>, THnD* > mn_AK8HTsearchBins;
   map< pair<int, int>, TH1D* > m_AK8searchBins;
+  map< pair<int, int>, TH1D* > m_AK8searchBins_noweight;
   map< pair<int, int>, TH1D* > m_AK8HTsearchBins;
    
   //signalstudy
@@ -347,10 +351,12 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       double xmin_ak4[dim_ak4]={-0.5,-0.5,0.5,0.5};
       double xmax_ak4[dim_ak4]={1.5,2.5,5.5,2.5};
       mn_AK4searchBins[MassPair] = new THnD("hn_AK4searchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
+      mn_AK4searchBins_noweight[MassPair] = new THnD("hn_AK4searchBins_noweight",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
       mn_AK4HTsearchBins[MassPair] = new THnD("hn_AK4HTsearchBins",";VR;AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
-      mn_AK4searchBins[MassPair]->Sumw2(); mn_AK4HTsearchBins[MassPair]->Sumw2();
+      mn_AK4searchBins[MassPair]->Sumw2(); mn_AK4searchBins_noweight[MassPair]->Sumw2(); mn_AK4HTsearchBins[MassPair]->Sumw2();
       unsigned int nsbins_ak4=mn_AK4searchBins[MassPair]->GetNbins();
       m_AK4searchBins[MassPair]= new TH1D("h_AK4searchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
+      m_AK4searchBins_noweight[MassPair]= new TH1D("h_AK4searchBins_noweight",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
       m_AK4HTsearchBins[MassPair]= new TH1D("h_AK4HTsearchBins",";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
      
       //AK8 searchbins
@@ -359,10 +365,12 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       double xmin_ak8[dim_ak8]={-0.5,-0.5,0.5,0.5};
       double xmax_ak8[dim_ak8]={1.5,1.5,5.5,2.5};
       mn_AK8searchBins[MassPair] = new THnD("hn_AK8searchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
+      mn_AK8searchBins_noweight[MassPair] = new THnD("hn_AK8searchBins_noweight",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
       mn_AK8HTsearchBins[MassPair] = new THnD("hn_AK8HTsearchBins",";VR;AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
-      mn_AK8searchBins[MassPair]->Sumw2(); mn_AK8HTsearchBins[MassPair]->Sumw2();
+      mn_AK8searchBins[MassPair]->Sumw2(); mn_AK8searchBins_noweight[MassPair]->Sumw2(); mn_AK8HTsearchBins[MassPair]->Sumw2();
       unsigned int nsbins_ak8=mn_AK8searchBins[MassPair]->GetNbins();
       m_AK8searchBins[MassPair]= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
+      m_AK8searchBins_noweight[MassPair]= new TH1D("h_AK8searchBins_noweight",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
       m_AK8HTsearchBins[MassPair]= new TH1D("h_AK8HTsearchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
       
        if (signalstudy){
