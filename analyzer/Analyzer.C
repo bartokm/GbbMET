@@ -419,7 +419,7 @@ void Analyzer::Loop()
    if (!is_quiet) now.Print();
    time.Start("time");
 
-   TRandom3 *gen = new TRandom3(0);
+   TRandom3 *gen = new TRandom3(137);
 
    std::map<pair<int,int>,int> signal_events;
    if (CountSignal) signal_events=init_signal_event(SignalScenario);
@@ -750,7 +750,8 @@ void Analyzer::Loop()
          {2017,{{"v1","input/egamma/syst/Run2017_17Nov2017_v1_ele_unc_smearings.dat"},{"v2","input/egamma/syst/Run2017_24Feb2020_runEtaR9Gain_v2_smearings.dat"},}},
          {2018,{{"v1","input/egamma/syst/Run2018_Step2Closure_CoarseEtaR9Gain_v2_smearings.dat"},}},
        };
-       std::string version = (year==2017) ? "v2" : "v1";
+       //std::string version = (year==2017) ? "v2" : "v1";
+       std::string version = "v1";
        EgammaScaling  = EgammaScalingReader(pathTo_photon_Scaling.at(year).at(version), year, version);
        EgammaSmearing = EgammaSmearingReader(pathTo_photon_Smearing.at(year).at(version), year);
      }
@@ -772,8 +773,8 @@ void Analyzer::Loop()
            size_t found = name.find("T5qqqqHg");
            int mg=stoi(name.substr(name.find("_",found)+1,name.find_last_of("_")-name.find("_",found)-1));
            int mn=stoi(name.substr(name.find_last_of("_")+1));
-           if (dm_g>abs(mg-mass_pair.first)) re_mg=mg;
-           if (dm_n>abs(mn-mass_pair.second)) re_mn=mn;
+           if (dm_g>abs(mg-mass_pair.first)) {re_mg=mg; dm_g=abs(mg-mass_pair.first);}
+           if (dm_n>abs(mn-mass_pair.second)) {re_mn=mn; dm_n=abs(mn-mass_pair.second);}
          }
          string eventsum="genEventSumw_T5qqqqHg_"+to_string(re_mg)+"_"+to_string(re_mn);
          Runs->SetBranchAddress(eventsum.c_str(),&sub_TotalEvents,&b_genEventSumw);
