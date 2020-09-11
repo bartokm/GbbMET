@@ -718,9 +718,9 @@ void Analyzer::Loop()
 
      if (isData && signalstudy) {cout<<"ERROR! Signalstudy option set, but running on Data..."<<endl; return;}
      //SignalScan variables
-     pair<int,int> mass_pair;
+     pair<int,int> mass_pair; int neutralino=-1, gluino=-1;
      if (SignalScan) {
-       int neutralino=-1, gluino=-1; bool foundG=0, foundX=0;
+       bool foundG=0, foundX=0;
        for (unsigned int i=0;i<nGenPart;i++) {
          if (!foundX && GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) {neutralino=i; foundX=1;}
          if (!foundG && GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) {gluino=i; foundG=1;}
@@ -773,8 +773,12 @@ void Analyzer::Loop()
            size_t found = name.find("T5qqqqHg");
            int mg=stoi(name.substr(name.find("_",found)+1,name.find_last_of("_")-name.find("_",found)-1));
            int mn=stoi(name.substr(name.find_last_of("_")+1));
-           if (dm_g>abs(mg-mass_pair.first)) {re_mg=mg; dm_g=abs(mg-mass_pair.first);}
-           if (dm_n>abs(mn-mass_pair.second)) {re_mn=mn; dm_n=abs(mn-mass_pair.second);}
+           int diff_g=abs(mg-GenPart_mass[gluino]);
+           int diff_n=abs(mn-GenPart_mass[neutralino]);
+           if (dm_g+dm_n>diff_g+diff_n) {
+             re_mg=mg; re_mn=mn;
+             dm_g=diff_g; dm_n=diff_n;
+           }
          }
          string eventsum="genEventSumw_T5qqqqHg_"+to_string(re_mg)+"_"+to_string(re_mn);
          Runs->SetBranchAddress(eventsum.c_str(),&sub_TotalEvents,&b_genEventSumw);
