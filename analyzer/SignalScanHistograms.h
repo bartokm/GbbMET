@@ -119,7 +119,7 @@
 map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario){
 //grid points
   std::map<int,std::vector<int>> grid; std::vector<int> Yticks;
-  if (SignalScenario==1) {
+  if (SignalScenario==1 || SignalScenario==4) {
     Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 790});
     grid.insert(pair<int,vector<int>>(800,Yticks));
     Yticks.clear();
@@ -244,13 +244,22 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       grid.insert(pair<int,vector<int>>(m,{1}));
     }
   }
+  
+  if (SignalScenario==3) {
+    Yticks =  std::vector<int>({127, 200});
+    grid.insert(pair<int,vector<int>>(1800,Yticks));
+    Yticks.clear();
+    Yticks =  std::vector<int>({1000, 2100, 2190});
+    grid.insert(pair<int,vector<int>>(2200,Yticks));
+    Yticks.clear();
+  }
 
   for (auto const&i : grid) {
     for (auto j : i.second) {
 
       std::pair<int,int> MassPair(i.first,j);
       std::string temp_name;
-      if (SignalScenario==1) temp_name = "g" + std::to_string(i.first) + "chi" + std::to_string(j);
+      if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) temp_name = "g" + std::to_string(i.first) + "chi" + std::to_string(j);
       if (SignalScenario==2) temp_name = "chi" + std::to_string(i.first);
       MassPairToDirectoy[MassPair] = outFile->mkdir(temp_name.c_str());
       MassPairToDirectoy[MassPair]->cd();
@@ -266,7 +275,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
     
       
       m_cuts[MassPair] = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,BDSV,Deep1,Deep2",15,0,15);
-      m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts, After cuts",2,0,2);
+      m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts, After cuts, only lumiweight",3,-0.5,2.5);
       m_nISR_jet[MassPair] = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
       m_SR[MassPair] = new TH1D("h_SR","",16,0.5,16.5);
   

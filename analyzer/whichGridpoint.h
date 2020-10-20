@@ -3,7 +3,7 @@
 
 std::pair<int, int> whichGridpoint(std::pair<double, double> in, int SignalScenario)
 {
-  if (SignalScenario==1) {
+  if (SignalScenario==1 || SignalScenario==4) {
     std::vector<int> Yticks;
 
     std::vector<int> Xticks = {800,900,1000,1050,1100,1150,1200,1250,1300,1350,1400,1450,1500,1550,1600,1650,1700,1750,1800,1850,1900,1950,2000,2050,2100,2150,2200,2250,2300,2350,2400,2450,2500,2550,2600,2650,2700,2750,2800};
@@ -125,6 +125,46 @@ std::pair<int, int> whichGridpoint(std::pair<double, double> in, int SignalScena
       if (abs(in.second-m)<diff) {diff=abs(in.second-m); mass=m;}
     }
     std::pair<int,int> a(mass,1);
+    return a;
+  }
+
+  if (SignalScenario==3) {
+    std::vector<int> Yticks;
+
+    std::vector<int> Xticks = {1800,2200};
+    int mG=800, delta_mG=800;
+    for (auto i : Xticks) {
+      if (int(in.first)==i) {mG=i; break;}
+      int mdiff=abs(int(in.first)-i);
+      if (mdiff<delta_mG) {delta_mG=mdiff; mG=i;}
+    }
+
+    switch(mG){
+        case  1800 :   Yticks =  std::vector<int>({127, 200}); 
+                    break;
+        case  2200 :   Yticks =  std::vector<int>({1000, 2100, 2190}); 
+                    break;
+    }
+    
+
+    double y = in.second;
+    int Yind = Yticks.size()-1;
+
+    for (unsigned int i = 0; i<Yticks.size();i++)
+    {
+        if (y<Yticks[i] )
+        {
+            Yind = i;
+            break;
+        }
+    }
+
+    if (Yind != 0)
+    {
+        Yind = ( (y-Yticks[Yind-1]) > (Yticks[Yind]-y) )?Yind:(Yind-1);
+    }
+
+    std::pair<int,int> a(mG,Yticks[Yind]);
     return a;
   }
   std::pair<int,int> a;

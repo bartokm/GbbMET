@@ -3,7 +3,7 @@
 
 //Get gluino-gluino cross section, use input of gluino mass and -1/+1 for lower/upper errors
 double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0) {
-  if (SignalScenario==1) {
+  if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) {
     switch (m_primary) {
       case 500 : return 0.338e+02+center_down_up*0.338e+02/100*7.86;
         break;                                            
@@ -1338,3334 +1338,3334 @@ double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0
 //Get precalculated total number of events for each grid point
 unsigned long long get_total_events(pair<int,int> input, int year, int SignalScenario) {
   int a=input.first, b=input.second;
-  if (SignalScenario==1) {
+  if (SignalScenario==1 || SignalScenario==4) {
     switch (year) {
       case 2016 :
-      if (a==800) {
-        switch (b) {
-          case 127 : return 147015;
-          case 200 : return 142321;
-          case 300 : return 138796;
-          case 400 : return 136379;
-          case 500 : return 138946;
-          case 600 : return 143811;
-          case 700 : return 139064;
-          case 790 : return 135319;
+        if (a==800) {
+          switch (b) {
+            case 127 : return 147004;
+            case 200 : return 142314;
+            case 300 : return 138793;
+            case 400 : return 136376;
+            case 500 : return 138954;
+            case 600 : return 143824;
+            case 700 : return 139064;
+            case 790 : return 135322;
         }
       }
-      if (a==900) {
-        switch (b) {
-          case 127 : return 136763;
-          case 200 : return 135312;
-          case 300 : return 141276;
-          case 400 : return 137781;
-          case 500 : return 138691;
-          case 600 : return 141933;
-          case 700 : return 139388;
-          case 800 : return 145519;
-          case 890 : return 137380;
+        if (a==900) {
+          switch (b) {
+            case 127 : return 136763;
+            case 200 : return 135301;
+            case 300 : return 141293;
+            case 400 : return 137761;
+            case 500 : return 138694;
+            case 600 : return 141951;
+            case 700 : return 139376;
+            case 800 : return 145521;
+            case 890 : return 137383;
         }
       }
-      if (a==1000) {
-        switch (b) {
-          case 127 : return 142911;
-          case 150 : return 144324;
-          case 175 : return 139620;
-          case 200 : return 137937;
-          case 300 : return 144428;
-          case 400 : return 147050;
-          case 500 : return 136693;
-          case 600 : return 146159;
-          case 700 : return 144006;
-          case 750 : return 147794;
-          case 800 : return 139675;
-          case 850 : return 140530;
-          case 900 : return 150819;
-          case 950 : return 133914;
-          case 975 : return 150746;
-          case 990 : return 131587;
+        if (a==1000) {
+          switch (b) {
+            case 127 : return 142938;
+            case 150 : return 144293;
+            case 175 : return 139601;
+            case 200 : return 137953;
+            case 300 : return 144404;
+            case 400 : return 147058;
+            case 500 : return 136710;
+            case 600 : return 146163;
+            case 700 : return 143995;
+            case 750 : return 147799;
+            case 800 : return 139703;
+            case 850 : return 140519;
+            case 900 : return 150818;
+            case 950 : return 133920;
+            case 975 : return 150745;
+            case 990 : return 131574;
         }
       }
-      if (a==1050) {
-        switch (b) {
-          case 127 : return 146019;
-          case 150 : return 135246;
-          case 175 : return 144789;
-          case 200 : return 143886;
-          case 300 : return 148310;
-          case 400 : return 141699;
-          case 500 : return 139154;
-          case 600 : return 142152;
-          case 700 : return 143556;
-          case 750 : return 148027;
-          case 800 : return 147231;
-          case 850 : return 137324;
-          case 900 : return 146374;
-          case 950 : return 146283;
-          case 1000 : return 143803;
-          case 1025 : return 147758;
-          case 1040 : return 147764;
+        if (a==1050) {
+          switch (b) {
+            case 127 : return 146003;
+            case 150 : return 135306;
+            case 175 : return 144720;
+            case 200 : return 143894;
+            case 300 : return 148366;
+            case 400 : return 141676;
+            case 500 : return 139140;
+            case 600 : return 142157;
+            case 700 : return 143559;
+            case 750 : return 148013;
+            case 800 : return 147223;
+            case 850 : return 137374;
+            case 900 : return 146365;
+            case 950 : return 146249;
+            case 1000 : return 143798;
+            case 1025 : return 147703;
+            case 1040 : return 147829;
         }
       }
-      if (a==1100) {
-        switch (b) {
-          case 127 : return 119304;
-          case 150 : return 121996;
-          case 175 : return 124500;
-          case 200 : return 131485;
-          case 300 : return 123653;
-          case 400 : return 123298;
-          case 500 : return 116248;
-          case 600 : return 126045;
-          case 700 : return 124964;
-          case 800 : return 131343;
-          case 850 : return 128339;
-          case 900 : return 131995;
-          case 950 : return 127654;
-          case 1000 : return 124114;
-          case 1050 : return 126010;
-          case 1075 : return 120873;
-          case 1090 : return 125265;
+        if (a==1100) {
+          switch (b) {
+            case 127 : return 119230;
+            case 150 : return 122018;
+            case 175 : return 124466;
+            case 200 : return 131556;
+            case 300 : return 123678;
+            case 400 : return 123277;
+            case 500 : return 116250;
+            case 600 : return 126040;
+            case 700 : return 124965;
+            case 800 : return 131321;
+            case 850 : return 128365;
+            case 900 : return 131960;
+            case 950 : return 127677;
+            case 1000 : return 124145;
+            case 1050 : return 125957;
+            case 1075 : return 120918;
+            case 1090 : return 125263;
         }
       }
-      if (a==1150) {
-        switch (b) {
-          case 127 : return 90241;
-          case 150 : return 90993;
-          case 175 : return 92460;
-          case 200 : return 96859;
-          case 300 : return 86246;
-          case 400 : return 91016;
-          case 500 : return 93643;
-          case 600 : return 92000;
-          case 700 : return 95991;
-          case 800 : return 102504;
-          case 850 : return 92416;
-          case 900 : return 86764;
-          case 950 : return 93989;
-          case 1000 : return 95359;
-          case 1050 : return 94527;
-          case 1100 : return 89981;
-          case 1125 : return 83493;
-          case 1140 : return 90333;
+        if (a==1150) {
+          switch (b) {
+            case 127 : return 90251;
+            case 150 : return 90960;
+            case 175 : return 92424;
+            case 200 : return 96916;
+            case 300 : return 86269;
+            case 400 : return 90997;
+            case 500 : return 93640;
+            case 600 : return 92002;
+            case 700 : return 96003;
+            case 800 : return 102523;
+            case 850 : return 92409;
+            case 900 : return 86744;
+            case 950 : return 94012;
+            case 1000 : return 95325;
+            case 1050 : return 94537;
+            case 1100 : return 89967;
+            case 1125 : return 83554;
+            case 1140 : return 90282;
         }
       }
-      if (a==1200) {
-        switch (b) {
-          case 127 : return 61783;
-          case 150 : return 68540;
-          case 175 : return 64096;
-          case 200 : return 64830;
-          case 300 : return 70265;
-          case 400 : return 61299;
-          case 500 : return 61306;
-          case 600 : return 62999;
-          case 700 : return 61482;
-          case 800 : return 65925;
-          case 900 : return 65957;
-          case 950 : return 63944;
-          case 1000 : return 59564;
-          case 1050 : return 64037;
-          case 1100 : return 64605;
-          case 1150 : return 65443;
-          case 1175 : return 64179;
-          case 1190 : return 62394;
+        if (a==1200) {
+          switch (b) {
+            case 127 : return 61805;
+            case 150 : return 68529;
+            case 175 : return 64099;
+            case 200 : return 64814;
+            case 300 : return 70290;
+            case 400 : return 61280;
+            case 500 : return 61300;
+            case 600 : return 62976;
+            case 700 : return 61500;
+            case 800 : return 65920;
+            case 900 : return 65974;
+            case 950 : return 63933;
+            case 1000 : return 59577;
+            case 1050 : return 64033;
+            case 1100 : return 64603;
+            case 1150 : return 65424;
+            case 1175 : return 64205;
+            case 1190 : return 62386;
         }
       }
-      if (a==1250) {
-        switch (b) {
-          case 127 : return 51108;
-          case 150 : return 48000;
-          case 175 : return 43643;
-          case 200 : return 47051;
-          case 300 : return 52699;
-          case 400 : return 48431;
-          case 500 : return 43157;
-          case 600 : return 41169;
-          case 700 : return 46062;
-          case 800 : return 49236;
-          case 900 : return 51285;
-          case 950 : return 47637;
-          case 1000 : return 52339;
-          case 1050 : return 46909;
-          case 1100 : return 48906;
-          case 1150 : return 48395;
-          case 1200 : return 54162;
-          case 1225 : return 43286;
-          case 1240 : return 45680;
+        if (a==1250) {
+          switch (b) {
+            case 127 : return 51111;
+            case 150 : return 48018;
+            case 175 : return 43636;
+            case 200 : return 47035;
+            case 300 : return 52707;
+            case 400 : return 48423;
+            case 500 : return 43161;
+            case 600 : return 41153;
+            case 700 : return 46080;
+            case 800 : return 49228;
+            case 900 : return 51262;
+            case 950 : return 47635;
+            case 1000 : return 52353;
+            case 1050 : return 46896;
+            case 1100 : return 48920;
+            case 1150 : return 48383;
+            case 1200 : return 54154;
+            case 1225 : return 43324;
+            case 1240 : return 45676;
         }
       }
-      if (a==1300) {
-        switch (b) {
-          case 127 : return 34036;
-          case 150 : return 38925;
-          case 175 : return 34327;
-          case 200 : return 37085;
-          case 300 : return 44069;
-          case 400 : return 38733;
-          case 500 : return 36084;
-          case 600 : return 38335;
-          case 700 : return 36502;
-          case 800 : return 38842;
-          case 900 : return 38078;
-          case 1000 : return 38354;
-          case 1050 : return 39975;
-          case 1100 : return 35985;
-          case 1150 : return 41195;
-          case 1200 : return 37862;
-          case 1250 : return 35607;
-          case 1275 : return 37398;
-          case 1290 : return 35135;
+        if (a==1300) {
+          switch (b) {
+            case 127 : return 34037;
+            case 150 : return 38918;
+            case 175 : return 34339;
+            case 200 : return 37080;
+            case 300 : return 44056;
+            case 400 : return 38739;
+            case 500 : return 36090;
+            case 600 : return 38334;
+            case 700 : return 36493;
+            case 800 : return 38850;
+            case 900 : return 38082;
+            case 1000 : return 38367;
+            case 1050 : return 39961;
+            case 1100 : return 35981;
+            case 1150 : return 41202;
+            case 1200 : return 37861;
+            case 1250 : return 35586;
+            case 1275 : return 37437;
+            case 1290 : return 35114;
         }
       }
-      if (a==1350) {
-        switch (b) {
-          case 127 : return 34072;
-          case 150 : return 36393;
-          case 175 : return 36939;
-          case 200 : return 40050;
-          case 300 : return 38508;
-          case 400 : return 34101;
-          case 500 : return 38137;
-          case 600 : return 39846;
-          case 700 : return 45849;
-          case 800 : return 40053;
-          case 900 : return 34805;
-          case 1000 : return 39373;
-          case 1050 : return 40544;
-          case 1100 : return 39725;
-          case 1150 : return 37551;
-          case 1200 : return 37046;
-          case 1250 : return 36968;
-          case 1300 : return 38770;
-          case 1325 : return 41936;
-          case 1340 : return 39808;
+        if (a==1350) {
+          switch (b) {
+            case 127 : return 34071;
+            case 150 : return 36398;
+            case 175 : return 36926;
+            case 200 : return 40048;
+            case 300 : return 38526;
+            case 400 : return 34110;
+            case 500 : return 38128;
+            case 600 : return 39847;
+            case 700 : return 45842;
+            case 800 : return 40067;
+            case 900 : return 34813;
+            case 1000 : return 39361;
+            case 1050 : return 40541;
+            case 1100 : return 39726;
+            case 1150 : return 37556;
+            case 1200 : return 37036;
+            case 1250 : return 36953;
+            case 1300 : return 38794;
+            case 1325 : return 41906;
+            case 1340 : return 39825;
         }
       }
-      if (a==1400) {
-        switch (b) {
-          case 127 : return 33599;
-          case 150 : return 38403;
-          case 175 : return 34319;
-          case 200 : return 36683;
-          case 300 : return 30336;
-          case 400 : return 39543;
-          case 500 : return 41853;
-          case 600 : return 36114;
-          case 700 : return 44107;
-          case 800 : return 35219;
-          case 900 : return 31442;
-          case 1000 : return 33693;
-          case 1100 : return 39367;
-          case 1150 : return 36437;
-          case 1200 : return 36831;
-          case 1250 : return 32489;
-          case 1300 : return 33196;
-          case 1350 : return 37780;
-          case 1375 : return 41224;
-          case 1390 : return 38698;
+        if (a==1400) {
+          switch (b) {
+            case 127 : return 33605;
+            case 150 : return 38427;
+            case 175 : return 34300;
+            case 200 : return 36685;
+            case 300 : return 30332;
+            case 400 : return 39534;
+            case 500 : return 41861;
+            case 600 : return 36117;
+            case 700 : return 44106;
+            case 800 : return 35209;
+            case 900 : return 31434;
+            case 1000 : return 33710;
+            case 1100 : return 39382;
+            case 1150 : return 36415;
+            case 1200 : return 36830;
+            case 1250 : return 32481;
+            case 1300 : return 33211;
+            case 1350 : return 37760;
+            case 1375 : return 41229;
+            case 1390 : return 38705;
         }
       }
-      if (a==1450) {
-        switch (b) {
-          case 127 : return 38610;
-          case 150 : return 42334;
-          case 175 : return 40811;
-          case 200 : return 38347;
-          case 300 : return 42470;
-          case 400 : return 41302;
-          case 500 : return 38352;
-          case 600 : return 37283;
-          case 700 : return 40532;
-          case 800 : return 35651;
-          case 900 : return 31370;
-          case 1000 : return 33786;
-          case 1100 : return 33896;
-          case 1150 : return 40904;
-          case 1200 : return 34412;
-          case 1250 : return 35373;
-          case 1300 : return 38949;
-          case 1350 : return 32520;
-          case 1400 : return 35752;
-          case 1425 : return 31108;
-          case 1440 : return 39433;
+        if (a==1450) {
+          switch (b) {
+            case 127 : return 38609;
+            case 150 : return 42337;
+            case 175 : return 40834;
+            case 200 : return 38320;
+            case 300 : return 42475;
+            case 400 : return 41298;
+            case 500 : return 38362;
+            case 600 : return 37273;
+            case 700 : return 40535;
+            case 800 : return 35670;
+            case 900 : return 31357;
+            case 1000 : return 33783;
+            case 1100 : return 33888;
+            case 1150 : return 40890;
+            case 1200 : return 34418;
+            case 1250 : return 35390;
+            case 1300 : return 38949;
+            case 1350 : return 32505;
+            case 1400 : return 35744;
+            case 1425 : return 31129;
+            case 1440 : return 39429;
         }
       }
-      if (a==1500) {
-        switch (b) {
-          case 127 : return 33652;
-          case 150 : return 34378;
-          case 175 : return 33045;
-          case 200 : return 36405;
-          case 300 : return 38227;
-          case 400 : return 34791;
-          case 500 : return 32467;
-          case 600 : return 36102;
-          case 700 : return 38004;
-          case 800 : return 34528;
-          case 900 : return 39729;
-          case 1000 : return 41418;
-          case 1100 : return 38843;
-          case 1200 : return 36612;
-          case 1250 : return 37962;
-          case 1300 : return 37782;
-          case 1350 : return 36617;
-          case 1400 : return 36453;
-          case 1450 : return 36968;
-          case 1475 : return 36419;
-          case 1490 : return 37024;
+        if (a==1500) {
+          switch (b) {
+            case 127 : return 33676;
+            case 150 : return 34358;
+            case 175 : return 33055;
+            case 200 : return 36403;
+            case 300 : return 38211;
+            case 400 : return 34787;
+            case 500 : return 32477;
+            case 600 : return 36096;
+            case 700 : return 38013;
+            case 800 : return 34527;
+            case 900 : return 39726;
+            case 1000 : return 41417;
+            case 1100 : return 38828;
+            case 1200 : return 36618;
+            case 1250 : return 37948;
+            case 1300 : return 37805;
+            case 1350 : return 36624;
+            case 1400 : return 36441;
+            case 1450 : return 36961;
+            case 1475 : return 36441;
+            case 1490 : return 37014;
         }
       }
-      if (a==1550) {
-        switch (b) {
-          case 127 : return 36989;
-          case 150 : return 32718;
-          case 175 : return 38299;
-          case 200 : return 38172;
-          case 300 : return 34929;
-          case 400 : return 36449;
-          case 500 : return 37592;
-          case 600 : return 34927;
-          case 700 : return 34401;
-          case 800 : return 33061;
-          case 900 : return 34938;
-          case 1000 : return 32901;
-          case 1100 : return 34677;
-          case 1200 : return 36653;
-          case 1250 : return 42446;
-          case 1300 : return 31807;
-          case 1350 : return 34697;
-          case 1400 : return 35796;
-          case 1450 : return 36866;
-          case 1500 : return 35927;
-          case 1525 : return 35541;
-          case 1540 : return 37554;
+        if (a==1550) {
+          switch (b) {
+            case 127 : return 37000;
+            case 150 : return 32714;
+            case 175 : return 38291;
+            case 200 : return 38175;
+            case 300 : return 34916;
+            case 400 : return 36442;
+            case 500 : return 37604;
+            case 600 : return 34930;
+            case 700 : return 34400;
+            case 800 : return 33060;
+            case 900 : return 34955;
+            case 1000 : return 32884;
+            case 1100 : return 34690;
+            case 1200 : return 36638;
+            case 1250 : return 42442;
+            case 1300 : return 31809;
+            case 1350 : return 34707;
+            case 1400 : return 35806;
+            case 1450 : return 36857;
+            case 1500 : return 35931;
+            case 1525 : return 35521;
+            case 1540 : return 37568;
         }
       }
-      if (a==1600) {
-        switch (b) {
-          case 127 : return 39496;
-          case 150 : return 35757;
-          case 175 : return 34466;
-          case 200 : return 30788;
-          case 300 : return 35563;
-          case 400 : return 35421;
-          case 500 : return 41435;
-          case 600 : return 33298;
-          case 700 : return 40754;
-          case 800 : return 36079;
-          case 900 : return 39331;
-          case 1000 : return 36801;
-          case 1100 : return 36965;
-          case 1200 : return 37629;
-          case 1300 : return 37266;
-          case 1350 : return 35390;
-          case 1400 : return 38171;
-          case 1450 : return 39800;
-          case 1500 : return 36108;
-          case 1550 : return 35446;
-          case 1575 : return 36021;
-          case 1590 : return 41525;
+        if (a==1600) {
+          switch (b) {
+            case 127 : return 39460;
+            case 150 : return 35781;
+            case 175 : return 34490;
+            case 200 : return 30772;
+            case 300 : return 35563;
+            case 400 : return 35427;
+            case 500 : return 41437;
+            case 600 : return 33291;
+            case 700 : return 40768;
+            case 800 : return 36077;
+            case 900 : return 39335;
+            case 1000 : return 36802;
+            case 1100 : return 36954;
+            case 1200 : return 37629;
+            case 1300 : return 37258;
+            case 1350 : return 35391;
+            case 1400 : return 38170;
+            case 1450 : return 39812;
+            case 1500 : return 36092;
+            case 1550 : return 35459;
+            case 1575 : return 35988;
+            case 1590 : return 41554;
         }
       }
-      if (a==1650) {
-        switch (b) {
-          case 127 : return 36637;
-          case 150 : return 39845;
-          case 175 : return 40636;
-          case 200 : return 38780;
-          case 300 : return 33540;
-          case 400 : return 38473;
-          case 500 : return 36277;
-          case 600 : return 35880;
-          case 700 : return 40488;
-          case 800 : return 33448;
-          case 900 : return 37524;
-          case 1000 : return 37930;
-          case 1100 : return 38835;
-          case 1200 : return 36104;
-          case 1300 : return 37776;
-          case 1350 : return 36012;
-          case 1400 : return 34638;
-          case 1450 : return 42325;
-          case 1500 : return 40953;
-          case 1550 : return 38395;
-          case 1600 : return 39808;
-          case 1625 : return 39006;
-          case 1640 : return 41155;
+        if (a==1650) {
+          switch (b) {
+            case 127 : return 36632;
+            case 150 : return 39843;
+            case 175 : return 40631;
+            case 200 : return 38785;
+            case 300 : return 33542;
+            case 400 : return 38475;
+            case 500 : return 36283;
+            case 600 : return 35886;
+            case 700 : return 40494;
+            case 800 : return 33447;
+            case 900 : return 37533;
+            case 1000 : return 37910;
+            case 1100 : return 38832;
+            case 1200 : return 36101;
+            case 1300 : return 37781;
+            case 1350 : return 36020;
+            case 1400 : return 34641;
+            case 1450 : return 42308;
+            case 1500 : return 40933;
+            case 1550 : return 38423;
+            case 1600 : return 39828;
+            case 1625 : return 38987;
+            case 1640 : return 41150;
         }
       }
-      if (a==1700) {
-        switch (b) {
-          case 127 : return 35779;
-          case 150 : return 36242;
-          case 175 : return 38745;
-          case 200 : return 38144;
-          case 300 : return 37641;
-          case 400 : return 40132;
-          case 500 : return 36363;
-          case 600 : return 42490;
-          case 700 : return 39747;
-          case 800 : return 36156;
-          case 900 : return 38849;
-          case 1000 : return 37847;
-          case 1100 : return 37684;
-          case 1200 : return 38478;
-          case 1300 : return 40808;
-          case 1400 : return 43835;
-          case 1450 : return 32939;
-          case 1500 : return 39107;
-          case 1550 : return 39079;
-          case 1600 : return 35346;
-          case 1650 : return 40036;
-          case 1675 : return 38939;
-          case 1690 : return 38696;
+        if (a==1700) {
+          switch (b) {
+            case 127 : return 35783;
+            case 150 : return 36241;
+            case 175 : return 38747;
+            case 200 : return 38130;
+            case 300 : return 37645;
+            case 400 : return 40136;
+            case 500 : return 36365;
+            case 600 : return 42494;
+            case 700 : return 39733;
+            case 800 : return 36160;
+            case 900 : return 38859;
+            case 1000 : return 37849;
+            case 1100 : return 37673;
+            case 1200 : return 38481;
+            case 1300 : return 40795;
+            case 1400 : return 43846;
+            case 1450 : return 32958;
+            case 1500 : return 39080;
+            case 1550 : return 39086;
+            case 1600 : return 35344;
+            case 1650 : return 40070;
+            case 1675 : return 38914;
+            case 1690 : return 38693;
         }
       }
-      if (a==1750) {
-        switch (b) {
-          case 127 : return 36846;
-          case 150 : return 37598;
-          case 175 : return 30918;
-          case 200 : return 38806;
-          case 300 : return 39661;
-          case 400 : return 37634;
-          case 500 : return 42015;
-          case 600 : return 40651;
-          case 700 : return 38705;
-          case 800 : return 37669;
-          case 900 : return 38932;
-          case 1000 : return 35816;
-          case 1100 : return 37993;
-          case 1200 : return 40866;
-          case 1300 : return 39409;
-          case 1400 : return 38904;
-          case 1450 : return 36136;
-          case 1500 : return 38388;
-          case 1550 : return 39319;
-          case 1600 : return 36799;
-          case 1650 : return 39221;
-          case 1700 : return 38446;
-          case 1725 : return 37700;
-          case 1740 : return 40104;
+        if (a==1750) {
+          switch (b) {
+            case 127 : return 36868;
+            case 150 : return 37589;
+            case 175 : return 30940;
+            case 200 : return 38757;
+            case 300 : return 39672;
+            case 400 : return 37639;
+            case 500 : return 42016;
+            case 600 : return 40649;
+            case 700 : return 38726;
+            case 800 : return 37649;
+            case 900 : return 38943;
+            case 1000 : return 35810;
+            case 1100 : return 37986;
+            case 1200 : return 40882;
+            case 1300 : return 39411;
+            case 1400 : return 38888;
+            case 1450 : return 36131;
+            case 1500 : return 38391;
+            case 1550 : return 39329;
+            case 1600 : return 36789;
+            case 1650 : return 39222;
+            case 1700 : return 38459;
+            case 1725 : return 37681;
+            case 1740 : return 40109;
         }
       }
-      if (a==1800) {
-        switch (b) {
-          case 127 : return 32053;
-          case 150 : return 34610;
-          case 175 : return 32362;
-          case 200 : return 37963;
-          case 300 : return 35335;
-          case 400 : return 33768;
-          case 500 : return 35608;
-          case 600 : return 37022;
-          case 700 : return 37061;
-          case 800 : return 36623;
-          case 900 : return 32941;
-          case 1000 : return 31343;
-          case 1100 : return 37230;
-          case 1200 : return 37367;
-          case 1300 : return 37494;
-          case 1400 : return 37424;
-          case 1500 : return 34233;
-          case 1550 : return 32898;
-          case 1600 : return 34658;
-          case 1650 : return 40862;
-          case 1700 : return 34872;
-          case 1750 : return 36109;
-          case 1775 : return 32644;
-          case 1790 : return 39054;
+        if (a==1800) {
+          switch (b) {
+            case 127 : return 32062;
+            case 150 : return 34593;
+            case 175 : return 32332;
+            case 200 : return 37971;
+            case 300 : return 35351;
+            case 400 : return 33775;
+            case 500 : return 35610;
+            case 600 : return 37013;
+            case 700 : return 37046;
+            case 800 : return 36630;
+            case 900 : return 32954;
+            case 1000 : return 31345;
+            case 1100 : return 37242;
+            case 1200 : return 37369;
+            case 1300 : return 37489;
+            case 1400 : return 37421;
+            case 1500 : return 34220;
+            case 1550 : return 32893;
+            case 1600 : return 34667;
+            case 1650 : return 40860;
+            case 1700 : return 34895;
+            case 1750 : return 36073;
+            case 1775 : return 32668;
+            case 1790 : return 39055;
         }
       }
-      if (a==1850) {
-        switch (b) {
-          case 127 : return 32329;
-          case 150 : return 39965;
-          case 175 : return 31761;
-          case 200 : return 38329;
-          case 300 : return 40827;
-          case 400 : return 34471;
-          case 500 : return 36231;
-          case 600 : return 34642;
-          case 700 : return 39613;
-          case 800 : return 31635;
-          case 900 : return 35917;
-          case 1000 : return 36748;
-          case 1100 : return 35296;
-          case 1200 : return 35396;
-          case 1300 : return 42178;
-          case 1400 : return 34272;
-          case 1500 : return 34307;
-          case 1550 : return 32301;
-          case 1600 : return 38348;
-          case 1650 : return 35501;
-          case 1700 : return 36507;
-          case 1750 : return 35950;
-          case 1800 : return 37413;
-          case 1825 : return 37878;
-          case 1840 : return 32957;
+        if (a==1850) {
+          switch (b) {
+            case 127 : return 32309;
+            case 150 : return 39996;
+            case 175 : return 31754;
+            case 200 : return 38315;
+            case 300 : return 40826;
+            case 400 : return 34468;
+            case 500 : return 36252;
+            case 600 : return 34630;
+            case 700 : return 39602;
+            case 800 : return 31628;
+            case 900 : return 35931;
+            case 1000 : return 36767;
+            case 1100 : return 35286;
+            case 1200 : return 35393;
+            case 1300 : return 42189;
+            case 1400 : return 34258;
+            case 1500 : return 34310;
+            case 1550 : return 32310;
+            case 1600 : return 38346;
+            case 1650 : return 35506;
+            case 1700 : return 36488;
+            case 1750 : return 35949;
+            case 1800 : return 37428;
+            case 1825 : return 37884;
+            case 1840 : return 32947;
         }
       }
-      if (a==1900) {
-        switch (b) {
-          case 127 : return 34427;
-          case 150 : return 33675;
-          case 175 : return 41086;
-          case 200 : return 34372;
-          case 300 : return 34263;
-          case 400 : return 33676;
-          case 500 : return 37058;
-          case 600 : return 36537;
-          case 700 : return 34677;
-          case 800 : return 37988;
-          case 900 : return 38088;
-          case 1000 : return 35168;
-          case 1100 : return 36043;
-          case 1200 : return 36273;
-          case 1300 : return 34790;
-          case 1400 : return 37889;
-          case 1500 : return 37281;
-          case 1600 : return 37956;
-          case 1650 : return 37195;
-          case 1700 : return 40392;
-          case 1750 : return 31431;
-          case 1800 : return 43507;
-          case 1850 : return 39977;
-          case 1875 : return 32707;
-          case 1890 : return 32650;
+        if (a==1900) {
+          switch (b) {
+            case 127 : return 34409;
+            case 150 : return 33688;
+            case 175 : return 41070;
+            case 200 : return 34394;
+            case 300 : return 34266;
+            case 400 : return 33672;
+            case 500 : return 37057;
+            case 600 : return 36547;
+            case 700 : return 34667;
+            case 800 : return 37999;
+            case 900 : return 38091;
+            case 1000 : return 35168;
+            case 1100 : return 36046;
+            case 1200 : return 36273;
+            case 1300 : return 34802;
+            case 1400 : return 37864;
+            case 1500 : return 37266;
+            case 1600 : return 37954;
+            case 1650 : return 37200;
+            case 1700 : return 40374;
+            case 1750 : return 31451;
+            case 1800 : return 43524;
+            case 1850 : return 39968;
+            case 1875 : return 32717;
+            case 1890 : return 32639;
         }
       }
-      if (a==1950) {
-        switch (b) {
-          case 127 : return 33561;
-          case 150 : return 39835;
-          case 175 : return 33078;
-          case 200 : return 39464;
-          case 300 : return 40279;
-          case 400 : return 37971;
-          case 500 : return 42622;
-          case 600 : return 38371;
-          case 700 : return 42629;
-          case 800 : return 31589;
-          case 900 : return 34902;
-          case 1000 : return 36023;
-          case 1100 : return 36073;
-          case 1200 : return 37831;
-          case 1300 : return 33967;
-          case 1400 : return 37939;
-          case 1500 : return 42599;
-          case 1600 : return 37657;
-          case 1650 : return 36486;
-          case 1700 : return 37879;
-          case 1750 : return 35215;
-          case 1800 : return 35964;
-          case 1850 : return 38192;
-          case 1900 : return 42012;
-          case 1925 : return 36712;
-          case 1940 : return 38735;
+        if (a==1950) {
+          switch (b) {
+            case 127 : return 33562;
+            case 150 : return 39826;
+            case 175 : return 33078;
+            case 200 : return 39458;
+            case 300 : return 40272;
+            case 400 : return 37985;
+            case 500 : return 42626;
+            case 600 : return 38363;
+            case 700 : return 42632;
+            case 800 : return 31587;
+            case 900 : return 34899;
+            case 1000 : return 36020;
+            case 1100 : return 36086;
+            case 1200 : return 37843;
+            case 1300 : return 33970;
+            case 1400 : return 37927;
+            case 1500 : return 42590;
+            case 1600 : return 37668;
+            case 1650 : return 36489;
+            case 1700 : return 37874;
+            case 1750 : return 35188;
+            case 1800 : return 35955;
+            case 1850 : return 38206;
+            case 1900 : return 42024;
+            case 1925 : return 36723;
+            case 1940 : return 38734;
         }
       }
-      if (a==2000) {
-        switch (b) {
-          case 127 : return 16623;
-          case 150 : return 20807;
-          case 175 : return 17550;
-          case 200 : return 18699;
-          case 300 : return 16721;
-          case 400 : return 17048;
-          case 500 : return 16801;
-          case 600 : return 19812;
-          case 700 : return 18447;
-          case 800 : return 17164;
-          case 900 : return 20095;
-          case 1000 : return 17438;
-          case 1100 : return 19516;
-          case 1200 : return 18709;
-          case 1300 : return 18328;
-          case 1400 : return 18982;
-          case 1500 : return 20217;
-          case 1600 : return 18731;
-          case 1700 : return 17059;
-          case 1750 : return 20412;
-          case 1800 : return 15883;
-          case 1850 : return 21274;
-          case 1900 : return 15962;
-          case 1950 : return 16822;
-          case 1975 : return 21387;
-          case 1990 : return 20330;
+        if (a==2000) {
+          switch (b) {
+            case 127 : return 16624;
+            case 150 : return 20797;
+            case 175 : return 17565;
+            case 200 : return 18691;
+            case 300 : return 16725;
+            case 400 : return 17051;
+            case 500 : return 16803;
+            case 600 : return 19798;
+            case 700 : return 18446;
+            case 800 : return 17169;
+            case 900 : return 20098;
+            case 1000 : return 17445;
+            case 1100 : return 19522;
+            case 1200 : return 18713;
+            case 1300 : return 18324;
+            case 1400 : return 18972;
+            case 1500 : return 20218;
+            case 1600 : return 18722;
+            case 1700 : return 17059;
+            case 1750 : return 20420;
+            case 1800 : return 15879;
+            case 1850 : return 21277;
+            case 1900 : return 15965;
+            case 1950 : return 16808;
+            case 1975 : return 21395;
+            case 1990 : return 20331;
         }
       }
-      if (a==2050) {
-        switch (b) {
-          case 127 : return 17424;
-          case 150 : return 15427;
-          case 175 : return 17593;
-          case 200 : return 22204;
-          case 300 : return 16894;
-          case 400 : return 19538;
-          case 500 : return 21584;
-          case 600 : return 21169;
-          case 700 : return 21507;
-          case 800 : return 20098;
-          case 900 : return 16669;
-          case 1000 : return 20473;
-          case 1100 : return 22447;
-          case 1200 : return 19079;
-          case 1300 : return 17503;
-          case 1400 : return 19226;
-          case 1500 : return 22240;
-          case 1600 : return 15569;
-          case 1700 : return 18336;
-          case 1750 : return 19084;
-          case 1800 : return 19148;
-          case 1850 : return 14163;
-          case 1900 : return 18498;
-          case 1950 : return 21268;
-          case 2000 : return 19134;
-          case 2025 : return 20370;
-          case 2040 : return 20391;
+        if (a==2050) {
+          switch (b) {
+            case 127 : return 17439;
+            case 150 : return 15424;
+            case 175 : return 17596;
+            case 200 : return 22194;
+            case 300 : return 16888;
+            case 400 : return 19541;
+            case 500 : return 21582;
+            case 600 : return 21167;
+            case 700 : return 21512;
+            case 800 : return 20096;
+            case 900 : return 16675;
+            case 1000 : return 20464;
+            case 1100 : return 22448;
+            case 1200 : return 19073;
+            case 1300 : return 17505;
+            case 1400 : return 19233;
+            case 1500 : return 22236;
+            case 1600 : return 15575;
+            case 1700 : return 18349;
+            case 1750 : return 19075;
+            case 1800 : return 19132;
+            case 1850 : return 14160;
+            case 1900 : return 18511;
+            case 1950 : return 21266;
+            case 2000 : return 19142;
+            case 2025 : return 20360;
+            case 2040 : return 20393;
         }
       }
-      if (a==2100) {
-        switch (b) {
-          case 127 : return 16845;
-          case 150 : return 16773;
-          case 175 : return 20250;
-          case 200 : return 13182;
-          case 300 : return 19490;
-          case 400 : return 16343;
-          case 500 : return 16967;
-          case 600 : return 17337;
-          case 700 : return 16001;
-          case 800 : return 19585;
-          case 900 : return 21093;
-          case 1000 : return 18717;
-          case 1100 : return 13729;
-          case 1200 : return 16277;
-          case 1300 : return 14332;
-          case 1400 : return 16919;
-          case 1500 : return 16717;
-          case 1600 : return 16915;
-          case 1700 : return 15971;
-          case 1800 : return 17354;
-          case 1850 : return 16212;
-          case 1900 : return 19301;
-          case 1950 : return 13461;
-          case 2000 : return 15529;
-          case 2050 : return 20458;
-          case 2075 : return 17553;
-          case 2090 : return 19255;
+        if (a==2100) {
+          switch (b) {
+            case 127 : return 16855;
+            case 150 : return 16757;
+            case 175 : return 20253;
+            case 200 : return 13185;
+            case 300 : return 19485;
+            case 400 : return 16346;
+            case 500 : return 16968;
+            case 600 : return 17332;
+            case 700 : return 16010;
+            case 800 : return 19583;
+            case 900 : return 21091;
+            case 1000 : return 18723;
+            case 1100 : return 13725;
+            case 1200 : return 16269;
+            case 1300 : return 14328;
+            case 1400 : return 16928;
+            case 1500 : return 16708;
+            case 1600 : return 16922;
+            case 1700 : return 15987;
+            case 1800 : return 17338;
+            case 1850 : return 16214;
+            case 1900 : return 19299;
+            case 1950 : return 13468;
+            case 2000 : return 15528;
+            case 2050 : return 20454;
+            case 2075 : return 17573;
+            case 2090 : return 19237;
         }
       }
-      if (a==2150) {
-        switch (b) {
-          case 127 : return 21337;
-          case 150 : return 16107;
-          case 175 : return 17291;
-          case 200 : return 16361;
-          case 300 : return 17137;
-          case 400 : return 15486;
-          case 500 : return 14350;
-          case 600 : return 18271;
-          case 700 : return 16893;
-          case 800 : return 15501;
-          case 900 : return 20300;
-          case 1000 : return 17427;
-          case 1100 : return 17435;
-          case 1200 : return 14486;
-          case 1300 : return 20016;
-          case 1400 : return 17091;
-          case 1500 : return 18760;
-          case 1600 : return 17508;
-          case 1700 : return 16230;
-          case 1800 : return 17020;
-          case 1850 : return 20454;
-          case 1900 : return 16222;
-          case 1950 : return 15407;
-          case 2000 : return 15722;
-          case 2050 : return 18195;
-          case 2100 : return 15589;
-          case 2125 : return 17727;
-          case 2140 : return 17809;
+        if (a==2150) {
+          switch (b) {
+            case 127 : return 21339;
+            case 150 : return 16128;
+            case 175 : return 17280;
+            case 200 : return 16360;
+            case 300 : return 17120;
+            case 400 : return 15484;
+            case 500 : return 14348;
+            case 600 : return 18277;
+            case 700 : return 16886;
+            case 800 : return 15509;
+            case 900 : return 20303;
+            case 1000 : return 17433;
+            case 1100 : return 17435;
+            case 1200 : return 14478;
+            case 1300 : return 20021;
+            case 1400 : return 17089;
+            case 1500 : return 18769;
+            case 1600 : return 17501;
+            case 1700 : return 16232;
+            case 1800 : return 17020;
+            case 1850 : return 20441;
+            case 1900 : return 16229;
+            case 1950 : return 15421;
+            case 2000 : return 15722;
+            case 2050 : return 18206;
+            case 2100 : return 15562;
+            case 2125 : return 17734;
+            case 2140 : return 17805;
         }
       }
-      if (a==2200) {
-        switch (b) {
-          case 127 : return 19698;
-          case 150 : return 18993;
-          case 175 : return 18515;
-          case 200 : return 18327;
-          case 300 : return 12592;
-          case 400 : return 24558;
-          case 500 : return 22708;
-          case 600 : return 15205;
-          case 700 : return 13352;
-          case 800 : return 18499;
-          case 900 : return 18663;
-          case 1000 : return 14891;
-          case 1100 : return 16903;
-          case 1200 : return 15222;
-          case 1300 : return 17752;
-          case 1400 : return 17448;
-          case 1500 : return 20526;
-          case 1600 : return 20077;
-          case 1700 : return 18987;
-          case 1800 : return 20180;
-          case 1900 : return 19514;
-          case 1950 : return 19348;
-          case 2000 : return 18099;
-          case 2050 : return 18403;
-          case 2100 : return 20550;
-          case 2150 : return 19480;
-          case 2175 : return 21326;
-          case 2190 : return 18598;
+        if (a==2200) {
+          switch (b) {
+            case 127 : return 19681;
+            case 150 : return 19004;
+            case 175 : return 18511;
+            case 200 : return 18334;
+            case 300 : return 12597;
+            case 400 : return 24551;
+            case 500 : return 22710;
+            case 600 : return 15207;
+            case 700 : return 13359;
+            case 800 : return 18495;
+            case 900 : return 18659;
+            case 1000 : return 14883;
+            case 1100 : return 16899;
+            case 1200 : return 15219;
+            case 1300 : return 17762;
+            case 1400 : return 17444;
+            case 1500 : return 20532;
+            case 1600 : return 20086;
+            case 1700 : return 18973;
+            case 1800 : return 20178;
+            case 1900 : return 19510;
+            case 1950 : return 19352;
+            case 2000 : return 18108;
+            case 2050 : return 18406;
+            case 2100 : return 20552;
+            case 2150 : return 19477;
+            case 2175 : return 21330;
+            case 2190 : return 18595;
         }
       }
-      if (a==2250) {
-        switch (b) {
-          case 127 : return 18311;
-          case 150 : return 20355;
-          case 175 : return 16723;
-          case 200 : return 19134;
-          case 300 : return 16651;
-          case 400 : return 17685;
-          case 500 : return 19322;
-          case 600 : return 19379;
-          case 700 : return 20946;
-          case 800 : return 20008;
-          case 900 : return 14697;
-          case 1000 : return 15828;
-          case 1100 : return 16867;
-          case 1200 : return 21196;
-          case 1300 : return 16511;
-          case 1400 : return 18132;
-          case 1500 : return 20511;
-          case 1600 : return 18510;
-          case 1700 : return 18288;
-          case 1800 : return 20287;
-          case 1900 : return 20777;
-          case 1950 : return 15942;
-          case 2000 : return 18010;
-          case 2050 : return 15435;
-          case 2100 : return 17246;
-          case 2150 : return 19465;
-          case 2200 : return 16449;
-          case 2225 : return 18385;
-          case 2240 : return 18007;
+        if (a==2250) {
+          switch (b) {
+            case 127 : return 18303;
+            case 150 : return 20341;
+            case 175 : return 16738;
+            case 200 : return 19131;
+            case 300 : return 16659;
+            case 400 : return 17685;
+            case 500 : return 19324;
+            case 600 : return 19383;
+            case 700 : return 20939;
+            case 800 : return 20005;
+            case 900 : return 14714;
+            case 1000 : return 15830;
+            case 1100 : return 16865;
+            case 1200 : return 21188;
+            case 1300 : return 16502;
+            case 1400 : return 18127;
+            case 1500 : return 20520;
+            case 1600 : return 18501;
+            case 1700 : return 18286;
+            case 1800 : return 20304;
+            case 1900 : return 20786;
+            case 1950 : return 15932;
+            case 2000 : return 18022;
+            case 2050 : return 15433;
+            case 2100 : return 17237;
+            case 2150 : return 19465;
+            case 2200 : return 16460;
+            case 2225 : return 18370;
+            case 2240 : return 18007;
         }
       }
-      if (a==2300) {
-        switch (b) {
-          case 127 : return 16516;
-          case 150 : return 19750;
-          case 175 : return 19752;
-          case 200 : return 19622;
-          case 300 : return 19415;
-          case 400 : return 14936;
-          case 500 : return 19942;
-          case 600 : return 16221;
-          case 700 : return 19473;
-          case 800 : return 17554;
-          case 900 : return 21261;
-          case 1000 : return 18573;
-          case 1100 : return 21144;
-          case 1200 : return 17560;
-          case 1300 : return 23922;
-          case 1400 : return 21004;
-          case 1500 : return 18649;
-          case 1600 : return 19103;
-          case 1700 : return 21044;
-          case 1800 : return 16513;
-          case 1900 : return 18084;
-          case 2000 : return 16007;
-          case 2050 : return 16445;
-          case 2100 : return 18702;
-          case 2150 : return 19478;
-          case 2200 : return 18876;
-          case 2250 : return 15012;
-          case 2275 : return 18923;
-          case 2290 : return 20161;
+        if (a==2300) {
+          switch (b) {
+            case 127 : return 16520;
+            case 150 : return 19743;
+            case 175 : return 19753;
+            case 200 : return 19623;
+            case 300 : return 19420;
+            case 400 : return 14938;
+            case 500 : return 19941;
+            case 600 : return 16225;
+            case 700 : return 19472;
+            case 800 : return 17548;
+            case 900 : return 21252;
+            case 1000 : return 18578;
+            case 1100 : return 21154;
+            case 1200 : return 17555;
+            case 1300 : return 23917;
+            case 1400 : return 21009;
+            case 1500 : return 18630;
+            case 1600 : return 19113;
+            case 1700 : return 21047;
+            case 1800 : return 16517;
+            case 1900 : return 18084;
+            case 2000 : return 16009;
+            case 2050 : return 16447;
+            case 2100 : return 18691;
+            case 2150 : return 19483;
+            case 2200 : return 18883;
+            case 2250 : return 15028;
+            case 2275 : return 18905;
+            case 2290 : return 20157;
         }
       }
-      if (a==2350) {
-        switch (b) {
-          case 127 : return 20118;
-          case 150 : return 18647;
-          case 175 : return 18835;
-          case 200 : return 17179;
-          case 300 : return 14530;
-          case 400 : return 16209;
-          case 500 : return 18686;
-          case 600 : return 17722;
-          case 700 : return 18055;
-          case 800 : return 17276;
-          case 900 : return 15425;
-          case 1000 : return 14478;
-          case 1100 : return 16122;
-          case 1200 : return 17916;
-          case 1300 : return 14292;
-          case 1400 : return 18691;
-          case 1500 : return 21705;
-          case 1600 : return 19033;
-          case 1700 : return 17649;
-          case 1800 : return 18251;
-          case 1900 : return 25423;
-          case 2000 : return 19233;
-          case 2050 : return 16890;
-          case 2100 : return 17027;
-          case 2150 : return 18653;
-          case 2200 : return 17639;
-          case 2250 : return 16724;
-          case 2300 : return 19472;
-          case 2325 : return 16091;
-          case 2340 : return 19502;
+        if (a==2350) {
+          switch (b) {
+            case 127 : return 20112;
+            case 150 : return 18638;
+            case 175 : return 18837;
+            case 200 : return 17187;
+            case 300 : return 14529;
+            case 400 : return 16209;
+            case 500 : return 18695;
+            case 600 : return 17712;
+            case 700 : return 18064;
+            case 800 : return 17273;
+            case 900 : return 15430;
+            case 1000 : return 14479;
+            case 1100 : return 16119;
+            case 1200 : return 17922;
+            case 1300 : return 14294;
+            case 1400 : return 18683;
+            case 1500 : return 21697;
+            case 1600 : return 19033;
+            case 1700 : return 17654;
+            case 1800 : return 18249;
+            case 1900 : return 25424;
+            case 2000 : return 19218;
+            case 2050 : return 16903;
+            case 2100 : return 17038;
+            case 2150 : return 18638;
+            case 2200 : return 17645;
+            case 2250 : return 16725;
+            case 2300 : return 19459;
+            case 2325 : return 16117;
+            case 2340 : return 19490;
         }
       }
-      if (a==2400) {
-        switch (b) {
-          case 127 : return 18187;
-          case 150 : return 16999;
-          case 175 : return 17126;
-          case 200 : return 17081;
-          case 300 : return 16401;
-          case 400 : return 17214;
-          case 500 : return 16211;
-          case 600 : return 18285;
-          case 700 : return 20253;
-          case 800 : return 15133;
-          case 900 : return 20158;
-          case 1000 : return 17999;
-          case 1100 : return 15310;
-          case 1200 : return 16891;
-          case 1300 : return 18842;
-          case 1400 : return 17630;
-          case 1500 : return 19878;
-          case 1600 : return 14580;
-          case 1700 : return 17144;
-          case 1800 : return 20426;
-          case 1900 : return 15206;
-          case 2000 : return 20504;
-          case 2100 : return 16619;
-          case 2150 : return 17140;
-          case 2200 : return 16796;
-          case 2250 : return 17459;
-          case 2300 : return 16783;
-          case 2350 : return 16328;
-          case 2375 : return 16361;
-          case 2390 : return 15555;
+        if (a==2400) {
+          switch (b) {
+            case 127 : return 18180;
+            case 150 : return 17012;
+            case 175 : return 17118;
+            case 200 : return 17073;
+            case 300 : return 16407;
+            case 400 : return 17201;
+            case 500 : return 16208;
+            case 600 : return 18299;
+            case 700 : return 20248;
+            case 800 : return 15138;
+            case 900 : return 20162;
+            case 1000 : return 18002;
+            case 1100 : return 15313;
+            case 1200 : return 16882;
+            case 1300 : return 18845;
+            case 1400 : return 17631;
+            case 1500 : return 19869;
+            case 1600 : return 14583;
+            case 1700 : return 17143;
+            case 1800 : return 20432;
+            case 1900 : return 15205;
+            case 2000 : return 20509;
+            case 2100 : return 16613;
+            case 2150 : return 17135;
+            case 2200 : return 16802;
+            case 2250 : return 17475;
+            case 2300 : return 16780;
+            case 2350 : return 16305;
+            case 2375 : return 16378;
+            case 2390 : return 15551;
         }
       }
-      if (a==2450) {
-        switch (b) {
-          case 127 : return 18131;
-          case 150 : return 16255;
-          case 175 : return 18457;
-          case 200 : return 16367;
-          case 300 : return 19823;
-          case 400 : return 15884;
-          case 500 : return 16442;
-          case 600 : return 17898;
-          case 700 : return 19875;
-          case 800 : return 17433;
-          case 900 : return 18958;
-          case 1000 : return 20074;
-          case 1100 : return 16356;
-          case 1200 : return 19370;
-          case 1300 : return 15233;
-          case 1400 : return 18658;
-          case 1500 : return 17410;
-          case 1600 : return 19017;
-          case 1700 : return 20918;
-          case 1800 : return 18716;
-          case 1900 : return 19358;
-          case 2000 : return 18507;
-          case 2100 : return 20373;
-          case 2150 : return 19306;
-          case 2200 : return 15268;
-          case 2250 : return 15039;
-          case 2300 : return 18022;
-          case 2350 : return 15417;
-          case 2400 : return 16991;
-          case 2425 : return 19280;
-          case 2440 : return 19847;
+        if (a==2450) {
+          switch (b) {
+            case 127 : return 18125;
+            case 150 : return 16256;
+            case 175 : return 18457;
+            case 200 : return 16379;
+            case 300 : return 19817;
+            case 400 : return 15875;
+            case 500 : return 16448;
+            case 600 : return 17894;
+            case 700 : return 19883;
+            case 800 : return 17433;
+            case 900 : return 18967;
+            case 1000 : return 20073;
+            case 1100 : return 16365;
+            case 1200 : return 19354;
+            case 1300 : return 15236;
+            case 1400 : return 18655;
+            case 1500 : return 17409;
+            case 1600 : return 19020;
+            case 1700 : return 20920;
+            case 1800 : return 18710;
+            case 1900 : return 19364;
+            case 2000 : return 18503;
+            case 2100 : return 20371;
+            case 2150 : return 19309;
+            case 2200 : return 15253;
+            case 2250 : return 15038;
+            case 2300 : return 18024;
+            case 2350 : return 15426;
+            case 2400 : return 16995;
+            case 2425 : return 19282;
+            case 2440 : return 19842;
         }
       }
-      if (a==2500) {
-        switch (b) {
-          case 127 : return 14959;
-          case 150 : return 20630;
-          case 175 : return 19072;
-          case 200 : return 18205;
-          case 300 : return 20866;
-          case 400 : return 18739;
-          case 500 : return 17470;
-          case 600 : return 16980;
-          case 700 : return 18760;
-          case 800 : return 18517;
-          case 900 : return 17063;
-          case 1000 : return 15523;
-          case 1100 : return 22152;
-          case 1200 : return 18815;
-          case 1300 : return 17976;
-          case 1400 : return 17590;
-          case 1500 : return 19195;
-          case 1600 : return 14605;
-          case 1700 : return 16635;
-          case 1800 : return 20697;
-          case 1900 : return 20254;
-          case 2000 : return 18371;
-          case 2100 : return 16161;
-          case 2200 : return 18704;
-          case 2250 : return 20915;
-          case 2300 : return 15911;
-          case 2350 : return 17524;
-          case 2400 : return 19006;
-          case 2450 : return 16844;
-          case 2475 : return 19610;
-          case 2490 : return 18615;
+        if (a==2500) {
+          switch (b) {
+            case 127 : return 14961;
+            case 150 : return 20630;
+            case 175 : return 19080;
+            case 200 : return 18205;
+            case 300 : return 20865;
+            case 400 : return 18729;
+            case 500 : return 17465;
+            case 600 : return 16982;
+            case 700 : return 18757;
+            case 800 : return 18534;
+            case 900 : return 17062;
+            case 1000 : return 15528;
+            case 1100 : return 22145;
+            case 1200 : return 18810;
+            case 1300 : return 17970;
+            case 1400 : return 17596;
+            case 1500 : return 19189;
+            case 1600 : return 14611;
+            case 1700 : return 16635;
+            case 1800 : return 20710;
+            case 1900 : return 20243;
+            case 2000 : return 18363;
+            case 2100 : return 16162;
+            case 2200 : return 18690;
+            case 2250 : return 20915;
+            case 2300 : return 15913;
+            case 2350 : return 17531;
+            case 2400 : return 18996;
+            case 2450 : return 16844;
+            case 2475 : return 19598;
+            case 2490 : return 18645;
         }
       }
-      if (a==2550) {
-        switch (b) {
-          case 127 : return 17498;
-          case 150 : return 21232;
-          case 175 : return 14192;
-          case 200 : return 18743;
-          case 300 : return 19422;
-          case 400 : return 16018;
-          case 500 : return 19127;
-          case 600 : return 20198;
-          case 700 : return 18818;
-          case 800 : return 18914;
-          case 900 : return 18769;
-          case 1000 : return 19493;
-          case 1100 : return 19788;
-          case 1200 : return 16793;
-          case 1300 : return 18412;
-          case 1400 : return 17164;
-          case 1500 : return 22010;
-          case 1600 : return 20287;
-          case 1700 : return 20260;
-          case 1800 : return 19017;
-          case 1900 : return 21187;
-          case 2000 : return 20308;
-          case 2100 : return 16165;
-          case 2200 : return 18666;
-          case 2250 : return 18179;
-          case 2300 : return 20282;
-          case 2350 : return 18932;
-          case 2400 : return 19365;
-          case 2450 : return 18685;
-          case 2500 : return 15340;
-          case 2525 : return 17440;
-          case 2540 : return 17339;
+        if (a==2550) {
+          switch (b) {
+            case 127 : return 17500;
+            case 150 : return 21243;
+            case 175 : return 14185;
+            case 200 : return 18733;
+            case 300 : return 19415;
+            case 400 : return 16029;
+            case 500 : return 19127;
+            case 600 : return 20195;
+            case 700 : return 18832;
+            case 800 : return 18913;
+            case 900 : return 18772;
+            case 1000 : return 19492;
+            case 1100 : return 19781;
+            case 1200 : return 16788;
+            case 1300 : return 18418;
+            case 1400 : return 17155;
+            case 1500 : return 21999;
+            case 1600 : return 20315;
+            case 1700 : return 20246;
+            case 1800 : return 19018;
+            case 1900 : return 21178;
+            case 2000 : return 20312;
+            case 2100 : return 16162;
+            case 2200 : return 18666;
+            case 2250 : return 18186;
+            case 2300 : return 20270;
+            case 2350 : return 18941;
+            case 2400 : return 19370;
+            case 2450 : return 18679;
+            case 2500 : return 15336;
+            case 2525 : return 17433;
+            case 2540 : return 17354;
         }
       }
-      if (a==2600) {
-        switch (b) {
-          case 127 : return 17487;
-          case 150 : return 14894;
-          case 175 : return 17542;
-          case 200 : return 21194;
-          case 300 : return 20856;
-          case 400 : return 16451;
-          case 500 : return 17286;
-          case 600 : return 14934;
-          case 700 : return 20286;
-          case 800 : return 20879;
-          case 900 : return 17500;
-          case 1000 : return 22782;
-          case 1100 : return 17588;
-          case 1200 : return 19649;
-          case 1300 : return 21731;
-          case 1400 : return 18142;
-          case 1500 : return 15629;
-          case 1600 : return 16876;
-          case 1700 : return 22021;
-          case 1800 : return 18745;
-          case 1900 : return 16755;
-          case 2000 : return 19709;
-          case 2100 : return 19669;
-          case 2200 : return 20589;
-          case 2300 : return 19794;
-          case 2350 : return 20949;
-          case 2400 : return 14364;
-          case 2450 : return 16594;
-          case 2500 : return 18764;
-          case 2550 : return 14545;
-          case 2575 : return 19655;
-          case 2590 : return 18270;
+        if (a==2600) {
+          switch (b) {
+            case 127 : return 17496;
+            case 150 : return 14878;
+            case 175 : return 17552;
+            case 200 : return 21180;
+            case 300 : return 20864;
+            case 400 : return 16459;
+            case 500 : return 17280;
+            case 600 : return 14934;
+            case 700 : return 20291;
+            case 800 : return 20874;
+            case 900 : return 17495;
+            case 1000 : return 22777;
+            case 1100 : return 17589;
+            case 1200 : return 19651;
+            case 1300 : return 21747;
+            case 1400 : return 18138;
+            case 1500 : return 15629;
+            case 1600 : return 16882;
+            case 1700 : return 22011;
+            case 1800 : return 18747;
+            case 1900 : return 16760;
+            case 2000 : return 19711;
+            case 2100 : return 19671;
+            case 2200 : return 20576;
+            case 2300 : return 19793;
+            case 2350 : return 20970;
+            case 2400 : return 14357;
+            case 2450 : return 16575;
+            case 2500 : return 18768;
+            case 2550 : return 14561;
+            case 2575 : return 19661;
+            case 2590 : return 18252;
         }
       }
-      if (a==2650) {
-        switch (b) {
-          case 127 : return 15117;
-          case 150 : return 15172;
-          case 175 : return 15532;
-          case 200 : return 17148;
-          case 300 : return 20149;
-          case 400 : return 19383;
-          case 500 : return 17454;
-          case 600 : return 16200;
-          case 700 : return 16558;
-          case 800 : return 13949;
-          case 900 : return 16699;
-          case 1000 : return 19134;
-          case 1100 : return 16944;
-          case 1200 : return 19970;
-          case 1300 : return 16699;
-          case 1400 : return 20923;
-          case 1500 : return 20888;
-          case 1600 : return 20059;
-          case 1700 : return 16488;
-          case 1800 : return 21318;
-          case 1900 : return 18061;
-          case 2000 : return 20681;
-          case 2100 : return 17448;
-          case 2200 : return 19032;
-          case 2300 : return 14511;
-          case 2350 : return 18033;
-          case 2400 : return 17285;
-          case 2450 : return 16776;
-          case 2500 : return 19552;
-          case 2550 : return 14017;
-          case 2600 : return 19693;
-          case 2625 : return 15980;
-          case 2640 : return 20828;
+        if (a==2650) {
+          switch (b) {
+            case 127 : return 15123;
+            case 150 : return 15169;
+            case 175 : return 15522;
+            case 200 : return 17153;
+            case 300 : return 20155;
+            case 400 : return 19384;
+            case 500 : return 17451;
+            case 600 : return 16188;
+            case 700 : return 16575;
+            case 800 : return 13951;
+            case 900 : return 16693;
+            case 1000 : return 19139;
+            case 1100 : return 16950;
+            case 1200 : return 19972;
+            case 1300 : return 16690;
+            case 1400 : return 20928;
+            case 1500 : return 20891;
+            case 1600 : return 20049;
+            case 1700 : return 16486;
+            case 1800 : return 21327;
+            case 1900 : return 18063;
+            case 2000 : return 20673;
+            case 2100 : return 17450;
+            case 2200 : return 19025;
+            case 2300 : return 14507;
+            case 2350 : return 18028;
+            case 2400 : return 17290;
+            case 2450 : return 16767;
+            case 2500 : return 19563;
+            case 2550 : return 14015;
+            case 2600 : return 19693;
+            case 2625 : return 15959;
+            case 2640 : return 20852;
         }
       }
-      if (a==2700) {
-        switch (b) {
-          case 127 : return 18346;
-          case 150 : return 17312;
-          case 175 : return 15415;
-          case 200 : return 15321;
-          case 300 : return 17264;
-          case 400 : return 15330;
-          case 500 : return 19187;
-          case 600 : return 18733;
-          case 700 : return 18447;
-          case 800 : return 17683;
-          case 900 : return 17627;
-          case 1000 : return 17155;
-          case 1100 : return 15757;
-          case 1200 : return 15310;
-          case 1300 : return 18138;
-          case 1400 : return 14949;
-          case 1500 : return 19627;
-          case 1600 : return 17801;
-          case 1700 : return 18373;
-          case 1800 : return 19274;
-          case 1900 : return 16648;
-          case 2000 : return 18786;
-          case 2100 : return 15236;
-          case 2200 : return 17842;
-          case 2300 : return 14636;
-          case 2400 : return 14274;
-          case 2450 : return 18643;
-          case 2500 : return 19982;
-          case 2550 : return 17719;
-          case 2600 : return 17386;
-          case 2650 : return 22254;
-          case 2675 : return 19497;
-          case 2690 : return 16774;
+        if (a==2700) {
+          switch (b) {
+            case 127 : return 18351;
+            case 150 : return 17316;
+            case 175 : return 15402;
+            case 200 : return 15340;
+            case 300 : return 17251;
+            case 400 : return 15333;
+            case 500 : return 19175;
+            case 600 : return 18739;
+            case 700 : return 18450;
+            case 800 : return 17684;
+            case 900 : return 17614;
+            case 1000 : return 17162;
+            case 1100 : return 15754;
+            case 1200 : return 15311;
+            case 1300 : return 18145;
+            case 1400 : return 14946;
+            case 1500 : return 19625;
+            case 1600 : return 17803;
+            case 1700 : return 18380;
+            case 1800 : return 19271;
+            case 1900 : return 16643;
+            case 2000 : return 18788;
+            case 2100 : return 15236;
+            case 2200 : return 17843;
+            case 2300 : return 14642;
+            case 2400 : return 14282;
+            case 2450 : return 18636;
+            case 2500 : return 19983;
+            case 2550 : return 17730;
+            case 2600 : return 17378;
+            case 2650 : return 22260;
+            case 2675 : return 19490;
+            case 2690 : return 16763;
         }
       }
-      if (a==2750) {
-        switch (b) {
-          case 127 : return 19079;
-          case 150 : return 19881;
-          case 175 : return 16421;
-          case 200 : return 19274;
-          case 300 : return 18399;
-          case 400 : return 15749;
-          case 500 : return 17859;
-          case 600 : return 17806;
-          case 700 : return 15308;
-          case 800 : return 15712;
-          case 900 : return 13398;
-          case 1000 : return 18388;
-          case 1100 : return 16630;
-          case 1200 : return 16366;
-          case 1300 : return 16881;
-          case 1400 : return 18232;
-          case 1500 : return 16845;
-          case 1600 : return 19890;
-          case 1700 : return 20414;
-          case 1800 : return 19630;
-          case 1900 : return 17810;
-          case 2000 : return 18358;
-          case 2100 : return 17388;
-          case 2200 : return 16754;
-          case 2300 : return 15045;
-          case 2400 : return 14272;
-          case 2450 : return 17931;
-          case 2500 : return 19468;
-          case 2550 : return 21305;
-          case 2600 : return 22196;
-          case 2650 : return 20843;
-          case 2700 : return 17436;
-          case 2725 : return 15954;
-          case 2740 : return 18630;
+        if (a==2750) {
+          switch (b) {
+            case 127 : return 19057;
+            case 150 : return 19894;
+            case 175 : return 16423;
+            case 200 : return 19272;
+            case 300 : return 18398;
+            case 400 : return 15751;
+            case 500 : return 17858;
+            case 600 : return 17819;
+            case 700 : return 15313;
+            case 800 : return 15701;
+            case 900 : return 13398;
+            case 1000 : return 18379;
+            case 1100 : return 16640;
+            case 1200 : return 16375;
+            case 1300 : return 16888;
+            case 1400 : return 18221;
+            case 1500 : return 16849;
+            case 1600 : return 19899;
+            case 1700 : return 20411;
+            case 1800 : return 19624;
+            case 1900 : return 17805;
+            case 2000 : return 18362;
+            case 2100 : return 17384;
+            case 2200 : return 16747;
+            case 2300 : return 15036;
+            case 2400 : return 14283;
+            case 2450 : return 17930;
+            case 2500 : return 19466;
+            case 2550 : return 21318;
+            case 2600 : return 22181;
+            case 2650 : return 20844;
+            case 2700 : return 17447;
+            case 2725 : return 15935;
+            case 2740 : return 18644;
         }
       }
-      if (a==2800) {
-        switch (b) {
-          case 127 : return 17912;
-          case 150 : return 17073;
-          case 175 : return 17858;
-          case 200 : return 20276;
-          case 300 : return 19404;
-          case 400 : return 18796;
-          case 500 : return 19854;
-          case 600 : return 18969;
-          case 700 : return 22134;
-          case 800 : return 18835;
-          case 900 : return 14195;
-          case 1000 : return 19484;
-          case 1100 : return 14298;
-          case 1200 : return 19891;
-          case 1300 : return 20116;
-          case 1400 : return 14551;
-          case 1500 : return 17801;
-          case 1600 : return 16604;
-          case 1700 : return 19441;
-          case 1800 : return 15250;
-          case 1900 : return 18407;
-          case 2000 : return 19301;
-          case 2100 : return 21078;
-          case 2200 : return 19424;
-          case 2300 : return 15683;
-          case 2400 : return 16551;
-          case 2500 : return 16419;
-          case 2550 : return 16026;
-          case 2600 : return 17163;
-          case 2650 : return 16305;
-          case 2700 : return 22544;
-          case 2750 : return 18088;
-          case 2775 : return 15328;
-          case 2790 : return 19082;
+        if (a==2800) {
+          switch (b) {
+            case 127 : return 17912;
+            case 150 : return 17078;
+            case 175 : return 17845;
+            case 200 : return 20282;
+            case 300 : return 19410;
+            case 400 : return 18789;
+            case 500 : return 19852;
+            case 600 : return 18967;
+            case 700 : return 22142;
+            case 800 : return 18837;
+            case 900 : return 14195;
+            case 1000 : return 19483;
+            case 1100 : return 14289;
+            case 1200 : return 19894;
+            case 1300 : return 20121;
+            case 1400 : return 14544;
+            case 1500 : return 17807;
+            case 1600 : return 16611;
+            case 1700 : return 19434;
+            case 1800 : return 15251;
+            case 1900 : return 18416;
+            case 2000 : return 19301;
+            case 2100 : return 21066;
+            case 2200 : return 19426;
+            case 2300 : return 15685;
+            case 2400 : return 16547;
+            case 2500 : return 16424;
+            case 2550 : return 16025;
+            case 2600 : return 17154;
+            case 2650 : return 16322;
+            case 2700 : return 22546;
+            case 2750 : return 18074;
+            case 2775 : return 15309;
+            case 2790 : return 19103;
         }
       }
       break;
       case 2017 :
       if (a==800) {
         switch (b) {
-          case 127 : return 164924;
-          case 200 : return 179529;
-          case 300 : return 141607;
-          case 400 : return 158559;
-          case 500 : return 194880;
-          case 600 : return 184119;
-          case 700 : return 195811;
-          case 790 : return 181272;
-        }
+          case 127 : return 164945;
+          case 200 : return 179515;
+          case 300 : return 141551;
+          case 400 : return 158603;
+          case 500 : return 194888;
+          case 600 : return 184120;
+          case 700 : return 195814;
+          case 790 : return 181265;
       }
+    }
       if (a==900) {
         switch (b) {
-          case 127 : return 183638;
-          case 200 : return 158814;
-          case 300 : return 194014;
-          case 400 : return 157036;
-          case 500 : return 166532;
-          case 600 : return 192318;
-          case 700 : return 173473;
-          case 800 : return 164550;
-          case 890 : return 177845;
-        }
+          case 127 : return 183641;
+          case 200 : return 158806;
+          case 300 : return 194041;
+          case 400 : return 157027;
+          case 500 : return 166566;
+          case 600 : return 192248;
+          case 700 : return 173488;
+          case 800 : return 164517;
+          case 890 : return 177886;
       }
+    }
       if (a==1000) {
         switch (b) {
-          case 127 : return 182002;
-          case 150 : return 178877;
-          case 175 : return 182779;
-          case 200 : return 176567;
-          case 300 : return 158713;
-          case 400 : return 168797;
-          case 500 : return 180537;
-          case 600 : return 164145;
-          case 700 : return 170294;
-          case 750 : return 167533;
-          case 800 : return 152925;
-          case 850 : return 158668;
-          case 900 : return 161252;
-          case 950 : return 173636;
-          case 975 : return 198050;
-          case 990 : return 159509;
-        }
+          case 127 : return 181998;
+          case 150 : return 178914;
+          case 175 : return 182815;
+          case 200 : return 176511;
+          case 300 : return 158717;
+          case 400 : return 168758;
+          case 500 : return 180559;
+          case 600 : return 164160;
+          case 700 : return 170267;
+          case 750 : return 167531;
+          case 800 : return 152929;
+          case 850 : return 158682;
+          case 900 : return 161253;
+          case 950 : return 173678;
+          case 975 : return 197990;
+          case 990 : return 159522;
       }
+    }
       if (a==1050) {
         switch (b) {
-          case 127 : return 207452;
-          case 150 : return 167187;
-          case 175 : return 176282;
-          case 200 : return 186359;
-          case 300 : return 192425;
-          case 400 : return 156190;
-          case 500 : return 185768;
-          case 600 : return 164483;
-          case 700 : return 175542;
-          case 750 : return 168811;
-          case 800 : return 179631;
-          case 850 : return 177295;
-          case 900 : return 158648;
-          case 950 : return 166174;
-          case 1000 : return 177439;
-          case 1025 : return 172442;
-          case 1040 : return 145876;
-        }
+          case 127 : return 207497;
+          case 150 : return 167073;
+          case 175 : return 176313;
+          case 200 : return 186381;
+          case 300 : return 192459;
+          case 400 : return 156168;
+          case 500 : return 185775;
+          case 600 : return 164469;
+          case 700 : return 175561;
+          case 750 : return 168828;
+          case 800 : return 179650;
+          case 850 : return 177252;
+          case 900 : return 158615;
+          case 950 : return 166183;
+          case 1000 : return 177454;
+          case 1025 : return 172489;
+          case 1040 : return 145837;
       }
+    }
       if (a==1100) {
         switch (b) {
-          case 127 : return 154406;
-          case 150 : return 154058;
-          case 175 : return 170034;
-          case 200 : return 154587;
-          case 300 : return 138339;
-          case 400 : return 164451;
-          case 500 : return 160345;
-          case 600 : return 156698;
-          case 700 : return 152775;
-          case 800 : return 161448;
-          case 850 : return 154978;
-          case 900 : return 144743;
-          case 950 : return 148565;
-          case 1000 : return 155731;
-          case 1050 : return 150465;
+          case 127 : return 154405;
+          case 150 : return 154018;
+          case 175 : return 170068;
+          case 200 : return 154564;
+          case 300 : return 138350;
+          case 400 : return 164459;
+          case 500 : return 160330;
+          case 600 : return 156700;
+          case 700 : return 152783;
+          case 800 : return 161462;
+          case 850 : return 154983;
+          case 900 : return 144756;
+          case 950 : return 148518;
+          case 1000 : return 155754;
+          case 1050 : return 150445;
           case 1075 : return 130199;
-          case 1090 : return 140209;
-        }
+          case 1090 : return 140237;
       }
+    }
       if (a==1150) {
         switch (b) {
-          case 127 : return 115797;
-          case 150 : return 113855;
-          case 175 : return 104672;
+          case 127 : return 115822;
+          case 150 : return 113825;
+          case 175 : return 104662;
           case 200 : return 100530;
-          case 300 : return 103299;
-          case 400 : return 118373;
+          case 300 : return 103311;
+          case 400 : return 118384;
           case 500 : return 113295;
-          case 600 : return 86596;
-          case 700 : return 100612;
-          case 800 : return 100098;
-          case 850 : return 103359;
-          case 900 : return 105439;
-          case 950 : return 117498;
-          case 1000 : return 92623;
-          case 1050 : return 105601;
-          case 1100 : return 96105;
-          case 1125 : return 100715;
-          case 1140 : return 102997;
-        }
+          case 600 : return 86613;
+          case 700 : return 100597;
+          case 800 : return 100103;
+          case 850 : return 103348;
+          case 900 : return 105432;
+          case 950 : return 117505;
+          case 1000 : return 92609;
+          case 1050 : return 105570;
+          case 1100 : return 96118;
+          case 1125 : return 100745;
+          case 1140 : return 102995;
       }
+    }
       if (a==1200) {
         switch (b) {
           case 127 : return 82026;
-          case 150 : return 85702;
-          case 175 : return 63571;
-          case 200 : return 71699;
-          case 300 : return 73130;
-          case 400 : return 88637;
-          case 500 : return 81779;
-          case 600 : return 70976;
-          case 700 : return 71394;
-          case 800 : return 75722;
-          case 900 : return 74116;
-          case 950 : return 72008;
-          case 1000 : return 89485;
-          case 1050 : return 64759;
-          case 1100 : return 74704;
-          case 1150 : return 71612;
-          case 1175 : return 74033;
-          case 1190 : return 85876;
-        }
+          case 150 : return 85677;
+          case 175 : return 63594;
+          case 200 : return 71674;
+          case 300 : return 73150;
+          case 400 : return 88654;
+          case 500 : return 81767;
+          case 600 : return 70983;
+          case 700 : return 71377;
+          case 800 : return 75720;
+          case 900 : return 74120;
+          case 950 : return 72024;
+          case 1000 : return 89443;
+          case 1050 : return 64793;
+          case 1100 : return 74694;
+          case 1150 : return 71644;
+          case 1175 : return 74004;
+          case 1190 : return 85885;
       }
+    }
       if (a==1250) {
         switch (b) {
           case 127 : return 60786;
-          case 150 : return 68000;
-          case 175 : return 50156;
-          case 200 : return 50953;
+          case 150 : return 67988;
+          case 175 : return 50145;
+          case 200 : return 50982;
           case 300 : return 69940;
-          case 400 : return 54630;
-          case 500 : return 59305;
-          case 600 : return 58362;
-          case 700 : return 51958;
-          case 800 : return 57169;
-          case 900 : return 65619;
-          case 950 : return 47967;
-          case 1000 : return 59913;
-          case 1050 : return 58315;
-          case 1100 : return 44931;
-          case 1150 : return 48450;
-          case 1200 : return 55570;
-          case 1225 : return 55593;
-          case 1240 : return 61968;
-        }
+          case 400 : return 54620;
+          case 500 : return 59316;
+          case 600 : return 58350;
+          case 700 : return 51972;
+          case 800 : return 57161;
+          case 900 : return 65582;
+          case 950 : return 48003;
+          case 1000 : return 59925;
+          case 1050 : return 58291;
+          case 1100 : return 44901;
+          case 1150 : return 48477;
+          case 1200 : return 55576;
+          case 1225 : return 55583;
+          case 1240 : return 61987;
       }
+    }
       if (a==1300) {
         switch (b) {
-          case 127 : return 36147;
-          case 150 : return 52486;
-          case 175 : return 45789;
-          case 200 : return 38645;
-          case 300 : return 47849;
-          case 400 : return 49137;
-          case 500 : return 43129;
-          case 600 : return 56152;
-          case 700 : return 46746;
-          case 800 : return 46794;
-          case 900 : return 46744;
-          case 1000 : return 49498;
-          case 1050 : return 47769;
-          case 1100 : return 49673;
-          case 1150 : return 52322;
-          case 1200 : return 49802;
-          case 1250 : return 41258;
-          case 1275 : return 57050;
-          case 1290 : return 43011;
-        }
+          case 127 : return 36150;
+          case 150 : return 52478;
+          case 175 : return 45813;
+          case 200 : return 38633;
+          case 300 : return 47847;
+          case 400 : return 49132;
+          case 500 : return 43120;
+          case 600 : return 56158;
+          case 700 : return 46750;
+          case 800 : return 46801;
+          case 900 : return 46745;
+          case 1000 : return 49468;
+          case 1050 : return 47762;
+          case 1100 : return 49674;
+          case 1150 : return 52332;
+          case 1200 : return 49833;
+          case 1250 : return 41274;
+          case 1275 : return 56976;
+          case 1290 : return 43055;
       }
+    }
       if (a==1350) {
         switch (b) {
-          case 127 : return 40678;
-          case 150 : return 51738;
-          case 175 : return 45535;
-          case 200 : return 49205;
-          case 300 : return 51914;
-          case 400 : return 52103;
-          case 500 : return 40892;
-          case 600 : return 46557;
-          case 700 : return 45996;
-          case 800 : return 47058;
-          case 900 : return 53783;
-          case 1000 : return 45430;
-          case 1050 : return 48256;
-          case 1100 : return 35326;
-          case 1150 : return 41935;
-          case 1200 : return 44544;
-          case 1250 : return 40674;
-          case 1300 : return 41094;
-          case 1325 : return 38162;
-          case 1340 : return 61756;
-        }
+          case 127 : return 40639;
+          case 150 : return 51747;
+          case 175 : return 45544;
+          case 200 : return 49232;
+          case 300 : return 51919;
+          case 400 : return 52078;
+          case 500 : return 40883;
+          case 600 : return 46560;
+          case 700 : return 46007;
+          case 800 : return 47064;
+          case 900 : return 53785;
+          case 1000 : return 45423;
+          case 1050 : return 48292;
+          case 1100 : return 35313;
+          case 1150 : return 41923;
+          case 1200 : return 44509;
+          case 1250 : return 40681;
+          case 1300 : return 41098;
+          case 1325 : return 38158;
+          case 1340 : return 61781;
       }
+    }
       if (a==1400) {
         switch (b) {
-          case 127 : return 45806;
-          case 150 : return 40302;
-          case 175 : return 50547;
-          case 200 : return 61907;
-          case 300 : return 51664;
-          case 400 : return 43845;
-          case 500 : return 53559;
-          case 600 : return 41192;
-          case 700 : return 55116;
-          case 800 : return 36278;
-          case 900 : return 49462;
-          case 1000 : return 50240;
-          case 1100 : return 46665;
-          case 1150 : return 40245;
-          case 1200 : return 48691;
-          case 1250 : return 36121;
-          case 1300 : return 38422;
-          case 1350 : return 37540;
-          case 1375 : return 33886;
-          case 1390 : return 44707;
-        }
+          case 127 : return 45807;
+          case 150 : return 40287;
+          case 175 : return 50561;
+          case 200 : return 61905;
+          case 300 : return 51657;
+          case 400 : return 43849;
+          case 500 : return 53567;
+          case 600 : return 41195;
+          case 700 : return 55103;
+          case 800 : return 36308;
+          case 900 : return 49444;
+          case 1000 : return 50241;
+          case 1100 : return 46671;
+          case 1150 : return 40221;
+          case 1200 : return 48696;
+          case 1250 : return 36116;
+          case 1300 : return 38445;
+          case 1350 : return 37535;
+          case 1375 : return 33900;
+          case 1390 : return 44687;
       }
+    }
       if (a==1450) {
         switch (b) {
-          case 127 : return 46258;
-          case 150 : return 47127;
-          case 175 : return 43690;
-          case 200 : return 31074;
-          case 300 : return 37935;
-          case 400 : return 40590;
-          case 500 : return 40645;
-          case 600 : return 44524;
-          case 700 : return 40859;
-          case 800 : return 57664;
-          case 900 : return 46507;
-          case 1000 : return 47960;
-          case 1100 : return 39747;
-          case 1150 : return 35874;
-          case 1200 : return 35811;
-          case 1250 : return 44607;
-          case 1300 : return 36933;
-          case 1350 : return 38820;
-          case 1400 : return 36009;
-          case 1425 : return 41661;
-          case 1440 : return 48270;
-        }
+          case 127 : return 46261;
+          case 150 : return 47138;
+          case 175 : return 43680;
+          case 200 : return 31078;
+          case 300 : return 37928;
+          case 400 : return 40585;
+          case 500 : return 40651;
+          case 600 : return 44522;
+          case 700 : return 40864;
+          case 800 : return 57662;
+          case 900 : return 46497;
+          case 1000 : return 47963;
+          case 1100 : return 39731;
+          case 1150 : return 35886;
+          case 1200 : return 35821;
+          case 1250 : return 44593;
+          case 1300 : return 36954;
+          case 1350 : return 38802;
+          case 1400 : return 36006;
+          case 1425 : return 41671;
+          case 1440 : return 48272;
       }
+    }
       if (a==1500) {
         switch (b) {
-          case 127 : return 52364;
-          case 150 : return 41128;
-          case 175 : return 48625;
-          case 200 : return 41319;
-          case 300 : return 38369;
-          case 400 : return 46090;
-          case 500 : return 45054;
-          case 600 : return 58168;
-          case 700 : return 50801;
-          case 800 : return 52771;
-          case 900 : return 43914;
-          case 1000 : return 39184;
-          case 1100 : return 38172;
-          case 1200 : return 43027;
-          case 1250 : return 41227;
-          case 1300 : return 41258;
-          case 1350 : return 30582;
-          case 1400 : return 41954;
-          case 1450 : return 48952;
-          case 1475 : return 41062;
-          case 1490 : return 35059;
-        }
+          case 127 : return 52381;
+          case 150 : return 41133;
+          case 175 : return 48617;
+          case 200 : return 41323;
+          case 300 : return 38352;
+          case 400 : return 46091;
+          case 500 : return 45060;
+          case 600 : return 58160;
+          case 700 : return 50797;
+          case 800 : return 52768;
+          case 900 : return 43927;
+          case 1000 : return 39166;
+          case 1100 : return 38182;
+          case 1200 : return 43031;
+          case 1250 : return 41226;
+          case 1300 : return 41267;
+          case 1350 : return 30587;
+          case 1400 : return 41951;
+          case 1450 : return 48956;
+          case 1475 : return 41064;
+          case 1490 : return 35041;
       }
+    }
       if (a==1550) {
         switch (b) {
-          case 127 : return 51054;
-          case 150 : return 42372;
-          case 175 : return 41258;
+          case 127 : return 51036;
+          case 150 : return 42377;
+          case 175 : return 41278;
           case 200 : return 46290;
-          case 300 : return 44571;
-          case 400 : return 44305;
+          case 300 : return 44564;
+          case 400 : return 44291;
           case 500 : return 36725;
-          case 600 : return 48312;
-          case 700 : return 44339;
-          case 800 : return 47244;
-          case 900 : return 43354;
-          case 1000 : return 41378;
-          case 1100 : return 43706;
-          case 1200 : return 38734;
-          case 1250 : return 43492;
-          case 1300 : return 39546;
-          case 1350 : return 46349;
-          case 1400 : return 47503;
-          case 1450 : return 30682;
-          case 1500 : return 38758;
-          case 1525 : return 49306;
-          case 1540 : return 38446;
-        }
+          case 600 : return 48325;
+          case 700 : return 44338;
+          case 800 : return 47254;
+          case 900 : return 43361;
+          case 1000 : return 41377;
+          case 1100 : return 43684;
+          case 1200 : return 38724;
+          case 1250 : return 43503;
+          case 1300 : return 39548;
+          case 1350 : return 46352;
+          case 1400 : return 47514;
+          case 1450 : return 30672;
+          case 1500 : return 38757;
+          case 1525 : return 49297;
+          case 1540 : return 38457;
       }
+    }
       if (a==1600) {
         switch (b) {
-          case 127 : return 45846;
-          case 150 : return 44814;
-          case 175 : return 45053;
-          case 200 : return 39924;
-          case 300 : return 41795;
-          case 400 : return 52697;
-          case 500 : return 39814;
-          case 600 : return 43044;
-          case 700 : return 47997;
-          case 800 : return 34216;
-          case 900 : return 43085;
-          case 1000 : return 46801;
-          case 1100 : return 43581;
-          case 1200 : return 43851;
-          case 1300 : return 37857;
-          case 1350 : return 43843;
-          case 1400 : return 37296;
-          case 1450 : return 43898;
-          case 1500 : return 38322;
-          case 1550 : return 42055;
-          case 1575 : return 34386;
-          case 1590 : return 41868;
-        }
+          case 127 : return 45853;
+          case 150 : return 44794;
+          case 175 : return 45073;
+          case 200 : return 39907;
+          case 300 : return 41806;
+          case 400 : return 52692;
+          case 500 : return 39833;
+          case 600 : return 43035;
+          case 700 : return 47981;
+          case 800 : return 34199;
+          case 900 : return 43096;
+          case 1000 : return 46802;
+          case 1100 : return 43594;
+          case 1200 : return 43843;
+          case 1300 : return 37854;
+          case 1350 : return 43859;
+          case 1400 : return 37275;
+          case 1450 : return 43925;
+          case 1500 : return 38318;
+          case 1550 : return 42041;
+          case 1575 : return 34372;
+          case 1590 : return 41891;
       }
+    }
       if (a==1650) {
         switch (b) {
-          case 127 : return 43146;
-          case 150 : return 42420;
-          case 175 : return 55450;
-          case 200 : return 39527;
-          case 300 : return 51335;
-          case 400 : return 50418;
-          case 500 : return 52263;
-          case 600 : return 37397;
-          case 700 : return 52059;
-          case 800 : return 44237;
-          case 900 : return 44234;
-          case 1000 : return 41430;
-          case 1100 : return 57290;
-          case 1200 : return 45095;
-          case 1300 : return 50940;
-          case 1350 : return 40312;
-          case 1400 : return 37589;
-          case 1450 : return 37097;
-          case 1500 : return 37641;
-          case 1550 : return 35834;
-          case 1600 : return 37508;
-          case 1625 : return 33626;
-          case 1640 : return 48218;
-        }
+          case 127 : return 43161;
+          case 150 : return 42408;
+          case 175 : return 55437;
+          case 200 : return 39547;
+          case 300 : return 51330;
+          case 400 : return 50408;
+          case 500 : return 52289;
+          case 600 : return 37380;
+          case 700 : return 52065;
+          case 800 : return 44227;
+          case 900 : return 44256;
+          case 1000 : return 41418;
+          case 1100 : return 57279;
+          case 1200 : return 45100;
+          case 1300 : return 50941;
+          case 1350 : return 40307;
+          case 1400 : return 37602;
+          case 1450 : return 37103;
+          case 1500 : return 37627;
+          case 1550 : return 35822;
+          case 1600 : return 37512;
+          case 1625 : return 33646;
+          case 1640 : return 48201;
       }
+    }
       if (a==1700) {
         switch (b) {
-          case 127 : return 43710;
-          case 150 : return 41200;
-          case 175 : return 51942;
-          case 200 : return 46090;
-          case 300 : return 49632;
-          case 400 : return 34070;
-          case 500 : return 49016;
-          case 600 : return 42169;
-          case 700 : return 51900;
-          case 800 : return 41842;
-          case 900 : return 57021;
-          case 1000 : return 60977;
-          case 1100 : return 44654;
-          case 1200 : return 41201;
-          case 1300 : return 39879;
-          case 1400 : return 38156;
-          case 1450 : return 43035;
-          case 1500 : return 41948;
-          case 1550 : return 45142;
-          case 1600 : return 45198;
+          case 127 : return 43703;
+          case 150 : return 41206;
+          case 175 : return 51938;
+          case 200 : return 46077;
+          case 300 : return 49639;
+          case 400 : return 34088;
+          case 500 : return 49025;
+          case 600 : return 42163;
+          case 700 : return 51905;
+          case 800 : return 41828;
+          case 900 : return 57026;
+          case 1000 : return 60972;
+          case 1100 : return 44659;
+          case 1200 : return 41203;
+          case 1300 : return 39870;
+          case 1400 : return 38137;
+          case 1450 : return 43056;
+          case 1500 : return 41941;
+          case 1550 : return 45154;
+          case 1600 : return 45192;
           case 1650 : return 43101;
-          case 1675 : return 40164;
-          case 1690 : return 47762;
-        }
+          case 1675 : return 40170;
+          case 1690 : return 47756;
       }
+    }
       if (a==1750) {
         switch (b) {
-          case 127 : return 32410;
-          case 150 : return 39646;
-          case 175 : return 61708;
-          case 200 : return 45561;
-          case 300 : return 44761;
-          case 400 : return 47548;
-          case 500 : return 53638;
-          case 600 : return 37631;
-          case 700 : return 43657;
-          case 800 : return 47568;
-          case 900 : return 41493;
-          case 1000 : return 38619;
-          case 1100 : return 51564;
-          case 1200 : return 38590;
-          case 1300 : return 41169;
-          case 1400 : return 33639;
-          case 1450 : return 42578;
-          case 1500 : return 40584;
-          case 1550 : return 30432;
-          case 1600 : return 44314;
-          case 1650 : return 36611;
-          case 1700 : return 37770;
-          case 1725 : return 59843;
-          case 1740 : return 44905;
-        }
+          case 127 : return 32422;
+          case 150 : return 39609;
+          case 175 : return 61728;
+          case 200 : return 45579;
+          case 300 : return 44749;
+          case 400 : return 47569;
+          case 500 : return 53622;
+          case 600 : return 37632;
+          case 700 : return 43648;
+          case 800 : return 47571;
+          case 900 : return 41492;
+          case 1000 : return 38610;
+          case 1100 : return 51571;
+          case 1200 : return 38587;
+          case 1300 : return 41185;
+          case 1400 : return 33615;
+          case 1450 : return 42583;
+          case 1500 : return 40591;
+          case 1550 : return 30431;
+          case 1600 : return 44307;
+          case 1650 : return 36602;
+          case 1700 : return 37771;
+          case 1725 : return 59878;
+          case 1740 : return 44887;
       }
+    }
       if (a==1800) {
         switch (b) {
-          case 127 : return 36112;
-          case 150 : return 43044;
-          case 175 : return 37114;
-          case 200 : return 40987;
+          case 127 : return 36131;
+          case 150 : return 43027;
+          case 175 : return 37100;
+          case 200 : return 41008;
           case 300 : return 42982;
-          case 400 : return 41159;
-          case 500 : return 40099;
-          case 600 : return 39192;
-          case 700 : return 42940;
-          case 800 : return 39139;
-          case 900 : return 47338;
-          case 1000 : return 36769;
-          case 1100 : return 45312;
-          case 1200 : return 37690;
-          case 1300 : return 27566;
-          case 1400 : return 30616;
-          case 1500 : return 37033;
-          case 1550 : return 53438;
-          case 1600 : return 34969;
-          case 1650 : return 36968;
-          case 1700 : return 43140;
-          case 1750 : return 49244;
-          case 1775 : return 29744;
-          case 1790 : return 45099;
-        }
+          case 400 : return 41132;
+          case 500 : return 40109;
+          case 600 : return 39195;
+          case 700 : return 42944;
+          case 800 : return 39142;
+          case 900 : return 47334;
+          case 1000 : return 36771;
+          case 1100 : return 45319;
+          case 1200 : return 37686;
+          case 1300 : return 27560;
+          case 1400 : return 30615;
+          case 1500 : return 37047;
+          case 1550 : return 53449;
+          case 1600 : return 34946;
+          case 1650 : return 36980;
+          case 1700 : return 43116;
+          case 1750 : return 49258;
+          case 1775 : return 29731;
+          case 1790 : return 45112;
       }
+    }
       if (a==1850) {
         switch (b) {
-          case 127 : return 47453;
-          case 150 : return 30147;
-          case 175 : return 37261;
-          case 200 : return 50193;
-          case 300 : return 39482;
-          case 400 : return 40613;
-          case 500 : return 45794;
-          case 600 : return 53811;
-          case 700 : return 33203;
-          case 800 : return 45200;
-          case 900 : return 37398;
-          case 1000 : return 37555;
-          case 1100 : return 41623;
-          case 1200 : return 49643;
-          case 1300 : return 42675;
+          case 127 : return 47480;
+          case 150 : return 30141;
+          case 175 : return 37241;
+          case 200 : return 50187;
+          case 300 : return 39483;
+          case 400 : return 40608;
+          case 500 : return 45809;
+          case 600 : return 53812;
+          case 700 : return 33197;
+          case 800 : return 45185;
+          case 900 : return 37410;
+          case 1000 : return 37554;
+          case 1100 : return 41614;
+          case 1200 : return 49658;
+          case 1300 : return 42677;
           case 1400 : return 40417;
-          case 1500 : return 47945;
-          case 1550 : return 37624;
-          case 1600 : return 44584;
-          case 1650 : return 35264;
-          case 1700 : return 49090;
-          case 1750 : return 29025;
-          case 1800 : return 30333;
-          case 1825 : return 36258;
-          case 1840 : return 36297;
-        }
+          case 1500 : return 47924;
+          case 1550 : return 37618;
+          case 1600 : return 44614;
+          case 1650 : return 35259;
+          case 1700 : return 49101;
+          case 1750 : return 29038;
+          case 1800 : return 30294;
+          case 1825 : return 36272;
+          case 1840 : return 36295;
       }
+    }
       if (a==1900) {
         switch (b) {
-          case 127 : return 42267;
-          case 150 : return 47600;
-          case 175 : return 46375;
-          case 200 : return 49814;
-          case 300 : return 36874;
-          case 400 : return 43086;
-          case 500 : return 40979;
-          case 600 : return 47389;
-          case 700 : return 41260;
-          case 800 : return 44586;
-          case 900 : return 46220;
-          case 1000 : return 54925;
+          case 127 : return 42280;
+          case 150 : return 47586;
+          case 175 : return 46392;
+          case 200 : return 49786;
+          case 300 : return 36885;
+          case 400 : return 43069;
+          case 500 : return 40986;
+          case 600 : return 47403;
+          case 700 : return 41268;
+          case 800 : return 44578;
+          case 900 : return 46218;
+          case 1000 : return 54928;
           case 1100 : return 46504;
-          case 1200 : return 39930;
+          case 1200 : return 39940;
           case 1300 : return 55062;
-          case 1400 : return 39122;
-          case 1500 : return 37082;
-          case 1600 : return 27555;
-          case 1650 : return 38978;
-          case 1700 : return 46553;
-          case 1750 : return 35013;
-          case 1800 : return 41375;
-          case 1850 : return 41318;
-          case 1875 : return 40444;
-          case 1890 : return 44411;
-        }
+          case 1400 : return 39119;
+          case 1500 : return 37069;
+          case 1600 : return 27544;
+          case 1650 : return 38994;
+          case 1700 : return 46551;
+          case 1750 : return 35018;
+          case 1800 : return 41362;
+          case 1850 : return 41299;
+          case 1875 : return 40478;
+          case 1890 : return 44403;
       }
+    }
       if (a==1950) {
         switch (b) {
-          case 127 : return 52527;
-          case 150 : return 48098;
-          case 175 : return 44841;
-          case 200 : return 53435;
-          case 300 : return 45051;
-          case 400 : return 40362;
-          case 500 : return 40649;
+          case 127 : return 52525;
+          case 150 : return 48112;
+          case 175 : return 44855;
+          case 200 : return 53421;
+          case 300 : return 45049;
+          case 400 : return 40371;
+          case 500 : return 40631;
           case 600 : return 38427;
-          case 700 : return 30946;
-          case 800 : return 52293;
-          case 900 : return 41525;
-          case 1000 : return 40550;
-          case 1100 : return 36496;
-          case 1200 : return 34448;
-          case 1300 : return 38061;
-          case 1400 : return 40521;
-          case 1500 : return 48137;
-          case 1600 : return 47115;
-          case 1650 : return 33005;
-          case 1700 : return 39413;
-          case 1750 : return 43563;
-          case 1800 : return 33235;
-          case 1850 : return 37375;
-          case 1900 : return 42820;
-          case 1925 : return 42860;
-          case 1940 : return 32958;
-        }
+          case 700 : return 30951;
+          case 800 : return 52289;
+          case 900 : return 41528;
+          case 1000 : return 40548;
+          case 1100 : return 36501;
+          case 1200 : return 34450;
+          case 1300 : return 38057;
+          case 1400 : return 40529;
+          case 1500 : return 48129;
+          case 1600 : return 47106;
+          case 1650 : return 33009;
+          case 1700 : return 39415;
+          case 1750 : return 43566;
+          case 1800 : return 33228;
+          case 1850 : return 37378;
+          case 1900 : return 42822;
+          case 1925 : return 42858;
+          case 1940 : return 32956;
       }
+    }
       if (a==2000) {
         switch (b) {
-          case 127 : return 21589;
-          case 150 : return 25894;
-          case 175 : return 20675;
-          case 200 : return 18503;
-          case 300 : return 21723;
-          case 400 : return 23699;
-          case 500 : return 18403;
-          case 600 : return 29268;
-          case 700 : return 11907;
-          case 800 : return 22719;
-          case 900 : return 18318;
-          case 1000 : return 31335;
-          case 1100 : return 19497;
-          case 1200 : return 24038;
-          case 1300 : return 23807;
-          case 1400 : return 16227;
-          case 1500 : return 20471;
-          case 1600 : return 16192;
-          case 1700 : return 14032;
-          case 1750 : return 15125;
-          case 1800 : return 21766;
-          case 1850 : return 18363;
-          case 1900 : return 20988;
-          case 1950 : return 14171;
-          case 1975 : return 19585;
-          case 1990 : return 14116;
-        }
+          case 127 : return 21594;
+          case 150 : return 25902;
+          case 175 : return 20684;
+          case 200 : return 18487;
+          case 300 : return 21712;
+          case 400 : return 23715;
+          case 500 : return 18397;
+          case 600 : return 29269;
+          case 700 : return 11894;
+          case 800 : return 22728;
+          case 900 : return 18302;
+          case 1000 : return 31348;
+          case 1100 : return 19496;
+          case 1200 : return 24044;
+          case 1300 : return 23797;
+          case 1400 : return 16234;
+          case 1500 : return 20466;
+          case 1600 : return 16208;
+          case 1700 : return 14017;
+          case 1750 : return 15129;
+          case 1800 : return 21757;
+          case 1850 : return 18376;
+          case 1900 : return 20982;
+          case 1950 : return 14149;
+          case 1975 : return 19611;
+          case 1990 : return 14113;
       }
+    }
       if (a==2050) {
         switch (b) {
-          case 127 : return 19752;
+          case 127 : return 19754;
           case 150 : return 20904;
-          case 175 : return 23173;
-          case 200 : return 25297;
-          case 300 : return 24221;
-          case 400 : return 21874;
-          case 500 : return 27532;
-          case 600 : return 17583;
-          case 700 : return 19814;
-          case 800 : return 31811;
-          case 900 : return 17578;
-          case 1000 : return 31895;
-          case 1100 : return 21925;
+          case 175 : return 23163;
+          case 200 : return 25311;
+          case 300 : return 24223;
+          case 400 : return 21867;
+          case 500 : return 27525;
+          case 600 : return 17586;
+          case 700 : return 19806;
+          case 800 : return 31814;
+          case 900 : return 17576;
+          case 1000 : return 31900;
+          case 1100 : return 21923;
           case 1200 : return 18890;
-          case 1300 : return 20984;
-          case 1400 : return 24281;
-          case 1500 : return 17583;
-          case 1600 : return 23066;
-          case 1700 : return 24210;
-          case 1750 : return 15308;
-          case 1800 : return 15305;
+          case 1300 : return 20992;
+          case 1400 : return 24274;
+          case 1500 : return 17574;
+          case 1600 : return 23075;
+          case 1700 : return 24207;
+          case 1750 : return 15304;
+          case 1800 : return 15304;
           case 1850 : return 23029;
-          case 1900 : return 15377;
-          case 1950 : return 23034;
-          case 2000 : return 18811;
-          case 2025 : return 22134;
-          case 2040 : return 28090;
-        }
+          case 1900 : return 15375;
+          case 1950 : return 23032;
+          case 2000 : return 18835;
+          case 2025 : return 22118;
+          case 2040 : return 28100;
       }
+    }
       if (a==2100) {
         switch (b) {
-          case 127 : return 23339;
+          case 127 : return 23328;
           case 150 : return 18789;
-          case 175 : return 19930;
-          case 200 : return 18989;
-          case 300 : return 24687;
-          case 400 : return 19119;
-          case 500 : return 21244;
-          case 600 : return 23303;
-          case 700 : return 22523;
-          case 800 : return 25644;
-          case 900 : return 18836;
-          case 1000 : return 26685;
-          case 1100 : return 17834;
-          case 1200 : return 19051;
-          case 1300 : return 25663;
-          case 1400 : return 30249;
-          case 1500 : return 24576;
-          case 1600 : return 27819;
-          case 1700 : return 13173;
-          case 1800 : return 21160;
-          case 1850 : return 17666;
-          case 1900 : return 11214;
-          case 1950 : return 14596;
-          case 2000 : return 23280;
-          case 2050 : return 12328;
-          case 2075 : return 21377;
-          case 2090 : return 16626;
-        }
+          case 175 : return 19944;
+          case 200 : return 18986;
+          case 300 : return 24707;
+          case 400 : return 19113;
+          case 500 : return 21229;
+          case 600 : return 23287;
+          case 700 : return 22508;
+          case 800 : return 25667;
+          case 900 : return 18832;
+          case 1000 : return 26706;
+          case 1100 : return 17820;
+          case 1200 : return 19047;
+          case 1300 : return 25670;
+          case 1400 : return 30257;
+          case 1500 : return 24564;
+          case 1600 : return 27822;
+          case 1700 : return 13174;
+          case 1800 : return 21163;
+          case 1850 : return 17655;
+          case 1900 : return 11221;
+          case 1950 : return 14599;
+          case 2000 : return 23276;
+          case 2050 : return 12327;
+          case 2075 : return 21365;
+          case 2090 : return 16644;
       }
+    }
       if (a==2150) {
         switch (b) {
-          case 127 : return 12470;
-          case 150 : return 24688;
-          case 175 : return 24745;
-          case 200 : return 16987;
-          case 300 : return 21338;
-          case 400 : return 18093;
-          case 500 : return 14610;
-          case 600 : return 25935;
-          case 700 : return 19264;
-          case 800 : return 22572;
+          case 127 : return 12480;
+          case 150 : return 24675;
+          case 175 : return 24740;
+          case 200 : return 16992;
+          case 300 : return 21340;
+          case 400 : return 18082;
+          case 500 : return 14619;
+          case 600 : return 25936;
+          case 700 : return 19263;
+          case 800 : return 22568;
           case 900 : return 14748;
-          case 1000 : return 21478;
-          case 1100 : return 19305;
-          case 1200 : return 20500;
-          case 1300 : return 21318;
-          case 1400 : return 14592;
-          case 1500 : return 19178;
-          case 1600 : return 19300;
-          case 1700 : return 19171;
-          case 1800 : return 27324;
-          case 1850 : return 19137;
-          case 1900 : return 18122;
-          case 1950 : return 21470;
-          case 2000 : return 22588;
-          case 2050 : return 15798;
-          case 2100 : return 15980;
-          case 2125 : return 22595;
-          case 2140 : return 13478;
-        }
+          case 1000 : return 21490;
+          case 1100 : return 19309;
+          case 1200 : return 20490;
+          case 1300 : return 21316;
+          case 1400 : return 14597;
+          case 1500 : return 19179;
+          case 1600 : return 19295;
+          case 1700 : return 19172;
+          case 1800 : return 27323;
+          case 1850 : return 19129;
+          case 1900 : return 18142;
+          case 1950 : return 21465;
+          case 2000 : return 22595;
+          case 2050 : return 15780;
+          case 2100 : return 15996;
+          case 2125 : return 22594;
+          case 2140 : return 13469;
       }
+    }
       if (a==2200) {
         switch (b) {
-          case 127 : return 29692;
-          case 150 : return 25086;
-          case 175 : return 28723;
-          case 200 : return 27421;
-          case 300 : return 22938;
-          case 400 : return 16034;
-          case 500 : return 25238;
-          case 600 : return 14926;
-          case 700 : return 19444;
-          case 800 : return 15927;
-          case 900 : return 27478;
-          case 1000 : return 26228;
-          case 1100 : return 20601;
-          case 1200 : return 27830;
-          case 1300 : return 21734;
-          case 1400 : return 18326;
-          case 1500 : return 12726;
-          case 1600 : return 19652;
-          case 1700 : return 12595;
-          case 1800 : return 11451;
-          case 1900 : return 17238;
-          case 1950 : return 21984;
-          case 2000 : return 27416;
-          case 2050 : return 10509;
-          case 2100 : return 16169;
-          case 2150 : return 20828;
-          case 2175 : return 12568;
-          case 2190 : return 12448;
-        }
+          case 127 : return 29681;
+          case 150 : return 25089;
+          case 175 : return 28738;
+          case 200 : return 27398;
+          case 300 : return 22950;
+          case 400 : return 16032;
+          case 500 : return 25254;
+          case 600 : return 14916;
+          case 700 : return 19448;
+          case 800 : return 15924;
+          case 900 : return 27480;
+          case 1000 : return 26226;
+          case 1100 : return 20591;
+          case 1200 : return 27836;
+          case 1300 : return 21745;
+          case 1400 : return 18322;
+          case 1500 : return 12724;
+          case 1600 : return 19654;
+          case 1700 : return 12596;
+          case 1800 : return 11444;
+          case 1900 : return 17226;
+          case 1950 : return 21999;
+          case 2000 : return 27410;
+          case 2050 : return 10513;
+          case 2100 : return 16168;
+          case 2150 : return 20819;
+          case 2175 : return 12570;
+          case 2190 : return 12457;
       }
+    }
       if (a==2250) {
         switch (b) {
-          case 127 : return 13880;
-          case 150 : return 23170;
-          case 175 : return 16398;
-          case 200 : return 23202;
-          case 300 : return 14065;
-          case 400 : return 23199;
-          case 500 : return 22076;
-          case 600 : return 20823;
-          case 700 : return 26965;
+          case 127 : return 13890;
+          case 150 : return 23172;
+          case 175 : return 16396;
+          case 200 : return 23192;
+          case 300 : return 14066;
+          case 400 : return 23202;
+          case 500 : return 22074;
+          case 600 : return 20821;
+          case 700 : return 26962;
           case 800 : return 24385;
-          case 900 : return 16236;
-          case 1000 : return 31403;
-          case 1100 : return 18606;
-          case 1200 : return 21974;
-          case 1300 : return 14929;
-          case 1400 : return 24275;
-          case 1500 : return 26786;
-          case 1600 : return 15078;
-          case 1700 : return 25740;
-          case 1800 : return 22243;
-          case 1900 : return 25482;
-          case 1950 : return 18524;
-          case 2000 : return 24466;
-          case 2050 : return 20808;
-          case 2100 : return 16367;
-          case 2150 : return 17365;
-          case 2200 : return 16146;
-          case 2225 : return 15183;
-          case 2240 : return 11541;
-        }
+          case 900 : return 16230;
+          case 1000 : return 31415;
+          case 1100 : return 18598;
+          case 1200 : return 21980;
+          case 1300 : return 14921;
+          case 1400 : return 24281;
+          case 1500 : return 26792;
+          case 1600 : return 15075;
+          case 1700 : return 25739;
+          case 1800 : return 22261;
+          case 1900 : return 25464;
+          case 1950 : return 18521;
+          case 2000 : return 24459;
+          case 2050 : return 20818;
+          case 2100 : return 16373;
+          case 2150 : return 17357;
+          case 2200 : return 16150;
+          case 2225 : return 15161;
+          case 2240 : return 11560;
       }
+    }
       if (a==2300) {
         switch (b) {
-          case 127 : return 24533;
-          case 150 : return 16573;
+          case 127 : return 24534;
+          case 150 : return 16572;
           case 175 : return 16520;
-          case 200 : return 21024;
-          case 300 : return 21191;
-          case 400 : return 23630;
-          case 500 : return 22247;
-          case 600 : return 12871;
-          case 700 : return 31605;
-          case 800 : return 18881;
-          case 900 : return 22272;
-          case 1000 : return 21164;
-          case 1100 : return 19909;
-          case 1200 : return 22417;
-          case 1300 : return 23649;
-          case 1400 : return 28425;
-          case 1500 : return 17490;
-          case 1600 : return 19969;
-          case 1700 : return 30773;
-          case 1800 : return 24545;
-          case 1900 : return 12922;
-          case 2000 : return 22326;
-          case 2050 : return 15523;
-          case 2100 : return 21294;
-          case 2150 : return 21156;
-          case 2200 : return 25973;
-          case 2250 : return 18880;
-          case 2275 : return 15303;
-          case 2290 : return 20008;
-        }
+          case 200 : return 21026;
+          case 300 : return 21197;
+          case 400 : return 23628;
+          case 500 : return 22248;
+          case 600 : return 12872;
+          case 700 : return 31613;
+          case 800 : return 18862;
+          case 900 : return 22280;
+          case 1000 : return 21152;
+          case 1100 : return 19921;
+          case 1200 : return 22426;
+          case 1300 : return 23652;
+          case 1400 : return 28420;
+          case 1500 : return 17482;
+          case 1600 : return 19972;
+          case 1700 : return 30781;
+          case 1800 : return 24533;
+          case 1900 : return 12924;
+          case 2000 : return 22317;
+          case 2050 : return 15537;
+          case 2100 : return 21296;
+          case 2150 : return 21151;
+          case 2200 : return 25962;
+          case 2250 : return 18893;
+          case 2275 : return 15291;
+          case 2290 : return 20011;
       }
+    }
       if (a==2350) {
         switch (b) {
-          case 127 : return 19055;
-          case 150 : return 25037;
-          case 175 : return 15554;
-          case 200 : return 22501;
-          case 300 : return 26140;
-          case 400 : return 26236;
-          case 500 : return 20278;
-          case 600 : return 20313;
-          case 700 : return 13017;
-          case 800 : return 16623;
-          case 900 : return 14178;
-          case 1000 : return 20214;
-          case 1100 : return 17860;
-          case 1200 : return 16706;
-          case 1300 : return 13163;
-          case 1400 : return 19026;
-          case 1500 : return 15351;
+          case 127 : return 19068;
+          case 150 : return 25034;
+          case 175 : return 15560;
+          case 200 : return 22488;
+          case 300 : return 26133;
+          case 400 : return 26238;
+          case 500 : return 20279;
+          case 600 : return 20305;
+          case 700 : return 13016;
+          case 800 : return 16633;
+          case 900 : return 14175;
+          case 1000 : return 20217;
+          case 1100 : return 17871;
+          case 1200 : return 16698;
+          case 1300 : return 13162;
+          case 1400 : return 19016;
+          case 1500 : return 15354;
           case 1600 : return 17955;
-          case 1700 : return 23822;
-          case 1800 : return 21347;
-          case 1900 : return 10798;
-          case 2000 : return 13095;
-          case 2050 : return 21521;
-          case 2100 : return 19108;
-          case 2150 : return 16646;
-          case 2200 : return 27335;
-          case 2250 : return 15518;
-          case 2300 : return 22503;
-          case 2325 : return 14363;
-          case 2340 : return 24824;
-        }
+          case 1700 : return 23836;
+          case 1800 : return 21342;
+          case 1900 : return 10794;
+          case 2000 : return 13085;
+          case 2050 : return 21525;
+          case 2100 : return 19126;
+          case 2150 : return 16658;
+          case 2200 : return 27314;
+          case 2250 : return 15504;
+          case 2300 : return 22513;
+          case 2325 : return 14345;
+          case 2340 : return 24843;
       }
+    }
       if (a==2400) {
         switch (b) {
-          case 127 : return 14419;
-          case 150 : return 12225;
-          case 175 : return 24119;
+          case 127 : return 14417;
+          case 150 : return 12217;
+          case 175 : return 24114;
           case 200 : return 25268;
-          case 300 : return 19315;
-          case 400 : return 11920;
-          case 500 : return 25408;
-          case 600 : return 22860;
-          case 700 : return 18081;
-          case 800 : return 24066;
-          case 900 : return 15732;
-          case 1000 : return 14553;
-          case 1100 : return 31342;
-          case 1200 : return 14610;
-          case 1300 : return 24242;
-          case 1400 : return 28797;
-          case 1500 : return 17944;
-          case 1600 : return 21899;
-          case 1700 : return 21475;
-          case 1800 : return 26800;
-          case 1900 : return 12008;
-          case 2000 : return 24158;
-          case 2100 : return 23978;
-          case 2150 : return 24053;
-          case 2200 : return 10866;
-          case 2250 : return 14522;
-          case 2300 : return 16919;
-          case 2350 : return 12167;
-          case 2375 : return 20363;
-          case 2390 : return 19487;
-        }
+          case 300 : return 19327;
+          case 400 : return 11924;
+          case 500 : return 25402;
+          case 600 : return 22876;
+          case 700 : return 18068;
+          case 800 : return 24070;
+          case 900 : return 15729;
+          case 1000 : return 14556;
+          case 1100 : return 31343;
+          case 1200 : return 14613;
+          case 1300 : return 24240;
+          case 1400 : return 28809;
+          case 1500 : return 17938;
+          case 1600 : return 21893;
+          case 1700 : return 21474;
+          case 1800 : return 26804;
+          case 1900 : return 12011;
+          case 2000 : return 24157;
+          case 2100 : return 23979;
+          case 2150 : return 24067;
+          case 2200 : return 10856;
+          case 2250 : return 14516;
+          case 2300 : return 16901;
+          case 2350 : return 12177;
+          case 2375 : return 20378;
+          case 2390 : return 19472;
       }
+    }
       if (a==2450) {
         switch (b) {
-          case 127 : return 18327;
-          case 150 : return 24304;
-          case 175 : return 23195;
-          case 200 : return 13511;
-          case 300 : return 18373;
-          case 400 : return 17108;
+          case 127 : return 18321;
+          case 150 : return 24300;
+          case 175 : return 23188;
+          case 200 : return 13535;
+          case 300 : return 18363;
+          case 400 : return 17113;
           case 500 : return 19580;
-          case 600 : return 14541;
-          case 700 : return 9769;
-          case 800 : return 28235;
-          case 900 : return 23266;
-          case 1000 : return 25613;
-          case 1100 : return 14693;
-          case 1200 : return 17170;
-          case 1300 : return 18363;
-          case 1400 : return 19677;
-          case 1500 : return 25800;
-          case 1600 : return 22028;
-          case 1700 : return 15984;
-          case 1800 : return 13413;
-          case 1900 : return 18387;
-          case 2000 : return 9807;
-          case 2100 : return 20772;
-          case 2150 : return 15774;
-          case 2200 : return 20789;
-          case 2250 : return 20780;
-          case 2300 : return 13386;
-          case 2350 : return 24413;
-          case 2400 : return 17007;
-          case 2425 : return 24298;
-          case 2440 : return 14600;
-        }
+          case 600 : return 14547;
+          case 700 : return 9770;
+          case 800 : return 28232;
+          case 900 : return 23258;
+          case 1000 : return 25619;
+          case 1100 : return 14696;
+          case 1200 : return 17162;
+          case 1300 : return 18365;
+          case 1400 : return 19674;
+          case 1500 : return 25803;
+          case 1600 : return 22025;
+          case 1700 : return 15977;
+          case 1800 : return 13421;
+          case 1900 : return 18386;
+          case 2000 : return 9810;
+          case 2100 : return 20774;
+          case 2150 : return 15783;
+          case 2200 : return 20786;
+          case 2250 : return 20764;
+          case 2300 : return 13402;
+          case 2350 : return 24408;
+          case 2400 : return 17018;
+          case 2425 : return 24274;
+          case 2440 : return 14609;
       }
+    }
       if (a==2500) {
         switch (b) {
-          case 127 : return 23458;
-          case 150 : return 18345;
-          case 175 : return 19786;
+          case 127 : return 23461;
+          case 150 : return 18333;
+          case 175 : return 19794;
           case 200 : return 31038;
-          case 300 : return 32236;
+          case 300 : return 32238;
           case 400 : return 29958;
-          case 500 : return 18580;
-          case 600 : return 27153;
-          case 700 : return 18559;
-          case 800 : return 19759;
-          case 900 : return 21123;
-          case 1000 : return 18426;
-          case 1100 : return 25981;
-          case 1200 : return 17131;
-          case 1300 : return 21163;
-          case 1400 : return 25928;
-          case 1500 : return 12387;
-          case 1600 : return 13488;
-          case 1700 : return 24781;
-          case 1800 : return 21010;
-          case 1900 : return 17343;
-          case 2000 : return 11213;
-          case 2100 : return 29785;
-          case 2200 : return 19722;
-          case 2250 : return 16199;
-          case 2300 : return 14810;
-          case 2350 : return 11122;
-          case 2400 : return 16134;
-          case 2450 : return 11040;
-          case 2475 : return 22216;
-          case 2490 : return 20989;
-        }
+          case 500 : return 18593;
+          case 600 : return 27152;
+          case 700 : return 18557;
+          case 800 : return 19749;
+          case 900 : return 21111;
+          case 1000 : return 18439;
+          case 1100 : return 25990;
+          case 1200 : return 17126;
+          case 1300 : return 21156;
+          case 1400 : return 25935;
+          case 1500 : return 12380;
+          case 1600 : return 13485;
+          case 1700 : return 24788;
+          case 1800 : return 21005;
+          case 1900 : return 17347;
+          case 2000 : return 11210;
+          case 2100 : return 29784;
+          case 2200 : return 19719;
+          case 2250 : return 16192;
+          case 2300 : return 14813;
+          case 2350 : return 11124;
+          case 2400 : return 16129;
+          case 2450 : return 11052;
+          case 2475 : return 22215;
+          case 2490 : return 20990;
       }
+    }
       if (a==2550) {
         switch (b) {
-          case 127 : return 18848;
-          case 150 : return 23670;
-          case 175 : return 21312;
-          case 200 : return 33517;
-          case 300 : return 27649;
-          case 400 : return 23866;
-          case 500 : return 30356;
+          case 127 : return 18852;
+          case 150 : return 23656;
+          case 175 : return 21322;
+          case 200 : return 33518;
+          case 300 : return 27661;
+          case 400 : return 23855;
+          case 500 : return 30349;
           case 600 : return 20063;
-          case 700 : return 27605;
-          case 800 : return 27579;
-          case 900 : return 13896;
-          case 1000 : return 19785;
-          case 1100 : return 32353;
-          case 1200 : return 21257;
-          case 1300 : return 22677;
-          case 1400 : return 12402;
-          case 1500 : return 28737;
-          case 1600 : return 27646;
-          case 1700 : return 18646;
-          case 1800 : return 20125;
-          case 1900 : return 12453;
-          case 2000 : return 18662;
-          case 2100 : return 13711;
-          case 2200 : return 22557;
-          case 2250 : return 12357;
-          case 2300 : return 22477;
-          case 2350 : return 17405;
-          case 2400 : return 21189;
-          case 2450 : return 23879;
-          case 2500 : return 17547;
-          case 2525 : return 13835;
-          case 2540 : return 21163;
-        }
+          case 700 : return 27628;
+          case 800 : return 27556;
+          case 900 : return 13889;
+          case 1000 : return 19790;
+          case 1100 : return 32349;
+          case 1200 : return 21263;
+          case 1300 : return 22675;
+          case 1400 : return 12410;
+          case 1500 : return 28722;
+          case 1600 : return 27648;
+          case 1700 : return 18657;
+          case 1800 : return 20119;
+          case 1900 : return 12458;
+          case 2000 : return 18666;
+          case 2100 : return 13705;
+          case 2200 : return 22554;
+          case 2250 : return 12379;
+          case 2300 : return 22466;
+          case 2350 : return 17412;
+          case 2400 : return 21194;
+          case 2450 : return 23858;
+          case 2500 : return 17567;
+          case 2525 : return 13837;
+          case 2540 : return 21146;
       }
+    }
       if (a==2600) {
         switch (b) {
-          case 127 : return 30304;
-          case 150 : return 20243;
-          case 175 : return 17653;
-          case 200 : return 18976;
-          case 300 : return 18982;
-          case 400 : return 24068;
-          case 500 : return 25439;
-          case 600 : return 8886;
-          case 700 : return 20259;
-          case 800 : return 22952;
-          case 900 : return 17748;
+          case 127 : return 30319;
+          case 150 : return 20224;
+          case 175 : return 17638;
+          case 200 : return 18988;
+          case 300 : return 18991;
+          case 400 : return 24063;
+          case 500 : return 25443;
+          case 600 : return 8896;
+          case 700 : return 20252;
+          case 800 : return 22956;
+          case 900 : return 17740;
           case 1000 : return 21420;
-          case 1100 : return 12659;
-          case 1200 : return 24199;
-          case 1300 : return 13995;
-          case 1400 : return 17696;
-          case 1500 : return 20418;
-          case 1600 : return 19163;
-          case 1700 : return 25382;
-          case 1800 : return 25326;
-          case 1900 : return 25330;
-          case 2000 : return 16450;
-          case 2100 : return 16570;
-          case 2200 : return 15105;
-          case 2300 : return 18789;
-          case 2350 : return 30495;
-          case 2400 : return 18893;
-          case 2450 : return 18944;
-          case 2500 : return 17757;
-          case 2550 : return 15229;
-          case 2575 : return 11381;
-          case 2590 : return 17690;
-        }
+          case 1100 : return 12662;
+          case 1200 : return 24196;
+          case 1300 : return 14001;
+          case 1400 : return 17701;
+          case 1500 : return 20407;
+          case 1600 : return 19169;
+          case 1700 : return 25376;
+          case 1800 : return 25322;
+          case 1900 : return 25326;
+          case 2000 : return 16465;
+          case 2100 : return 16561;
+          case 2200 : return 15102;
+          case 2300 : return 18793;
+          case 2350 : return 30487;
+          case 2400 : return 18890;
+          case 2450 : return 18948;
+          case 2500 : return 17768;
+          case 2550 : return 15235;
+          case 2575 : return 11379;
+          case 2590 : return 17683;
       }
+    }
       if (a==2650) {
         switch (b) {
-          case 127 : return 28034;
-          case 150 : return 21876;
-          case 175 : return 21789;
-          case 200 : return 16736;
-          case 300 : return 15276;
-          case 400 : return 24408;
-          case 500 : return 19474;
-          case 600 : return 21828;
-          case 700 : return 21734;
-          case 800 : return 28297;
-          case 900 : return 30772;
-          case 1000 : return 17926;
-          case 1100 : return 28259;
-          case 1200 : return 27097;
-          case 1300 : return 19289;
-          case 1400 : return 18072;
-          case 1500 : return 28229;
-          case 1600 : return 12974;
-          case 1700 : return 15456;
-          case 1800 : return 20551;
-          case 1900 : return 24251;
-          case 2000 : return 17869;
-          case 2100 : return 28102;
-          case 2200 : return 15326;
-          case 2300 : return 12910;
-          case 2350 : return 12710;
-          case 2400 : return 14083;
+          case 127 : return 28021;
+          case 150 : return 21898;
+          case 175 : return 21775;
+          case 200 : return 16748;
+          case 300 : return 15266;
+          case 400 : return 24416;
+          case 500 : return 19464;
+          case 600 : return 21833;
+          case 700 : return 21728;
+          case 800 : return 28298;
+          case 900 : return 30780;
+          case 1000 : return 17933;
+          case 1100 : return 28254;
+          case 1200 : return 27094;
+          case 1300 : return 19293;
+          case 1400 : return 18075;
+          case 1500 : return 28236;
+          case 1600 : return 12964;
+          case 1700 : return 15451;
+          case 1800 : return 20550;
+          case 1900 : return 24249;
+          case 2000 : return 17858;
+          case 2100 : return 28117;
+          case 2200 : return 15323;
+          case 2300 : return 12908;
+          case 2350 : return 12711;
+          case 2400 : return 14076;
           case 2450 : return 10217;
-          case 2500 : return 20513;
-          case 2550 : return 15428;
-          case 2600 : return 25471;
-          case 2625 : return 22074;
-          case 2640 : return 21685;
-        }
+          case 2500 : return 20525;
+          case 2550 : return 15419;
+          case 2600 : return 25473;
+          case 2625 : return 22053;
+          case 2640 : return 21710;
       }
+    }
       if (a==2700) {
         switch (b) {
-          case 127 : return 23329;
-          case 150 : return 23187;
-          case 175 : return 15418;
-          case 200 : return 15388;
-          case 300 : return 18088;
-          case 400 : return 24796;
-          case 500 : return 37647;
-          case 600 : return 24663;
-          case 700 : return 21997;
-          case 800 : return 21957;
-          case 900 : return 15536;
-          case 1000 : return 24862;
-          case 1100 : return 17960;
-          case 1200 : return 10401;
-          case 1300 : return 16673;
-          case 1400 : return 23109;
-          case 1500 : return 14370;
-          case 1600 : return 20647;
-          case 1700 : return 15550;
-          case 1800 : return 16900;
-          case 1900 : return 16752;
-          case 2000 : return 17976;
-          case 2100 : return 27160;
-          case 2200 : return 18147;
-          case 2300 : return 18251;
-          case 2400 : return 16808;
-          case 2450 : return 29857;
-          case 2500 : return 24818;
-          case 2550 : return 11704;
-          case 2600 : return 15686;
-          case 2650 : return 20781;
-          case 2675 : return 18116;
-          case 2690 : return 30844;
-        }
+          case 127 : return 23316;
+          case 150 : return 23199;
+          case 175 : return 15414;
+          case 200 : return 15397;
+          case 300 : return 18086;
+          case 400 : return 24797;
+          case 500 : return 37649;
+          case 600 : return 24658;
+          case 700 : return 21989;
+          case 800 : return 21970;
+          case 900 : return 15533;
+          case 1000 : return 24856;
+          case 1100 : return 17965;
+          case 1200 : return 10400;
+          case 1300 : return 16680;
+          case 1400 : return 23103;
+          case 1500 : return 14365;
+          case 1600 : return 20651;
+          case 1700 : return 15544;
+          case 1800 : return 16894;
+          case 1900 : return 16768;
+          case 2000 : return 17966;
+          case 2100 : return 27162;
+          case 2200 : return 18152;
+          case 2300 : return 18240;
+          case 2400 : return 16820;
+          case 2450 : return 29844;
+          case 2500 : return 24830;
+          case 2550 : return 11692;
+          case 2600 : return 15674;
+          case 2650 : return 20794;
+          case 2675 : return 18091;
+          case 2690 : return 30879;
       }
+    }
       if (a==2750) {
         switch (b) {
-          case 127 : return 26295;
-          case 150 : return 13178;
-          case 175 : return 17111;
-          case 200 : return 18389;
-          case 300 : return 26205;
-          case 400 : return 15731;
-          case 500 : return 21178;
-          case 600 : return 24972;
-          case 700 : return 15760;
-          case 800 : return 23556;
-          case 900 : return 19627;
-          case 1000 : return 32807;
-          case 1100 : return 19784;
-          case 1200 : return 20922;
-          case 1300 : return 15669;
-          case 1400 : return 26155;
+          case 127 : return 26273;
+          case 150 : return 13167;
+          case 175 : return 17131;
+          case 200 : return 18395;
+          case 300 : return 26214;
+          case 400 : return 15720;
+          case 500 : return 21180;
+          case 600 : return 24967;
+          case 700 : return 15778;
+          case 800 : return 23547;
+          case 900 : return 19638;
+          case 1000 : return 32800;
+          case 1100 : return 19788;
+          case 1200 : return 20913;
+          case 1300 : return 15675;
+          case 1400 : return 26161;
           case 1500 : return 21084;
-          case 1600 : return 16993;
-          case 1700 : return 25008;
-          case 1800 : return 27634;
-          case 1900 : return 31483;
-          case 2000 : return 17034;
-          case 2100 : return 16904;
-          case 2200 : return 27657;
-          case 2300 : return 19617;
-          case 2400 : return 7793;
-          case 2450 : return 13114;
-          case 2500 : return 22333;
-          case 2550 : return 13095;
-          case 2600 : return 22264;
-          case 2650 : return 9125;
-          case 2700 : return 14492;
-          case 2725 : return 12956;
-          case 2740 : return 22208;
-        }
+          case 1600 : return 16989;
+          case 1700 : return 25010;
+          case 1800 : return 27635;
+          case 1900 : return 31471;
+          case 2000 : return 17028;
+          case 2100 : return 16907;
+          case 2200 : return 27671;
+          case 2300 : return 19605;
+          case 2400 : return 7804;
+          case 2450 : return 13102;
+          case 2500 : return 22349;
+          case 2550 : return 13089;
+          case 2600 : return 22254;
+          case 2650 : return 9130;
+          case 2700 : return 14491;
+          case 2725 : return 12964;
+          case 2740 : return 22203;
       }
+    }
       if (a==2800) {
         switch (b) {
-          case 127 : return 19843;
-          case 150 : return 18529;
-          case 175 : return 28910;
+          case 127 : return 19857;
+          case 150 : return 18527;
+          case 175 : return 28897;
           case 200 : return 22651;
-          case 300 : return 19730;
-          case 400 : return 29268;
-          case 500 : return 16036;
-          case 600 : return 18540;
-          case 700 : return 17223;
-          case 800 : return 16063;
-          case 900 : return 25059;
-          case 1000 : return 21126;
-          case 1100 : return 14658;
-          case 1200 : return 27671;
-          case 1300 : return 18472;
-          case 1400 : return 22596;
-          case 1500 : return 33034;
-          case 1600 : return 30477;
-          case 1700 : return 23980;
-          case 1800 : return 19865;
+          case 300 : return 19739;
+          case 400 : return 29280;
+          case 500 : return 16017;
+          case 600 : return 18532;
+          case 700 : return 17227;
+          case 800 : return 16074;
+          case 900 : return 25060;
+          case 1000 : return 21120;
+          case 1100 : return 14660;
+          case 1200 : return 27674;
+          case 1300 : return 18470;
+          case 1400 : return 22591;
+          case 1500 : return 33023;
+          case 1600 : return 30488;
+          case 1700 : return 23983;
+          case 1800 : return 19866;
           case 1900 : return 17252;
-          case 2000 : return 25134;
-          case 2100 : return 26467;
-          case 2200 : return 25221;
-          case 2300 : return 31557;
+          case 2000 : return 25131;
+          case 2100 : return 26458;
+          case 2200 : return 25235;
+          case 2300 : return 31553;
           case 2400 : return 17198;
-          case 2500 : return 13418;
-          case 2550 : return 15785;
-          case 2600 : return 22558;
-          case 2650 : return 26276;
-          case 2700 : return 20034;
-          case 2750 : return 18621;
-          case 2775 : return 14355;
-          case 2790 : return 20050;
-        }
+          case 2500 : return 13416;
+          case 2550 : return 15790;
+          case 2600 : return 22554;
+          case 2650 : return 26256;
+          case 2700 : return 20039;
+          case 2750 : return 18637;
+          case 2775 : return 14349;
+          case 2790 : return 20053;
       }
+    }
       break;
       case 2018 :
       if (a==800) {
         switch (b) {
-          case 127 : return 256999;
-          case 200 : return 243726;
-          case 300 : return 231228;
-          case 400 : return 268028;
-          case 500 : return 284270;
-          case 600 : return 256774;
-          case 700 : return 273839;
-          case 790 : return 259296;
-        }
+          case 127 : return 257032;
+          case 200 : return 243699;
+          case 300 : return 231244;
+          case 400 : return 267999;
+          case 500 : return 284276;
+          case 600 : return 256765;
+          case 700 : return 273841;
+          case 790 : return 259304;
       }
+    }
       if (a==900) {
         switch (b) {
-          case 127 : return 253948;
-          case 200 : return 243272;
-          case 300 : return 288570;
+          case 127 : return 253985;
+          case 200 : return 243267;
+          case 300 : return 288544;
           case 400 : return 265875;
-          case 500 : return 256856;
-          case 600 : return 260321;
-          case 700 : return 249065;
-          case 800 : return 257120;
-          case 890 : return 238992;
-        }
+          case 500 : return 256835;
+          case 600 : return 260319;
+          case 700 : return 249054;
+          case 800 : return 257125;
+          case 890 : return 239015;
       }
+    }
       if (a==1000) {
         switch (b) {
-          case 127 : return 269962;
-          case 150 : return 287993;
-          case 175 : return 263637;
-          case 200 : return 291115;
-          case 300 : return 248462;
-          case 400 : return 267428;
-          case 500 : return 270970;
-          case 600 : return 253435;
-          case 700 : return 231794;
-          case 750 : return 242843;
-          case 800 : return 248838;
-          case 850 : return 258439;
-          case 900 : return 257442;
-          case 950 : return 265736;
-          case 975 : return 248970;
-          case 990 : return 245558;
-        }
+          case 127 : return 269914;
+          case 150 : return 288000;
+          case 175 : return 263744;
+          case 200 : return 291072;
+          case 300 : return 248400;
+          case 400 : return 267455;
+          case 500 : return 271012;
+          case 600 : return 253394;
+          case 700 : return 231793;
+          case 750 : return 242840;
+          case 800 : return 248774;
+          case 850 : return 258494;
+          case 900 : return 257449;
+          case 950 : return 265746;
+          case 975 : return 248963;
+          case 990 : return 245572;
       }
+    }
       if (a==1050) {
         switch (b) {
-          case 127 : return 245678;
-          case 150 : return 263347;
-          case 175 : return 225881;
-          case 200 : return 256273;
-          case 300 : return 252608;
-          case 400 : return 261290;
-          case 500 : return 271904;
-          case 600 : return 259351;
-          case 700 : return 269158;
-          case 750 : return 278724;
-          case 800 : return 255152;
-          case 850 : return 252612;
-          case 900 : return 259555;
-          case 950 : return 265801;
-          case 1000 : return 261829;
-          case 1025 : return 267796;
-          case 1040 : return 266903;
-        }
+          case 127 : return 245640;
+          case 150 : return 263327;
+          case 175 : return 225957;
+          case 200 : return 256270;
+          case 300 : return 252587;
+          case 400 : return 261302;
+          case 500 : return 271906;
+          case 600 : return 259324;
+          case 700 : return 269216;
+          case 750 : return 278666;
+          case 800 : return 255195;
+          case 850 : return 252606;
+          case 900 : return 259535;
+          case 950 : return 265839;
+          case 1000 : return 261837;
+          case 1025 : return 267853;
+          case 1040 : return 266802;
       }
+    }
       if (a==1100) {
         switch (b) {
-          case 127 : return 232511;
-          case 150 : return 219002;
-          case 175 : return 221294;
-          case 200 : return 237439;
-          case 300 : return 233630;
-          case 400 : return 232836;
-          case 500 : return 228782;
-          case 600 : return 247959;
-          case 700 : return 234425;
-          case 800 : return 218362;
-          case 850 : return 220449;
-          case 900 : return 220679;
-          case 950 : return 234255;
-          case 1000 : return 214165;
-          case 1050 : return 224118;
-          case 1075 : return 213574;
-          case 1090 : return 238570;
-        }
+          case 127 : return 232431;
+          case 150 : return 219045;
+          case 175 : return 221337;
+          case 200 : return 237395;
+          case 300 : return 233694;
+          case 400 : return 232834;
+          case 500 : return 228786;
+          case 600 : return 247950;
+          case 700 : return 234416;
+          case 800 : return 218375;
+          case 850 : return 220450;
+          case 900 : return 220655;
+          case 950 : return 234277;
+          case 1000 : return 214092;
+          case 1050 : return 224114;
+          case 1075 : return 213579;
+          case 1090 : return 238620;
       }
+    }
       if (a==1150) {
         switch (b) {
-          case 127 : return 176570;
-          case 150 : return 167231;
-          case 175 : return 180697;
-          case 200 : return 156600;
-          case 300 : return 161124;
-          case 400 : return 187529;
-          case 500 : return 173434;
-          case 600 : return 159337;
-          case 700 : return 153741;
-          case 800 : return 168651;
-          case 850 : return 173365;
-          case 900 : return 156897;
-          case 950 : return 157709;
-          case 1000 : return 142415;
-          case 1050 : return 179896;
-          case 1100 : return 151905;
-          case 1125 : return 131090;
-          case 1140 : return 154351;
-        }
+          case 127 : return 176592;
+          case 150 : return 167204;
+          case 175 : return 180714;
+          case 200 : return 156586;
+          case 300 : return 161123;
+          case 400 : return 187543;
+          case 500 : return 173449;
+          case 600 : return 159296;
+          case 700 : return 153725;
+          case 800 : return 168696;
+          case 850 : return 173348;
+          case 900 : return 156896;
+          case 950 : return 157704;
+          case 1000 : return 142428;
+          case 1050 : return 179877;
+          case 1100 : return 151930;
+          case 1125 : return 131078;
+          case 1140 : return 154353;
       }
+    }
       if (a==1200) {
         switch (b) {
-          case 127 : return 116195;
-          case 150 : return 114460;
-          case 175 : return 149619;
-          case 200 : return 130090;
-          case 300 : return 125500;
+          case 127 : return 116221;
+          case 150 : return 114455;
+          case 175 : return 149582;
+          case 200 : return 130127;
+          case 300 : return 125499;
           case 400 : return 118485;
-          case 500 : return 109521;
-          case 600 : return 99439;
-          case 700 : return 126024;
-          case 800 : return 127358;
-          case 900 : return 100391;
-          case 950 : return 116676;
-          case 1000 : return 117515;
-          case 1050 : return 113667;
-          case 1100 : return 106850;
-          case 1150 : return 120859;
-          case 1175 : return 123788;
-          case 1190 : return 113719;
-        }
+          case 500 : return 109504;
+          case 600 : return 99442;
+          case 700 : return 126028;
+          case 800 : return 127335;
+          case 900 : return 100400;
+          case 950 : return 116661;
+          case 1000 : return 117504;
+          case 1050 : return 113703;
+          case 1100 : return 106849;
+          case 1150 : return 120841;
+          case 1175 : return 123799;
+          case 1190 : return 113721;
       }
+    }
       if (a==1250) {
         switch (b) {
           case 127 : return 92316;
-          case 150 : return 91943;
-          case 175 : return 82829;
-          case 200 : return 85224;
-          case 300 : return 95327;
-          case 400 : return 87362;
-          case 500 : return 95442;
-          case 600 : return 85417;
-          case 700 : return 76009;
-          case 800 : return 86133;
-          case 900 : return 81018;
-          case 950 : return 76646;
-          case 1000 : return 67409;
-          case 1050 : return 88017;
-          case 1100 : return 87478;
-          case 1150 : return 78094;
-          case 1200 : return 80935;
-          case 1225 : return 87052;
-          case 1240 : return 82780;
-        }
+          case 150 : return 91950;
+          case 175 : return 82797;
+          case 200 : return 85223;
+          case 300 : return 95341;
+          case 400 : return 87391;
+          case 500 : return 95414;
+          case 600 : return 85455;
+          case 700 : return 76007;
+          case 800 : return 86104;
+          case 900 : return 81053;
+          case 950 : return 76640;
+          case 1000 : return 67395;
+          case 1050 : return 88005;
+          case 1100 : return 87472;
+          case 1150 : return 78095;
+          case 1200 : return 80939;
+          case 1225 : return 87025;
+          case 1240 : return 82809;
       }
+    }
       if (a==1300) {
         switch (b) {
-          case 127 : return 78815;
-          case 150 : return 60337;
-          case 175 : return 80723;
-          case 200 : return 73183;
-          case 300 : return 74665;
-          case 400 : return 73478;
-          case 500 : return 68896;
-          case 600 : return 74228;
-          case 700 : return 50702;
-          case 800 : return 78521;
-          case 900 : return 81257;
-          case 1000 : return 59943;
-          case 1050 : return 67093;
-          case 1100 : return 60722;
-          case 1150 : return 64260;
+          case 127 : return 78824;
+          case 150 : return 60319;
+          case 175 : return 80757;
+          case 200 : return 73163;
+          case 300 : return 74658;
+          case 400 : return 73497;
+          case 500 : return 68908;
+          case 600 : return 74212;
+          case 700 : return 50697;
+          case 800 : return 78519;
+          case 900 : return 81251;
+          case 1000 : return 59919;
+          case 1050 : return 67112;
+          case 1100 : return 60742;
+          case 1150 : return 64250;
           case 1200 : return 68284;
-          case 1250 : return 57851;
-          case 1275 : return 79983;
-          case 1290 : return 66070;
-        }
+          case 1250 : return 57861;
+          case 1275 : return 80013;
+          case 1290 : return 66025;
       }
+    }
       if (a==1350) {
         switch (b) {
-          case 127 : return 69678;
-          case 150 : return 83206;
+          case 127 : return 69694;
+          case 150 : return 83233;
           case 175 : return 62035;
-          case 200 : return 47698;
-          case 300 : return 70663;
-          case 400 : return 61370;
-          case 500 : return 70245;
-          case 600 : return 55627;
-          case 700 : return 61053;
-          case 800 : return 64819;
-          case 900 : return 57555;
-          case 1000 : return 64649;
-          case 1050 : return 56222;
-          case 1100 : return 71054;
-          case 1150 : return 75059;
-          case 1200 : return 53904;
-          case 1250 : return 58440;
-          case 1300 : return 76351;
-          case 1325 : return 84377;
-          case 1340 : return 67783;
-        }
+          case 200 : return 47661;
+          case 300 : return 70665;
+          case 400 : return 61376;
+          case 500 : return 70230;
+          case 600 : return 55611;
+          case 700 : return 61048;
+          case 800 : return 64825;
+          case 900 : return 57547;
+          case 1000 : return 64660;
+          case 1050 : return 56200;
+          case 1100 : return 71067;
+          case 1150 : return 75083;
+          case 1200 : return 53907;
+          case 1250 : return 58429;
+          case 1300 : return 76337;
+          case 1325 : return 84393;
+          case 1340 : return 67787;
       }
+    }
       if (a==1400) {
         switch (b) {
-          case 127 : return 69236;
-          case 150 : return 75479;
-          case 175 : return 75517;
-          case 200 : return 69336;
-          case 300 : return 65546;
-          case 400 : return 80857;
-          case 500 : return 58474;
-          case 600 : return 64642;
-          case 700 : return 74035;
-          case 800 : return 76924;
-          case 900 : return 48783;
-          case 1000 : return 56935;
-          case 1100 : return 78056;
-          case 1150 : return 72763;
-          case 1200 : return 67240;
-          case 1250 : return 66518;
-          case 1300 : return 69111;
-          case 1350 : return 62970;
-          case 1375 : return 61940;
-          case 1390 : return 64308;
-        }
+          case 127 : return 69229;
+          case 150 : return 75493;
+          case 175 : return 75503;
+          case 200 : return 69347;
+          case 300 : return 65563;
+          case 400 : return 80844;
+          case 500 : return 58451;
+          case 600 : return 64652;
+          case 700 : return 74031;
+          case 800 : return 76926;
+          case 900 : return 48809;
+          case 1000 : return 56931;
+          case 1100 : return 78072;
+          case 1150 : return 72753;
+          case 1200 : return 67247;
+          case 1250 : return 66514;
+          case 1300 : return 69103;
+          case 1350 : return 62992;
+          case 1375 : return 61962;
+          case 1390 : return 64248;
       }
+    }
       if (a==1450) {
         switch (b) {
-          case 127 : return 69091;
-          case 150 : return 86529;
+          case 127 : return 69101;
+          case 150 : return 86512;
           case 175 : return 68972;
-          case 200 : return 62658;
-          case 300 : return 52813;
-          case 400 : return 84190;
+          case 200 : return 62652;
+          case 300 : return 52825;
+          case 400 : return 84204;
           case 500 : return 62523;
-          case 600 : return 65573;
-          case 700 : return 66373;
-          case 800 : return 62270;
-          case 900 : return 60375;
-          case 1000 : return 63730;
-          case 1100 : return 60255;
-          case 1150 : return 67143;
-          case 1200 : return 42600;
+          case 600 : return 65580;
+          case 700 : return 66366;
+          case 800 : return 62265;
+          case 900 : return 60377;
+          case 1000 : return 63736;
+          case 1100 : return 60258;
+          case 1150 : return 67153;
+          case 1200 : return 42564;
           case 1250 : return 59900;
-          case 1300 : return 72826;
-          case 1350 : return 81150;
-          case 1400 : return 77808;
-          case 1425 : return 75329;
-          case 1440 : return 58172;
-        }
+          case 1300 : return 72828;
+          case 1350 : return 81177;
+          case 1400 : return 77818;
+          case 1425 : return 75269;
+          case 1440 : return 58200;
       }
+    }
       if (a==1500) {
         switch (b) {
-          case 127 : return 47685;
-          case 150 : return 55270;
-          case 175 : return 70948;
-          case 200 : return 82567;
-          case 300 : return 89929;
-          case 400 : return 62989;
-          case 500 : return 63822;
-          case 600 : return 62366;
-          case 700 : return 67334;
-          case 800 : return 68756;
-          case 900 : return 73658;
-          case 1000 : return 77373;
-          case 1100 : return 68904;
-          case 1200 : return 65160;
-          case 1250 : return 59299;
-          case 1300 : return 65417;
-          case 1350 : return 55536;
-          case 1400 : return 55527;
-          case 1450 : return 61415;
-          case 1475 : return 54270;
-          case 1490 : return 65777;
-        }
+          case 127 : return 47677;
+          case 150 : return 55276;
+          case 175 : return 71001;
+          case 200 : return 82531;
+          case 300 : return 89914;
+          case 400 : return 62995;
+          case 500 : return 63831;
+          case 600 : return 62361;
+          case 700 : return 67327;
+          case 800 : return 68761;
+          case 900 : return 73638;
+          case 1000 : return 77361;
+          case 1100 : return 68926;
+          case 1200 : return 65165;
+          case 1250 : return 59310;
+          case 1300 : return 65384;
+          case 1350 : return 55533;
+          case 1400 : return 55536;
+          case 1450 : return 61429;
+          case 1475 : return 54255;
+          case 1490 : return 65791;
       }
+    }
       if (a==1550) {
         switch (b) {
-          case 127 : return 78211;
-          case 150 : return 62977;
-          case 175 : return 66501;
-          case 200 : return 60953;
-          case 300 : return 58083;
-          case 400 : return 54137;
-          case 500 : return 62997;
-          case 600 : return 71604;
-          case 700 : return 67693;
-          case 800 : return 70774;
-          case 900 : return 55852;
-          case 1000 : return 57085;
-          case 1100 : return 69543;
-          case 1200 : return 67806;
-          case 1250 : return 66404;
-          case 1300 : return 63971;
-          case 1350 : return 65843;
-          case 1400 : return 58387;
-          case 1450 : return 71305;
-          case 1500 : return 73619;
-          case 1525 : return 67424;
-          case 1540 : return 51979;
-        }
+          case 127 : return 78258;
+          case 150 : return 62941;
+          case 175 : return 66496;
+          case 200 : return 60954;
+          case 300 : return 58084;
+          case 400 : return 54112;
+          case 500 : return 63003;
+          case 600 : return 71615;
+          case 700 : return 67690;
+          case 800 : return 70762;
+          case 900 : return 55868;
+          case 1000 : return 57070;
+          case 1100 : return 69551;
+          case 1200 : return 67801;
+          case 1250 : return 66411;
+          case 1300 : return 63984;
+          case 1350 : return 65847;
+          case 1400 : return 58353;
+          case 1450 : return 71336;
+          case 1500 : return 73588;
+          case 1525 : return 67455;
+          case 1540 : return 51969;
       }
+    }
       if (a==1600) {
         switch (b) {
-          case 127 : return 58343;
-          case 150 : return 65282;
-          case 175 : return 70054;
-          case 200 : return 62395;
-          case 300 : return 63422;
-          case 400 : return 68179;
-          case 500 : return 53605;
-          case 600 : return 64566;
-          case 700 : return 63299;
-          case 800 : return 68244;
-          case 900 : return 73036;
-          case 1000 : return 49741;
-          case 1100 : return 59543;
-          case 1200 : return 64525;
-          case 1300 : return 57787;
-          case 1350 : return 57391;
-          case 1400 : return 60606;
-          case 1450 : return 55795;
-          case 1500 : return 64304;
-          case 1550 : return 64944;
-          case 1575 : return 71031;
-          case 1590 : return 56241;
-        }
+          case 127 : return 58342;
+          case 150 : return 65273;
+          case 175 : return 70015;
+          case 200 : return 62438;
+          case 300 : return 63430;
+          case 400 : return 68189;
+          case 500 : return 53586;
+          case 600 : return 64561;
+          case 700 : return 63298;
+          case 800 : return 68223;
+          case 900 : return 73049;
+          case 1000 : return 49752;
+          case 1100 : return 59536;
+          case 1200 : return 64538;
+          case 1300 : return 57806;
+          case 1350 : return 57393;
+          case 1400 : return 60570;
+          case 1450 : return 55814;
+          case 1500 : return 64327;
+          case 1550 : return 64887;
+          case 1575 : return 71075;
+          case 1590 : return 56231;
       }
+    }
       if (a==1650) {
         switch (b) {
-          case 127 : return 66073;
-          case 150 : return 61144;
-          case 175 : return 63201;
-          case 200 : return 68262;
-          case 300 : return 63006;
-          case 400 : return 57543;
-          case 500 : return 65264;
-          case 600 : return 63240;
-          case 700 : return 66035;
-          case 800 : return 56285;
-          case 900 : return 84656;
-          case 1000 : return 83964;
-          case 1100 : return 64304;
-          case 1200 : return 73434;
-          case 1300 : return 82804;
-          case 1350 : return 64440;
-          case 1400 : return 62469;
-          case 1450 : return 52523;
-          case 1500 : return 59452;
-          case 1550 : return 53407;
-          case 1600 : return 42378;
-          case 1625 : return 45491;
-          case 1640 : return 61942;
-        }
+          case 127 : return 66062;
+          case 150 : return 61158;
+          case 175 : return 63174;
+          case 200 : return 68295;
+          case 300 : return 63010;
+          case 400 : return 57521;
+          case 500 : return 65271;
+          case 600 : return 63241;
+          case 700 : return 66041;
+          case 800 : return 56300;
+          case 900 : return 84645;
+          case 1000 : return 83963;
+          case 1100 : return 64303;
+          case 1200 : return 73433;
+          case 1300 : return 82789;
+          case 1350 : return 64443;
+          case 1400 : return 62480;
+          case 1450 : return 52524;
+          case 1500 : return 59466;
+          case 1550 : return 53399;
+          case 1600 : return 42366;
+          case 1625 : return 45483;
+          case 1640 : return 61950;
       }
+    }
       if (a==1700) {
         switch (b) {
-          case 127 : return 66946;
-          case 150 : return 71218;
-          case 175 : return 71000;
-          case 200 : return 69053;
-          case 300 : return 94870;
-          case 400 : return 79913;
-          case 500 : return 67174;
-          case 600 : return 77714;
-          case 700 : return 59181;
-          case 800 : return 81819;
-          case 900 : return 72813;
-          case 1000 : return 74886;
-          case 1100 : return 76394;
-          case 1200 : return 61613;
-          case 1300 : return 63063;
-          case 1400 : return 65023;
-          case 1450 : return 65954;
-          case 1500 : return 84797;
-          case 1550 : return 74356;
-          case 1600 : return 70952;
-          case 1650 : return 72447;
-          case 1675 : return 59776;
-          case 1690 : return 58940;
-        }
+          case 127 : return 66942;
+          case 150 : return 71213;
+          case 175 : return 71010;
+          case 200 : return 69028;
+          case 300 : return 94895;
+          case 400 : return 79905;
+          case 500 : return 67173;
+          case 600 : return 77730;
+          case 700 : return 59175;
+          case 800 : return 81814;
+          case 900 : return 72780;
+          case 1000 : return 74903;
+          case 1100 : return 76392;
+          case 1200 : return 61606;
+          case 1300 : return 63094;
+          case 1400 : return 65014;
+          case 1450 : return 65955;
+          case 1500 : return 84801;
+          case 1550 : return 74346;
+          case 1600 : return 70940;
+          case 1650 : return 72457;
+          case 1675 : return 59768;
+          case 1690 : return 58961;
       }
+    }
       if (a==1750) {
         switch (b) {
-          case 127 : return 71155;
-          case 150 : return 78763;
-          case 175 : return 75955;
-          case 200 : return 74317;
-          case 300 : return 73070;
-          case 400 : return 72836;
-          case 500 : return 65876;
+          case 127 : return 71172;
+          case 150 : return 78736;
+          case 175 : return 75989;
+          case 200 : return 74298;
+          case 300 : return 73076;
+          case 400 : return 72825;
+          case 500 : return 65868;
           case 600 : return 69047;
-          case 700 : return 71026;
-          case 800 : return 71028;
-          case 900 : return 73682;
-          case 1000 : return 64277;
-          case 1100 : return 61667;
-          case 1200 : return 75139;
-          case 1300 : return 69036;
-          case 1400 : return 54927;
-          case 1450 : return 78285;
-          case 1500 : return 57842;
-          case 1550 : return 53594;
-          case 1600 : return 51263;
-          case 1650 : return 43562;
-          case 1700 : return 57710;
-          case 1725 : return 74953;
-          case 1740 : return 58728;
-        }
+          case 700 : return 71055;
+          case 800 : return 71003;
+          case 900 : return 73680;
+          case 1000 : return 64274;
+          case 1100 : return 61694;
+          case 1200 : return 75133;
+          case 1300 : return 69024;
+          case 1400 : return 54943;
+          case 1450 : return 78274;
+          case 1500 : return 57820;
+          case 1550 : return 53605;
+          case 1600 : return 51277;
+          case 1650 : return 43570;
+          case 1700 : return 57682;
+          case 1725 : return 74971;
+          case 1740 : return 58722;
       }
+    }
       if (a==1800) {
         switch (b) {
-          case 127 : return 73983;
-          case 150 : return 58690;
-          case 175 : return 65738;
-          case 200 : return 67723;
-          case 300 : return 51525;
-          case 400 : return 62720;
-          case 500 : return 65896;
-          case 600 : return 62389;
-          case 700 : return 74860;
-          case 800 : return 66443;
-          case 900 : return 73740;
-          case 1000 : return 57210;
-          case 1100 : return 58291;
-          case 1200 : return 68706;
-          case 1300 : return 62818;
-          case 1400 : return 55564;
-          case 1500 : return 54420;
-          case 1550 : return 54420;
-          case 1600 : return 69893;
-          case 1650 : return 59369;
-          case 1700 : return 57909;
-          case 1750 : return 55534;
-          case 1775 : return 66832;
-          case 1790 : return 50308;
-        }
+          case 127 : return 73944;
+          case 150 : return 58703;
+          case 175 : return 65743;
+          case 200 : return 67744;
+          case 300 : return 51531;
+          case 400 : return 62713;
+          case 500 : return 65897;
+          case 600 : return 62383;
+          case 700 : return 74864;
+          case 800 : return 66451;
+          case 900 : return 73736;
+          case 1000 : return 57224;
+          case 1100 : return 58280;
+          case 1200 : return 68696;
+          case 1300 : return 62820;
+          case 1400 : return 55559;
+          case 1500 : return 54441;
+          case 1550 : return 54431;
+          case 1600 : return 69867;
+          case 1650 : return 59406;
+          case 1700 : return 57890;
+          case 1750 : return 55543;
+          case 1775 : return 66784;
+          case 1790 : return 50331;
       }
+    }
       if (a==1850) {
         switch (b) {
-          case 127 : return 66524;
-          case 150 : return 62362;
-          case 175 : return 79199;
-          case 200 : return 72729;
-          case 300 : return 66471;
-          case 400 : return 66313;
-          case 500 : return 69858;
-          case 600 : return 71539;
-          case 700 : return 51228;
-          case 800 : return 64504;
-          case 900 : return 55084;
-          case 1000 : return 76931;
-          case 1100 : return 75694;
-          case 1200 : return 66790;
-          case 1300 : return 56410;
-          case 1400 : return 63690;
-          case 1500 : return 58558;
-          case 1550 : return 56053;
-          case 1600 : return 67525;
-          case 1650 : return 44909;
-          case 1700 : return 64359;
-          case 1750 : return 55093;
-          case 1800 : return 60785;
-          case 1825 : return 57625;
-          case 1840 : return 54901;
-        }
+          case 127 : return 66539;
+          case 150 : return 62318;
+          case 175 : return 79233;
+          case 200 : return 72714;
+          case 300 : return 66466;
+          case 400 : return 66320;
+          case 500 : return 69873;
+          case 600 : return 71537;
+          case 700 : return 51213;
+          case 800 : return 64491;
+          case 900 : return 55099;
+          case 1000 : return 76928;
+          case 1100 : return 75695;
+          case 1200 : return 66801;
+          case 1300 : return 56406;
+          case 1400 : return 63703;
+          case 1500 : return 58532;
+          case 1550 : return 56076;
+          case 1600 : return 67542;
+          case 1650 : return 44906;
+          case 1700 : return 64372;
+          case 1750 : return 55067;
+          case 1800 : return 60769;
+          case 1825 : return 57640;
+          case 1840 : return 54894;
       }
+    }
       if (a==1900) {
         switch (b) {
-          case 127 : return 54081;
-          case 150 : return 68438;
-          case 175 : return 72830;
-          case 200 : return 72781;
-          case 300 : return 62404;
-          case 400 : return 61245;
-          case 500 : return 72549;
-          case 600 : return 69715;
-          case 700 : return 61267;
-          case 800 : return 62213;
-          case 900 : return 64091;
-          case 1000 : return 73568;
-          case 1100 : return 56985;
-          case 1200 : return 56213;
-          case 1300 : return 57767;
-          case 1400 : return 57660;
-          case 1500 : return 60918;
-          case 1600 : return 62004;
-          case 1650 : return 54946;
-          case 1700 : return 62141;
-          case 1750 : return 52753;
-          case 1800 : return 50996;
-          case 1850 : return 63609;
-          case 1875 : return 56789;
-          case 1890 : return 72418;
-        }
+          case 127 : return 54069;
+          case 150 : return 68456;
+          case 175 : return 72812;
+          case 200 : return 72795;
+          case 300 : return 62408;
+          case 400 : return 61260;
+          case 500 : return 72529;
+          case 600 : return 69726;
+          case 700 : return 61258;
+          case 800 : return 62189;
+          case 900 : return 64108;
+          case 1000 : return 73541;
+          case 1100 : return 57009;
+          case 1200 : return 56219;
+          case 1300 : return 57759;
+          case 1400 : return 57663;
+          case 1500 : return 60909;
+          case 1600 : return 62005;
+          case 1650 : return 54921;
+          case 1700 : return 62167;
+          case 1750 : return 52752;
+          case 1800 : return 50979;
+          case 1850 : return 63588;
+          case 1875 : return 56872;
+          case 1890 : return 72387;
       }
+    }
       if (a==1950) {
         switch (b) {
           case 127 : return 66185;
-          case 150 : return 78786;
-          case 175 : return 55440;
-          case 200 : return 54727;
-          case 300 : return 67603;
-          case 400 : return 70657;
-          case 500 : return 70616;
-          case 600 : return 65419;
-          case 700 : return 70795;
-          case 800 : return 68423;
-          case 900 : return 55699;
-          case 1000 : return 82678;
-          case 1100 : return 68414;
-          case 1200 : return 58826;
-          case 1300 : return 46751;
-          case 1400 : return 52655;
-          case 1500 : return 65072;
-          case 1600 : return 50101;
-          case 1650 : return 58595;
-          case 1700 : return 63343;
-          case 1750 : return 58114;
-          case 1800 : return 62948;
-          case 1850 : return 60748;
-          case 1900 : return 64487;
-          case 1925 : return 64292;
-          case 1940 : return 73354;
-        }
+          case 150 : return 78812;
+          case 175 : return 55456;
+          case 200 : return 54719;
+          case 300 : return 67565;
+          case 400 : return 70668;
+          case 500 : return 70620;
+          case 600 : return 65407;
+          case 700 : return 70782;
+          case 800 : return 68433;
+          case 900 : return 55698;
+          case 1000 : return 82692;
+          case 1100 : return 68411;
+          case 1200 : return 58816;
+          case 1300 : return 46756;
+          case 1400 : return 52642;
+          case 1500 : return 65074;
+          case 1600 : return 50125;
+          case 1650 : return 58578;
+          case 1700 : return 63352;
+          case 1750 : return 58111;
+          case 1800 : return 62953;
+          case 1850 : return 60715;
+          case 1900 : return 64522;
+          case 1925 : return 64270;
+          case 1940 : return 73366;
       }
+    }
       if (a==2000) {
         switch (b) {
-          case 127 : return 37957;
-          case 150 : return 32562;
-          case 175 : return 29466;
-          case 200 : return 34726;
-          case 300 : return 30146;
-          case 400 : return 32534;
-          case 500 : return 39950;
-          case 600 : return 29189;
-          case 700 : return 37939;
-          case 800 : return 41825;
-          case 900 : return 42213;
-          case 1000 : return 32216;
-          case 1100 : return 31681;
-          case 1200 : return 31365;
-          case 1300 : return 32775;
-          case 1400 : return 32667;
-          case 1500 : return 29178;
-          case 1600 : return 34740;
-          case 1700 : return 29266;
-          case 1750 : return 31372;
-          case 1800 : return 15136;
-          case 1850 : return 28117;
-          case 1900 : return 28084;
-          case 1950 : return 28087;
-          case 1975 : return 24129;
-          case 1990 : return 35921;
-        }
+          case 127 : return 37954;
+          case 150 : return 32563;
+          case 175 : return 29456;
+          case 200 : return 34724;
+          case 300 : return 30163;
+          case 400 : return 32530;
+          case 500 : return 39959;
+          case 600 : return 29182;
+          case 700 : return 37936;
+          case 800 : return 41819;
+          case 900 : return 42233;
+          case 1000 : return 32212;
+          case 1100 : return 31685;
+          case 1200 : return 31363;
+          case 1300 : return 32765;
+          case 1400 : return 32666;
+          case 1500 : return 29186;
+          case 1600 : return 34734;
+          case 1700 : return 29267;
+          case 1750 : return 31377;
+          case 1800 : return 15139;
+          case 1850 : return 28119;
+          case 1900 : return 28069;
+          case 1950 : return 28090;
+          case 1975 : return 24115;
+          case 1990 : return 35935;
       }
+    }
       if (a==2050) {
         switch (b) {
-          case 127 : return 34953;
-          case 150 : return 30776;
-          case 175 : return 30848;
-          case 200 : return 38473;
-          case 300 : return 32865;
-          case 400 : return 25214;
-          case 500 : return 36334;
-          case 600 : return 37389;
+          case 127 : return 34931;
+          case 150 : return 30770;
+          case 175 : return 30871;
+          case 200 : return 38463;
+          case 300 : return 32866;
+          case 400 : return 25220;
+          case 500 : return 36353;
+          case 600 : return 37380;
           case 700 : return 29621;
-          case 800 : return 25353;
-          case 900 : return 26393;
-          case 1000 : return 25349;
-          case 1100 : return 22029;
-          case 1200 : return 31785;
-          case 1300 : return 31803;
-          case 1400 : return 41636;
-          case 1500 : return 30497;
-          case 1600 : return 42639;
-          case 1700 : return 25346;
-          case 1750 : return 38530;
-          case 1800 : return 31012;
-          case 1850 : return 35059;
-          case 1900 : return 39588;
+          case 800 : return 25348;
+          case 900 : return 26381;
+          case 1000 : return 25371;
+          case 1100 : return 22024;
+          case 1200 : return 31776;
+          case 1300 : return 31813;
+          case 1400 : return 41624;
+          case 1500 : return 30496;
+          case 1600 : return 42650;
+          case 1700 : return 25333;
+          case 1750 : return 38558;
+          case 1800 : return 30991;
+          case 1850 : return 35063;
+          case 1900 : return 39585;
           case 1950 : return 24267;
-          case 2000 : return 32927;
-          case 2025 : return 27383;
-          case 2040 : return 26317;
-        }
+          case 2000 : return 32937;
+          case 2025 : return 27376;
+          case 2040 : return 26318;
       }
+    }
       if (a==2100) {
         switch (b) {
-          case 127 : return 30095;
-          case 150 : return 28865;
-          case 175 : return 28962;
-          case 200 : return 40216;
-          case 300 : return 41091;
-          case 400 : return 31328;
-          case 500 : return 22263;
-          case 600 : return 27885;
+          case 127 : return 30112;
+          case 150 : return 28866;
+          case 175 : return 28982;
+          case 200 : return 40201;
+          case 300 : return 41076;
+          case 400 : return 31324;
+          case 500 : return 22267;
+          case 600 : return 27887;
           case 700 : return 35535;
-          case 800 : return 29983;
-          case 900 : return 35509;
-          case 1000 : return 34536;
-          case 1100 : return 23367;
-          case 1200 : return 34238;
-          case 1300 : return 35751;
-          case 1400 : return 29051;
+          case 800 : return 29981;
+          case 900 : return 35494;
+          case 1000 : return 34541;
+          case 1100 : return 23369;
+          case 1200 : return 34247;
+          case 1300 : return 35745;
+          case 1400 : return 29047;
           case 1500 : return 36693;
-          case 1600 : return 18914;
-          case 1700 : return 16671;
-          case 1800 : return 24479;
-          case 1850 : return 27875;
-          case 1900 : return 28734;
-          case 1950 : return 31200;
-          case 2000 : return 19054;
-          case 2050 : return 25711;
-          case 2075 : return 31287;
+          case 1600 : return 18909;
+          case 1700 : return 16687;
+          case 1800 : return 24474;
+          case 1850 : return 27876;
+          case 1900 : return 28730;
+          case 1950 : return 31201;
+          case 2000 : return 19048;
+          case 2050 : return 25710;
+          case 2075 : return 31291;
           case 2090 : return 25499;
-        }
       }
+    }
       if (a==2150) {
         switch (b) {
-          case 127 : return 30688;
-          case 150 : return 31533;
-          case 175 : return 31565;
-          case 200 : return 31409;
-          case 300 : return 26160;
-          case 400 : return 41848;
-          case 500 : return 30631;
-          case 600 : return 47064;
-          case 700 : return 33957;
-          case 800 : return 25020;
-          case 900 : return 30469;
-          case 1000 : return 33859;
-          case 1100 : return 20107;
-          case 1200 : return 28095;
-          case 1300 : return 36140;
-          case 1400 : return 29160;
-          case 1500 : return 31868;
-          case 1600 : return 32769;
-          case 1700 : return 27340;
-          case 1800 : return 30525;
-          case 1850 : return 27053;
-          case 1900 : return 30552;
-          case 1950 : return 23831;
-          case 2000 : return 35998;
-          case 2050 : return 25077;
-          case 2100 : return 20181;
-          case 2125 : return 29325;
-          case 2140 : return 29109;
-        }
+          case 127 : return 30680;
+          case 150 : return 31561;
+          case 175 : return 31562;
+          case 200 : return 31393;
+          case 300 : return 26155;
+          case 400 : return 41838;
+          case 500 : return 30654;
+          case 600 : return 47058;
+          case 700 : return 33950;
+          case 800 : return 25021;
+          case 900 : return 30472;
+          case 1000 : return 33855;
+          case 1100 : return 20109;
+          case 1200 : return 28098;
+          case 1300 : return 36134;
+          case 1400 : return 29157;
+          case 1500 : return 31876;
+          case 1600 : return 32780;
+          case 1700 : return 27342;
+          case 1800 : return 30515;
+          case 1850 : return 27045;
+          case 1900 : return 30556;
+          case 1950 : return 23814;
+          case 2000 : return 36007;
+          case 2050 : return 25072;
+          case 2100 : return 20179;
+          case 2125 : return 29333;
+          case 2140 : return 29117;
       }
+    }
       if (a==2200) {
         switch (b) {
-          case 127 : return 35357;
-          case 150 : return 33151;
-          case 175 : return 32043;
-          case 200 : return 43581;
-          case 300 : return 27525;
-          case 400 : return 25108;
-          case 500 : return 32096;
-          case 600 : return 28603;
+          case 127 : return 35380;
+          case 150 : return 33130;
+          case 175 : return 32029;
+          case 200 : return 43562;
+          case 300 : return 27543;
+          case 400 : return 25109;
+          case 500 : return 32092;
+          case 600 : return 28613;
           case 700 : return 20592;
-          case 800 : return 26336;
-          case 900 : return 32153;
+          case 800 : return 26335;
+          case 900 : return 32157;
           case 1000 : return 36530;
-          case 1100 : return 42482;
-          case 1200 : return 36711;
-          case 1300 : return 36643;
-          case 1400 : return 31173;
-          case 1500 : return 17103;
-          case 1600 : return 27484;
-          case 1700 : return 36564;
-          case 1800 : return 32447;
-          case 1900 : return 31021;
-          case 1950 : return 24016;
-          case 2000 : return 30056;
-          case 2050 : return 28605;
-          case 2100 : return 21669;
-          case 2150 : return 28609;
-          case 2175 : return 18234;
-          case 2190 : return 21868;
-        }
+          case 1100 : return 42479;
+          case 1200 : return 36721;
+          case 1300 : return 36631;
+          case 1400 : return 31191;
+          case 1500 : return 17106;
+          case 1600 : return 27476;
+          case 1700 : return 36557;
+          case 1800 : return 32456;
+          case 1900 : return 31002;
+          case 1950 : return 24023;
+          case 2000 : return 30063;
+          case 2050 : return 28603;
+          case 2100 : return 21672;
+          case 2150 : return 28601;
+          case 2175 : return 18230;
+          case 2190 : return 21877;
       }
+    }
       if (a==2250) {
         switch (b) {
-          case 127 : return 24302;
-          case 150 : return 35888;
-          case 175 : return 28933;
-          case 200 : return 27783;
-          case 300 : return 31245;
-          case 400 : return 32521;
-          case 500 : return 22069;
-          case 600 : return 34912;
-          case 700 : return 25347;
-          case 800 : return 33616;
-          case 900 : return 22254;
-          case 1000 : return 25437;
-          case 1100 : return 30043;
-          case 1200 : return 38316;
-          case 1300 : return 27912;
-          case 1400 : return 38434;
-          case 1500 : return 35715;
+          case 127 : return 24314;
+          case 150 : return 35865;
+          case 175 : return 28947;
+          case 200 : return 27779;
+          case 300 : return 31239;
+          case 400 : return 32525;
+          case 500 : return 22058;
+          case 600 : return 34919;
+          case 700 : return 25355;
+          case 800 : return 33612;
+          case 900 : return 22259;
+          case 1000 : return 25433;
+          case 1100 : return 30045;
+          case 1200 : return 38321;
+          case 1300 : return 27910;
+          case 1400 : return 38430;
+          case 1500 : return 35709;
           case 1600 : return 29002;
-          case 1700 : return 24420;
-          case 1800 : return 44042;
-          case 1900 : return 28911;
-          case 1950 : return 27846;
-          case 2000 : return 44283;
-          case 2050 : return 18698;
-          case 2100 : return 34790;
-          case 2150 : return 34721;
-          case 2200 : return 25577;
-          case 2225 : return 31482;
-          case 2240 : return 33788;
-        }
+          case 1700 : return 24408;
+          case 1800 : return 44053;
+          case 1900 : return 28919;
+          case 1950 : return 27842;
+          case 2000 : return 44297;
+          case 2050 : return 18677;
+          case 2100 : return 34804;
+          case 2150 : return 34715;
+          case 2200 : return 25565;
+          case 2225 : return 31489;
+          case 2240 : return 33796;
       }
+    }
       if (a==2300) {
         switch (b) {
-          case 127 : return 32726;
-          case 150 : return 34195;
-          case 175 : return 27139;
-          case 200 : return 37689;
-          case 300 : return 31671;
-          case 400 : return 33200;
-          case 500 : return 18748;
-          case 600 : return 28139;
-          case 700 : return 37697;
-          case 800 : return 27190;
-          case 900 : return 25849;
-          case 1000 : return 39987;
-          case 1100 : return 32854;
-          case 1200 : return 39895;
-          case 1300 : return 30612;
-          case 1400 : return 34103;
-          case 1500 : return 32895;
-          case 1600 : return 24555;
-          case 1700 : return 32995;
-          case 1800 : return 24723;
-          case 1900 : return 19692;
-          case 2000 : return 23618;
-          case 2050 : return 35545;
-          case 2100 : return 28274;
-          case 2150 : return 31625;
-          case 2200 : return 37391;
-          case 2250 : return 24706;
-          case 2275 : return 38750;
-          case 2290 : return 33940;
-        }
+          case 127 : return 32704;
+          case 150 : return 34213;
+          case 175 : return 27149;
+          case 200 : return 37675;
+          case 300 : return 31674;
+          case 400 : return 33211;
+          case 500 : return 18755;
+          case 600 : return 28140;
+          case 700 : return 37709;
+          case 800 : return 27178;
+          case 900 : return 25830;
+          case 1000 : return 39993;
+          case 1100 : return 32865;
+          case 1200 : return 39886;
+          case 1300 : return 30619;
+          case 1400 : return 34092;
+          case 1500 : return 32898;
+          case 1600 : return 24556;
+          case 1700 : return 32986;
+          case 1800 : return 24740;
+          case 1900 : return 19683;
+          case 2000 : return 23623;
+          case 2050 : return 35531;
+          case 2100 : return 28288;
+          case 2150 : return 31622;
+          case 2200 : return 37397;
+          case 2250 : return 24691;
+          case 2275 : return 38751;
+          case 2290 : return 33944;
       }
+    }
       if (a==2350) {
         switch (b) {
-          case 127 : return 32105;
-          case 150 : return 39309;
-          case 175 : return 32220;
-          case 200 : return 31130;
-          case 300 : return 28506;
-          case 400 : return 27310;
+          case 127 : return 32104;
+          case 150 : return 39310;
+          case 175 : return 32199;
+          case 200 : return 31152;
+          case 300 : return 28499;
+          case 400 : return 27305;
           case 500 : return 32123;
-          case 600 : return 23820;
-          case 700 : return 26410;
-          case 800 : return 28540;
-          case 900 : return 34658;
-          case 1000 : return 29790;
-          case 1100 : return 23800;
-          case 1200 : return 29559;
-          case 1300 : return 26271;
-          case 1400 : return 35659;
-          case 1500 : return 38166;
+          case 600 : return 23832;
+          case 700 : return 26400;
+          case 800 : return 28561;
+          case 900 : return 34643;
+          case 1000 : return 29814;
+          case 1100 : return 23784;
+          case 1200 : return 29549;
+          case 1300 : return 26282;
+          case 1400 : return 35660;
+          case 1500 : return 38164;
           case 1600 : return 27491;
-          case 1700 : return 28292;
-          case 1800 : return 26093;
-          case 1900 : return 30804;
-          case 2000 : return 32063;
-          case 2050 : return 24911;
-          case 2100 : return 19023;
-          case 2150 : return 26342;
-          case 2200 : return 20359;
-          case 2250 : return 28696;
-          case 2300 : return 35694;
-          case 2325 : return 23846;
-          case 2340 : return 28355;
-        }
+          case 1700 : return 28290;
+          case 1800 : return 26095;
+          case 1900 : return 30798;
+          case 2000 : return 32053;
+          case 2050 : return 24930;
+          case 2100 : return 19019;
+          case 2150 : return 26334;
+          case 2200 : return 20370;
+          case 2250 : return 28678;
+          case 2300 : return 35706;
+          case 2325 : return 23841;
+          case 2340 : return 28359;
       }
+    }
       if (a==2400) {
         switch (b) {
-          case 127 : return 37478;
-          case 150 : return 33737;
-          case 175 : return 32790;
-          case 200 : return 37262;
-          case 300 : return 30234;
-          case 400 : return 36183;
-          case 500 : return 26465;
-          case 600 : return 32765;
-          case 700 : return 27689;
-          case 800 : return 41069;
-          case 900 : return 25424;
-          case 1000 : return 33944;
-          case 1100 : return 33727;
-          case 1200 : return 25492;
-          case 1300 : return 27745;
-          case 1400 : return 30156;
-          case 1500 : return 31484;
-          case 1600 : return 20457;
+          case 127 : return 37476;
+          case 150 : return 33711;
+          case 175 : return 32820;
+          case 200 : return 37255;
+          case 300 : return 30236;
+          case 400 : return 36201;
+          case 500 : return 26479;
+          case 600 : return 32750;
+          case 700 : return 27687;
+          case 800 : return 41060;
+          case 900 : return 25418;
+          case 1000 : return 33953;
+          case 1100 : return 33713;
+          case 1200 : return 25490;
+          case 1300 : return 27760;
+          case 1400 : return 30151;
+          case 1500 : return 31482;
+          case 1600 : return 20450;
           case 1700 : return 26497;
-          case 1800 : return 30050;
-          case 1900 : return 25319;
+          case 1800 : return 30052;
+          case 1900 : return 25331;
           case 2000 : return 21871;
-          case 2100 : return 20718;
-          case 2150 : return 41060;
-          case 2200 : return 24166;
-          case 2250 : return 13351;
-          case 2300 : return 29257;
-          case 2350 : return 24226;
+          case 2100 : return 20717;
+          case 2150 : return 41051;
+          case 2200 : return 24163;
+          case 2250 : return 13337;
+          case 2300 : return 29293;
+          case 2350 : return 24222;
           case 2375 : return 21667;
-          case 2390 : return 27853;
-        }
+          case 2390 : return 27843;
       }
+    }
       if (a==2450) {
         switch (b) {
-          case 127 : return 31777;
-          case 150 : return 21931;
-          case 175 : return 33968;
-          case 200 : return 11086;
-          case 300 : return 23272;
+          case 127 : return 31788;
+          case 150 : return 21900;
+          case 175 : return 33985;
+          case 200 : return 11075;
+          case 300 : return 23302;
           case 400 : return 29547;
-          case 500 : return 23337;
-          case 600 : return 29971;
-          case 700 : return 38817;
-          case 800 : return 26828;
-          case 900 : return 29458;
-          case 1000 : return 34153;
-          case 1100 : return 36308;
-          case 1200 : return 36600;
-          case 1300 : return 37679;
+          case 500 : return 23327;
+          case 600 : return 29984;
+          case 700 : return 38804;
+          case 800 : return 26833;
+          case 900 : return 29453;
+          case 1000 : return 34158;
+          case 1100 : return 36299;
+          case 1200 : return 36593;
+          case 1300 : return 37676;
           case 1400 : return 19419;
-          case 1500 : return 30659;
-          case 1600 : return 26841;
-          case 1700 : return 29295;
-          case 1800 : return 35361;
-          case 1900 : return 27127;
-          case 2000 : return 25800;
-          case 2100 : return 27018;
-          case 2150 : return 32029;
-          case 2200 : return 32770;
-          case 2250 : return 32760;
-          case 2300 : return 39082;
-          case 2350 : return 30792;
-          case 2400 : return 30591;
-          case 2425 : return 24518;
-          case 2440 : return 27934;
-        }
+          case 1500 : return 30657;
+          case 1600 : return 26837;
+          case 1700 : return 29296;
+          case 1800 : return 35363;
+          case 1900 : return 27124;
+          case 2000 : return 25806;
+          case 2100 : return 27028;
+          case 2150 : return 32024;
+          case 2200 : return 32754;
+          case 2250 : return 32778;
+          case 2300 : return 39104;
+          case 2350 : return 30770;
+          case 2400 : return 30617;
+          case 2425 : return 24519;
+          case 2440 : return 27908;
       }
+    }
       if (a==2500) {
         switch (b) {
-          case 127 : return 33322;
-          case 150 : return 34418;
-          case 175 : return 28388;
-          case 200 : return 17437;
-          case 300 : return 38279;
-          case 400 : return 35996;
-          case 500 : return 30953;
-          case 600 : return 25798;
-          case 700 : return 35794;
-          case 800 : return 31176;
-          case 900 : return 34714;
-          case 1000 : return 38468;
-          case 1100 : return 38085;
-          case 1200 : return 28364;
-          case 1300 : return 34632;
-          case 1400 : return 31945;
-          case 1500 : return 23322;
-          case 1600 : return 23419;
-          case 1700 : return 29889;
-          case 1800 : return 29810;
-          case 1900 : return 23370;
-          case 2000 : return 30972;
+          case 127 : return 33330;
+          case 150 : return 34398;
+          case 175 : return 28425;
+          case 200 : return 17417;
+          case 300 : return 38271;
+          case 400 : return 36002;
+          case 500 : return 30947;
+          case 600 : return 25796;
+          case 700 : return 35792;
+          case 800 : return 31182;
+          case 900 : return 34722;
+          case 1000 : return 38472;
+          case 1100 : return 38083;
+          case 1200 : return 28362;
+          case 1300 : return 34638;
+          case 1400 : return 31948;
+          case 1500 : return 23309;
+          case 1600 : return 23407;
+          case 1700 : return 29901;
+          case 1800 : return 29806;
+          case 1900 : return 23364;
+          case 2000 : return 30970;
           case 2100 : return 28535;
-          case 2200 : return 27257;
-          case 2250 : return 18623;
-          case 2300 : return 23496;
-          case 2350 : return 22329;
-          case 2400 : return 33128;
-          case 2450 : return 30830;
-          case 2475 : return 23708;
-          case 2490 : return 33249;
-        }
+          case 2200 : return 27245;
+          case 2250 : return 18649;
+          case 2300 : return 23515;
+          case 2350 : return 22325;
+          case 2400 : return 33112;
+          case 2450 : return 30845;
+          case 2475 : return 23686;
+          case 2490 : return 33252;
       }
+    }
       if (a==2550) {
         switch (b) {
-          case 127 : return 24922;
-          case 150 : return 32543;
-          case 175 : return 36422;
-          case 200 : return 30188;
-          case 300 : return 26220;
-          case 400 : return 30072;
-          case 500 : return 35066;
-          case 600 : return 27573;
-          case 700 : return 23640;
-          case 800 : return 22422;
-          case 900 : return 33963;
+          case 127 : return 24932;
+          case 150 : return 32530;
+          case 175 : return 36450;
+          case 200 : return 30169;
+          case 300 : return 26226;
+          case 400 : return 30060;
+          case 500 : return 35065;
+          case 600 : return 27576;
+          case 700 : return 23633;
+          case 800 : return 22425;
+          case 900 : return 33974;
           case 1000 : return 23554;
-          case 1100 : return 46419;
-          case 1200 : return 29865;
-          case 1300 : return 27523;
-          case 1400 : return 36263;
-          case 1500 : return 39868;
-          case 1600 : return 41297;
-          case 1700 : return 27527;
-          case 1800 : return 29984;
-          case 1900 : return 22632;
-          case 2000 : return 19981;
-          case 2100 : return 38643;
-          case 2200 : return 24973;
-          case 2250 : return 31242;
-          case 2300 : return 38871;
-          case 2350 : return 22764;
-          case 2400 : return 32331;
-          case 2450 : return 27617;
-          case 2500 : return 23912;
-          case 2525 : return 17455;
-          case 2540 : return 19925;
-        }
+          case 1100 : return 46417;
+          case 1200 : return 29855;
+          case 1300 : return 27536;
+          case 1400 : return 36259;
+          case 1500 : return 39870;
+          case 1600 : return 41289;
+          case 1700 : return 27534;
+          case 1800 : return 29977;
+          case 1900 : return 22641;
+          case 2000 : return 19993;
+          case 2100 : return 38628;
+          case 2200 : return 24982;
+          case 2250 : return 31241;
+          case 2300 : return 38861;
+          case 2350 : return 22769;
+          case 2400 : return 32317;
+          case 2450 : return 27614;
+          case 2500 : return 23900;
+          case 2525 : return 17462;
+          case 2540 : return 19938;
       }
+    }
       if (a==2600) {
         switch (b) {
           case 127 : return 33954;
-          case 150 : return 23932;
-          case 175 : return 20277;
-          case 200 : return 26499;
-          case 300 : return 29041;
-          case 400 : return 29099;
-          case 500 : return 30175;
-          case 600 : return 24049;
-          case 700 : return 32810;
-          case 800 : return 31713;
-          case 900 : return 24212;
-          case 1000 : return 25314;
-          case 1100 : return 23920;
-          case 1200 : return 30485;
-          case 1300 : return 34210;
-          case 1400 : return 25415;
-          case 1500 : return 26730;
-          case 1600 : return 32874;
-          case 1700 : return 23995;
-          case 1800 : return 28944;
-          case 1900 : return 39096;
-          case 2000 : return 20130;
-          case 2100 : return 22599;
-          case 2200 : return 13931;
-          case 2300 : return 36563;
-          case 2350 : return 22750;
-          case 2400 : return 22797;
-          case 2450 : return 25378;
-          case 2500 : return 22735;
-          case 2550 : return 31678;
-          case 2575 : return 32847;
-          case 2590 : return 35408;
-        }
+          case 150 : return 23921;
+          case 175 : return 20287;
+          case 200 : return 26505;
+          case 300 : return 29040;
+          case 400 : return 29098;
+          case 500 : return 30187;
+          case 600 : return 24029;
+          case 700 : return 32817;
+          case 800 : return 31710;
+          case 900 : return 24207;
+          case 1000 : return 25323;
+          case 1100 : return 23907;
+          case 1200 : return 30489;
+          case 1300 : return 34216;
+          case 1400 : return 25425;
+          case 1500 : return 26735;
+          case 1600 : return 32865;
+          case 1700 : return 23990;
+          case 1800 : return 28952;
+          case 1900 : return 39094;
+          case 2000 : return 20125;
+          case 2100 : return 22609;
+          case 2200 : return 13925;
+          case 2300 : return 36565;
+          case 2350 : return 22742;
+          case 2400 : return 22814;
+          case 2450 : return 25346;
+          case 2500 : return 22744;
+          case 2550 : return 31667;
+          case 2575 : return 32872;
+          case 2590 : return 35400;
       }
+    }
       if (a==2650) {
         switch (b) {
-          case 127 : return 29585;
-          case 150 : return 28077;
-          case 175 : return 30697;
-          case 200 : return 30663;
-          case 300 : return 49859;
-          case 400 : return 28040;
-          case 500 : return 46313;
-          case 600 : return 33188;
-          case 700 : return 33142;
-          case 800 : return 38533;
-          case 900 : return 33405;
-          case 1000 : return 15262;
-          case 1100 : return 37156;
-          case 1200 : return 30790;
-          case 1300 : return 30982;
-          case 1400 : return 33487;
-          case 1500 : return 42428;
-          case 1600 : return 34558;
-          case 1700 : return 30719;
-          case 1800 : return 30648;
-          case 1900 : return 34560;
-          case 2000 : return 33295;
-          case 2100 : return 22986;
+          case 127 : return 29554;
+          case 150 : return 28093;
+          case 175 : return 30683;
+          case 200 : return 30681;
+          case 300 : return 49854;
+          case 400 : return 28046;
+          case 500 : return 46323;
+          case 600 : return 33189;
+          case 700 : return 33140;
+          case 800 : return 38527;
+          case 900 : return 33401;
+          case 1000 : return 15279;
+          case 1100 : return 37147;
+          case 1200 : return 30789;
+          case 1300 : return 30970;
+          case 1400 : return 33490;
+          case 1500 : return 42431;
+          case 1600 : return 34556;
+          case 1700 : return 30726;
+          case 1800 : return 30649;
+          case 1900 : return 34573;
+          case 2000 : return 33284;
+          case 2100 : return 22988;
           case 2200 : return 34429;
-          case 2300 : return 17863;
-          case 2350 : return 23150;
-          case 2400 : return 29426;
-          case 2450 : return 24246;
-          case 2500 : return 24306;
-          case 2550 : return 26792;
-          case 2600 : return 15327;
-          case 2625 : return 34427;
-          case 2640 : return 21650;
-        }
+          case 2300 : return 17840;
+          case 2350 : return 23154;
+          case 2400 : return 29443;
+          case 2450 : return 24230;
+          case 2500 : return 24302;
+          case 2550 : return 26809;
+          case 2600 : return 15324;
+          case 2625 : return 34438;
+          case 2640 : return 21647;
       }
+    }
       if (a==2700) {
         switch (b) {
-          case 127 : return 46212;
-          case 150 : return 28463;
-          case 175 : return 34953;
-          case 200 : return 30065;
-          case 300 : return 32378;
-          case 400 : return 29923;
-          case 500 : return 33508;
-          case 600 : return 29886;
-          case 700 : return 31241;
-          case 800 : return 20757;
-          case 900 : return 24329;
-          case 1000 : return 34936;
-          case 1100 : return 23326;
-          case 1200 : return 25944;
-          case 1300 : return 32533;
-          case 1400 : return 33792;
-          case 1500 : return 20710;
-          case 1600 : return 34855;
-          case 1700 : return 33733;
-          case 1800 : return 20735;
-          case 1900 : return 15757;
-          case 2000 : return 29739;
-          case 2100 : return 32367;
-          case 2200 : return 20688;
-          case 2300 : return 19515;
-          case 2400 : return 39057;
-          case 2450 : return 31116;
-          case 2500 : return 25915;
-          case 2550 : return 27132;
-          case 2600 : return 25928;
-          case 2650 : return 23393;
-          case 2675 : return 25878;
-          case 2690 : return 35024;
-        }
+          case 127 : return 46229;
+          case 150 : return 28439;
+          case 175 : return 34978;
+          case 200 : return 30046;
+          case 300 : return 32394;
+          case 400 : return 29908;
+          case 500 : return 33501;
+          case 600 : return 29891;
+          case 700 : return 31236;
+          case 800 : return 20753;
+          case 900 : return 24342;
+          case 1000 : return 34921;
+          case 1100 : return 23333;
+          case 1200 : return 25933;
+          case 1300 : return 32541;
+          case 1400 : return 33794;
+          case 1500 : return 20715;
+          case 1600 : return 34864;
+          case 1700 : return 33729;
+          case 1800 : return 20731;
+          case 1900 : return 15761;
+          case 2000 : return 29746;
+          case 2100 : return 32362;
+          case 2200 : return 20691;
+          case 2300 : return 19508;
+          case 2400 : return 39053;
+          case 2450 : return 31110;
+          case 2500 : return 25938;
+          case 2550 : return 27128;
+          case 2600 : return 25911;
+          case 2650 : return 23374;
+          case 2675 : return 25917;
+          case 2690 : return 35011;
       }
+    }
       if (a==2750) {
         switch (b) {
-          case 127 : return 29880;
-          case 150 : return 28800;
-          case 175 : return 24651;
-          case 200 : return 38131;
-          case 300 : return 40571;
+          case 127 : return 29889;
+          case 150 : return 28805;
+          case 175 : return 24649;
+          case 200 : return 38120;
+          case 300 : return 40569;
           case 400 : return 31268;
-          case 500 : return 35176;
+          case 500 : return 35184;
           case 600 : return 28959;
-          case 700 : return 32913;
-          case 800 : return 31498;
-          case 900 : return 39415;
-          case 1000 : return 18402;
-          case 1100 : return 30243;
-          case 1200 : return 27638;
-          case 1300 : return 27532;
-          case 1400 : return 35062;
-          case 1500 : return 30020;
-          case 1600 : return 23532;
-          case 1700 : return 39359;
-          case 1800 : return 27489;
-          case 1900 : return 25099;
-          case 2000 : return 19638;
-          case 2100 : return 27524;
-          case 2200 : return 22335;
-          case 2300 : return 22216;
-          case 2400 : return 28734;
-          case 2450 : return 26226;
-          case 2500 : return 23499;
+          case 700 : return 32907;
+          case 800 : return 31481;
+          case 900 : return 39420;
+          case 1000 : return 18418;
+          case 1100 : return 30241;
+          case 1200 : return 27646;
+          case 1300 : return 27521;
+          case 1400 : return 35067;
+          case 1500 : return 30010;
+          case 1600 : return 23541;
+          case 1700 : return 39345;
+          case 1800 : return 27494;
+          case 1900 : return 25095;
+          case 2000 : return 19651;
+          case 2100 : return 27528;
+          case 2200 : return 22337;
+          case 2300 : return 22210;
+          case 2400 : return 28741;
+          case 2450 : return 26223;
+          case 2500 : return 23497;
           case 2550 : return 19773;
-          case 2600 : return 32854;
-          case 2650 : return 26177;
-          case 2700 : return 27522;
-          case 2725 : return 26163;
-          case 2740 : return 18373;
-        }
+          case 2600 : return 32853;
+          case 2650 : return 26195;
+          case 2700 : return 27506;
+          case 2725 : return 26158;
+          case 2740 : return 18371;
       }
+    }
       if (a==2800) {
         switch (b) {
-          case 127 : return 31644;
-          case 150 : return 34428;
-          case 175 : return 25289;
-          case 200 : return 22250;
-          case 300 : return 26380;
-          case 400 : return 23877;
+          case 127 : return 31638;
+          case 150 : return 34431;
+          case 175 : return 25271;
+          case 200 : return 22267;
+          case 300 : return 26376;
+          case 400 : return 23878;
           case 500 : return 34491;
-          case 600 : return 22562;
-          case 700 : return 25140;
-          case 800 : return 38593;
-          case 900 : return 37047;
-          case 1000 : return 26373;
+          case 600 : return 22565;
+          case 700 : return 25144;
+          case 800 : return 38588;
+          case 900 : return 37044;
+          case 1000 : return 26366;
           case 1100 : return 39559;
-          case 1200 : return 38449;
-          case 1300 : return 45188;
-          case 1400 : return 21150;
-          case 1500 : return 23765;
-          case 1600 : return 32962;
-          case 1700 : return 37162;
-          case 1800 : return 22545;
-          case 1900 : return 33230;
-          case 2000 : return 30392;
-          case 2100 : return 22422;
-          case 2200 : return 34520;
-          case 2300 : return 25058;
-          case 2400 : return 21150;
-          case 2500 : return 28935;
-          case 2550 : return 19731;
-          case 2600 : return 26894;
-          case 2650 : return 22601;
-          case 2700 : return 30485;
-          case 2750 : return 26395;
-          case 2775 : return 26247;
+          case 1200 : return 38455;
+          case 1300 : return 45195;
+          case 1400 : return 21143;
+          case 1500 : return 23758;
+          case 1600 : return 32968;
+          case 1700 : return 37154;
+          case 1800 : return 22552;
+          case 1900 : return 33225;
+          case 2000 : return 30404;
+          case 2100 : return 22432;
+          case 2200 : return 34527;
+          case 2300 : return 25056;
+          case 2400 : return 21147;
+          case 2500 : return 28933;
+          case 2550 : return 19716;
+          case 2600 : return 26888;
+          case 2650 : return 22628;
+          case 2700 : return 30477;
+          case 2750 : return 26393;
+          case 2775 : return 26245;
           case 2790 : return 13253;
-        }
       }
+    }
       break;
     }
   }
@@ -4842,12 +4842,59 @@ unsigned long long get_total_events(pair<int,int> input, int year, int SignalSce
       }
     }
   }
+  if (SignalScenario==3) {
+    switch (year) {
+      case 2016 :
+      if (a==1800) {
+        switch (b) {
+          case 127 : return 41134;
+          case 200 : return 40163;
+        }
+      }
+      if (a==2200) {
+        switch (b) {
+          case 1000 : return 15989;
+          case 2100 : return 22199;
+          case 2190 : return 19984;
+        }
+      }
+      case 2017 :
+      if (a==1800) {
+        switch (b) {
+          case 127 : return 147015;
+          case 200 : return 142321;
+        }
+      }
+      if (a==2200) {
+        switch (b) {
+          case 1000 : return 147015;
+          case 2100 : return 142321;
+          case 2190 : return 142321;
+        }
+      }
+      case 2018 :
+      if (a==1800) {
+        switch (b) {
+          case 127 : return 147015;
+          case 200 : return 142321;
+        }
+      }
+      if (a==2200) {
+        switch (b) {
+          case 1000 : return 147015;
+          case 2100 : return 142321;
+          case 2190 : return 142321;
+        }
+      }
+      break;
+    }
+  }
   return 0;
 }
 
 std::map<pair<int,int>,int> init_signal_event(int SignalScenario) {
   std::map<pair<int,int>,int> output;
-  if (SignalScenario==1) {
+  if (SignalScenario==1 || SignalScenario==4) {
     std::vector<int> Yticks;
     Yticks =  std::vector<int>({127, 200, 300, 400, 500, 600, 700, 790});
     for (auto i : Yticks) {pair<int,int> p(800,i); output.insert(pair<pair<int,int>,int>(p,0));}
@@ -4974,6 +5021,15 @@ std::map<pair<int,int>,int> init_signal_event(int SignalScenario) {
       pair<int,int> p(m,1);
       output.insert(pair<pair<int,int>,int>(p,0));
     }
+  }
+  if (SignalScenario==3) {
+    std::vector<int> Yticks;
+    Yticks =  std::vector<int>({127, 200});
+    for (auto i : Yticks) {pair<int,int> p(1800,i); output.insert(pair<pair<int,int>,int>(p,0));}
+    Yticks.clear();
+    Yticks =  std::vector<int>({1000, 2100, 2190});
+    for (auto i : Yticks) {pair<int,int> p(2200,i); output.insert(pair<pair<int,int>,int>(p,0));}
+    Yticks.clear();
   }
   return output;
 }

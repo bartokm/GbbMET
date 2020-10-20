@@ -608,8 +608,8 @@ public :
    Bool_t          HLT_Photon300_NoHE;
    Bool_t          HLT_Photon500;
    Bool_t          HLT_Photon600;
-   Bool_t          HLT_AK8PFJet360_TrimMass30;
-   Bool_t          HLT_AK8PFJet400_TrimMass30;
+   //Bool_t          HLT_AK8PFJet360_TrimMass30;
+   //Bool_t          HLT_AK8PFJet400_TrimMass30;
    Bool_t          HLT_AK8PFJet500;
    Bool_t          HLT_PFJet450;
    Bool_t          HLT_PFJet500;
@@ -1183,8 +1183,8 @@ public :
    TBranch        *b_HLT_Photon300_NoHE;
    TBranch        *b_HLT_Photon500;
    TBranch        *b_HLT_Photon600;
-   TBranch        *b_HLT_AK8PFJet360_TrimMass30;
-   TBranch        *b_HLT_AK8PFJet400_TrimMass30;
+   //TBranch        *b_HLT_AK8PFJet360_TrimMass30;
+   //TBranch        *b_HLT_AK8PFJet400_TrimMass30;
    TBranch        *b_HLT_AK8PFJet500;
    TBranch        *b_HLT_PFJet450;
    TBranch        *b_HLT_PFJet500;
@@ -1251,7 +1251,7 @@ public :
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
-   double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999;
+   double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999;
    double e_pt=5, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
    //histograms
@@ -1403,7 +1403,9 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   }
   Init(tree);
   string temp=tree->GetCurrentFile()->GetName();
-  if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
+  if (temp.find("T5qqqqHg_refPoints")!=std::string::npos) SignalScenario=3;//nanoaodv6 fullsim points
+  else if (temp.find("NanoAODv6")!=std::string::npos && temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=4;//nanoaodv6 fastsim
+  else if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
   else if (temp.find("TChiNG")!=std::string::npos) SignalScenario=2;
 }
 
@@ -2009,8 +2011,8 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("HLT_Photon300_NoHE")) fChain->SetBranchAddress("HLT_Photon300_NoHE", &HLT_Photon300_NoHE, &b_HLT_Photon300_NoHE);
    if (fChain->GetBranch("HLT_Photon500")) fChain->SetBranchAddress("HLT_Photon500", &HLT_Photon500, &b_HLT_Photon500);
    if (fChain->GetBranch("HLT_Photon600")) fChain->SetBranchAddress("HLT_Photon600", &HLT_Photon600, &b_HLT_Photon600);
-   if (fChain->GetBranch("HLT_AK8PFJet360_TrimMass30")) fChain->SetBranchAddress("HLT_AK8PFJet360_TrimMass30", &HLT_AK8PFJet360_TrimMass30, &b_HLT_AK8PFJet360_TrimMass30);
-   if (fChain->GetBranch("HLT_AK8PFJet400_TrimMass30")) fChain->SetBranchAddress("HLT_AK8PFJet400_TrimMass30", &HLT_AK8PFJet400_TrimMass30, &b_HLT_AK8PFJet400_TrimMass30);
+   //if (fChain->GetBranch("HLT_AK8PFJet360_TrimMass30")) fChain->SetBranchAddress("HLT_AK8PFJet360_TrimMass30", &HLT_AK8PFJet360_TrimMass30, &b_HLT_AK8PFJet360_TrimMass30);
+   //if (fChain->GetBranch("HLT_AK8PFJet400_TrimMass30")) fChain->SetBranchAddress("HLT_AK8PFJet400_TrimMass30", &HLT_AK8PFJet400_TrimMass30, &b_HLT_AK8PFJet400_TrimMass30);
    if (fChain->GetBranch("HLT_AK8PFJet500")) fChain->SetBranchAddress("HLT_AK8PFJet500", &HLT_AK8PFJet500, &b_HLT_AK8PFJet500);
    if (fChain->GetBranch("HLT_PFJet450")) fChain->SetBranchAddress("HLT_PFJet450", &HLT_PFJet450, &b_HLT_PFJet450);
    if (fChain->GetBranch("HLT_PFJet500")) fChain->SetBranchAddress("HLT_PFJet500", &HLT_PFJet500, &b_HLT_PFJet500);
@@ -2306,6 +2308,12 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_jet_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_jet_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btag") returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_btag_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btag_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btags") returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_btags_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btags_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_H_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_Hmin_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_H_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);}
@@ -2463,7 +2471,7 @@ void Analyzer::CalcBtagSF(bool fastsim, float v_eta[], vector<float> v_pt, int v
     eta=v_eta[it->first];
     pt=v_pt[it->first];
     //cout<<"pt "<<pt<<" eta "<<eta<<" flav "<<v_had[it->first]<<" tag "<<it->second<<endl;
-    if (pt>=2000) pt=1999;
+    if (pt>=1000) pt=999;
     if (v_had[it->first]==5) {
       FLAV = BTEntry::FLAV_B;
       mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
@@ -2746,6 +2754,12 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"dphi_met_jet","Dphi of met and nearest jet/photon with pt>100"},
   {"dphi_met_jet_at_high_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet>=4"},
   {"dphi_met_jet_at_low_njet","Dphi of met and nearest jet/photon with pt>100, only if nonHiggsJet<4"},
+  {"dphi_met_btag","Dphi of met and highest btagged jet"},
+  {"dphi_met_btag_at_high_njet","Dphi of met and highest btagged jet, only if nonHiggsJet>=4"},
+  {"dphi_met_btag_at_low_njet","Dphi of met and highest btagged jet, only if nonHiggsJet<4"},
+  {"dphi_met_btags","Dphi of met and closest btagged jet"},
+  {"dphi_met_btags_at_high_njet","Dphi of met and closest btagged jet, only if nonHiggsJet>=4"},
+  {"dphi_met_btags_at_low_njet","Dphi of met and closest btagged jet, only if nonHiggsJet<4"},
   {"dphi_met_H_candidate","Dphi of met and Higgs candidate"},
   {"dphi_met_Hmin_candidate","Dphi of met and minimum of Higgs candidate jets"},
   {"dphi_met_H_candidate_at_low_njet","Dphi of met and Higgs candidate, only if nonHiggsJet<4"},

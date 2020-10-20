@@ -81,7 +81,7 @@ class EgammaScalingReader{
 std::vector< float > EgammaScalingReader::get_vals(const float eta, const float r9, const float gain, const float run){
 
     // int rAbsEta = round(abs(eta)*MAP_MULTIPLIER);
-    int iAbsEta = int(abs(eta)*MAP_MULTIPLIER);
+    int iAbsEta = int(std::abs(eta)*MAP_MULTIPLIER);
     // int rR9 = round(r9*MAP_MULTIPLIER);
     int iR9 = int(r9*MAP_MULTIPLIER);
 
@@ -92,30 +92,30 @@ std::vector< float > EgammaScalingReader::get_vals(const float eta, const float 
 
     // std::cout<<iAbsEta<<" "<<iR9<<" "<<gain<<" "<<run<<std::endl;
     // std::cout<<k0<<" "<<k1<<" "<<k2<<" "<<k3<<std::endl;
-    // for (auto x : _etaVector_low) cout<<x<<" ";
-    // cout<<endl;
-    // for (auto x : _r9Vector_low) cout<<x<<" ";
-    // cout<<endl;
-    // for (auto x : _gainVector) cout<<x<<" ";
-    // cout<<endl;
-    // for (auto x : _runVector_low) cout<<x<<" ";
-    // cout<<endl;
+    // for (auto x : _etaVector_low) std::cout<<x<<" ";
+    // std::cout<<std::endl;
+    // for (auto x : _r9Vector_low) std::cout<<x<<" ";
+    // std::cout<<std::endl;
+    // for (auto x : _gainVector) std::cout<<x<<" ";
+    // std::cout<<std::endl;
+    // for (auto x : _runVector_low) std::cout<<x<<" ";
+    // std::cout<<std::endl;
 
     // // for (auto x : etaLow2r9Low2gain2runLow2values.at(k0)) cout<<x.first<<" ";
-
+    
     // auto x1 = etaLow2r9Low2gain2runLow2values.at(k0);
-    // cout<<"OK1"<<endl;
+    // std::cout<<"OK1"<<std::endl;
     // auto x2 = etaLow2r9Low2gain2runLow2values.at(k0).at(k1);
-    // cout<<"OK2"<<endl;
+    // std::cout<<"OK2"<<std::endl;
     // auto x3 = etaLow2r9Low2gain2runLow2values.at(k0).at(k1).at(k2);
-    // cout<<"OK3"<<endl;
-    // cout<<endl;
-    // cout<<endl;
-    // for (auto x :  x3 ) cout<<x.first<<" ";
-    // cout<<endl;
-    // cout<<endl;
+    // std::cout<<"OK3"<<std::endl;
+    // std::cout<<std::endl;
+    // std::cout<<std::endl;
+    // for (auto x :  x3 ) std::cout<<x.first<<" ";
+    // std::cout<<std::endl;
+    // std::cout<<std::endl;
     // auto x4 = etaLow2r9Low2gain2runLow2values.at(k0).at(k1).at(k2).at(k3);
-    // cout<<"OK4"<<endl;
+    // std::cout<<"OK4"<<std::endl;
 
     // // exit(1);
 
@@ -531,7 +531,7 @@ class EgammaSmearingReader{
 
 std::vector< float > EgammaSmearingReader::get_vals(const float eta, const float r9){
 
-    int   k0 = quantize(int(abs(eta)*MAP_MULTIPLIER), _etaVector_low);
+    int   k0 = quantize(int(std::abs(eta)*MAP_MULTIPLIER), _etaVector_low);
     int   k1 = quantize(int(r9*MAP_MULTIPLIER), _r9Vector_low);
 
     return etaLow2r9Low2values.at(k0).at(k1);

@@ -288,7 +288,7 @@ void Analyzer::Loop()
 
    //histograms
    h_cuts = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,DDBvL,Deep1,Deep2",15,0,15);
-   TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",2,-0.5,1.5);
+   TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",3,-0.5,2.5);
    TH1D *h_nISR_jet = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
    TH1D *h_SR    = new TH1D("h_SR","",16,0.5,16.5);
    
@@ -727,7 +727,7 @@ void Analyzer::Loop()
          if (foundX && foundG) break;
        }
        int m_Gluino=1;
-       if (SignalScenario==1) m_Gluino = GenPart_mass[gluino];
+       if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) m_Gluino = GenPart_mass[gluino];
        //Neutralino/gluino mass is not exact. Need to find nearest grid point
        double m_Neutralino=GenPart_mass[neutralino];
        pair<double,double> initial_pair(m_Gluino,m_Neutralino);
@@ -760,29 +760,10 @@ void Analyzer::Loop()
      //MC weights and scale factors
      double pu_weight=1, weight=1;
      if (!isData){
-       if (SignalScan && temp_f.find("NanoAODv6")==std::string::npos) {xsec=get_cross_section(mass_pair.first, SignalScenario); TotalEvents=get_total_events(mass_pair,year,SignalScenario);}
-       else if (SignalScan && temp_f.find("NanoAODv6")!=std::string::npos) {
-         TBranch *b_genEventSumw;
-         Double_t sub_TotalEvents=0; TotalEvents=0;
-         TTree *Runs; fChain->GetCurrentFile()->GetObject("Runs",Runs);
-         TObjArray *leaves=Runs->GetListOfLeaves();
-         int dm_g=999, dm_n=999, re_mg=0, re_mn=0;
-         for (int i = 0; i <= leaves->GetLast(); i++) {
-           string name=leaves->At(i)->GetName();
-           if (name.find("genEventCount_T5qqqqHg")==string::npos) continue;
-           size_t found = name.find("T5qqqqHg");
-           int mg=stoi(name.substr(name.find("_",found)+1,name.find_last_of("_")-name.find("_",found)-1));
-           int mn=stoi(name.substr(name.find_last_of("_")+1));
-           int diff_g=abs(mg-GenPart_mass[gluino]);
-           int diff_n=abs(mn-GenPart_mass[neutralino]);
-           if (dm_g+dm_n>diff_g+diff_n) {
-             re_mg=mg; re_mn=mn;
-             dm_g=diff_g; dm_n=diff_n;
-           }
-         }
-         string eventsum="genEventSumw_T5qqqqHg_"+to_string(re_mg)+"_"+to_string(re_mn);
-         Runs->SetBranchAddress(eventsum.c_str(),&sub_TotalEvents,&b_genEventSumw);
-         for (int i=0; i<Runs->GetEntries();i++) {b_genEventSumw->GetEntry(i); TotalEvents+=sub_TotalEvents;}
+       if (SignalScan) {
+         xsec=get_cross_section(mass_pair.first, SignalScenario);
+         TotalEvents=get_total_events(mass_pair,year,SignalScenario);
+         if (TotalEvents==0) continue;
        }
        //weights
        (PUweight_whichSF==1) ? pu_weight=puWeightUp : (PUweight_whichSF==2) ? pu_weight=puWeightDown : pu_weight=puWeight;
@@ -1369,7 +1350,7 @@ void Analyzer::Loop()
            if ( abs(Photon_eCorr[i]-scale1)/scale1<0.0001 && abs(Photon_eCorr[i]-scale6)/scale6>0.0001 ) {trueGain=1; scale = scale1;}
            else if ( abs(Photon_eCorr[i]-scale1)/scale1>0.0001 && abs(Photon_eCorr[i]-scale6)/scale6<0.0001) {trueGain=6; scale  = scale6;}
            else { trueGain = -1; scale = (scale6+scale1)/2;}
-           // some weird thing: both r9=0.919941a and r9=0.93994 are taking their corrections from the 0.92-0.94 bin in the nanoAOD implelentation. no idea why this is.
+            //some weird thing: both r9=0.919941a and r9=0.93994 are taking their corrections from the 0.92-0.94 bin in the nanoAOD implelentation. no idea why this is.
          }
          else {
            scale    = EgammaScaling.get_energyScale(SCEta,Photon_r9[i], static_cast<int>(Photon_seedGain[i]) , run);
@@ -2193,12 +2174,21 @@ void Analyzer::Loop()
                }
              }
            }
+           /*
            //MT & dphi VR version
-           //if (DDBvL_selected==0 && Deep_selected<2 && Deep_medium_selected==0) {
-           //  if (passHiggsMass) boost=1;
-           //  else if (!passAK4DeepHiggsMass) continue;
-           //}
+           if (DDBvL_selected==0 && Deep_selected<2 && Deep_medium_selected==0) {
+             if (passHiggsMass) boost=1;
+             else if (!passAK4DeepHiggsMass) continue;
+           }
+           */
 
+           //highest btag phi
+           double btag_phi=999, dphi_closest=999;
+           if (passJet.size()>0) {btag_phi=Jet_phi[passJet[0]]; dphi_met_btag=deltaPhi(btag_phi,METPhi);}
+           for (auto i : passJet) {
+             if (Jet_btagDeepFlavB[i]<BtagDeepWP[year_chooser][0]) continue;
+             if (deltaPhi(Jet_phi[i],METPhi)<dphi_closest) {dphi_met_btags=deltaPhi(Jet_phi[i],METPhi); dphi_closest=dphi_met_btags;}
+           }
            //AK4 AK8 overlap
            if (!boost) nonHiggsJet=passJet.size()-2;
            else {
@@ -2231,6 +2221,7 @@ void Analyzer::Loop()
            //MT & dphi VR version
            //if (MT<100) VR=1;
            //if (dphi_met_H_candidate<0.3) VR=1;
+           //if (dphi_met_btags<0.3) VR=1;
            double sbFill_ak4ak8[dim_ak4]={double(VR),double(AK4AK8),met,njet};
            
            
@@ -2258,7 +2249,7 @@ void Analyzer::Loop()
              }
            }
            //Efficiency fill for no cuts bin
-           h_eff->Fill(0.,w);
+           h_eff->Fill(0.,w); if (SignalScan) m_eff[mass_pair]->Fill(0.,w);
            //cuts with command line
            if (_cut_variable.size()>0) {if (!(Cut(ientry,mass_pair))) continue;}
            else { //Hardcoded cuts
@@ -2267,7 +2258,7 @@ void Analyzer::Loop()
 
            //Cut for high njet region (need to implement in Cut() if decided as standard)
            //Filling histograms
-           h_eff->Fill(1.,w);
+           h_eff->Fill(1.,w); h_eff->Fill(2.,weight);
            h_nISR_jet->Fill(n_isr_jets,w);
            double bw=(Deep_SF_L[0]>200) ? 199 : Deep_SF_L[0];
            h2_btag_weight->Fill(bw,countb);
@@ -2351,9 +2342,10 @@ void Analyzer::Loop()
                if (HT_after>1500) hn_AK8HTsearchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
                break;
            }
-           //if (w_AK4searchBin/weight>10) {
+           //if (event==11549298) {
              //if (boost) cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[0]<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<DDBvL_SF_L[DDBvL_whichSF]<<" "<<w_AK8searchBin<<endl;
              //else       cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[0]<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<Deep_SF_L[Deep_whichSF]<<" "<<w_AK4searchBin<<endl;
+             //if (event==11549298) cout<<"deep sf "<<Deep_SF_L[Deep_whichSF]<<endl;
            //}
 
            //higgs mass distribution plot fills
@@ -2414,7 +2406,7 @@ void Analyzer::Loop()
      }
     
      if (SignalScan) {
-       m_eff[mass_pair]->Fill(1.,w);
+       m_eff[mass_pair]->Fill(1.,w); m_eff[mass_pair]->Fill(2.,weight);
        m_nISR_jet[mass_pair]->Fill(n_isr_jets,w);
        if (nleadPho!=-1) m_phoEt[mass_pair]->Fill(phoET[nleadPho],w);
        if (nleadPho!=-1) m_phoEta[mass_pair]->Fill(Photon_eta[nleadPho],w);
@@ -2629,7 +2621,7 @@ void Analyzer::Loop()
      ofstream counttxt;
      string temp="CountSignal_"+to_string(year)+".txt";
      counttxt.open (temp);
-     if (SignalScenario==1) {
+     if (SignalScenario==1 || SignalScenario==4) {
        bool newg=true;
        for (auto i : signal_events) {
          if (newg) counttxt<<"    if (a=="<<i.first.first<<") {\n      switch (b) {"<<endl;
@@ -2639,5 +2631,12 @@ void Analyzer::Loop()
        }
      }
      if (SignalScenario==2) for (auto i : signal_events) counttxt<<"      case "<<i.first.first<<" : return "<<i.second<<";"<<endl;
+     if (SignalScenario==3) {
+       for (auto i : signal_events) {
+         if (i.first.second==127 || i.first.second==1000) counttxt<<"    if (a=="<<i.first.first<<") {\n      switch (b) {"<<endl;
+         counttxt<<"        case "<<i.first.second<<" : return "<<i.second<<";"<<endl;
+         if (i.first.second==200 || i.first.second==2190) counttxt<<"    }\n  }"<<endl;
+       }
+     }
    }
 }
