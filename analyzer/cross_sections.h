@@ -4861,29 +4861,29 @@ unsigned long long get_total_events(pair<int,int> input, int year, int SignalSce
       case 2017 :
       if (a==1800) {
         switch (b) {
-          case 127 : return 147015;
-          case 200 : return 142321;
+          case 127 : return 37444;
+          case 200 : return 39328;
         }
       }
       if (a==2200) {
         switch (b) {
-          case 1000 : return 147015;
-          case 2100 : return 142321;
-          case 2190 : return 142321;
+          case 1000 : return 19836;
+          case 2100 : return 23072;
+          case 2190 : return 18587;
         }
       }
       case 2018 :
       if (a==1800) {
         switch (b) {
-          case 127 : return 147015;
-          case 200 : return 142321;
+          case 127 : return 68282;
+          case 200 : return 66069;
         }
       }
       if (a==2200) {
         switch (b) {
-          case 1000 : return 147015;
-          case 2100 : return 142321;
-          case 2190 : return 142321;
+          case 1000 : return 39850;
+          case 2100 : return 39874;
+          case 2190 : return 39972;
         }
       }
       break;
