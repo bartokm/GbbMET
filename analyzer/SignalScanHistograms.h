@@ -71,6 +71,8 @@
   map< pair<int, int>, TH2D* > m2_dphi_met_h_ak8;
   map< pair<int, int>, TH2D* > m2_dphi_met_ak8btag;
   map< pair<int, int>, TH2D* > m2_dphi_met_h_ak4;
+  map< pair<int, int>, TH2D* > m2_dphi_met_btags_ak8;
+  map< pair<int, int>, TH2D* > m2_dphi_met_btags_ak4;
   map< pair<int, int>, TH2D* > m2_dphi_met_hmin_ak4;
   map< pair<int, int>, TH2D* > m2_dphi_met_ak4btag;
   map< pair<int, int>, TH2D* > m2_dphi_met_h_pt_lowjet;
@@ -339,6 +341,8 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m2_dphi_met_h_ak8[MassPair]= new TH2D("h2_dphi_met_h_ak8",";Unrolled bins;|#Delta#phi|(MET,ak8 H candidate)",4,0.5,4.5,10,0,3.2);
       m2_dphi_met_ak8btag[MassPair]= new TH2D("h2_dphi_met_ak8btag",";Unrolled bins;|#Delta#phi|(MET,ak8 btag)",4,0.5,4.5,10,0,3.2);
       m2_dphi_met_h_ak4[MassPair]= new TH2D("h2_dphi_met_h_ak4",";Unrolled bins;|#Delta#phi|(MET,ak4 H candidate)",8,0.5,8.5,10,0,3.2);
+      m2_dphi_met_btags_ak8[MassPair]= new TH2D("h2_dphi_met_btags_ak8",";Unrolled bins;|#Delta#phi|(MET,loose-jets)",4,0.5,4.5,10,0,3.2);
+      m2_dphi_met_btags_ak4[MassPair]= new TH2D("h2_dphi_met_btags_ak4",";Unrolled bins;|#Delta#phi|(MET,loose-jets)",8,0.5,8.5,10,0,3.2);
       m2_dphi_met_hmin_ak4[MassPair]= new TH2D("h2_dphi_met_hmin_ak4",";Unrolled bins;|#Delta#phi|(MET,ak4 Hmin candidate)",8,0.5,8.5,10,0,3.2);
       m2_dphi_met_ak4btag[MassPair]= new TH2D("h2_dphi_met_ak4btag",";Unrolled bins;|#Delta#phi|(MET,ak4 btag)",8,0.5,8.5,10,0,3.2);
       m2_dphi_met_h_pt_lowjet[MassPair]= new TH2D("h2_dphi_met_h_pt_lowjet",";|#Delta#phi|(MET,jet/H);jet/H p_{T}",10,0,3.2,10,30,2030);

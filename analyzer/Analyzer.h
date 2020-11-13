@@ -1214,7 +1214,7 @@ public :
    vector<double> _cut_value;
    //For cuts
    int nPassPhoL=-1, nPassPhoM=-1, nPassPhoT=-1, nPassPhoMVA80=-1, nPassPhoMVA90=-1;
-   int nPassAK4=-1, nPassAK8=-1, nonHiggsJet=-1;
+   int nPassAK4=-1, nPassAK8=-1, nonHiggsJet=-1, noHmass_in_event=0;
    int nPassEleV=-1, nPassEleL=-1, nPassEleM=-1, nPassEleT=-1, nPassEleNO=-1;
    int nPassFREleL=0, nPassFREleM=0, nPassFREleT=0;
    int nPassElePhoL=0, nPassElePhoM=0, nPassElePhoT=0, nPassElePhoMVA80=-1, nPassElePhoMVA90=-1;
@@ -2322,6 +2322,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nonHiggsJet") returnvalue*=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="noHmass_in_event") returnvalue*=Parser(noHmass_in_event,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_L") returnvalue*=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_M") returnvalue*=Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_T") returnvalue*=Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
@@ -2768,6 +2769,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
   {"nonHiggsJet","number of loose ak4 jets which are not Higgs candidates"},
+  {"noHmass_in_event","Neither AK8 nor AK4 pair with correct mass found in event (when True=1)"},
   {"bcounterDeep_L","number of loose Deep btagged jets"},
   {"bcounterDeep_M","number of medium Deep btagged jets"},
   {"bcounterDeep_T","number of tight Deep btagged jets"},
