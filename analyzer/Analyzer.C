@@ -1390,6 +1390,149 @@ void Analyzer::Loop()
      double nonPrefiringProbability[3]={1,1,1};
      if (!_fastSim && year!=2018) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      phoET.clear();
+     //muon
+     for (unsigned int i=0;i<nMuon;i++) {
+       if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_miniPFRelIso_all[i]<0.2) {
+         if (Muon_looseId[i]) passMuL.push_back(i);
+         if (Muon_mediumId[i]) passMuM.push_back(i);
+         if (Muon_tightId[i]) passMuT.push_back(i);
+         if (!Muon_looseId[i]) passMuNO.push_back(i);
+       }
+     }
+     (whichMuon==0) ? passMuons=passMuL : (whichMuon==1) ? passMuons=passMuM : passMuons=passMuT;
+     nPassMuL=passMuL.size();
+     nPassMuM=passMuM.size();
+     nPassMuT=passMuT.size();
+     nPassMuNO=passMuNO.size();
+     if (passMuons.size() != 0) nleadMu=passMuons[0];
+     if (passMuL.size() != 0) nleadMuL=passMuL[0];
+     if (passMuM.size() != 0) nleadMuM=passMuM[0];
+     if (passMuT.size() != 0) nleadMuT=passMuT[0];
+     //muon SF
+     if (!isData){
+       int iter[3]={-1,-1,-1};
+       if (nPassMuL>0) iter[0]=passMuL.at(0);
+       if (nPassMuM>0) iter[1]=passMuM.at(0);
+       if (nPassMuT>0) iter[2]=passMuT.at(0);
+       for (int i=0;i<3;i++) {
+         if (iter[i]!=-1){
+           float pt = ( Muon_pt[iter[i]]< 20)? 20 : (Muon_pt[iter[i]]< 100) ? Muon_pt[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
+           float eta = (year==2016) ? Muon_eta[iter[i]] : abs(Muon_eta[iter[i]]);
+           double id_sf=0, iso_sf=0, syst_id=0, syst_iso=0;
+           int sign_id=0, sign_iso=0;
+           id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,eta));
+           syst_id=h_muID_SF2D[i]->GetBinError(h_muID_SF2D[i]->FindBin(pt,eta));
+           iso_sf=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,eta));
+           syst_iso=h_muISO_SF2D[i]->GetBinError(h_muISO_SF2D[i]->FindBin(pt,eta));
+           (muID_whichSF==1) ? sign_id=1 : (muID_whichSF==2) ? sign_id=-1 : sign_id=0;
+           (muISO_whichSF==1) ? sign_iso=1 : (muISO_whichSF==2) ? sign_iso=-1 : sign_iso=0;
+           mu_SF[i]=(id_sf+sign_id*syst_id)*(iso_sf+sign_iso*syst_iso);
+           if (id_sf==0 || iso_sf==0) cout<<i<<" id_sf "<<id_sf<<" iso_sf "<<iso_sf<<" mu_SF "<<mu_SF[i]<<endl;
+         }
+       }
+     }
+     //electron
+     for (unsigned int i=0;i<nElectron;i++) {
+       bool passOverlap=true;
+       for (auto j : passMuons) if (deltaR(Electron_phi[i],Muon_phi[j],Electron_eta[i],Muon_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       if (Electron_pt[i]>e_pt && abs(Electron_eta[i])<2.5 && Electron_miniPFRelIso_all[i]<0.2) {
+         if (Electron_cutBased[i]>=2) passFREleL.push_back(i);
+         if (Electron_cutBased[i]>=3) passFREleM.push_back(i);
+         if (Electron_cutBased[i]>=4) passFREleT.push_back(i);
+         if (!passOverlap) continue;
+         if (Electron_cutBased[i]>=1) passEleV.push_back(i);
+         if (Electron_cutBased[i]>=2) passEleL.push_back(i);
+         if (Electron_cutBased[i]>=3) passEleM.push_back(i);
+         if (Electron_cutBased[i]>=4) passEleT.push_back(i);
+         if (Electron_cutBased[i]<=1) passEleNO.push_back(i); //vetoElectron is also considered no electron
+       }
+     }
+     (whichElectron==0) ? passElectrons=passEleV : (whichElectron==1) ? passElectrons=passEleL : (whichElectron==2) ? passElectrons=passEleM : passElectrons=passEleT;
+     nPassEleV=passEleV.size();
+     nPassEleL=passEleL.size();
+     nPassEleM=passEleM.size();
+     nPassEleT=passEleT.size();
+     nPassEleNO=passEleNO.size();
+     if (passElectrons.size() != 0) nleadEle=passElectrons[0];
+     if (passEleV.size() != 0) nleadEleV=passEleV[0];
+     if (passEleL.size() != 0) nleadEleL=passEleL[0];
+     if (passEleM.size() != 0) nleadEleM=passEleM[0];
+     if (passEleT.size() != 0) nleadEleT=passEleT[0];
+     nPassFREleL=passFREleL.size();
+     nPassFREleM=passFREleM.size();
+     nPassFREleT=passFREleT.size();
+     if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
+     if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
+     if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
+     
+     //Calculate electron SFs
+     if (!isData) {
+       double id_sf=0, rec_sf=0, syst_id=0, syst_rec=0;
+       int sign_id=0, sign_rec=0;
+       (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
+       (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
+       if (passElectrons.size()!=0){
+         double pt=Electron_pt[passElectrons[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
+         id_sf=h_ele_EGamma_SF2D[whichElectron]->GetBinContent(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
+         syst_id=h_ele_EGamma_SF2D[whichElectron]->GetBinError(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
+         if (pt<20) {
+           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
+         }
+         else {
+           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
+           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
+         }
+         ele_SF[whichElectron]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
+         if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
+       }
+       if (nPassEleNO!=0){ //only for loose electrons so far
+         double pt=Electron_pt[passEleNO[0]];//, pt2=Electron_pt[passEleNO[0]];
+         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;// pt2=(pt>30) ? pt : 31;
+         double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
+         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
+         syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
+         ele_VETOSF = (epsilon == 1) ? 1 : (1-(id_sf+sign_id*syst_id)*epsilon)/(1-epsilon);
+         if (ele_VETOSF==0 || std::isnan(ele_VETOSF)) cout<<"ele veto id "<<id_sf<<" epsilon "<<epsilon<<" sf "<<ele_VETOSF<<endl;
+       }
+     }
+
+     //Tau
+     for (unsigned int i=0;i<nTau;i++) {
+       bool passOverlap=true;
+       for (auto j : passMuons) if (deltaR(Tau_phi[i],Muon_phi[j],Tau_eta[i],Muon_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       for (auto j : passElectrons) if (deltaR(Tau_phi[i],Electron_phi[j],Tau_eta[i],Electron_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       if (!passOverlap) continue;
+       if (Tau_pt[i]>tau_pt && abs(Tau_eta[i])<2.3) {
+         if (Tau_idMVAoldDM2017v2[i]>>2&1) passTauL.push_back(i);
+         if (Tau_idMVAoldDM2017v2[i]>>3&1) passTauM.push_back(i);
+         if (Tau_idMVAoldDM2017v2[i]>>4&1) passTauT.push_back(i);
+       }
+     }
+     (whichTau==0) ? passTaus=passTauL : (whichTau==1) ? passTaus=passTauM : passTaus=passTauT;
+     nPassTauL=passTauL.size();
+     nPassTauM=passTauM.size();
+     nPassTauT=passTauT.size();
+     //nPassTauNO=passTauNO.size();
+     if (passTaus.size() != 0) nleadTau=passTaus[0];
+     if (passTauL.size() != 0) nleadTauL=passTauL[0];
+     if (passTauM.size() != 0) nleadTauM=passTauM[0];
+     if (passTauT.size() != 0) nleadTauT=passTauT[0];
+
+     //Tau SF
+     if (!isData) {
+       if (passTauL.size() != 0) tau_SF[0]=tf1_tau_ID_SF[0]->Eval(Tau_pt[nleadTauL]);
+       if (passTauM.size() != 0) tau_SF[1]=tf1_tau_ID_SF[1]->Eval(Tau_pt[nleadTauM]);
+       if (passTauT.size() != 0) tau_SF[2]=tf1_tau_ID_SF[2]->Eval(Tau_pt[nleadTauT]);
+       if (tau_SF[0]==0 || tau_SF[1]==0 || tau_SF[2]==0) cout<<"nPassTauL "<<nPassTauL<<" nPassTauM "<<nPassTauM<<" nPassTauT "<<nPassTauT<<" tau L SF "<<tau_SF[0]<<" tau M SF "<<tau_SF[1]<<" tau T SF "<<tau_SF[2]<<endl;
+     }
      //photon
      for (unsigned int i=0;i<nPhoton;i++){
        //Systematics for Egamma scaling
@@ -1451,7 +1594,18 @@ void Analyzer::Loop()
          nonPrefiringProbability[1]*=(1-std::min(1.,prefireProb+sqrt(pow(stat,2)+pow(syst,2))));
          nonPrefiringProbability[2]*=(1-std::max(0.,prefireProb-sqrt(pow(stat,2)+pow(syst,2))));
        }
-       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>200) {
+       bool passOverlap=true;
+       for (auto j : passMuons) if (deltaR(Photon_phi[i],Muon_phi[j],Photon_eta[i],Muon_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       for (auto j : passElectrons) if (deltaR(Photon_phi[i],Electron_phi[j],Photon_eta[i],Electron_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       for (auto j : passTaus) if (deltaR(Photon_phi[i],Tau_phi[j],Photon_eta[i],Tau_eta[j])<0.3) {
+         passOverlap=false;break;
+       }
+       if (!passOverlap) continue;
+       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>40) {
          if (Photon_cutBased_versionFree[i]>0) passPhoL.push_back(i);
          if (Photon_cutBased_versionFree[i]>>1&1) passPhoM.push_back(i);
          if (Photon_cutBased_versionFree[i]>>2&1) passPhoT.push_back(i);
@@ -1533,45 +1687,8 @@ void Analyzer::Loop()
          (phoID_whichSF==1) ? sign_id=1 : (phoID_whichSF==2) ? sign_id=-1 : sign_id=0;
          (phoPix_whichSF==1) ? sign_pix=1 : (phoPix_whichSF==2) ? sign_pix=-1 : sign_pix=0;
          pho_SF[0]=(id_sf+sign_id*syst_id)*(pix_sf+sign_pix*syst_pix);
-         if (id_sf==0 || pix_sf==0) cout<<"pho Et "<<phoET[nleadPho]<<" pho eta "<<Photon_eta[nleadPho]<<" mod_eta "<<photon_eta<<" scEB "<<Photon_isScEtaEB[nleadPho]<<" scEE "<<Photon_isScEtaEE[nleadPho]<<" id sf "<<id_sf<<" +- "<<syst_id<<" pix sf "<<pix_sf<<" +- "<<syst_pix<<endl;
        }
      }
-     //electron
-     for (unsigned int i=0;i<nElectron;i++) {
-       bool passOverlap=true;
-       for (auto j : passPhotons) if (deltaR(Electron_phi[i],Photon_phi[j],Electron_eta[i],Photon_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       if (Electron_pt[i]>e_pt && abs(Electron_eta[i])<2.5 && Electron_miniPFRelIso_all[i]<0.2) {
-         if (Electron_cutBased[i]>=2) passFREleL.push_back(i);
-         if (Electron_cutBased[i]>=3) passFREleM.push_back(i);
-         if (Electron_cutBased[i]>=4) passFREleT.push_back(i);
-         if (!passOverlap) continue;
-         if (Electron_cutBased[i]>=1) passEleV.push_back(i);
-         if (Electron_cutBased[i]>=2) passEleL.push_back(i);
-         if (Electron_cutBased[i]>=3) passEleM.push_back(i);
-         if (Electron_cutBased[i]>=4) passEleT.push_back(i);
-         if (Electron_cutBased[i]<=1) passEleNO.push_back(i); //vetoElectron is also considered no electron
-       }
-     }
-     (whichElectron==0) ? passElectrons=passEleV : (whichElectron==1) ? passElectrons=passEleL : (whichElectron==2) ? passElectrons=passEleM : passElectrons=passEleT;
-     nPassEleV=passEleV.size();
-     nPassEleL=passEleL.size();
-     nPassEleM=passEleM.size();
-     nPassEleT=passEleT.size();
-     nPassEleNO=passEleNO.size();
-     if (passElectrons.size() != 0) nleadEle=passElectrons[0];
-     if (passEleV.size() != 0) nleadEleV=passEleV[0];
-     if (passEleL.size() != 0) nleadEleL=passEleL[0];
-     if (passEleM.size() != 0) nleadEleM=passEleM[0];
-     if (passEleT.size() != 0) nleadEleT=passEleT[0];
-     nPassFREleL=passFREleL.size();
-     nPassFREleM=passFREleM.size();
-     nPassFREleT=passFREleT.size();
-     if (nPassFREleL != 0) nleadFREleL=passFREleL[0];
-     if (nPassFREleM != 0) nleadFREleM=passFREleM[0];
-     if (nPassFREleT != 0) nleadFREleT=passFREleT[0];
-     
      //Applying Fake Rate
      if (_fakeRate) {
        if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
@@ -1582,124 +1699,6 @@ void Analyzer::Loop()
          //cout<<FRvalue<<" = "<<FRetaphi<<" * "<<_C<<" *("<<_A<<" * "<<PV_npvsGood<<" + "<<_B<<")"<<endl;
          w*=FRvalue;
        }
-     }
-     //Calculate electron SFs
-     if (!isData) {
-       double id_sf=0, rec_sf=0, syst_id=0, syst_rec=0;
-       int sign_id=0, sign_rec=0;
-       (eleID_whichSF==1) ? sign_id=1 : (eleID_whichSF==2) ? sign_id=-1 : sign_id=0;
-       (eleRec_whichSF==1) ? sign_rec=1 : (eleRec_whichSF==2) ? sign_rec=-1 : sign_rec=0;
-       if (passElectrons.size()!=0){
-         double pt=Electron_pt[passElectrons[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;
-         id_sf=h_ele_EGamma_SF2D[whichElectron]->GetBinContent(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[whichElectron]->GetBinError(h_ele_EGamma_SF2D[whichElectron]->FindBin(Electron_eta[passElectrons[0]],pt));
-         if (pt<20) {
-           rec_sf=h_eleRec_EGamma_SF2D[0]->GetBinContent(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[0]->GetBinError(h_eleRec_EGamma_SF2D[0]->FindBin(Electron_eta[passElectrons[0]],pt));
-         }
-         else {
-           rec_sf=h_eleRec_EGamma_SF2D[1]->GetBinContent(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
-           syst_rec=h_eleRec_EGamma_SF2D[1]->GetBinError(h_eleRec_EGamma_SF2D[1]->FindBin(Electron_eta[passElectrons[0]],pt));
-         }
-         ele_SF[whichElectron]=(id_sf+sign_id*syst_id)*(rec_sf+sign_rec*syst_rec);
-         if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" +- "<<syst_id<<" "<<syst_rec<<" finalSF= "<<ele_SF[0]<<endl;
-       }
-       if (nPassEleNO!=0){ //only for loose electrons so far
-         double pt=Electron_pt[passEleNO[0]];//, pt2=Electron_pt[passEleNO[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;// pt2=(pt>30) ? pt : 31;
-         double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         syst_id=h_ele_EGamma_SF2D[1]->GetBinError(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         ele_VETOSF = (epsilon == 1) ? 1 : (1-(id_sf+sign_id*syst_id)*epsilon)/(1-epsilon);
-         if (ele_VETOSF==0 || std::isnan(ele_VETOSF)) cout<<"ele veto id "<<id_sf<<" epsilon "<<epsilon<<" sf "<<ele_VETOSF<<endl;
-       }
-     }
-     //muon
-     for (unsigned int i=0;i<nMuon;i++) {
-       bool passOverlap=true;
-       for (auto j : passPhotons) if (deltaR(Muon_phi[i],Photon_phi[j],Muon_eta[i],Photon_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passElectrons) if (deltaR(Muon_phi[i],Electron_phi[j],Muon_eta[i],Electron_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       if (!passOverlap) continue;
-       if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_miniPFRelIso_all[i]<0.2) {
-         if (Muon_looseId[i]) passMuL.push_back(i);
-         if (Muon_mediumId[i]) passMuM.push_back(i);
-         if (Muon_tightId[i]) passMuT.push_back(i);
-         if (!Muon_looseId[i]) passMuNO.push_back(i);
-       }
-     }
-     (whichMuon==0) ? passMuons=passMuL : (whichMuon==1) ? passMuons=passMuM : passMuons=passMuT;
-     nPassMuL=passMuL.size();
-     nPassMuM=passMuM.size();
-     nPassMuT=passMuT.size();
-     nPassMuNO=passMuNO.size();
-     if (passMuons.size() != 0) nleadMu=passMuons[0];
-     if (passMuL.size() != 0) nleadMuL=passMuL[0];
-     if (passMuM.size() != 0) nleadMuM=passMuM[0];
-     if (passMuT.size() != 0) nleadMuT=passMuT[0];
-     //muon SF
-     if (!isData){
-       int iter[3]={-1,-1,-1};
-       if (nPassMuL>0) iter[0]=passMuL.at(0);
-       if (nPassMuM>0) iter[1]=passMuM.at(0);
-       if (nPassMuT>0) iter[2]=passMuT.at(0);
-       for (int i=0;i<3;i++) {
-         if (iter[i]!=-1){
-           float pt = ( Muon_pt[iter[i]]< 20)? 20 : (Muon_pt[iter[i]]< 100) ? Muon_pt[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
-           float eta = (year==2016) ? Muon_eta[iter[i]] : abs(Muon_eta[iter[i]]);
-           double id_sf=0, iso_sf=0, syst_id=0, syst_iso=0;
-           int sign_id=0, sign_iso=0;
-           id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,eta));
-           syst_id=h_muID_SF2D[i]->GetBinError(h_muID_SF2D[i]->FindBin(pt,eta));
-           iso_sf=h_muISO_SF2D[i]->GetBinContent(h_muISO_SF2D[i]->FindBin(pt,eta));
-           syst_iso=h_muISO_SF2D[i]->GetBinError(h_muISO_SF2D[i]->FindBin(pt,eta));
-           (muID_whichSF==1) ? sign_id=1 : (muID_whichSF==2) ? sign_id=-1 : sign_id=0;
-           (muISO_whichSF==1) ? sign_iso=1 : (muISO_whichSF==2) ? sign_iso=-1 : sign_iso=0;
-           mu_SF[i]=(id_sf+sign_id*syst_id)*(iso_sf+sign_iso*syst_iso);
-           if (id_sf==0 || iso_sf==0) cout<<i<<" id_sf "<<id_sf<<" iso_sf "<<iso_sf<<" mu_SF "<<mu_SF[i]<<endl;
-         }
-       }
-     }
-
-     //Tau
-     for (unsigned int i=0;i<nTau;i++) {
-       bool passOverlap=true;
-       for (auto j : passPhotons) if (deltaR(Tau_phi[i],Photon_phi[j],Tau_eta[i],Photon_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passElectrons) if (deltaR(Tau_phi[i],Electron_phi[j],Tau_eta[i],Electron_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       for (auto j : passMuons) if (deltaR(Tau_phi[i],Muon_phi[j],Tau_eta[i],Muon_eta[j])<0.3) {
-         passOverlap=false;break;
-       }
-       if (!passOverlap) continue;
-       if (Tau_pt[i]>tau_pt && abs(Tau_eta[i])<2.3) {
-         if (Tau_idMVAoldDM2017v2[i]>>2&1) passTauL.push_back(i);
-         if (Tau_idMVAoldDM2017v2[i]>>3&1) passTauM.push_back(i);
-         if (Tau_idMVAoldDM2017v2[i]>>4&1) passTauT.push_back(i);
-       }
-     }
-     (whichTau==0) ? passTaus=passTauL : (whichTau==1) ? passTaus=passTauM : passTaus=passTauT;
-     nPassTauL=passTauL.size();
-     nPassTauM=passTauM.size();
-     nPassTauT=passTauT.size();
-     //nPassTauNO=passTauNO.size();
-     if (passTaus.size() != 0) nleadTau=passTaus[0];
-     if (passTauL.size() != 0) nleadTauL=passTauL[0];
-     if (passTauM.size() != 0) nleadTauM=passTauM[0];
-     if (passTauT.size() != 0) nleadTauT=passTauT[0];
-
-     //Tau SF
-     if (!isData) {
-       if (passTauL.size() != 0) tau_SF[0]=tf1_tau_ID_SF[0]->Eval(Tau_pt[nleadTauL]);
-       if (passTauM.size() != 0) tau_SF[1]=tf1_tau_ID_SF[1]->Eval(Tau_pt[nleadTauM]);
-       if (passTauT.size() != 0) tau_SF[2]=tf1_tau_ID_SF[2]->Eval(Tau_pt[nleadTauT]);
-       if (tau_SF[0]==0 || tau_SF[1]==0 || tau_SF[2]==0) cout<<"nPassTauL "<<nPassTauL<<" nPassTauM "<<nPassTauM<<" nPassTauT "<<nPassTauT<<" tau L SF "<<tau_SF[0]<<" tau M SF "<<tau_SF[1]<<" tau T SF "<<tau_SF[2]<<endl;
      }
 
      //IsoTrack
@@ -1810,7 +1809,13 @@ void Analyzer::Loop()
      }
      nPassAK4=passJet.size();
      if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
-     if (vetoFastSim) continue;
+     if (vetoFastSim) {
+       if (CountSignal) {
+         auto search = signal_events.find(mass_pair);
+         if (search!=signal_events.end()) search->second -=1;
+       }
+       continue;
+     }
      //jet pt, btags
      for (auto i : passJet) {
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
@@ -1997,18 +2002,22 @@ void Analyzer::Loop()
        
      //HEM15/16 veto
      bool HEMveto_electron=false, HEMveto_jet=false;
-     if (year==2018 && ((isData && run>=319077) || (!isData && !SignalScan && jentry/TotalEvents<0.65))) {
-       for (unsigned int i=0;i<nElectron;i++) {
-         //Veto events with any electron with pT > 30GeV, -3.0 < eta < -1.4, and -1.57 < phi < -0.87
-         if (Electron_pt[i]>30 && Electron_eta[i]<-1.4 && Electron_eta[i]>-3.0 && Electron_phi[i]<-0.87 && Electron_phi[i]>-1.57) HEMveto_electron=true;
-         //if (HEMveto_electron) cout<<"ele pt "<<Electron_pt[i]<<" eta "<<Electron_eta[i]<<" phi "<<Electron_phi[i]<<endl;
-         if (HEMveto_electron) break; 
-       }
-       for (unsigned int i=0;i<nJet;i++) {
-         //Veto events with any jet with pT > 30 GeV, DeltaPhi(jet, HT,miss) < 0.5, -3.2 <eta< -1.2, and -1.77 < phi < -0.67 (veto enlarged by half the jet cone)
-         if (jetSmearedPt[i]>30 && Jet_eta[i]<-1.2 && Jet_eta[i]>-3.2 && Jet_phi[i]<-0.67 && Jet_phi[i]>-1.77 && deltaPhi(Jet_phi[i],METPhi)<0.5) HEMveto_jet=true;
-         //if (HEMveto_jet) cout<<"jet pt "<<jetSmearedPt[i]<<" eta "<<Jet_eta[i]<<" phi "<<Jet_phi[i]<<" dphi "<<deltaPhi(Jet_phi[i],METPhi)<<endl;
-         if (HEMveto_jet) break; 
+     if (year==2018) {
+       if ((isData && run>=319077) ||
+           (!isData && !SignalScan && jentry/TotalEvents<0.65) ||
+           (!isData && SignalScan && jentry/TotalEvents<0.325)) {//since running on 1H1G but totalevents is for full dataset
+         for (unsigned int i=0;i<nElectron;i++) {
+           //Veto events with any electron with pT > 30GeV, -3.0 < eta < -1.4, and -1.57 < phi < -0.87
+           if (Electron_pt[i]>30 && Electron_eta[i]<-1.4 && Electron_eta[i]>-3.0 && Electron_phi[i]<-0.87 && Electron_phi[i]>-1.57) HEMveto_electron=true;
+           //if (HEMveto_electron) cout<<"ele pt "<<Electron_pt[i]<<" eta "<<Electron_eta[i]<<" phi "<<Electron_phi[i]<<endl;
+           if (HEMveto_electron) break; 
+         }
+         for (unsigned int i=0;i<nJet;i++) {
+           //Veto events with any jet with pT > 30 GeV, DeltaPhi(jet, HT,miss) < 0.5, -3.2 <eta< -1.2, and -1.77 < phi < -0.67 (veto enlarged by half the jet cone)
+           if (jetSmearedPt[i]>30 && Jet_eta[i]<-1.2 && Jet_eta[i]>-3.2 && Jet_phi[i]<-0.67 && Jet_phi[i]>-1.77 && deltaPhi(Jet_phi[i],METPhi)<0.5) HEMveto_jet=true;
+           //if (HEMveto_jet) cout<<"jet pt "<<jetSmearedPt[i]<<" eta "<<Jet_eta[i]<<" phi "<<Jet_phi[i]<<" dphi "<<deltaPhi(Jet_phi[i],METPhi)<<endl;
+           if (HEMveto_jet) break; 
+         }
        }
      }
      if (HEMveto_electron || HEMveto_jet) continue;
@@ -2116,7 +2125,7 @@ void Analyzer::Loop()
              }
              //cout<<event<<" "<<Deep_SF_L[0]<<" tagged light "<<count<<endl;
              //AK8
-             if (_fastSim) CalcBtagSF_AK8(year, AK8JetSmearedPt, passDDBvL, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T1, DDBvL_SF_T2);
+             if (SignalScan) CalcBtagSF_AK8(year, AK8JetSmearedPt, passDDBvL, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T1, DDBvL_SF_T2);
            }
 
            //SignalStudy
@@ -2309,7 +2318,7 @@ void Analyzer::Loop()
            else { //Hardcoded cuts
              if (PV_npvsGood==0) continue;
            }
-
+           
            //Cut for high njet region (need to implement in Cut() if decided as standard)
            //Filling histograms
            h_eff->Fill(1.,w); h_eff->Fill(2.,weight);
