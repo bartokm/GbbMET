@@ -1227,7 +1227,7 @@ public :
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
    int bcounterDDBvL[6]={}, bcounterDeep[4]={};
-   int DDBvL_selected=0, Deep_selected=0;
+   int DDBvL_selected=0, Deep_selected=0, Deep_medium_selected=0;
    bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
@@ -2348,6 +2348,13 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         if (_cut_value[i]==2) w*=Deep_SF_L[Deep_whichSF]*Deep_SF_L[Deep_whichSF];
       }
     }
+    else if (_cut_variable[i]=="Deep_medium_selected") {
+      returnvalue*=Parser(Deep_medium_selected,_cut_operator[i],_cut_value[i]);
+      if (!isData) {
+        if (_cut_value[i]==1) w*=Deep_SF_M[Deep_whichSF];
+        if (_cut_value[i]==2) w*=Deep_SF_M[Deep_whichSF]*Deep_SF_M[Deep_whichSF];
+      }
+    }
     else if (_cut_variable[i]=="sth_selected") {
       returnvalue*=Parser(Deep_selected+DDBvL_selected,_cut_operator[i],_cut_value[i]);
       if (_cut_variable[i]>0) {
@@ -2780,6 +2787,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"bcounterDDBvL_T2","number of tight 2 DDBvL btagged jets"},
   {"DDBvL_selected","DDBvL btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
+  {"Deep_medium_selected","Deep btag (0-NoMediumbtag, 1-1 medium btag) of the higgs candidate ak4jets"},
   {"sth_selected","Deep_selected+DDBvL_selected"},
   {"passBtag","Higgs candidate ak8jet passes medium btag"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},

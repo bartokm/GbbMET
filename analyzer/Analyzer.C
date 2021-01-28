@@ -2003,9 +2003,10 @@ void Analyzer::Loop()
      //HEM15/16 veto
      bool HEMveto_electron=false, HEMveto_jet=false;
      if (year==2018) {
+       bool oneHoneG=(SignalScan && temp_f.find("1H1g")!=std::string::npos) ? true : false;
        if ((isData && run>=319077) ||
-           (!isData && !SignalScan && jentry/TotalEvents<0.65) ||
-           (!isData && SignalScan && jentry/TotalEvents<0.325)) {//since running on 1H1G but totalevents is for full dataset
+           (!isData && !oneHoneG && jentry/TotalEvents<0.65) ||
+           (!isData &&  oneHoneG && jentry/TotalEvents<0.325)) {//since running on 1H1G but totalevents is for full dataset
          for (unsigned int i=0;i<nElectron;i++) {
            //Veto events with any electron with pT > 30GeV, -3.0 < eta < -1.4, and -1.57 < phi < -0.87
            if (Electron_pt[i]>30 && Electron_eta[i]<-1.4 && Electron_eta[i]>-3.0 && Electron_phi[i]<-0.87 && Electron_phi[i]>-1.57) HEMveto_electron=true;
@@ -2053,7 +2054,7 @@ void Analyzer::Loop()
        double m_bb_deep=-1, phi_H_candidate=999, pt_H_candidate=-1;
        bool passAK4DeepHiggsMass=false;
        Deep_selected=0; //Deep btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
-       int Deep_medium_selected=0;
+       Deep_medium_selected=0;
        int SelectedAK4Jet1=-1, SelectedAK4Jet2=-1;
        double dR_ak4_Hcandidate=-1, pt_ak4_Hcandidate1=-1, pt_ak4_Hcandidate2=-1;
        if (passJet.size()>1){
