@@ -1128,8 +1128,13 @@ void Analyzer::Loop()
            if (btag_file.compare("hardcoded")==0) {
              string pretag="/data/BTagEff/nanoAODv5/";
              string tag="BTagEff_";
-             if (temp_f.find("DYJetsToLL")!=std::string::npos) tag+="DYJetsToLL";
+             if (temp_f.find("DYJetsToLL_Pt")!=std::string::npos) tag+="DYJetsToLL_Pt_merged";
+             else if (temp_f.find("DYJetsToLL_M-10to50")!=std::string::npos) tag+="DYJetsToLL_M-10to50";
+             else if (temp_f.find("DYJetsToLL")!=std::string::npos) tag+="DYJetsToLL";
+             else if (temp_f.find("WGJets_MonoPhoton_PtG-40to130")!=std::string::npos) tag+="WGJets_MonoPhoton_PtG-40to130";
+             else if (temp_f.find("WGJets")!=std::string::npos) tag+="WGJets";
              else if (temp_f.find("TTGJets")!=std::string::npos) tag+="TTGJets";
+             else if (temp_f.find("GJets_DR-0p4")!=std::string::npos) tag+="GJets_DR-0p4_HT_merged";
              else if (temp_f.find("GJets")!=std::string::npos) tag+="GJets_HT_merged";
              else if (temp_f.find("QCD")!=std::string::npos) tag+="QCD_HT_merged";
              else if (temp_f.find("ST_s-channel_hadronicDecays")!=std::string::npos) tag+="ST_s-channel_hadronicDecays";
@@ -1140,11 +1145,15 @@ void Analyzer::Loop()
              else if (temp_f.find("ST_tW_antitop")!=std::string::npos) tag+="ST_tW_antitop";
              else if (temp_f.find("ST_tW_top")!=std::string::npos) tag+="ST_tW_top";
              else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) tag+="TTGamma_Hadronic";
+             else if (temp_f.find("TTGamma_Dilept")!=std::string::npos) tag+="TTGamma_Dilept_merged";
+             else if (temp_f.find("TTGamma_SingleLept")!=std::string::npos) tag+="TTGamma_SingleLept_merged";
              else if (temp_f.find("TTJets")!=std::string::npos) tag+="TTJets";
-             else if (temp_f.find("WGJets")!=std::string::npos) tag+="WGJets";
+             else if (temp_f.find("TTTo2L2Nu")!=std::string::npos) tag+="TTTo2L2Nu";
+             else if (temp_f.find("TTToSemiLeptonic")!=std::string::npos) tag+="TTToSemiLeptonic";
              else if (temp_f.find("WJetsToLNu")!=std::string::npos) tag+="WJetsToLNu_HT_merged";
              else if (temp_f.find("WJetsToQQ_HT")!=std::string::npos) tag+="WJetsToQQ_HT_merged";
              else if (temp_f.find("WJetsToQQ")!=std::string::npos) tag+="WJetsToQQ";
+             else if (temp_f.find("WWG")!=std::string::npos) tag+="WWG";
              else if (temp_f.find("WW")!=std::string::npos) tag+="WW";
              else if (temp_f.find("WZ")!=std::string::npos) tag+="WZ";
              else if (temp_f.find("ZGTo2LG")!=std::string::npos) tag+="ZGTo2LG";
@@ -1157,6 +1166,7 @@ void Analyzer::Loop()
              btag_fname=pretag+"hadded/"+to_string(year)+"/"+tag+".root";
              if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+to_string(year)+"_all_out.root";
              if (temp_f.find("TChiNG")!=std::string::npos) btag_fname=pretag+"signal/TChiNg_tree_"+to_string(year)+"_all_out.root";
+             if (!is_quiet) cout<<"btag efficiency file "<<btag_fname<<endl;
            }
            TFile f_btag(btag_fname.c_str(),"read");
            eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
@@ -1817,9 +1827,9 @@ void Analyzer::Loop()
      for (auto i : passJet) {
        //Updating jet b-tagging status
        if (!isData && btag_file.size()>0) {
-         if (year==2016) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
-         if (year==2017) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
-         if (year==2018) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
+         if (year==2016) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
+         if (year==2017) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
+         if (year==2018) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
        }
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
@@ -2031,10 +2041,7 @@ void Analyzer::Loop()
      //HEM15/16 veto
      bool HEMveto_electron=false, HEMveto_jet=false;
      if (year==2018) {
-       bool oneHoneG=(SignalScan && temp_f.find("1H1g")!=std::string::npos) ? true : false;
-       if ((isData && run>=319077) ||
-           (!isData && !oneHoneG && jentry/TotalEvents<0.65) ||
-           (!isData &&  oneHoneG && jentry/TotalEvents<0.325)) {//since running on 1H1G but totalevents is for full dataset
+       if ((isData && run>=319077) || (!isData && jentry%100<65)) {
          for (unsigned int i=0;i<nElectron;i++) {
            //Veto events with any electron with pT > 30GeV, -3.0 < eta < -1.4, and -1.57 < phi < -0.87
            if (Electron_pt[i]>30 && Electron_eta[i]<-1.4 && Electron_eta[i]>-3.0 && Electron_phi[i]<-0.87 && Electron_phi[i]>-1.57) HEMveto_electron=true;
@@ -2242,7 +2249,7 @@ void Analyzer::Loop()
            //If you want dphi VR version, you have to put it just before sbFill
 
            //highest btag phi
-           double btag_phi=999, dphi_closest=999;
+           double btag_phi=999, dphi_closest=999; dphi_met_btags=999;
            if (passJet.size()>0) {btag_phi=Jet_phi[passJet[0]]; dphi_met_btag=deltaPhi(btag_phi,METPhi);}
            for (auto i : passJet) {
              if (jetbtagDeepFlavB[i]<BtagDeepWP[year_chooser][0]) continue;
@@ -2395,10 +2402,9 @@ void Analyzer::Loop()
                if (HT_after>1500) hn_AK8HTsearchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
                break;
            }
-           //if (event==11549298) {
-             //if (boost) cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[0]<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<DDBvL_SF_L[DDBvL_whichSF]<<" "<<w_AK8searchBin<<endl;
-             //else       cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[0]<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<" "<<w_AK4searchBin<<endl;
-             //if (event==11549298) cout<<"deep sf "<<endl;
+           //if (jentry==3302907) {
+             //if (boost) cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[1]<<" "<<ele_VETOSF<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<" "<<w_AK8searchBin<<endl;
+             //else       cout << fixed << setprecision(4) << jentry<<" "<<event<<" "<<pu_weight<<" "<<weight<<" "<<pho_SF[0]<<" "<<nonPrefiringProbability[0]<<" "<<ele_SF[1]<<" "<<ele_VETOSF<<" "<<mu_SF[0]<<" "<<tau_SF[0]<<" "<<w_isr<<" "<<" "<<w_AK4searchBin<<endl;
            //}
 
            //higgs mass distribution plot fills

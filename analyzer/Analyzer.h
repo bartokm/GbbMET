@@ -1308,7 +1308,7 @@ public :
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
    void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
-   double           UpdateBtags(bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
+   double           UpdateBtags(bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
    void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
@@ -2452,7 +2452,7 @@ float Analyzer::Photon_SCEta(const int i){
   return SCEta;
 }
 
-double Analyzer::UpdateBtags(bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
+double Analyzer::UpdateBtags(bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
   BTEntry::JetFlavor FLAV;
   double mc_eff[3]={0}; char tag='0';
   if (btag_discr>WP_M) tag='M';
@@ -2499,8 +2499,7 @@ double Analyzer::UpdateBtags(bool fastsim, double eta, double pt, int had, doubl
   double NtoL = (SF[0]-1)/(1/mc_eff[0]-1);
   double LtoN = (1-SF[0])/(1-mc_eff[1]*SF[1]/mc_eff[0]);
   double LtoM = (SF[1]-1)/(mc_eff[0]/mc_eff[1]-1);
-
-
+  
   if (SF[1]<=1 && SF[0]<=1) {
     if (tag == 'M') if (rand>SF[1]) {newtag = 'L'; if (rand2<LtoN) newtag='0';}
     if (tag == 'L') if (rand<LtoN) newtag='0';
@@ -2519,14 +2518,10 @@ double Analyzer::UpdateBtags(bool fastsim, double eta, double pt, int had, doubl
       else if (rand2<LtoN) newtag='0';
     }
   }
+  
+  if (debug) cout<<"pt "<<pt<<" eta "<<eta<<" flav "<<had<<" mc eff loose medium "<<mc_eff[0]<<" "<<mc_eff[1]<<" sf loose medium "<<SF[0]<<" "<<SF[1]<<" rand "<<rand<<" rand2 "<<rand2<<" tag "<<tag<<" newtag "<<newtag<<endl;
+
   if (tag!=newtag) {
-  /*
-    cout<<"Jet pt "<<pt<<" eta "<<eta<<" flavour "<<had<<" btag "<<tag<<endl;
-    cout<<"SF loose "<<SF[0]<<" medium "<<SF[1]<<" mc eff loose "<<mc_eff[0]<<" medium "<<mc_eff[1]<<endl;
-    cout<<"NtoL "<<NtoL<<" LtoN "<<LtoN<<" LtoM "<<LtoM<<endl;
-    cout<<"rand "<<rand<<" rand2 "<<rand2<<endl;
-    cout<<"NEWTAG "<<newtag<<endl;
-  */
     //new tag to top
     //if (newtag =='0') return WP_L-0.0001;
     //if (newtag =='L') return WP_M-0.0001;
