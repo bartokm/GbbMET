@@ -5,6 +5,7 @@
 #include "cross_sections.h"
 #include <bitset>
 #include <algorithm>
+#include <TKey.h>
 #include <TH2.h>
 #include <TH3.h>
 #include <THn.h>
@@ -766,7 +767,6 @@ void Analyzer::Loop()
        }
        //weights
        (PUweight_whichSF==1) ? pu_weight=puWeightUp : (PUweight_whichSF==2) ? pu_weight=puWeightDown : pu_weight=puWeight;
-       if (_fastSim || SignalScan) pu_weight=1;
        weight=L_data[year_chooser]*xsec*genWeight/TotalEvents;
        //if (newfile) std::cout<<"weight=L_data[year_chooser]*genWeight*xsec/TotalEvents "<<weight<<"="<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<std::endl;
        w=weight*pu_weight;

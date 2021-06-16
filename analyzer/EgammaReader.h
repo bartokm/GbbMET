@@ -1,6 +1,7 @@
 
 #ifndef EgammaScalingReader_h
 #define NanoAODselector_h
+#include <set>
 
 
 #define MAP_MULTIPLIER 1000 // r9 is given to 3 digits sometimes
