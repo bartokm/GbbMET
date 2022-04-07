@@ -1,6 +1,77 @@
 #ifndef cross_sections_h
 #define cross_sections_h
 
+double get_cross_section(string name, int year, int center_down_up=0) {
+  if (name.find("DYJetsToLL_Pt-50To100")!=std::string::npos) return (year==2016) ? 354.8 : 407.9;
+  else if (name.find("DYJetsToLL_Pt-100To250")!=std::string::npos) return (year==2016) ? 81.22 : 96.8;
+  else if (name.find("DYJetsToLL_Pt-250To400")!=std::string::npos) return (year==2016) ? 2.991 : 3.774;
+  else if (name.find("DYJetsToLL_Pt-400To650")!=std::string::npos) return (year==2016) ? 0.3882 : 0.5164;
+  else if (name.find("DYJetsToLL_Pt-650ToInf")!=std::string::npos) return (year==2016) ? 0.03737 : 0.04796;
+  else if (name.find("DYJetsToLL_M-10to50")!=std::string::npos) return (year==2016) ? 16270 : 15810;
+  else if (name.find("DYJetsToLL")!=std::string::npos) return (year==2016) ? 5941 : (year==2017) ? 6529 : 6435;
+  else if (name.find("GJets_DR-0p4_HT-100To200")!=std::string::npos) return (year==2016) ? 5363 : 5034;
+  else if (name.find("GJets_DR-0p4_HT-200To400")!=std::string::npos) return (year==2016) ? 1178 : 1128;
+  else if (name.find("GJets_DR-0p4_HT-400To600")!=std::string::npos) return (year==2016) ? 131.8 : 124.8;
+  else if (name.find("GJets_DR-0p4_HT-600ToInf")!=std::string::npos) return (year==2016) ? 44.27 : 40.72;
+  else if (name.find("GJets_HT40To100")!=std::string::npos) return (year==2016) ? 20660 : 18700;
+  else if (name.find("GJets_HT100To200")!=std::string::npos) return (year==2016) ? 9249 : 8640;
+  else if (name.find("GJets_HT200To400")!=std::string::npos) return (year==2016) ? 2321 : 2185;
+  else if (name.find("GJets_HT400To600")!=std::string::npos) return (year==2016) ? 275.2 : 259.9;
+  else if (name.find("GJets_HT600ToInf")!=std::string::npos) return (year==2016) ? 93.19 : 85.31;
+  else if (name.find("QCD_HT300to500")!=std::string::npos) return (year==2016) ? 347500 : (year==2017) ? 322600 : 323400;
+  else if (name.find("QCD_HT500to700")!=std::string::npos) return (year==2016) ? 32060 : (year==2017) ? 29980 : 30140;
+  else if (name.find("QCD_HT700to1000")!=std::string::npos) return (year==2016) ? 6829 : (year==2017) ? 6334 : 6310;
+  else if (name.find("QCD_HT1000to1500")!=std::string::npos) return (year==2016) ? 1207 : (year==2017) ? 1088 : 1094;
+  else if (name.find("QCD_HT1500to2000")!=std::string::npos) return (year==2016) ? 120 : (year==2017) ? 99.11 : 99.38;
+  else if (name.find("QCD_HT2000toInf")!=std::string::npos) return (year==2016) ? 25.25 : (year==2017) ? 20.23 : 20.2;
+  else if (name.find("ST_s-channel_hadronicDecays")!=std::string::npos) return (year==2016) ? 1 : 11.24;
+  else if (name.find("ST_s-channel_leptonDecays")!=std::string::npos) return (year==2016) ? 1 : 3.74;
+  else if (name.find("ST_s-channel")!=std::string::npos) return (year==2016) ? 10.12 : 1;
+  else if (name.find("ST_t-channel_antitop")!=std::string::npos) return (year==2016) ? 80.95 : 67.91;
+  else if (name.find("ST_t-channel_top")!=std::string::npos) return (year==2016) ? 136.02 : 113.3;
+  else if (name.find("ST_tW_antitop")!=std::string::npos) return (year==2016) ? 38.06 : 34.97;
+  else if (name.find("ST_tW_top")!=std::string::npos) return (year==2016) ? 38.09 :34.91;
+  else if (name.find("TTGJets")!=std::string::npos) return (year==2016) ? 3.795 : 4.078;
+  else if (name.find("TTGamma_Hadronic")!=std::string::npos) return (year==2016) ? 4.15 : (year==2017) ? 4.165 : 4.175;
+  else if (name.find("TTGamma_Dilept_ptGamma100-200")!=std::string::npos) return (year==2016) ? 1 : (year==2017) ? 0.0343 : 0.03428;
+  else if (name.find("TTGamma_Dilept_ptGamma200inf")!=std::string::npos) return (year==2016) ? 1 : (year==2017) ? 0.006802 : 0.006801;
+  else if (name.find("TTGamma_Dilept")!=std::string::npos) return 1.494;
+  else if (name.find("TTGamma_SingleLept_ptGamma100-200")!=std::string::npos) return (year==2016) ? 1 : (year==2017) ? 0.132 : 0.1319;
+  else if (name.find("TTGamma_SingleLept_ptGamma200inf")!=std::string::npos) return (year==2016) ? 1 : (year==2017) ? 0.027 : 0.02701;
+  else if (name.find("TTGamma_SingleLept")!=std::string::npos) return 5.077;
+  else if (name.find("TTJets")!=std::string::npos) return 831.76;
+  else if (name.find("TTTo2L2Nu")!=std::string::npos) return 88.29;
+  else if (name.find("TTToSemiLeptonic")!=std::string::npos) return (year==2016) ? 1 : (year==2016) ? 365.34 : (year==2017) ? 368.3 : 368.34;
+  else if (name.find("WGJets_MonoPhoton_PtG-40to130")!=std::string::npos) return 0.7114;
+  else if (name.find("WGJets")!=std::string::npos) return 0.6578;
+  else if (name.find("WJetsToLNu_HT100To200")!=std::string::npos) return (year==2016) ? 1346 : 1395;
+  else if (name.find("WJetsToLNu_HT200To400")!=std::string::npos) return (year==2016) ? 360.1 : 407.9;
+  else if (name.find("WJetsToLNu_HT400To600")!=std::string::npos) return (year==2016) ? 48.8 : 57.48;
+  else if (name.find("WJetsToLNu_HT600To800")!=std::string::npos) return (year==2016) ? 12.07 : 12.87;
+  else if (name.find("WJetsToLNu_HT800To1200")!=std::string::npos) return (year==2016) ? 5.497 : 5.366;
+  else if (name.find("WJetsToLNu_HT1200To2500")!=std::string::npos) return (year==2016) ? 1.329 : 1.074;
+  else if (name.find("WJetsToLNu_HT2500ToInf")!=std::string::npos) return (year==2016) ? 0.03209 : 0.008001;
+  else if (name.find("WJetsToQQ_HT600to800")!=std::string::npos) return (year==2016) ? 59.52 : (year==2017) ? 68.64 : 68.6;
+  else if (name.find("WJetsToQQ_HT800toInf")!=std::string::npos) return (year==2016) ? 30.17 : (year==2017) ? 34.7 : 34.75;
+  else if (name.find("WWG")!=std::string::npos) return 0.2147;
+  else if (name.find("WW")!=std::string::npos) return (year==2016) ? 64.3 : 75.8;
+  else if (name.find("WZ")!=std::string::npos) return (year==2016) ? 23.43 : 27.6;
+  else if (name.find("ZGTo2LG")!=std::string::npos) return (year==2016) ? 47.43 : (year==2017) ? 55.47 : 55.48;
+  else if (name.find("ZGTo2NuG")!=std::string::npos) return (year==2016) ? 28.04 : (year==2017) ? 30.24 : 30.17;
+  else if (name.find("ZJetsToNuNu_HT-100To200")!=std::string::npos) return 302.8;
+  else if (name.find("ZJetsToNuNu_HT-200To400")!=std::string::npos) return 92.59;
+  else if (name.find("ZJetsToNuNu_HT-400To600")!=std::string::npos) return 13.18;
+  else if (name.find("ZJetsToNuNu_HT-600To800")!=std::string::npos) return 3.257;
+  else if (name.find("ZJetsToNuNu_HT-800To1200")!=std::string::npos) return 1.49;
+  else if (name.find("ZJetsToNuNu_HT-1200To2500")!=std::string::npos) return 0.3419;
+  else if (name.find("ZJetsToNuNu_HT-2500ToInf")!=std::string::npos) return 0.005146;
+  else if (name.find("ZJetsToQQ_HT600to800")!=std::string::npos) return (year==2016) ? 27.37 : (year==2017) ? 34.06 : 34.05;
+  else if (name.find("ZJetsToQQ_HT800toInf")!=std::string::npos) return (year==2016) ? 15.03 : (year==2017) ? 18.57 : 18.54;
+  else if (name.find("ZZ")!=std::string::npos) return (year==2016) ? 10.16 : 12.14;
+  cout<<"No cross section found for "<<name<<"\nUsing xsec=1"<<endl;
+  return 1;
+}
+
 //Get gluino-gluino cross section, use input of gluino mass and -1/+1 for lower/upper errors
 double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0) {
   if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) {
@@ -1010,7 +1081,7 @@ double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0
       default : return 0;
     }
   }
-  if (SignalScenario==2) {
+  if (SignalScenario==2 || SignalScenario==5) {
     //TChiNG xsec is the sum of wino like n2c1 + c1c1
     //Might "add" higgsino like xsec later
     double returnvalue=0;
@@ -4842,6 +4913,179 @@ unsigned long long get_total_events(pair<int,int> input, int year, int SignalSce
       }
     }
   }
+  if (SignalScenario==5) {
+    if (year==2016) { 
+      switch (a) {
+        case 300 : return 58118;
+        case 325 : return 61917;
+        case 350 : return 57252;
+        case 375 : return 53887;
+        case 400 : return 59756;
+        case 425 : return 60699;
+        case 450 : return 55598;
+        case 475 : return 56962;
+        case 500 : return 57975;
+        case 525 : return 56519;
+        case 550 : return 57730;
+        case 575 : return 57321;
+        case 600 : return 57795;
+        case 625 : return 56302;
+        case 650 : return 58425;
+        case 675 : return 57161;
+        case 700 : return 57591;
+        case 725 : return 58500;
+        case 750 : return 60852;
+        case 775 : return 61228;
+        case 800 : return 56960;
+        case 825 : return 63741;
+        case 850 : return 64146;
+        case 875 : return 56939;
+        case 900 : return 57282;
+        case 925 : return 56513;
+        case 950 : return 60588;
+        case 975 : return 59779;
+        case 1000 : return 59249;
+        case 1025 : return 57128;
+        case 1050 : return 58805;
+        case 1075 : return 56641;
+        case 1100 : return 57981;
+        case 1125 : return 60182;
+        case 1150 : return 58791;
+        case 1175 : return 58231;
+        case 1200 : return 61741;
+        case 1225 : return 58635;
+        case 1250 : return 59486;
+        case 1275 : return 61506;
+        case 1300 : return 58420;
+        case 1325 : return 59597;
+        case 1350 : return 61382;
+        case 1375 : return 61483;
+        case 1400 : return 59605;
+        case 1425 : return 65340;
+        case 1450 : return 58465;
+        case 1475 : return 61024;
+        case 1500 : return 59072;
+        case 1525 : return 57476;
+        case 1550 : return 58584;
+        case 1575 : return 57074;
+        case 1600 : return 57698;
+      }
+    }
+    if (year==2017) {
+      switch (a) {
+        case 300 : return 74405;
+        case 325 : return 71808;
+        case 350 : return 64578;
+        case 375 : return 72186;
+        case 400 : return 73814;
+        case 425 : return 76960;
+        case 450 : return 66054;
+        case 475 : return 68182;
+        case 500 : return 59313;
+        case 525 : return 67670;
+        case 550 : return 77413;
+        case 575 : return 70006;
+        case 600 : return 69254;
+        case 625 : return 74090;
+        case 650 : return 68340;
+        case 675 : return 64079;
+        case 700 : return 68879;
+        case 725 : return 76006;
+        case 750 : return 65680;
+        case 775 : return 67435;
+        case 800 : return 80716;
+        case 825 : return 76961;
+        case 850 : return 66395;
+        case 875 : return 66253;
+        case 900 : return 68334;
+        case 925 : return 77779;
+        case 950 : return 70905;
+        case 975 : return 75311;
+        case 1000 : return 69608;
+        case 1025 : return 55661;
+        case 1050 : return 62084;
+        case 1075 : return 71074;
+        case 1100 : return 64663;
+        case 1125 : return 66667;
+        case 1150 : return 65306;
+        case 1175 : return 66899;
+        case 1200 : return 69375;
+        case 1225 : return 65900;
+        case 1250 : return 63028;
+        case 1275 : return 61399;
+        case 1300 : return 71548;
+        case 1325 : return 59712;
+        case 1350 : return 75912;
+        case 1375 : return 66175;
+        case 1400 : return 65903;
+        case 1425 : return 62548;
+        case 1450 : return 64753;
+        case 1475 : return 68707;
+        case 1500 : return 57919;
+        case 1525 : return 61900;
+        case 1550 : return 64912;
+        case 1575 : return 64162;
+        case 1600 : return 65461;
+      }
+    }
+    if (year==2018) {
+      switch (a) {
+        case 300 : return 113777;
+        case 325 : return 112422;
+        case 350 : return 109789;
+        case 375 : return 107769;
+        case 400 : return 109130;
+        case 425 : return 105163;
+        case 450 : return 107887;
+        case 475 : return 100744;
+        case 500 : return 109374;
+        case 525 : return 97169;
+        case 550 : return 107612;
+        case 575 : return 103359;
+        case 600 : return 110771;
+        case 625 : return 102060;
+        case 650 : return 102705;
+        case 675 : return 102954;
+        case 700 : return 110375;
+        case 725 : return 101258;
+        case 750 : return 100263;
+        case 775 : return 92718;
+        case 800 : return 111396;
+        case 825 : return 107350;
+        case 850 : return 98063;
+        case 875 : return 105413;
+        case 900 : return 103451;
+        case 925 : return 107198;
+        case 950 : return 101630;
+        case 975 : return 103219;
+        case 1000 : return 100693;
+        case 1025 : return 110300;
+        case 1050 : return 104650;
+        case 1075 : return 102983;
+        case 1100 : return 94621;
+        case 1125 : return 105544;
+        case 1150 : return 93819;
+        case 1175 : return 96160;
+        case 1200 : return 105247;
+        case 1225 : return 102070;
+        case 1250 : return 92884;
+        case 1275 : return 100031;
+        case 1300 : return 95203;
+        case 1325 : return 103445;
+        case 1350 : return 100041;
+        case 1375 : return 95322;
+        case 1400 : return 92622;
+        case 1425 : return 97417;
+        case 1450 : return 101634;
+        case 1475 : return 98829;
+        case 1500 : return 88159;
+        case 1525 : return 96664;
+        case 1550 : return 95566;
+        case 1575 : return 93542;
+        case 1600 : return 91173;
+      }
+    }
+  }
   if (SignalScenario==3) {
     switch (year) {
       case 2016 :
@@ -5014,7 +5258,7 @@ std::map<pair<int,int>,int> init_signal_event(int SignalScenario) {
     for (auto i : Yticks) {pair<int,int> p(2800,i); output.insert(pair<pair<int,int>,int>(p,0));}
     Yticks.clear();
   }
-  if (SignalScenario==2) {
+  if (SignalScenario==2 || SignalScenario==5) {
     //TChiNG 300 to 1600 GeV in steps of 25 GeV.
     for (unsigned int i=0; i<53; i++) {
       int m=(300+i*25);

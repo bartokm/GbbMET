@@ -117,7 +117,7 @@ std::pair<int, int> whichGridpoint(std::pair<double, double> in, int SignalScena
     return a;
   }
 
-  if (SignalScenario==2) {
+  if (SignalScenario==2 || SignalScenario==5) {
     //TChiNG 300 to 1600 GeV in steps of 25 GeV.
     double diff=999; int mass=-1;
     for (unsigned int i=0; i<53; i++) {

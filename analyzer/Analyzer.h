@@ -34,6 +34,7 @@
 #include <TChain.h>
 #include <TFile.h>
 #include <TH2.h>
+#include <TH3.h>
 #include <TGraph.h>
 
 using namespace std;
@@ -227,6 +228,9 @@ public :
    Int_t           GenVisTau_genPartIdxMother[99];   //[nGenVisTau]
    Int_t           GenVisTau_status[99];   //[nGenVisTau]
    Float_t         genWeight;
+   Float_t         puAutoWeight;
+   Float_t         puAutoWeightUp;
+   Float_t         puAutoWeightDown;
    Float_t         puWeight;
    Float_t         puWeightUp;
    Float_t         puWeightDown;
@@ -802,6 +806,9 @@ public :
    TBranch        *b_GenVisTau_genPartIdxMother;   //!
    TBranch        *b_GenVisTau_status;   //!
    TBranch        *b_genWeight;   //!
+   TBranch        *b_puAutoWeight;
+   TBranch        *b_puAutoWeightUp;
+   TBranch        *b_puAutoWeightDown;
    TBranch        *b_puWeight;
    TBranch        *b_puWeightUp;
    TBranch        *b_puWeightDown;
@@ -1200,13 +1207,15 @@ public :
    //Added
    double BtagDDBvLWP[3][5]={{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92}};
    double BtagDeepWP[3][3]={{0.0614,0.3093,0.7221},{0.0521,0.3033,0.7489},{0.0494,0.2770,0.7264}};
-   std::string output_file="default", btag_file="", xsec_file="default";
+   std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
+   int _ABCD=0;
    bool _fastSim=false;
    int _fakeRate=0;
    int _testRun=0;
    bool isData=true;
    bool is_quiet=false;
+   bool is_debug=false;
    bool signalstudy=false;
    bool SignalScan=false;
    bool CountSignal=false;
@@ -1232,16 +1241,16 @@ public :
    bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
-   bool notAK4=true;
-   bool Hbb=false, mcLeptonFilter=false;
-   int truePU=0;
-   int SignalHiggs=0;
+   bool notAK4=true, OneOr2jet=false;
+   bool Hbb=false;
+   int mcLeptonFilter=0;
+   int SignalHiggs=0, SignalZ=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
    double ele_VETOSF=1;
-   int year=2016;
+   int year=1;
    int DDBvL_whichSF=0, Deep_whichSF=0;
    int JES_whichSF=0, JER_whichSF=0, UES_whichSF=0, JMR_whichSF=0, JMS_whichSF=0, ISR_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
@@ -1258,6 +1267,8 @@ public :
    TH1D *h_cuts;
    map< pair<int, int>, TH1D* > m_cuts;
    TH1D *h_PUweight;
+   //ABCD distribution histograms
+   vector<TH3D*> abcd_histos;
    //histograms needed for SFs
    TH2F *h_pho_EGamma_SF2D[5];
    TH2F *h_ele_EGamma_SF2D[4];
@@ -1293,7 +1304,7 @@ public :
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, string xsec_fname={""}, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={});
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, int _year=0, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0);
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1313,12 +1324,15 @@ public :
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
    void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
    virtual Bool_t   IsGoldEvent(UInt_t run, UInt_t LS);
+   void             OverFill(TH1D *h, double x, double w);
+   void             OverFill(TH2D *h, double x, double y, double w);
+   void             set_ABCD_histo(TH1D *h);
 };
 
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string xsec_fname, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, int _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1357,14 +1371,17 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   }
 
   is_quiet=is_q;
+  is_debug=is_d;
   signalstudy=is_signalstudy;
   SignalScan=is_signalscan;
   CountSignal=is_countSignal;
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
   btag_file=btag_fname;
-  if (xsec_fname!="") xsec_file=xsec_fname;
+  if (_xsec) xsec=_xsec;
+  if (_year) year=_year;
   if (fastSim) _fastSim=true;
+  if (ABCD) _ABCD=ABCD;
   if (fakeRate) _fakeRate=fakeRate;
   if (testrun) _testRun=testrun;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
@@ -1406,6 +1423,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, string
   if (temp.find("T5qqqqHg_refPoints")!=std::string::npos) SignalScenario=3;//nanoaodv6 fullsim points
   else if (temp.find("NanoAODv6")!=std::string::npos && temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=4;//nanoaodv6 fastsim
   else if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
+  else if (temp.find("TChiNG_BF50N50G")!=std::string::npos) SignalScenario=5; //EW with all final states
   else if (temp.find("TChiNG")!=std::string::npos) SignalScenario=2;
 }
 
@@ -1632,6 +1650,9 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("puWeight")) fChain->SetBranchAddress("puWeight", &puWeight, &b_puWeight);
    if (fChain->GetBranch("puWeightUp")) fChain->SetBranchAddress("puWeightUp", &puWeightUp, &b_puWeightUp);
    if (fChain->GetBranch("puWeightDown")) fChain->SetBranchAddress("puWeightDown", &puWeightDown, &b_puWeightDown);
+   if (fChain->GetBranch("puAutoWeight")) fChain->SetBranchAddress("puAutoWeight", &puAutoWeight, &b_puAutoWeight);
+   if (fChain->GetBranch("puAutoWeightUp")) fChain->SetBranchAddress("puAutoWeightUp", &puAutoWeightUp, &b_puAutoWeightUp);
+   if (fChain->GetBranch("puAutoWeightDown")) fChain->SetBranchAddress("puAutoWeightDown", &puAutoWeightDown, &b_puAutoWeightDown);
    if (fChain->GetBranch("nPSWeight")) fChain->SetBranchAddress("nPSWeight", &nPSWeight, &b_nPSWeight);
    if (fChain->GetBranch("PSWeight")) fChain->SetBranchAddress("PSWeight", PSWeight, &b_PSWeight);
    fChain->SetBranchAddress("nIsoTrack", &nIsoTrack, &b_nIsoTrack);
@@ -2134,20 +2155,20 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     bool HLTPho=0;
     if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
-    if      (_cut_variable[i]=="HLTPho")    returnvalue*=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="isPVGood") returnvalue*=Parser(PV_npvsGood,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassEleL") {returnvalue*=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
-    else if (_cut_variable[i]=="nPassEleM") {returnvalue*=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
-    else if (_cut_variable[i]=="nPassEleT") {returnvalue*=Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
-    else if (_cut_variable[i]=="nPassMuL") {returnvalue*=Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];}
-    else if (_cut_variable[i]=="nPassMuM") {returnvalue*=Parser(nPassMuM,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[1];}
-    else if (_cut_variable[i]=="nPassMuT") {returnvalue*=Parser(nPassMuT,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[2];}
-    else if (_cut_variable[i]=="nPassTauL") {returnvalue*=Parser(nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[0];}
-    else if (_cut_variable[i]=="nPassTauM") {returnvalue*=Parser(nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[1];}
-    else if (_cut_variable[i]=="nPassTauT") {returnvalue*=Parser(nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[2];}
-    else if (_cut_variable[i]=="nPassIso") {returnvalue*=Parser(nPassIso,_cut_operator[i],_cut_value[i]);}
-    //else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {double tempw=w;if (nPassEleL) {cout<<"ele w "<<ele_SF[1]<<endl; w*=ele_SF[1]; if (_cut_value[i]==0) w*=ele_VETOSF;} if (nPassMuL) {cout<<"mu w "<<mu_SF[0]<<endl; w*=mu_SF[0];} if (nPassTauL) {cout<<"tau w "<<tau_SF[0]<<endl; w*=tau_SF[0];}cout<<"lepton w "<<w/tempw<<endl;}}
-    else if (_cut_variable[i]=="nPassLepL") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
+    if      (_cut_variable[i]=="HLTPho")    returnvalue&&Parser(HLTPho,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="isPVGood") returnvalue&&Parser(PV_npvsGood,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassEleL") {returnvalue&&Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
+    else if (_cut_variable[i]=="nPassEleM") {returnvalue&&Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
+    else if (_cut_variable[i]=="nPassEleT") {returnvalue&&Parser(nPassEleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
+    else if (_cut_variable[i]=="nPassMuL") {returnvalue&&Parser(nPassMuL,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[0];}
+    else if (_cut_variable[i]=="nPassMuM") {returnvalue&&Parser(nPassMuM,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[1];}
+    else if (_cut_variable[i]=="nPassMuT") {returnvalue&&Parser(nPassMuT,_cut_operator[i],_cut_value[i]); if (!isData) w*=mu_SF[2];}
+    else if (_cut_variable[i]=="nPassTauL") {returnvalue&&Parser(nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[0];}
+    else if (_cut_variable[i]=="nPassTauM") {returnvalue&&Parser(nPassTauM,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[1];}
+    else if (_cut_variable[i]=="nPassTauT") {returnvalue&&Parser(nPassTauT,_cut_operator[i],_cut_value[i]); if (!isData) w*=tau_SF[2];}
+    else if (_cut_variable[i]=="nPassIso") {returnvalue&&Parser(nPassIso,_cut_operator[i],_cut_value[i]);}
+    //else if (_cut_variable[i]=="nPassLepL") {returnvalue&&Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]); if (!isData) {double tempw=w;if (nPassEleL) {cout<<"ele w "<<ele_SF[1]<<endl; w*=ele_SF[1]; if (_cut_value[i]==0) w*=ele_VETOSF;} if (nPassMuL) {cout<<"mu w "<<mu_SF[0]<<endl; w*=mu_SF[0];} if (nPassTauL) {cout<<"tau w "<<tau_SF[0]<<endl; w*=tau_SF[0];}cout<<"lepton w "<<w/tempw<<endl;}}
+    else if (_cut_variable[i]=="nPassLepL") {returnvalue&&Parser(nPassEleL+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleL+nPassMuL+nPassTauL>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2166,7 +2187,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepM") {returnvalue*=Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepM") {returnvalue&&Parser(nPassEleM+nPassMuM+nPassTauM,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleM+nPassMuM+nPassTauM>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2185,7 +2206,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepT") {returnvalue*=Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepT") {returnvalue&&Parser(nPassEleT+nPassMuT+nPassTauT,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleT+nPassMuT+nPassTauT>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2204,7 +2225,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepVLL") {returnvalue*=Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepVLL") {returnvalue&&Parser(nPassEleV+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleV+nPassMuL+nPassTauL>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2223,7 +2244,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepMLL") {returnvalue*=Parser(nPassEleM+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepMLL") {returnvalue&&Parser(nPassEleM+nPassMuL+nPassTauL,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleM+nPassMuL+nPassTauL>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2242,7 +2263,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepLML") {returnvalue*=Parser(nPassEleL+nPassMuM+nPassTauL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepLML") {returnvalue&&Parser(nPassEleL+nPassMuM+nPassTauL,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleL+nPassMuM+nPassTauL>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2261,7 +2282,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassLepLLM") {returnvalue*=Parser(nPassEleL+nPassMuL+nPassTauM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassLepLLM") {returnvalue&&Parser(nPassEleL+nPassMuL+nPassTauM,_cut_operator[i],_cut_value[i]);
       if (!isData) {
         if (nPassEleL+nPassMuL+nPassTauM>0) {
           double max_pt=0; unsigned int whichLepton=0;
@@ -2280,59 +2301,59 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         else if (_cut_value[i]==0) w*=ele_VETOSF;
       }
     }
-    else if (_cut_variable[i]=="nPassFREleL") {returnvalue*=Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
-    else if (_cut_variable[i]=="nPassFREleM") {returnvalue*=Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
-    else if (_cut_variable[i]=="nPassFREleT") {returnvalue*=Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
-    else if (_cut_variable[i]=="nPassElePhoL") returnvalue*=Parser(nPassElePhoL,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassElePhoM") returnvalue*=Parser(nPassElePhoM,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassElePhoT") returnvalue*=Parser(nPassElePhoT,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassElePhoMVA80") returnvalue*=Parser(nPassElePhoMVA80,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassElePhoMVA90") returnvalue*=Parser(nPassElePhoMVA90,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassPhoL") {returnvalue*=Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
-    else if (_cut_variable[i]=="nPassPhoM") {returnvalue*=Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
-    else if (_cut_variable[i]=="nPassPhoT") {returnvalue*=Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
-    else if (_cut_variable[i]=="nPassPhoMVA80") {returnvalue*=Parser(nPassPhoMVA80,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[3];}
-    else if (_cut_variable[i]=="nPassPhoMVA90") {returnvalue*=Parser(nPassPhoMVA90,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[4];}
-    else if (_cut_variable[i]=="elePt") returnvalue*=Parser_float(Electron_pt[nleadEle],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="elephoPt") returnvalue*=Parser_float(phoET[nleadElePho],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="phoEt") returnvalue*=Parser_float(phoET[nleadPho],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="HT") returnvalue*=Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="EMHT") returnvalue*=Parser_float(EMHT_after,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="MT") returnvalue*=Parser_float(MT,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="ST") returnvalue*=Parser_float(ST,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="ST_G") returnvalue*=Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="metFilters") returnvalue*=Parser(metFilters&(int)_cut_value[i],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="metFilters_hardcoded") returnvalue*=Parser(metFilters_hardcoded,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="Flag_METFilters") returnvalue*=Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="MET") returnvalue*=Parser_float(MET,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_jet") returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_jet_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_jet_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_btag") returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_btag_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_btag_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_btags") returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_btags_at_high_njet") {if (nonHiggsJet>=4) returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_btags_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_H_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_Hmin_candidate") returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="dphi_met_H_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="dphi_met_Hmin_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue*=Parser_float(dphi_met_Hmin_candidate,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="L1prefire") returnvalue*=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassAK4") returnvalue*=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nPassAK8") returnvalue*=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="nonHiggsJet") returnvalue*=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="noHmass_in_event") returnvalue*=Parser(noHmass_in_event,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterDeep_L") returnvalue*=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterDeep_M") returnvalue*=Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterDeep_T") returnvalue*=Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterDDBvL_L") {returnvalue*=Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_L[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_M1") {returnvalue*=Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M1[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue*=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_T1") {returnvalue*=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T1[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_T2") {returnvalue*=Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T2[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="nPassFREleL") {returnvalue&&Parser(nPassFREleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1];}
+    else if (_cut_variable[i]=="nPassFREleM") {returnvalue&&Parser(nPassFREleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
+    else if (_cut_variable[i]=="nPassFREleT") {returnvalue&&Parser(nPassFREleT,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[3];}
+    else if (_cut_variable[i]=="nPassElePhoL") returnvalue&&Parser(nPassElePhoL,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoM") returnvalue&&Parser(nPassElePhoM,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoT") returnvalue&&Parser(nPassElePhoT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoMVA80") returnvalue&&Parser(nPassElePhoMVA80,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassElePhoMVA90") returnvalue&&Parser(nPassElePhoMVA90,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassPhoL") {returnvalue&&Parser(nPassPhoL,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[0];}
+    else if (_cut_variable[i]=="nPassPhoM") {returnvalue&&Parser(nPassPhoM,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[1];}
+    else if (_cut_variable[i]=="nPassPhoT") {returnvalue&&Parser(nPassPhoT,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[2];}
+    else if (_cut_variable[i]=="nPassPhoMVA80") {returnvalue&&Parser(nPassPhoMVA80,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[3];}
+    else if (_cut_variable[i]=="nPassPhoMVA90") {returnvalue&&Parser(nPassPhoMVA90,_cut_operator[i],_cut_value[i]); if (!isData) w*=pho_SF[4];}
+    else if (_cut_variable[i]=="elePt") returnvalue&&Parser_float(Electron_pt[nleadEle],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="elephoPt") returnvalue&&Parser_float(phoET[nleadElePho],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="phoEt") returnvalue&&Parser_float(phoET[nleadPho],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="HT") returnvalue&&Parser_float(HT_after,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="EMHT") returnvalue&&Parser_float(EMHT_after,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="MT") returnvalue&&Parser_float(MT,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="ST") returnvalue&&Parser_float(ST,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="ST_G") returnvalue&&Parser_float(ST_G,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="metFilters") returnvalue&&Parser(metFilters&(int)_cut_value[i],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="metFilters_hardcoded") returnvalue&&Parser(metFilters_hardcoded,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Flag_METFilters") returnvalue&&Parser(Flag_METFilters,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="MET") returnvalue&&Parser_float(MET,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_jet") returnvalue&&Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_jet_at_high_njet") {if (nonHiggsJet>=4) returnvalue&&Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_jet_at_low_njet") {if (nonHiggsJet<4) returnvalue&&Parser_float(dphi_met_jet,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btag") returnvalue&&Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_btag_at_high_njet") {if (nonHiggsJet>=4) returnvalue&&Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btag_at_low_njet") {if (nonHiggsJet<4) returnvalue&&Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btags") returnvalue&&Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_btags_at_high_njet") {if (nonHiggsJet>=4) returnvalue&&Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_btags_at_low_njet") {if (nonHiggsJet<4) returnvalue&&Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_H_candidate") returnvalue&&Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_Hmin_candidate") returnvalue&&Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_H_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue&&Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="dphi_met_Hmin_candidate_at_low_njet") {if (nonHiggsJet<4) returnvalue&&Parser_float(dphi_met_Hmin_candidate,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="L1prefire") returnvalue&&Parser(L1prefire,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassAK4") returnvalue&&Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nPassAK8") returnvalue&&Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="nonHiggsJet") returnvalue&&Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="noHmass_in_event") returnvalue&&Parser(noHmass_in_event,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDeep_L") returnvalue&&Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDeep_M") returnvalue&&Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDeep_T") returnvalue&&Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_L") {returnvalue&&Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_L[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_M1") {returnvalue&&Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M1[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue&&Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_T1") {returnvalue&&Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T1[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_T2") {returnvalue&&Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T2[DDBvL_whichSF];}
     else if (_cut_variable[i]=="DDBvL_selected") {
-      returnvalue*=Parser(DDBvL_selected,_cut_operator[i],_cut_value[i]);
+      returnvalue&&Parser(DDBvL_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
         if (_cut_value[i]==1) w*=DDBvL_SF_L[DDBvL_whichSF];
         if (_cut_value[i]==2) w*=DDBvL_SF_M1[DDBvL_whichSF];
@@ -2341,20 +2362,28 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
         if (_cut_value[i]==5) w*=DDBvL_SF_T2[DDBvL_whichSF];
       }
     }
-    else if (_cut_variable[i]=="Deep_selected") returnvalue*=Parser(Deep_selected,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="Deep_medium_selected") returnvalue*=Parser(Deep_medium_selected,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="sth_selected") returnvalue*=Parser(Deep_selected+DDBvL_selected,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="passBtag") returnvalue*=Parser(passBtag,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="passAK4Btag1") returnvalue*=Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="passAK4Btag2") returnvalue*=Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="passHiggsMass") returnvalue*=Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue*=Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="notAK4") returnvalue*=Parser(notAK4,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="Hbb") returnvalue*=Parser(Hbb,_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="SignalHiggs") {returnvalue*=Parser(SignalHiggs,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="truePU") {returnvalue*=Parser(truePU,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="nVtx") {returnvalue*=Parser(PV_npvs,_cut_operator[i],_cut_value[i]);}
-    else if (_cut_variable[i]=="mcLeptonFilter") returnvalue*=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Deep_selected") returnvalue&&Parser(Deep_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Deep_medium_selected") returnvalue&&Parser(Deep_medium_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="sth_selected") {
+      int sth = 0;
+      if (DDBvL_selected>0) sth = 1;
+      else if (Deep_medium_selected==1) sth = 1;
+      else if (Deep_medium_selected==0 && Deep_selected==2) sth = 1;
+      returnvalue&&Parser(sth,_cut_operator[i],_cut_value[i]);
+    }
+    else if (_cut_variable[i]=="passBtag") returnvalue&&Parser(passBtag,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4Btag1") returnvalue&&Parser(passAK4Btag1,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4Btag2") returnvalue&&Parser(passAK4Btag2,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passHiggsMass") returnvalue&&Parser(passHiggsMass,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="passAK4HiggsMass") returnvalue&&Parser(passAK4HiggsMass,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="notAK4") returnvalue&&Parser(notAK4,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="Hbb") returnvalue&&Parser(Hbb,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="SignalHiggs") {returnvalue&&Parser(SignalHiggs,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="SignalZ") {returnvalue&&Parser(SignalZ,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="truePU") {returnvalue&&Parser_float(Pileup_nTrueInt,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="nVtx") {returnvalue&&Parser(PV_npvs,_cut_operator[i],_cut_value[i]);}
+    else if (_cut_variable[i]=="mcLeptonFilter") returnvalue&&Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="1or2jet") returnvalue&&Parser(OneOr2jet,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (returnvalue) {
       if (SignalScan) {h_cuts->Fill(i,w); m_cuts[mass_pair]->Fill(i,w);}
@@ -2370,6 +2399,41 @@ double Analyzer::deltaR(double phi1, double phi2, double eta1, double eta2){
   if (abs(phi1-phi2)>M_PI) dR=sqrt(pow(2*M_PI-(abs(phi2-phi1)),2)+pow(eta1-eta2,2));
   else dR=sqrt(pow(phi1-phi2,2)+pow(eta1-eta2,2));
   return dR;
+}
+
+void Analyzer::set_ABCD_histo(TH1D *h){
+  string h_name="ABCD_"+string(h->GetName());
+  string axis_names=";"+string(h->GetXaxis()->GetTitle())+"; MET; H-tag";
+  TH3D *h3_ABCD = new TH3D(h_name.c_str(),axis_names.c_str(),h->GetNbinsX(),h->GetBinLowEdge(1),h->GetXaxis()->GetBinUpEdge(h->GetNbinsX()),2,-0.5,1.5,2,-0.5,1.5);
+  abcd_histos.push_back(h3_ABCD);
+}
+
+void Analyzer::OverFill(TH1D *h, double x, double w){
+  bool h_tag=DDBvL_selected>0 || Deep_medium_selected==1;
+  bool met = MET>_ABCD;
+  double max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
+  if (_ABCD) {
+    for (auto i : abcd_histos) {
+      string h_name=h->GetName(); string abcd_name=i->GetName();
+      abcd_name.substr(5,abcd_name.length());
+      if (h_name.compare(abcd_name.substr(5,abcd_name.length()))==0) {
+        if (x>max) x=max;
+        i->Fill(x,met,h_tag,w);
+        break;
+      }
+    }
+  }
+  if (!_ABCD || (h_tag && met)) (x>max) ? h->Fill(max,w) : h->Fill(x,w);
+}
+
+void Analyzer::OverFill(TH2D *h, double x, double y, double w){
+  double x_max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
+  double y_max=h->GetYaxis()->GetBinCenter(h->GetNbinsY());
+  double fill_x=(x>x_max) ? x_max : x;
+  double fill_y=(y>y_max) ? y_max : y;
+  bool h_tag=DDBvL_selected>0 || Deep_medium_selected==1;
+  bool met = MET>_ABCD;
+  if (!_ABCD || (h_tag && met)) h->Fill(fill_x,fill_y,w);
 }
 
 double Analyzer::deltaPhi(double phi1, double phi2){
@@ -2771,9 +2835,11 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"notAK4","True if 2AK4 Higgs candidate bjets are NOT found."},
   {"Hbb","Higgs to bb found in the event (only for Signal...)"},
   {"SignalHiggs","Neutralinos decay to 0,1 or 2 Higgs. Cut on number of Higgs bosons."},
+  {"SignalZ","Electroweakly produced neutralinos decay to 0,1 or 2 Z bosons. Cut on number of Z bosons."},
   {"truePU","Cut on number of true pileup."},
   {"nVtx","Cut on number of vertices."},
-  {"mcLeptonFilter","True if MC truth lepton was present in the event"}};
+  {"mcLeptonFilter","True if MC truth lepton was present in the event"},
+  {"1or2jet","Boolean. Presence of at least 1 AK8 or 2 AK4 jet(s)"}};
 
 bool CompareCuts(vector<string> input_cuts){
   for (auto i : input_cuts) {
@@ -2798,16 +2864,19 @@ void PrintHelp(){
   cout<<"-o outname \t\t Output filename will be set: histos/Analyzer_histos_+outname"<<endl;
   cout<<"-i inputfile1 inputfile2 ... \t\t Inputfiles"<<endl;
   cout<<"-b bname \t\t Btag efficiency file location and name (needed only for MC). Write 'hardcoded' to use predefined values."<<endl;
-  cout<<"-x xname \t\t Xsec file location and name"<<endl;
+  cout<<"-x xsec \t\t Use xsec (pb)"<<endl;
+  cout<<"-y year \t\t Use year"<<endl;
   cout<<"-f \t\t Turn on FastSim option (for MC)"<<endl;
   cout<<"-F 1 or 2\t\t Turn on FakeRate weights. 1->for electrons 2->\"pixelseed\" electrons. Needs input file \"input/FakeRate_EGamma.root\""<<endl;
   cout<<"-s \t\t Turn on \"signalstudy\" option, which fills MC-truth histos"<<endl;
   cout<<"-q \t\t Quiet option, only errors are printed"<<endl;
+  cout<<"-d \t\t Debugging mode, many printouts, run only for few events"<<endl;
   cout<<"-S \t\t SignalScan run. Use only for T5qqqqHG MC!"<<endl;
   cout<<"-C \t\t Counts and prints out T5qqqqHg signal events for each mass point"<<endl;
   cout<<"-h \t\t Print out this help"<<endl;
   cout<<"-c \t\t Print out available cut variables"<<endl;
   cout<<"-t x \t\t Test running only on \"x\" number of events. (default is x=1000)"<<endl;
+  cout<<"-A met_cut \t\t turns on ABCD distribution histograms, with the MET cut (in GeV) as input. Automatically introduces the MET cut and a \"sth_selected>0\" cut in general."<<endl;
   cout<<"--lept \t\t set lepton pt cut for e/m/t"<<endl;
   cout<<"FORMAT:\n--lept e 10 m 5 t 20"<<endl;
   cout<<"--syst \t\t run with +- systematics settings"<<endl;
