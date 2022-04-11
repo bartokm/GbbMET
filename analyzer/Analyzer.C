@@ -2453,7 +2453,7 @@ void Analyzer::Loop()
            }
            
            //Filling histograms
-           if (is_debug) cout<<"Filling histograms"<<endl;
+           if (is_debug) cout<<"Event accepted, filling histograms"<<endl;
                  
            if (h_puW->GetBinContent(h_puW->FindBin(Pileup_nTrueInt))==0) h_puW->SetBinContent(h_puW->FindBin(Pileup_nTrueInt),pu_weight);
            OverFill(h_eff,1.,w); OverFill(h_eff,2.,weight);
