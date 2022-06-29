@@ -7,6 +7,7 @@
 # Author: Fons Rademakers, 29/2/2000
 
 ROOTCONFIG   := root-config
+CORRCONFIG   := ~/.local/bin/correction config
 
 ARCH         := $(shell $(ROOTCONFIG) --arch)
 PLATFORM     := $(shell $(ROOTCONFIG) --platform)
@@ -31,6 +32,9 @@ OPT2          = -O2
 endif
 endif
 
+CORRCFLAGS   := $(shell $(CORRCONFIG) --cflags)
+CORRLDFLAGS  := $(shell $(CORRCONFIG) --ldflags)
+CORRPATH     := $(shell $(CORRCONFIG) --rpath)
 ROOTCFLAGS   := $(shell $(ROOTCONFIG) --cflags)
 ROOTLDFLAGS  := $(shell $(ROOTCONFIG) --ldflags)
 ROOTLIBS     := $(shell $(ROOTCONFIG) --libs)
@@ -510,7 +514,10 @@ ifeq ($(CXX),)
 $(error $(ARCH) invalid architecture)
 endif
 
+CXXFLAGS     += $(CORRCFLAGS)
 CXXFLAGS     += $(ROOTCFLAGS)
+LDFLAGS      += $(CORRLDFLAGS)
 LDFLAGS      += $(ROOTLDFLAGS)
+LDFLAGS      += $(CORRPATH)
 LIBS          = $(ROOTLIBS) $(SYSLIBS)
 GLIBS         = $(ROOTGLIBS) $(SYSLIBS)

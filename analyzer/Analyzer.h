@@ -25,7 +25,7 @@
 #include <TRandom3.h>
 //BTagSF
 #include "input/BTCalibrationStandalone.cpp"
-#include "EgammaReader.h"
+#include "correctionlib/correction.h"
 
 #ifndef Analyzer_h
 #define Analyzer_h
@@ -38,6 +38,7 @@
 #include <TGraph.h>
 
 using namespace std;
+using namespace correction;
 
 // Header file for the classes stored in the TTree if any.
 
@@ -85,10 +86,6 @@ public :
    Float_t         Electron_mass[99];   //[nElectron]
    Float_t         Electron_miniPFRelIso_all[99];   //[nElectron]
    Float_t         Electron_miniPFRelIso_chg[99];   //[nElectron]
-   Float_t         Electron_mvaFall17V1Iso[99];   //[nElectron]
-   Float_t         Electron_mvaFall17V1noIso[99];   //[nElectron]
-   Float_t         Electron_mvaFall17V2Iso[99];   //[nElectron]
-   Float_t         Electron_mvaFall17V2noIso[99];   //[nElectron]
    Float_t         Electron_mvaSpring16GP[99];   //[nElectron]
    Float_t         Electron_mvaSpring16HZZ[99];   //[nElectron]
    Float_t         Electron_pfRelIso03_all[99];   //[nElectron]
@@ -101,7 +98,6 @@ public :
    Float_t         Electron_mvaTTH[99];   //[nElectron]
    Int_t           Electron_charge[99];   //[nElectron]
    Int_t           Electron_cutBased[99];   //[nElectron]
-   Int_t           Electron_cutBased_Fall17_V1[99];   //[nElectron]
    Int_t           Electron_cutBased_HLTPreSel[99];   //[nElectron]
    Int_t           Electron_cutBased_Spring15[99];   //[nElectron]
    Int_t           Electron_cutBased_Sum16[99];   //[nElectron]
@@ -116,29 +112,16 @@ public :
    Bool_t          Electron_cutBased_HEEP[99];   //[nElectron]
    Bool_t          Electron_isPFcand[99];   //[nElectron]
    UChar_t         Electron_lostHits[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1Iso_WP80[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1Iso_WP90[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1Iso_WPL[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1noIso_WP80[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1noIso_WP90[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V1noIso_WPL[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2Iso_WP80[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2Iso_WP90[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2Iso_WPL[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2noIso_WP80[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2noIso_WP90[99];   //[nElectron]
-   Bool_t          Electron_mvaFall17V2noIso_WPL[99];   //[nElectron]
    Bool_t          Electron_mvaSpring16GP_WP80[99];   //[nElectron]
    Bool_t          Electron_mvaSpring16GP_WP90[99];   //[nElectron]
    Bool_t          Electron_mvaSpring16HZZ_WPL[99];   //[nElectron]
    UChar_t         Electron_seedGain[99];   //[nElectron]
    UInt_t          nFatJet;
    Float_t         FatJet_area[99];   //[nFatJet]
-   Float_t         FatJet_btagCMVA[99];   //[nFatJet]
    Float_t         FatJet_btagCSVV2[99];   //[nFatJet]
-   Float_t         FatJet_btagDDBvL[99];   //[nFatJet]
-   Float_t         FatJet_btagDDCvB[99];   //[nFatJet]
-   Float_t         FatJet_btagDDCvL[99];   //[nFatJet]
+   Float_t         FatJet_btagDDBvLV2[99];   //[nFatJet]
+   Float_t         FatJet_btagDDCvBV2[99];   //[nFatJet]
+   Float_t         FatJet_btagDDCvLV2[99];   //[nFatJet]
    Float_t         FatJet_btagDeepB[99];   //[nFatJet]
    Float_t         FatJet_btagHbb[99];   //[nFatJet]
    Float_t         FatJet_deepTagMD_H4qvsQCD[99];   //[nFatJet]
@@ -186,6 +169,7 @@ public :
    Int_t           FatJet_jetId[99];   //[nFatJet]
    Int_t           FatJet_subJetIdx1[99];   //[nFatJet]
    Int_t           FatJet_subJetIdx2[99];   //[nFatJet]
+   Int_t           FatJet_genJetAK8Idx[99];   //[nFatJet]
    UInt_t          nGenJetAK8;
    Float_t         GenJetAK8_eta[99];   //[nGenJetAK8]
    Float_t         GenJetAK8_mass[99];   //[nGenJetAK8]
@@ -253,17 +237,13 @@ public :
    Bool_t          IsoTrack_isFromLostTrack[99];   //[nIsoTrack]
    UInt_t          nJet;
    Float_t         Jet_area[99];   //[nJet]
-   Float_t         Jet_btagCMVA[99];   //[nJet]
    Float_t         Jet_btagCSVV2[99];   //[nJet]
    Float_t         Jet_btagDeepB[99];   //[nJet]
    Float_t         Jet_btagDeepC[99];   //[nJet]
    Float_t         Jet_btagDeepFlavB[99];   //[nJet]
-   Float_t         Jet_btagDeepFlavC[99];   //[nJet]
    Float_t         Jet_chEmEF[99];   //[nJet]
    Float_t         Jet_chHEF[99];   //[nJet]
    Float_t         Jet_eta[99];   //[nJet]
-   Float_t         Jet_jercCHF[99];   //[nJet]
-   Float_t         Jet_jercCHPUF[99];   //[nJet]
    Float_t         Jet_mass[99];   //[nJet]
    Float_t         Jet_mass_nom[99];//[nJet]
    Float_t         Jet_mass_jerUp[99];   //[nJet]
@@ -306,50 +286,23 @@ public :
    Float_t         MET_covXY;
    Float_t         MET_covYY;
    Float_t         MET_phi;
-   Float_t         MET_phi_nom;
-   Float_t         MET_phi_jer;
-   Float_t         MET_phi_jerUp;
-   Float_t         MET_phi_jerDown;
-   Float_t         MET_phi_jesTotalUp;
-   Float_t         MET_phi_jesTotalDown;
-   Float_t         MET_phi_unclustEnUp;
-   Float_t         MET_phi_unclustEnDown;
+   Float_t         MET_T1_phi;
+   Float_t         MET_T1_phi_jerUp;
+   Float_t         MET_T1_phi_jerDown;
+   Float_t         MET_T1_phi_jesTotalUp;
+   Float_t         MET_T1_phi_jesTotalDown;
+   Float_t         MET_T1_phi_unclustEnUp;
+   Float_t         MET_T1_phi_unclustEnDown;
    Float_t         MET_pt;
-   Float_t         MET_pt_nom;
-   Float_t         MET_pt_jer;
-   Float_t         MET_pt_jerUp;
-   Float_t         MET_pt_jerDown;
-   Float_t         MET_pt_jesTotalUp;
-   Float_t         MET_pt_jesTotalDown;
-   Float_t         MET_pt_unclustEnUp;
-   Float_t         MET_pt_unclustEnDown;
+   Float_t         MET_T1_pt;
+   Float_t         MET_T1_pt_jerUp;
+   Float_t         MET_T1_pt_jerDown;
+   Float_t         MET_T1_pt_jesTotalUp;
+   Float_t         MET_T1_pt_jesTotalDown;
+   Float_t         MET_T1_pt_unclustEnUp;
+   Float_t         MET_T1_pt_unclustEnDown;
    Float_t         MET_significance;
    Float_t         MET_sumEt;
-   Float_t         METFixEE2017_MetUnclustEnUpDeltaX;
-   Float_t         METFixEE2017_MetUnclustEnUpDeltaY;
-   Float_t         METFixEE2017_covXX;
-   Float_t         METFixEE2017_covXY;
-   Float_t         METFixEE2017_covYY;
-   Float_t         METFixEE2017_phi;
-   Float_t         METFixEE2017_phi_nom;
-   Float_t         METFixEE2017_phi_jer;
-   Float_t         METFixEE2017_phi_jerUp;
-   Float_t         METFixEE2017_phi_jerDown;
-   Float_t         METFixEE2017_phi_jesTotalUp;
-   Float_t         METFixEE2017_phi_jesTotalDown;
-   Float_t         METFixEE2017_phi_unclustEnUp;
-   Float_t         METFixEE2017_phi_unclustEnDown;
-   Float_t         METFixEE2017_pt;
-   Float_t         METFixEE2017_pt_nom;
-   Float_t         METFixEE2017_pt_jer;
-   Float_t         METFixEE2017_pt_jerUp;
-   Float_t         METFixEE2017_pt_jerDown;
-   Float_t         METFixEE2017_pt_jesTotalUp;
-   Float_t         METFixEE2017_pt_jesTotalDown;
-   Float_t         METFixEE2017_pt_unclustEnUp;
-   Float_t         METFixEE2017_pt_unclustEnDown;
-   Float_t         METFixEE2017_significance;
-   Float_t         METFixEE2017_sumEt;
    UInt_t          nMuon;
    Float_t         Muon_dxy[99];   //[nMuon]
    Float_t         Muon_dxyErr[99];   //[nMuon]
@@ -398,6 +351,10 @@ public :
    UChar_t         Muon_tkIsoId[99];   //[nMuon]
    Bool_t          Muon_triggerIdLoose[99];   //[nMuon]
    UInt_t          nPhoton;
+   Float_t         Photon_dEscaleUp[99];   //[nPhoton]
+   Float_t         Photon_dEscaleDown[99];   //[nPhoton]
+   Float_t         Photon_dEsigmaUp[99];   //[nPhoton]
+   Float_t         Photon_dEsigmaDown[99];   //[nPhoton]
    Float_t         Photon_eCorr[99];   //[nPhoton]
    Float_t         Photon_energyErr[99];   //[nPhoton]
    Float_t         Photon_eta[99];   //[nPhoton]
@@ -413,9 +370,6 @@ public :
    Float_t         Photon_sieie[99];   //[nPhoton]
    Int_t           Photon_charge[99];   //[nPhoton]
    Int_t           Photon_cutBased[99];   //[nPhoton]
-   Int_t           Photon_cutBasedBitmap[99];   //[nPhoton]
-   Int_t           Photon_cutBasedV1Bitmap[99];   //[nPhoton]
-   Int_t           Photon_cutBased17Bitmap[99];   //[nPhoton]
    Int_t           Photon_electronIdx[99];   //[nPhoton]
    Int_t           Photon_jetIdx[99];   //[nPhoton]
    Int_t           Photon_pdgId[99];   //[nPhoton]
@@ -465,7 +419,6 @@ public :
    Int_t           SoftActivityJetNjets2;
    Int_t           SoftActivityJetNjets5;
    UInt_t          nSubJet;
-   Float_t         SubJet_btagCMVA[99];   //[nSubJet]
    Float_t         SubJet_btagCSVV2[99];   //[nSubJet]
    Float_t         SubJet_btagDeepB[99];   //[nSubJet]
    Float_t         SubJet_eta[99];   //[nSubJet]
@@ -493,30 +446,12 @@ public :
    Float_t         Tau_photonsOutsideSignalCone[99];   //[nTau]
    Float_t         Tau_pt[99];   //[nTau]
    Float_t         Tau_puCorr[99];   //[nTau]
-   Float_t         Tau_rawAntiEle[99];   //[nTau]
-   Float_t         Tau_rawAntiEle2018[99];   //[nTau]
-   Float_t         Tau_rawIso[99];   //[nTau]
-   Float_t         Tau_rawIsodR03[99];   //[nTau]
-   Float_t         Tau_rawMVAnewDM2017v2[99];   //[nTau]
-   Float_t         Tau_rawMVAoldDM[99];   //[nTau]
-   Float_t         Tau_rawMVAoldDM2017v1[99];   //[nTau]
-   Float_t         Tau_rawMVAoldDM2017v2[99];   //[nTau]
-   Float_t         Tau_rawMVAoldDMdR032017v2[99];   //[nTau]
    Int_t           Tau_charge[99];   //[nTau]
    Int_t           Tau_decayMode[99];   //[nTau]
    Int_t           Tau_jetIdx[99];   //[nTau]
-   Int_t           Tau_rawAntiEleCat[99];   //[nTau]
-   Int_t           Tau_rawAntiEleCat2018[99];   //[nTau]
-   UChar_t         Tau_idAntiEle[99];   //[nTau]
-   UChar_t         Tau_idAntiEle2018[99];   //[nTau]
-   UChar_t         Tau_idAntiMu[99];   //[nTau]
-   Bool_t          Tau_idDecayMode[99];   //[nTau]
-   Bool_t          Tau_idDecayModeNewDMs[99];   //[nTau]
-   UChar_t         Tau_idMVAnewDM2017v2[99];   //[nTau]
-   UChar_t         Tau_idMVAoldDM[99];   //[nTau]
-   UChar_t         Tau_idMVAoldDM2017v1[99];   //[nTau]
-   UChar_t         Tau_idMVAoldDM2017v2[99];   //[nTau]
-   UChar_t         Tau_idMVAoldDMdR032017v2[99];   //[nTau]
+   UChar_t         Tau_idDeepTau2017v2p1VSe[99];   //[nTau]
+   UChar_t         Tau_idDeepTau2017v2p1VSjet[99];   //[nTau]
+   UChar_t         Tau_idDeepTau2017v2p1VSmu[99];   //[nTau]
    Float_t         TkMET_phi;
    Float_t         TkMET_pt;
    Float_t         TkMET_sumEt;
@@ -663,10 +598,6 @@ public :
    TBranch        *b_Electron_mass;   //!
    TBranch        *b_Electron_miniPFRelIso_all;   //!
    TBranch        *b_Electron_miniPFRelIso_chg;   //!
-   TBranch        *b_Electron_mvaFall17V1Iso;   //!
-   TBranch        *b_Electron_mvaFall17V1noIso;   //!
-   TBranch        *b_Electron_mvaFall17V2Iso;   //!
-   TBranch        *b_Electron_mvaFall17V2noIso;   //!
    TBranch        *b_Electron_mvaSpring16GP;   //!
    TBranch        *b_Electron_mvaSpring16HZZ;   //!
    TBranch        *b_Electron_pfRelIso03_all;   //!
@@ -679,7 +610,6 @@ public :
    TBranch        *b_Electron_mvaTTH;   //!
    TBranch        *b_Electron_charge;   //!
    TBranch        *b_Electron_cutBased;   //!
-   TBranch        *b_Electron_cutBased_Fall17_V1;   //!
    TBranch        *b_Electron_cutBased_HLTPreSel;   //!
    TBranch        *b_Electron_cutBased_Spring15;   //!
    TBranch        *b_Electron_cutBased_Sum16;   //!
@@ -694,29 +624,16 @@ public :
    TBranch        *b_Electron_cutBased_HEEP;   //!
    TBranch        *b_Electron_isPFcand;   //!
    TBranch        *b_Electron_lostHits;   //!
-   TBranch        *b_Electron_mvaFall17V1Iso_WP80;   //!
-   TBranch        *b_Electron_mvaFall17V1Iso_WP90;   //!
-   TBranch        *b_Electron_mvaFall17V1Iso_WPL;   //!
-   TBranch        *b_Electron_mvaFall17V1noIso_WP80;   //!
-   TBranch        *b_Electron_mvaFall17V1noIso_WP90;   //!
-   TBranch        *b_Electron_mvaFall17V1noIso_WPL;   //!
-   TBranch        *b_Electron_mvaFall17V2Iso_WP80;   //!
-   TBranch        *b_Electron_mvaFall17V2Iso_WP90;   //!
-   TBranch        *b_Electron_mvaFall17V2Iso_WPL;   //!
-   TBranch        *b_Electron_mvaFall17V2noIso_WP80;   //!
-   TBranch        *b_Electron_mvaFall17V2noIso_WP90;   //!
-   TBranch        *b_Electron_mvaFall17V2noIso_WPL;   //!
    TBranch        *b_Electron_mvaSpring16GP_WP80;   //!
    TBranch        *b_Electron_mvaSpring16GP_WP90;   //!
    TBranch        *b_Electron_mvaSpring16HZZ_WPL;   //!
    TBranch        *b_Electron_seedGain;   //!
    TBranch        *b_nFatJet;   //!
    TBranch        *b_FatJet_area;   //!
-   TBranch        *b_FatJet_btagCMVA;   //!
    TBranch        *b_FatJet_btagCSVV2;   //!
-   TBranch        *b_FatJet_btagDDBvL;   //!
-   TBranch        *b_FatJet_btagDDCvB;   //!
-   TBranch        *b_FatJet_btagDDCvL;   //!
+   TBranch        *b_FatJet_btagDDBvLV2;   //!
+   TBranch        *b_FatJet_btagDDCvBV2;   //!
+   TBranch        *b_FatJet_btagDDCvLV2;   //!
    TBranch        *b_FatJet_btagDeepB;   //!
    TBranch        *b_FatJet_btagHbb;   //!
    TBranch        *b_FatJet_deepTagMD_H4qvsQCD;   //!
@@ -764,6 +681,7 @@ public :
    TBranch        *b_FatJet_jetId;   //!
    TBranch        *b_FatJet_subJetIdx1;   //!
    TBranch        *b_FatJet_subJetIdx2;   //!
+   TBranch        *b_FatJet_genJetAK8Idx;   //!
    TBranch        *b_nGenJetAK8;   //!
    TBranch        *b_GenJetAK8_eta;   //!
    TBranch        *b_GenJetAK8_mass;   //!
@@ -831,17 +749,12 @@ public :
    TBranch        *b_IsoTrack_isFromLostTrack;   //!
    TBranch        *b_nJet;   //!
    TBranch        *b_Jet_area;   //!
-   TBranch        *b_Jet_btagCMVA;   //!
    TBranch        *b_Jet_btagCSVV2;   //!
    TBranch        *b_Jet_btagDeepB;   //!
-   TBranch        *b_Jet_btagDeepC;   //!
    TBranch        *b_Jet_btagDeepFlavB;   //!
-   TBranch        *b_Jet_btagDeepFlavC;   //!
    TBranch        *b_Jet_chEmEF;   //!
    TBranch        *b_Jet_chHEF;   //!
    TBranch        *b_Jet_eta;   //!
-   TBranch        *b_Jet_jercCHF;   //!
-   TBranch        *b_Jet_jercCHPUF;   //!
    TBranch        *b_Jet_mass;   //!
    TBranch        *b_Jet_mass_nom;   //!
    TBranch        *b_Jet_mass_jerUp;   //[nJet]
@@ -884,50 +797,23 @@ public :
    TBranch        *b_MET_covXY;   //!
    TBranch        *b_MET_covYY;   //!
    TBranch        *b_MET_phi;   //!
-   TBranch        *b_MET_phi_nom;
-   TBranch        *b_MET_phi_jer;
-   TBranch        *b_MET_phi_jerUp;
-   TBranch        *b_MET_phi_jerDown;
-   TBranch        *b_MET_phi_jesTotalUp;
-   TBranch        *b_MET_phi_jesTotalDown;
-   TBranch        *b_MET_phi_unclustEnUp;
-   TBranch        *b_MET_phi_unclustEnDown;
+   TBranch        *b_MET_T1_phi;
+   TBranch        *b_MET_T1_phi_jerUp;
+   TBranch        *b_MET_T1_phi_jerDown;
+   TBranch        *b_MET_T1_phi_jesTotalUp;
+   TBranch        *b_MET_T1_phi_jesTotalDown;
+   TBranch        *b_MET_T1_phi_unclustEnUp;
+   TBranch        *b_MET_T1_phi_unclustEnDown;
    TBranch        *b_MET_pt;   //!
-   TBranch        *b_MET_pt_nom;
-   TBranch        *b_MET_pt_jer;
-   TBranch        *b_MET_pt_jerUp;
-   TBranch        *b_MET_pt_jerDown;
-   TBranch        *b_MET_pt_jesTotalUp;
-   TBranch        *b_MET_pt_jesTotalDown;
-   TBranch        *b_MET_pt_unclustEnUp;
-   TBranch        *b_MET_pt_unclustEnDown;
+   TBranch        *b_MET_T1_pt;
+   TBranch        *b_MET_T1_pt_jerUp;
+   TBranch        *b_MET_T1_pt_jerDown;
+   TBranch        *b_MET_T1_pt_jesTotalUp;
+   TBranch        *b_MET_T1_pt_jesTotalDown;
+   TBranch        *b_MET_T1_pt_unclustEnUp;
+   TBranch        *b_MET_T1_pt_unclustEnDown;
    TBranch        *b_MET_significance;   //!
    TBranch        *b_MET_sumEt;   //!
-   TBranch        *b_METFixEE2017_MetUnclustEnUpDeltaX;   //!
-   TBranch        *b_METFixEE2017_MetUnclustEnUpDeltaY;   //!
-   TBranch        *b_METFixEE2017_covXX;   //!
-   TBranch        *b_METFixEE2017_covXY;   //!
-   TBranch        *b_METFixEE2017_covYY;   //!
-   TBranch        *b_METFixEE2017_phi;   //!
-   TBranch        *b_METFixEE2017_phi_nom;
-   TBranch        *b_METFixEE2017_phi_jer;
-   TBranch        *b_METFixEE2017_phi_jerUp;
-   TBranch        *b_METFixEE2017_phi_jerDown;
-   TBranch        *b_METFixEE2017_phi_jesTotalUp;
-   TBranch        *b_METFixEE2017_phi_jesTotalDown;
-   TBranch        *b_METFixEE2017_phi_unclustEnUp;
-   TBranch        *b_METFixEE2017_phi_unclustEnDown;
-   TBranch        *b_METFixEE2017_pt;   //!
-   TBranch        *b_METFixEE2017_pt_nom;
-   TBranch        *b_METFixEE2017_pt_jer;
-   TBranch        *b_METFixEE2017_pt_jerUp;
-   TBranch        *b_METFixEE2017_pt_jerDown;
-   TBranch        *b_METFixEE2017_pt_jesTotalUp;
-   TBranch        *b_METFixEE2017_pt_jesTotalDown;
-   TBranch        *b_METFixEE2017_pt_unclustEnUp;
-   TBranch        *b_METFixEE2017_pt_unclustEnDown;
-   TBranch        *b_METFixEE2017_significance;   //!
-   TBranch        *b_METFixEE2017_sumEt;   //!
    TBranch        *b_nMuon;   //!
    TBranch        *b_Muon_dxy;   //!
    TBranch        *b_Muon_dxyErr;   //!
@@ -976,6 +862,10 @@ public :
    TBranch        *b_Muon_tkIsoId;   //!
    TBranch        *b_Muon_triggerIdLoose;   //!
    TBranch        *b_nPhoton;   //!
+   TBranch        *b_Photon_dEscaleUp;   //!
+   TBranch        *b_Photon_dEscaleDown;   //!
+   TBranch        *b_Photon_dEsigmaUp;   //!
+   TBranch        *b_Photon_dEsigmaDown;   //!
    TBranch        *b_Photon_eCorr;   //!
    TBranch        *b_Photon_energyErr;   //!
    TBranch        *b_Photon_eta;   //!
@@ -991,9 +881,6 @@ public :
    TBranch        *b_Photon_sieie;   //!
    TBranch        *b_Photon_charge;   //!
    TBranch        *b_Photon_cutBased;   //!
-   TBranch        *b_Photon_cutBasedBitmap;   //!
-   TBranch        *b_Photon_cutBasedV1Bitmap;   //!
-   TBranch        *b_Photon_cutBased17Bitmap;   //!
    TBranch        *b_Photon_electronIdx;   //!
    TBranch        *b_Photon_jetIdx;   //!
    TBranch        *b_Photon_pdgId;   //!
@@ -1043,7 +930,6 @@ public :
    TBranch        *b_SoftActivityJetNjets2;   //!
    TBranch        *b_SoftActivityJetNjets5;   //!
    TBranch        *b_nSubJet;   //!
-   TBranch        *b_SubJet_btagCMVA;   //!
    TBranch        *b_SubJet_btagCSVV2;   //!
    TBranch        *b_SubJet_btagDeepB;   //!
    TBranch        *b_SubJet_eta;   //!
@@ -1071,30 +957,12 @@ public :
    TBranch        *b_Tau_photonsOutsideSignalCone;   //!
    TBranch        *b_Tau_pt;   //!
    TBranch        *b_Tau_puCorr;   //!
-   TBranch        *b_Tau_rawAntiEle;   //!
-   TBranch        *b_Tau_rawAntiEle2018;   //!
-   TBranch        *b_Tau_rawIso;   //!
-   TBranch        *b_Tau_rawIsodR03;   //!
-   TBranch        *b_Tau_rawMVAnewDM2017v2;   //!
-   TBranch        *b_Tau_rawMVAoldDM;   //!
-   TBranch        *b_Tau_rawMVAoldDM2017v1;   //!
-   TBranch        *b_Tau_rawMVAoldDM2017v2;   //!
-   TBranch        *b_Tau_rawMVAoldDMdR032017v2;   //!
    TBranch        *b_Tau_charge;   //!
    TBranch        *b_Tau_decayMode;   //!
    TBranch        *b_Tau_jetIdx;   //!
-   TBranch        *b_Tau_rawAntiEleCat;   //!
-   TBranch        *b_Tau_rawAntiEleCat2018;   //!
-   TBranch        *b_Tau_idAntiEle;   //!
-   TBranch        *b_Tau_idAntiEle2018;   //!
-   TBranch        *b_Tau_idAntiMu;   //!
-   TBranch        *b_Tau_idDecayMode;   //!
-   TBranch        *b_Tau_idDecayModeNewDMs;   //!
-   TBranch        *b_Tau_idMVAnewDM2017v2;   //!
-   TBranch        *b_Tau_idMVAoldDM;   //!
-   TBranch        *b_Tau_idMVAoldDM2017v1;   //!
-   TBranch        *b_Tau_idMVAoldDM2017v2;   //!
-   TBranch        *b_Tau_idMVAoldDMdR032017v2;   //!
+   TBranch        *b_Tau_idDeepTau2017v2p1VSe;
+   TBranch        *b_Tau_idDeepTau2017v2p1VSjet;
+   TBranch        *b_Tau_idDeepTau2017v2p1VSmu;
    TBranch        *b_TkMET_phi;   //!
    TBranch        *b_TkMET_pt;   //!
    TBranch        *b_TkMET_sumEt;   //!
@@ -1250,18 +1118,19 @@ public :
    double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
    double ele_VETOSF=1;
+   Double_t TotalEvents=0;
    int year=1;
    int DDBvL_whichSF=0, Deep_whichSF=0;
    int JES_whichSF=0, JER_whichSF=0, UES_whichSF=0, JMR_whichSF=0, JMS_whichSF=0, ISR_whichSF=0;
-   int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0;
+   int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0, tauTES_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0, PUweight_whichSF=0;
-   int Egamma_Statscale_whichSF=0, Egamma_Systscale_whichSF=0, Egamma_Gainscale_whichSF=0, Egamma_Rhoresol_whichSF=0, Egamma_Phiresol_whichSF=0;
+   int Egamma_scale_whichSF=0, Egamma_smear_whichSF=0;
    unsigned int whichPhoton=0, whichElectron=1, whichMuon=0, whichTau=0;
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999;
-   double e_pt=5, mu_pt=5, tau_pt=20;
+   double e_pt=10, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
    //histograms
    TH1D *h_cuts;
@@ -1299,8 +1168,6 @@ public :
    TH2D *h2_FR;
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
-   EgammaScalingReader  EgammaScaling;
-   EgammaSmearingReader EgammaSmearing;
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
@@ -1310,6 +1177,7 @@ public :
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
+   virtual void     Get_total_sum(TTree *tree);
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
@@ -1319,7 +1187,7 @@ public :
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
    void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
-   double           UpdateBtags(bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
+   double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
    void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
@@ -1377,6 +1245,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   CountSignal=is_countSignal;
   TTree *tree;
   TChain * ch = new TChain("EventTree","");
+  TChain * ch_run = new TChain("Runs","");
   btag_file=btag_fname;
   if (_xsec) xsec=_xsec;
   if (_year) year=_year;
@@ -1395,21 +1264,19 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   else {
     for (auto i : arg) {
       const char* cstr_i=i.c_str();
-      std::string temp=i;
+      std::string temp=i, temp_run=i;
       if (temp.find("*") != std::string::npos) {
         if (!is_quiet){
           std::cout<<"Wildcard found in input argument."<<std::endl;
         }
-        temp+="/Events";
-        ch->Add(temp.c_str());
+        temp+="/Events"; temp_run+="/Runs";
+        ch->Add(temp.c_str()); ch_run->Add(temp_run.c_str());
         continue;
       }
       TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject(cstr_i);
-      if (!f || !f->IsOpen()) {
-        f = new TFile(cstr_i);
-      }
-      temp+="/Events";
-      ch->Add(temp.c_str());
+      if (!f || !f->IsOpen()) f = new TFile(cstr_i);
+      temp+="/Events"; temp_run+="/Runs";
+      ch->Add(temp.c_str()); ch_run->Add(temp_run.c_str());
       f->Close();
     }
     nFiles=ch->GetNtrees();
@@ -1418,6 +1285,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
     }
     tree = ch;
   }
+  Get_total_sum(ch_run);
   Init(tree);
   string temp=tree->GetCurrentFile()->GetName();
   if (temp.find("T5qqqqHg_refPoints")!=std::string::npos) SignalScenario=3;//nanoaodv6 fullsim points
@@ -1450,6 +1318,22 @@ Long64_t Analyzer::LoadTree(Long64_t entry)
       Notify();
    }
    return centry;
+}
+
+void Analyzer::Get_total_sum(TTree *tree){
+  TBranch *b_genEventSumw;
+  Double_t sub_TotalEvents=0;
+  string eventsum="genEventSumw";
+  if (tree->GetBranch(eventsum.c_str())) {
+    if (is_debug) cout<<"Looping on Runs Tree to get total number of events"<<endl; 
+    for (int i=0; i<tree->GetEntries();i++) {
+      int ientry = tree->LoadTree(i);
+      b_genEventSumw->GetEntry(ientry);
+      TotalEvents+=sub_TotalEvents;
+      if (is_debug) cout<<tree->GetCurrentFile()->GetName()<<" "<<i<<" "<<sub_TotalEvents<<endl;
+    }
+    if (is_debug) cout<<"Total unskimmed Events "<<TotalEvents<<endl;
+  }
 }
 
 void Analyzer::Init(TTree *tree)
@@ -1504,10 +1388,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Electron_mass", Electron_mass, &b_Electron_mass);
    fChain->SetBranchAddress("Electron_miniPFRelIso_all", Electron_miniPFRelIso_all, &b_Electron_miniPFRelIso_all);
    fChain->SetBranchAddress("Electron_miniPFRelIso_chg", Electron_miniPFRelIso_chg, &b_Electron_miniPFRelIso_chg);
-   fChain->SetBranchAddress("Electron_mvaFall17V1Iso", Electron_mvaFall17V1Iso, &b_Electron_mvaFall17V1Iso);
-   fChain->SetBranchAddress("Electron_mvaFall17V1noIso", Electron_mvaFall17V1noIso, &b_Electron_mvaFall17V1noIso);
-   fChain->SetBranchAddress("Electron_mvaFall17V2Iso", Electron_mvaFall17V2Iso, &b_Electron_mvaFall17V2Iso);
-   fChain->SetBranchAddress("Electron_mvaFall17V2noIso", Electron_mvaFall17V2noIso, &b_Electron_mvaFall17V2noIso);
    if (fChain->GetBranch("Electron_mvaSpring16GP")) fChain->SetBranchAddress("Electron_mvaSpring16GP", Electron_mvaSpring16GP, &b_Electron_mvaSpring16GP);
    if (fChain->GetBranch("Electron_mvaSpring16HZZ")) fChain->SetBranchAddress("Electron_mvaSpring16HZZ", Electron_mvaSpring16HZZ, &b_Electron_mvaSpring16HZZ);
    fChain->SetBranchAddress("Electron_pfRelIso03_all", Electron_pfRelIso03_all, &b_Electron_pfRelIso03_all);
@@ -1520,7 +1400,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Electron_mvaTTH", Electron_mvaTTH, &b_Electron_mvaTTH);
    fChain->SetBranchAddress("Electron_charge", Electron_charge, &b_Electron_charge);
    fChain->SetBranchAddress("Electron_cutBased", Electron_cutBased, &b_Electron_cutBased);
-   fChain->SetBranchAddress("Electron_cutBased_Fall17_V1", Electron_cutBased_Fall17_V1, &b_Electron_cutBased_Fall17_V1);
    if (fChain->GetBranch("Electron_cutBased_HLTPreSel")) fChain->SetBranchAddress("Electron_cutBased_HLTPreSel", Electron_cutBased_HLTPreSel, &b_Electron_cutBased_HLTPreSel);
    if (fChain->GetBranch("Electron_cutBased_Spring15")) fChain->SetBranchAddress("Electron_cutBased_Spring15", Electron_cutBased_Spring15, &b_Electron_cutBased_Spring15);
    if (fChain->GetBranch("Electron_cutBased_Sum16")) fChain->SetBranchAddress("Electron_cutBased_Sum16", Electron_cutBased_Sum16, &b_Electron_cutBased_Sum16);
@@ -1535,29 +1414,16 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Electron_cutBased_HEEP", Electron_cutBased_HEEP, &b_Electron_cutBased_HEEP);
    fChain->SetBranchAddress("Electron_isPFcand", Electron_isPFcand, &b_Electron_isPFcand);
    fChain->SetBranchAddress("Electron_lostHits", Electron_lostHits, &b_Electron_lostHits);
-   fChain->SetBranchAddress("Electron_mvaFall17V1Iso_WP80", Electron_mvaFall17V1Iso_WP80, &b_Electron_mvaFall17V1Iso_WP80);
-   fChain->SetBranchAddress("Electron_mvaFall17V1Iso_WP90", Electron_mvaFall17V1Iso_WP90, &b_Electron_mvaFall17V1Iso_WP90);
-   fChain->SetBranchAddress("Electron_mvaFall17V1Iso_WPL", Electron_mvaFall17V1Iso_WPL, &b_Electron_mvaFall17V1Iso_WPL);
-   fChain->SetBranchAddress("Electron_mvaFall17V1noIso_WP80", Electron_mvaFall17V1noIso_WP80, &b_Electron_mvaFall17V1noIso_WP80);
-   fChain->SetBranchAddress("Electron_mvaFall17V1noIso_WP90", Electron_mvaFall17V1noIso_WP90, &b_Electron_mvaFall17V1noIso_WP90);
-   fChain->SetBranchAddress("Electron_mvaFall17V1noIso_WPL", Electron_mvaFall17V1noIso_WPL, &b_Electron_mvaFall17V1noIso_WPL);
-   fChain->SetBranchAddress("Electron_mvaFall17V2Iso_WP80", Electron_mvaFall17V2Iso_WP80, &b_Electron_mvaFall17V2Iso_WP80);
-   fChain->SetBranchAddress("Electron_mvaFall17V2Iso_WP90", Electron_mvaFall17V2Iso_WP90, &b_Electron_mvaFall17V2Iso_WP90);
-   fChain->SetBranchAddress("Electron_mvaFall17V2Iso_WPL", Electron_mvaFall17V2Iso_WPL, &b_Electron_mvaFall17V2Iso_WPL);
-   fChain->SetBranchAddress("Electron_mvaFall17V2noIso_WP80", Electron_mvaFall17V2noIso_WP80, &b_Electron_mvaFall17V2noIso_WP80);
-   fChain->SetBranchAddress("Electron_mvaFall17V2noIso_WP90", Electron_mvaFall17V2noIso_WP90, &b_Electron_mvaFall17V2noIso_WP90);
-   fChain->SetBranchAddress("Electron_mvaFall17V2noIso_WPL", Electron_mvaFall17V2noIso_WPL, &b_Electron_mvaFall17V2noIso_WPL);
    if (fChain->GetBranch("Electron_mvaSpring16GP_WP80")) fChain->SetBranchAddress("Electron_mvaSpring16GP_WP80", Electron_mvaSpring16GP_WP80, &b_Electron_mvaSpring16GP_WP80);
    if (fChain->GetBranch("Electron_mvaSpring16GP_WP90")) fChain->SetBranchAddress("Electron_mvaSpring16GP_WP90", Electron_mvaSpring16GP_WP90, &b_Electron_mvaSpring16GP_WP90);
    if (fChain->GetBranch("Electron_mvaSpring16HZZ_WPL")) fChain->SetBranchAddress("Electron_mvaSpring16HZZ_WPL", Electron_mvaSpring16HZZ_WPL, &b_Electron_mvaSpring16HZZ_WPL);
    fChain->SetBranchAddress("Electron_seedGain", Electron_seedGain, &b_Electron_seedGain);
    fChain->SetBranchAddress("nFatJet", &nFatJet, &b_nFatJet);
    fChain->SetBranchAddress("FatJet_area", FatJet_area, &b_FatJet_area);
-   fChain->SetBranchAddress("FatJet_btagCMVA", FatJet_btagCMVA, &b_FatJet_btagCMVA);
    fChain->SetBranchAddress("FatJet_btagCSVV2", FatJet_btagCSVV2, &b_FatJet_btagCSVV2);
-   fChain->SetBranchAddress("FatJet_btagDDBvL", FatJet_btagDDBvL, &b_FatJet_btagDDBvL);
-   fChain->SetBranchAddress("FatJet_btagDDCvB", FatJet_btagDDCvB, &b_FatJet_btagDDCvB);
-   fChain->SetBranchAddress("FatJet_btagDDCvL", FatJet_btagDDCvL, &b_FatJet_btagDDCvL);
+   fChain->SetBranchAddress("FatJet_btagDDBvLV2", FatJet_btagDDBvLV2, &b_FatJet_btagDDBvLV2);
+   fChain->SetBranchAddress("FatJet_btagDDCvBV2", FatJet_btagDDCvBV2, &b_FatJet_btagDDCvBV2);
+   fChain->SetBranchAddress("FatJet_btagDDCvLV2", FatJet_btagDDCvLV2, &b_FatJet_btagDDCvLV2);
    fChain->SetBranchAddress("FatJet_btagDeepB", FatJet_btagDeepB, &b_FatJet_btagDeepB);
    fChain->SetBranchAddress("FatJet_btagHbb", FatJet_btagHbb, &b_FatJet_btagHbb);
    fChain->SetBranchAddress("FatJet_deepTagMD_H4qvsQCD", FatJet_deepTagMD_H4qvsQCD, &b_FatJet_deepTagMD_H4qvsQCD);
@@ -1605,6 +1471,7 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("FatJet_jetId", FatJet_jetId, &b_FatJet_jetId);
    fChain->SetBranchAddress("FatJet_subJetIdx1", FatJet_subJetIdx1, &b_FatJet_subJetIdx1);
    fChain->SetBranchAddress("FatJet_subJetIdx2", FatJet_subJetIdx2, &b_FatJet_subJetIdx2);
+   if (fChain->GetBranch("FatJet_genJetAK8Idx")) fChain->SetBranchAddress("FatJet_genJetAK8Idx", FatJet_genJetAK8Idx, &b_FatJet_genJetAK8Idx);
    if (fChain->GetBranch("nGenJetAK8")) fChain->SetBranchAddress("nGenJetAK8", &nGenJetAK8, &b_nGenJetAK8);
    if (fChain->GetBranch("GenJetAK8_eta")) fChain->SetBranchAddress("GenJetAK8_eta", GenJetAK8_eta, &b_GenJetAK8_eta);
    if (fChain->GetBranch("GenJetAK8_mass")) fChain->SetBranchAddress("GenJetAK8_mass", GenJetAK8_mass, &b_GenJetAK8_mass);
@@ -1672,17 +1539,12 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("IsoTrack_isFromLostTrack", IsoTrack_isFromLostTrack, &b_IsoTrack_isFromLostTrack);
    fChain->SetBranchAddress("nJet", &nJet, &b_nJet);
    fChain->SetBranchAddress("Jet_area", Jet_area, &b_Jet_area);
-   fChain->SetBranchAddress("Jet_btagCMVA", Jet_btagCMVA, &b_Jet_btagCMVA);
    fChain->SetBranchAddress("Jet_btagCSVV2", Jet_btagCSVV2, &b_Jet_btagCSVV2);
    fChain->SetBranchAddress("Jet_btagDeepB", Jet_btagDeepB, &b_Jet_btagDeepB);
-   fChain->SetBranchAddress("Jet_btagDeepC", Jet_btagDeepC, &b_Jet_btagDeepC);
    fChain->SetBranchAddress("Jet_btagDeepFlavB", Jet_btagDeepFlavB, &b_Jet_btagDeepFlavB);
-   fChain->SetBranchAddress("Jet_btagDeepFlavC", Jet_btagDeepFlavC, &b_Jet_btagDeepFlavC);
    fChain->SetBranchAddress("Jet_chEmEF", Jet_chEmEF, &b_Jet_chEmEF);
    fChain->SetBranchAddress("Jet_chHEF", Jet_chHEF, &b_Jet_chHEF);
    fChain->SetBranchAddress("Jet_eta", Jet_eta, &b_Jet_eta);
-   fChain->SetBranchAddress("Jet_jercCHF", Jet_jercCHF, &b_Jet_jercCHF);
-   fChain->SetBranchAddress("Jet_jercCHPUF", Jet_jercCHPUF, &b_Jet_jercCHPUF);
    fChain->SetBranchAddress("Jet_mass", Jet_mass, &b_Jet_mass);
    //fChain->SetBranchAddress("Jet_mass_nom", Jet_mass_nom, &b_Jet_mass_nom);
    if (fChain->GetBranch("Jet_mass_jerUp")) fChain->SetBranchAddress("Jet_mass_jerUp", Jet_mass_jerUp, &b_Jet_mass_jerUp);
@@ -1725,50 +1587,23 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("MET_covXY", &MET_covXY, &b_MET_covXY);
    fChain->SetBranchAddress("MET_covYY", &MET_covYY, &b_MET_covYY);
    fChain->SetBranchAddress("MET_phi", &MET_phi, &b_MET_phi);
-   if (fChain->GetBranch("MET_phi_nom")) fChain->SetBranchAddress("MET_phi_nom", &MET_phi_nom, &b_MET_phi_nom);
-   if (fChain->GetBranch("MET_phi_jer")) fChain->SetBranchAddress("MET_phi_jer", &MET_phi_jer, &b_MET_phi_jer);
-   if (fChain->GetBranch("MET_phi_jerUp")) fChain->SetBranchAddress("MET_phi_jerUp", &MET_phi_jerUp, &b_MET_phi_jerUp);
-   if (fChain->GetBranch("MET_phi_jerDown")) fChain->SetBranchAddress("MET_phi_jerDown", &MET_phi_jerDown, &b_MET_phi_jerDown);
-   if (fChain->GetBranch("MET_phi_jesTotalUp")) fChain->SetBranchAddress("MET_phi_jesTotalUp", &MET_phi_jesTotalUp, &b_MET_phi_jesTotalUp);
-   if (fChain->GetBranch("MET_phi_jesTotalDown")) fChain->SetBranchAddress("MET_phi_jesTotalDown", &MET_phi_jesTotalDown, &b_MET_phi_jesTotalDown);
-   if (fChain->GetBranch("MET_phi_unclustEnUp")) fChain->SetBranchAddress("MET_phi_unclustEnUp", &MET_phi_unclustEnUp, &b_MET_phi_unclustEnUp);
-   if (fChain->GetBranch("MET_phi_unclustEnDown")) fChain->SetBranchAddress("MET_phi_unclustEnDown", &MET_phi_unclustEnDown, &b_MET_phi_unclustEnDown);
+   if (fChain->GetBranch("MET_T1_phi")) fChain->SetBranchAddress("MET_T1_phi", &MET_T1_phi, &b_MET_T1_phi);
+   if (fChain->GetBranch("MET_T1_phi_jerUp")) fChain->SetBranchAddress("MET_T1_phi_jerUp", &MET_T1_phi_jerUp, &b_MET_T1_phi_jerUp);
+   if (fChain->GetBranch("MET_T1_phi_jerDown")) fChain->SetBranchAddress("MET_T1_phi_jerDown", &MET_T1_phi_jerDown, &b_MET_T1_phi_jerDown);
+   if (fChain->GetBranch("MET_T1_phi_jesTotalUp")) fChain->SetBranchAddress("MET_T1_phi_jesTotalUp", &MET_T1_phi_jesTotalUp, &b_MET_T1_phi_jesTotalUp);
+   if (fChain->GetBranch("MET_T1_phi_jesTotalDown")) fChain->SetBranchAddress("MET_T1_phi_jesTotalDown", &MET_T1_phi_jesTotalDown, &b_MET_T1_phi_jesTotalDown);
+   if (fChain->GetBranch("MET_T1_phi_unclustEnUp")) fChain->SetBranchAddress("MET_T1_phi_unclustEnUp", &MET_T1_phi_unclustEnUp, &b_MET_T1_phi_unclustEnUp);
+   if (fChain->GetBranch("MET_T1_phi_unclustEnDown")) fChain->SetBranchAddress("MET_T1_phi_unclustEnDown", &MET_T1_phi_unclustEnDown, &b_MET_T1_phi_unclustEnDown);
    fChain->SetBranchAddress("MET_pt", &MET_pt, &b_MET_pt);
-   if (fChain->GetBranch("MET_pt_nom")) fChain->SetBranchAddress("MET_pt_nom", &MET_pt_nom, &b_MET_pt_nom);
-   if (fChain->GetBranch("MET_pt_jer")) fChain->SetBranchAddress("MET_pt_jer", &MET_pt_jer, &b_MET_pt_jer);
-   if (fChain->GetBranch("MET_pt_jerUp")) fChain->SetBranchAddress("MET_pt_jerUp", &MET_pt_jerUp, &b_MET_pt_jerUp);
-   if (fChain->GetBranch("MET_pt_jerDown")) fChain->SetBranchAddress("MET_pt_jerDown", &MET_pt_jerDown, &b_MET_pt_jerDown);
-   if (fChain->GetBranch("MET_pt_jesTotalUp")) fChain->SetBranchAddress("MET_pt_jesTotalUp", &MET_pt_jesTotalUp, &b_MET_pt_jesTotalUp);
-   if (fChain->GetBranch("MET_pt_jesTotalDown")) fChain->SetBranchAddress("MET_pt_jesTotalDown", &MET_pt_jesTotalDown, &b_MET_pt_jesTotalDown);
-   if (fChain->GetBranch("MET_pt_unclustEnUp")) fChain->SetBranchAddress("MET_pt_unclustEnUp", &MET_pt_unclustEnUp, &b_MET_pt_unclustEnUp);
-   if (fChain->GetBranch("MET_pt_unclustEnDown")) fChain->SetBranchAddress("MET_pt_unclustEnDown", &MET_pt_unclustEnDown, &b_MET_pt_unclustEnDown);
+   if (fChain->GetBranch("MET_T1_pt")) fChain->SetBranchAddress("MET_T1_pt", &MET_T1_pt, &b_MET_T1_pt);
+   if (fChain->GetBranch("MET_T1_pt_jerUp")) fChain->SetBranchAddress("MET_T1_pt_jerUp", &MET_T1_pt_jerUp, &b_MET_T1_pt_jerUp);
+   if (fChain->GetBranch("MET_T1_pt_jerDown")) fChain->SetBranchAddress("MET_T1_pt_jerDown", &MET_T1_pt_jerDown, &b_MET_T1_pt_jerDown);
+   if (fChain->GetBranch("MET_T1_pt_jesTotalUp")) fChain->SetBranchAddress("MET_T1_pt_jesTotalUp", &MET_T1_pt_jesTotalUp, &b_MET_T1_pt_jesTotalUp);
+   if (fChain->GetBranch("MET_T1_pt_jesTotalDown")) fChain->SetBranchAddress("MET_T1_pt_jesTotalDown", &MET_T1_pt_jesTotalDown, &b_MET_T1_pt_jesTotalDown);
+   if (fChain->GetBranch("MET_T1_pt_unclustEnUp")) fChain->SetBranchAddress("MET_T1_pt_unclustEnUp", &MET_T1_pt_unclustEnUp, &b_MET_T1_pt_unclustEnUp);
+   if (fChain->GetBranch("MET_T1_pt_unclustEnDown")) fChain->SetBranchAddress("MET_T1_pt_unclustEnDown", &MET_T1_pt_unclustEnDown, &b_MET_T1_pt_unclustEnDown);
    if (fChain->GetBranch("MET_significance")) fChain->SetBranchAddress("MET_significance", &MET_significance, &b_MET_significance);
    if (fChain->GetBranch("MET_sumEt")) fChain->SetBranchAddress("MET_sumEt", &MET_sumEt, &b_MET_sumEt);
-   if (fChain->GetBranch("METFixEE2017_MetUnclustEnUpDeltaX")) fChain->SetBranchAddress("METFixEE2017_MetUnclustEnUpDeltaX", &METFixEE2017_MetUnclustEnUpDeltaX, &b_METFixEE2017_MetUnclustEnUpDeltaX);
-   if (fChain->GetBranch("METFixEE2017_MetUnclustEnUpDeltaY")) fChain->SetBranchAddress("METFixEE2017_MetUnclustEnUpDeltaY", &METFixEE2017_MetUnclustEnUpDeltaY, &b_METFixEE2017_MetUnclustEnUpDeltaY);
-   if (fChain->GetBranch("METFixEE2017_covXX")) fChain->SetBranchAddress("METFixEE2017_covXX", &METFixEE2017_covXX, &b_METFixEE2017_covXX);
-   if (fChain->GetBranch("METFixEE2017_covXY")) fChain->SetBranchAddress("METFixEE2017_covXY", &METFixEE2017_covXY, &b_METFixEE2017_covXY);
-   if (fChain->GetBranch("METFixEE2017_covYY")) fChain->SetBranchAddress("METFixEE2017_covYY", &METFixEE2017_covYY, &b_METFixEE2017_covYY);
-   if (fChain->GetBranch("METFixEE2017_phi")) fChain->SetBranchAddress("METFixEE2017_phi", &METFixEE2017_phi, &b_METFixEE2017_phi);
-   if (fChain->GetBranch("METFixEE2017_phi_nom")) fChain->SetBranchAddress("METFixEE2017_phi_nom", &METFixEE2017_phi_nom, &b_METFixEE2017_phi_nom);
-   if (fChain->GetBranch("METFixEE2017_phi_jer")) fChain->SetBranchAddress("METFixEE2017_phi_jer", &METFixEE2017_phi_jer, &b_METFixEE2017_phi_jer);
-   if (fChain->GetBranch("METFixEE2017_phi_jerUp")) fChain->SetBranchAddress("METFixEE2017_phi_jerUp", &METFixEE2017_phi_jerUp, &b_METFixEE2017_phi_jerUp);
-   if (fChain->GetBranch("METFixEE2017_phi_jerDown")) fChain->SetBranchAddress("METFixEE2017_phi_jerDown", &METFixEE2017_phi_jerDown, &b_METFixEE2017_phi_jerDown);
-   if (fChain->GetBranch("METFixEE2017_phi_jesTotalUp")) fChain->SetBranchAddress("METFixEE2017_phi_jesTotalUp", &METFixEE2017_phi_jesTotalUp, &b_METFixEE2017_phi_jesTotalUp);
-   if (fChain->GetBranch("METFixEE2017_phi_jesTotalDown")) fChain->SetBranchAddress("METFixEE2017_phi_jesTotalDown", &METFixEE2017_phi_jesTotalDown, &b_METFixEE2017_phi_jesTotalDown);
-   if (fChain->GetBranch("METFixEE2017_phi_unclustEnUp")) fChain->SetBranchAddress("METFixEE2017_phi_unclustEnUp", &METFixEE2017_phi_unclustEnUp, &b_METFixEE2017_phi_unclustEnUp);
-   if (fChain->GetBranch("METFixEE2017_phi_unclustEnDown")) fChain->SetBranchAddress("METFixEE2017_phi_unclustEnDown", &METFixEE2017_phi_unclustEnDown, &b_METFixEE2017_phi_unclustEnDown);
-   if (fChain->GetBranch("METFixEE2017_pt")) fChain->SetBranchAddress("METFixEE2017_pt", &METFixEE2017_pt, &b_METFixEE2017_pt);
-   if (fChain->GetBranch("METFixEE2017_pt_nom")) fChain->SetBranchAddress("METFixEE2017_pt_nom", &METFixEE2017_pt_nom, &b_METFixEE2017_pt_nom);
-   if (fChain->GetBranch("METFixEE2017_pt_jer")) fChain->SetBranchAddress("METFixEE2017_pt_jer", &METFixEE2017_pt_jer, &b_METFixEE2017_pt_jer);
-   if (fChain->GetBranch("METFixEE2017_pt_jerUp")) fChain->SetBranchAddress("METFixEE2017_pt_jerUp", &METFixEE2017_pt_jerUp, &b_METFixEE2017_pt_jerUp);
-   if (fChain->GetBranch("METFixEE2017_pt_jerDown")) fChain->SetBranchAddress("METFixEE2017_pt_jerDown", &METFixEE2017_pt_jerDown, &b_METFixEE2017_pt_jerDown);
-   if (fChain->GetBranch("METFixEE2017_pt_jesTotalUp")) fChain->SetBranchAddress("METFixEE2017_pt_jesTotalUp", &METFixEE2017_pt_jesTotalUp, &b_METFixEE2017_pt_jesTotalUp);
-   if (fChain->GetBranch("METFixEE2017_pt_jesTotalDown")) fChain->SetBranchAddress("METFixEE2017_pt_jesTotalDown", &METFixEE2017_pt_jesTotalDown, &b_METFixEE2017_pt_jesTotalDown);
-   if (fChain->GetBranch("METFixEE2017_pt_unclustEnUp")) fChain->SetBranchAddress("METFixEE2017_pt_unclustEnUp", &METFixEE2017_pt_unclustEnUp, &b_METFixEE2017_pt_unclustEnUp);
-   if (fChain->GetBranch("METFixEE2017_pt_unclustEnDown")) fChain->SetBranchAddress("METFixEE2017_pt_unclustEnDown", &METFixEE2017_pt_unclustEnDown, &b_METFixEE2017_pt_unclustEnDown);
-   if (fChain->GetBranch("METFixEE2017_significance")) fChain->SetBranchAddress("METFixEE2017_significance", &METFixEE2017_significance, &b_METFixEE2017_significance);
-   if (fChain->GetBranch("METFixEE2017_sumEt")) fChain->SetBranchAddress("METFixEE2017_sumEt", &METFixEE2017_sumEt, &b_METFixEE2017_sumEt);
    fChain->SetBranchAddress("nMuon", &nMuon, &b_nMuon);
    fChain->SetBranchAddress("Muon_dxy", Muon_dxy, &b_Muon_dxy);
    fChain->SetBranchAddress("Muon_dxyErr", Muon_dxyErr, &b_Muon_dxyErr);
@@ -1817,6 +1652,10 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Muon_tkIsoId", Muon_tkIsoId, &b_Muon_tkIsoId);
    fChain->SetBranchAddress("Muon_triggerIdLoose", Muon_triggerIdLoose, &b_Muon_triggerIdLoose);
    fChain->SetBranchAddress("nPhoton", &nPhoton, &b_nPhoton);
+   fChain->SetBranchAddress("Photon_dEscaleUp", Photon_dEscaleUp, &b_Photon_dEscaleUp);
+   fChain->SetBranchAddress("Photon_dEscaleDown", Photon_dEscaleDown, &b_Photon_dEscaleDown);
+   fChain->SetBranchAddress("Photon_dEsigmaUp", Photon_dEsigmaUp, &b_Photon_dEsigmaUp);
+   fChain->SetBranchAddress("Photon_dEsigmaDown", Photon_dEsigmaDown, &b_Photon_dEsigmaDown);
    fChain->SetBranchAddress("Photon_eCorr", Photon_eCorr, &b_Photon_eCorr);
    fChain->SetBranchAddress("Photon_energyErr", Photon_energyErr, &b_Photon_energyErr);
    fChain->SetBranchAddress("Photon_eta", Photon_eta, &b_Photon_eta);
@@ -1832,9 +1671,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Photon_sieie", Photon_sieie, &b_Photon_sieie);
    fChain->SetBranchAddress("Photon_charge", Photon_charge, &b_Photon_charge);
    if (fChain->GetBranch("Photon_cutBased")) fChain->SetBranchAddress("Photon_cutBased", Photon_cutBased, &b_Photon_cutBased);
-   if (fChain->GetBranch("Photon_cutBasedBitmap")) fChain->SetBranchAddress("Photon_cutBasedBitmap", Photon_cutBasedBitmap, &b_Photon_cutBasedBitmap);
-   if (fChain->GetBranch("Photon_cutBasedV1Bitmap")) fChain->SetBranchAddress("Photon_cutBasedV1Bitmap", Photon_cutBasedV1Bitmap, &b_Photon_cutBasedV1Bitmap);
-   if (fChain->GetBranch("Photon_cutBased17Bitmap")) fChain->SetBranchAddress("Photon_cutBased17Bitmap", Photon_cutBased17Bitmap, &b_Photon_cutBased17Bitmap);
    fChain->SetBranchAddress("Photon_electronIdx", Photon_electronIdx, &b_Photon_electronIdx);
    fChain->SetBranchAddress("Photon_jetIdx", Photon_jetIdx, &b_Photon_jetIdx);
    fChain->SetBranchAddress("Photon_pdgId", Photon_pdgId, &b_Photon_pdgId);
@@ -1884,7 +1720,6 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("SoftActivityJetNjets2", &SoftActivityJetNjets2, &b_SoftActivityJetNjets2);
    fChain->SetBranchAddress("SoftActivityJetNjets5", &SoftActivityJetNjets5, &b_SoftActivityJetNjets5);
    fChain->SetBranchAddress("nSubJet", &nSubJet, &b_nSubJet);
-   fChain->SetBranchAddress("SubJet_btagCMVA", SubJet_btagCMVA, &b_SubJet_btagCMVA);
    fChain->SetBranchAddress("SubJet_btagCSVV2", SubJet_btagCSVV2, &b_SubJet_btagCSVV2);
    fChain->SetBranchAddress("SubJet_btagDeepB", SubJet_btagDeepB, &b_SubJet_btagDeepB);
    fChain->SetBranchAddress("SubJet_eta", SubJet_eta, &b_SubJet_eta);
@@ -1912,30 +1747,12 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Tau_photonsOutsideSignalCone", Tau_photonsOutsideSignalCone, &b_Tau_photonsOutsideSignalCone);
    fChain->SetBranchAddress("Tau_pt", Tau_pt, &b_Tau_pt);
    fChain->SetBranchAddress("Tau_puCorr", Tau_puCorr, &b_Tau_puCorr);
-   fChain->SetBranchAddress("Tau_rawAntiEle", Tau_rawAntiEle, &b_Tau_rawAntiEle);
-   fChain->SetBranchAddress("Tau_rawAntiEle2018", Tau_rawAntiEle2018, &b_Tau_rawAntiEle2018);
-   fChain->SetBranchAddress("Tau_rawIso", Tau_rawIso, &b_Tau_rawIso);
-   fChain->SetBranchAddress("Tau_rawIsodR03", Tau_rawIsodR03, &b_Tau_rawIsodR03);
-   fChain->SetBranchAddress("Tau_rawMVAnewDM2017v2", Tau_rawMVAnewDM2017v2, &b_Tau_rawMVAnewDM2017v2);
-   fChain->SetBranchAddress("Tau_rawMVAoldDM", Tau_rawMVAoldDM, &b_Tau_rawMVAoldDM);
-   fChain->SetBranchAddress("Tau_rawMVAoldDM2017v1", Tau_rawMVAoldDM2017v1, &b_Tau_rawMVAoldDM2017v1);
-   fChain->SetBranchAddress("Tau_rawMVAoldDM2017v2", Tau_rawMVAoldDM2017v2, &b_Tau_rawMVAoldDM2017v2);
-   fChain->SetBranchAddress("Tau_rawMVAoldDMdR032017v2", Tau_rawMVAoldDMdR032017v2, &b_Tau_rawMVAoldDMdR032017v2);
    fChain->SetBranchAddress("Tau_charge", Tau_charge, &b_Tau_charge);
    fChain->SetBranchAddress("Tau_decayMode", Tau_decayMode, &b_Tau_decayMode);
    fChain->SetBranchAddress("Tau_jetIdx", Tau_jetIdx, &b_Tau_jetIdx);
-   fChain->SetBranchAddress("Tau_rawAntiEleCat", Tau_rawAntiEleCat, &b_Tau_rawAntiEleCat);
-   fChain->SetBranchAddress("Tau_rawAntiEleCat2018", Tau_rawAntiEleCat2018, &b_Tau_rawAntiEleCat2018);
-   fChain->SetBranchAddress("Tau_idAntiEle", Tau_idAntiEle, &b_Tau_idAntiEle);
-   fChain->SetBranchAddress("Tau_idAntiEle2018", Tau_idAntiEle2018, &b_Tau_idAntiEle2018);
-   fChain->SetBranchAddress("Tau_idAntiMu", Tau_idAntiMu, &b_Tau_idAntiMu);
-   fChain->SetBranchAddress("Tau_idDecayMode", Tau_idDecayMode, &b_Tau_idDecayMode);
-   fChain->SetBranchAddress("Tau_idDecayModeNewDMs", Tau_idDecayModeNewDMs, &b_Tau_idDecayModeNewDMs);
-   fChain->SetBranchAddress("Tau_idMVAnewDM2017v2", Tau_idMVAnewDM2017v2, &b_Tau_idMVAnewDM2017v2);
-   fChain->SetBranchAddress("Tau_idMVAoldDM", Tau_idMVAoldDM, &b_Tau_idMVAoldDM);
-   fChain->SetBranchAddress("Tau_idMVAoldDM2017v1", Tau_idMVAoldDM2017v1, &b_Tau_idMVAoldDM2017v1);
-   fChain->SetBranchAddress("Tau_idMVAoldDM2017v2", Tau_idMVAoldDM2017v2, &b_Tau_idMVAoldDM2017v2);
-   fChain->SetBranchAddress("Tau_idMVAoldDMdR032017v2", Tau_idMVAoldDMdR032017v2, &b_Tau_idMVAoldDMdR032017v2);
+   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSe", Tau_idDeepTau2017v2p1VSe, &b_Tau_idDeepTau2017v2p1VSe);
+   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSjet", Tau_idDeepTau2017v2p1VSjet, &b_Tau_idDeepTau2017v2p1VSjet);
+   fChain->SetBranchAddress("Tau_idDeepTau2017v2p1VSmu", Tau_idDeepTau2017v2p1VSmu, &b_Tau_idDeepTau2017v2p1VSmu);
    fChain->SetBranchAddress("TkMET_phi", &TkMET_phi, &b_TkMET_phi);
    fChain->SetBranchAddress("TkMET_pt", &TkMET_pt, &b_TkMET_pt);
    fChain->SetBranchAddress("TkMET_sumEt", &TkMET_sumEt, &b_TkMET_sumEt);
@@ -2516,9 +2333,11 @@ float Analyzer::Photon_SCEta(const int i){
   return SCEta;
 }
 
-double Analyzer::UpdateBtags(bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader reader_L, BTCalibrationReader reader_M, BTCalibrationReader reader_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
+double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
   BTEntry::JetFlavor FLAV;
   double mc_eff[3]={0}; char tag='0';
+  //string sf_btag_fname="correctionlib/POG/BTV/"+to_string(year)+"_UL/btagging.json";
+  //auto cset= CorrectionSet::from_file(sf_btag_fname);
   if (btag_discr>WP_M) tag='M';
   else if (btag_discr>WP_L) tag='L';
   if (pt>=1000) pt=999;
@@ -2542,21 +2361,57 @@ double Analyzer::UpdateBtags(bool debug, bool fastsim, double eta, double pt, in
   }
   double SF[3]={1,1,1};
   if (Deep_whichSF==0) {
-    SF[0] = reader_L.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[0]*=fastreader_L.eval_auto_bounds("central",FLAV,eta,pt);
-    SF[1] = reader_M.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[1]*=fastreader_M.eval_auto_bounds("central",FLAV,eta,pt) ;
-    SF[2] = reader_T.eval_auto_bounds("central",FLAV,eta,pt); if (fastsim) SF[2]*=fastreader_T.eval_auto_bounds("central",FLAV,eta,pt);
+    if (had==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",had,abs(eta),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",had,abs(eta),pt});
+    }
+    if (fastsim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("central",FLAV,eta,pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("central",FLAV,eta,pt) ;
+      SF[2]*=fastreader_T.eval_auto_bounds("central",FLAV,eta,pt);
+    }
   }
   else if (Deep_whichSF==1) {
-    SF[0] = reader_L.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF[0]*=fastreader_L.eval_auto_bounds("up",FLAV,eta,pt);
-    SF[1] = reader_M.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF[1]*=fastreader_M.eval_auto_bounds("up",FLAV,eta,pt);
-    SF[2] = reader_T.eval_auto_bounds("up", FLAV, eta, pt); if (fastsim)   SF[2]*=fastreader_T.eval_auto_bounds("up",FLAV,eta,pt);
+    if (had==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"up","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"up","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"up","T",had,abs(eta),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"up","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"up","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"up","T",had,abs(eta),pt});
+    }
+    if (fastsim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("up",FLAV,eta,pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("up",FLAV,eta,pt);
+      SF[2]*=fastreader_T.eval_auto_bounds("up",FLAV,eta,pt);
+    }
   }
   else if (Deep_whichSF==2) {
-    SF[0] = reader_L.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF[0]*=fastreader_L.eval_auto_bounds("down",FLAV,eta,pt);
-    SF[1] = reader_M.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF[1]*=fastreader_M.eval_auto_bounds("down",FLAV,eta,pt);
-    SF[2] = reader_T.eval_auto_bounds("down", FLAV, eta, pt); if (fastsim) SF[2]*=fastreader_T.eval_auto_bounds("down",FLAV,eta,pt);
+    if (had==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"down","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"down","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"down","T",had,abs(eta),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"down","L",had,abs(eta),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"down","M",had,abs(eta),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"down","T",had,abs(eta),pt});
+    }
+    if (fastsim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("down",FLAV,eta,pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("down",FLAV,eta,pt);
+      SF[2]*=fastreader_T.eval_auto_bounds("down",FLAV,eta,pt);
+    }
   }
-  
+
   double rand=gen->Uniform(), rand2=gen->Uniform();
   
   char newtag = tag;
@@ -2695,12 +2550,10 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="muID") muID_whichSF=x.second;
     else if (x.first=="muISO") muISO_whichSF=x.second;
     else if (x.first=="tau") tau_whichSF=x.second;
+    else if (x.first=="tauTES") tauTES_whichSF=x.second;
     else if (x.first=="L1prefire") L1prefire_whichSF=x.second;
-    else if (x.first=="Egamma_scale_stat") Egamma_Statscale_whichSF=x.second;
-    else if (x.first=="Egamma_scale_syst") Egamma_Systscale_whichSF=x.second;
-    else if (x.first=="Egamma_scale_gain") Egamma_Gainscale_whichSF=x.second;
-    else if (x.first=="Egamma_resol_rho") Egamma_Rhoresol_whichSF=x.second;
-    else if (x.first=="Egamma_resol_phi") Egamma_Phiresol_whichSF=x.second;
+    else if (x.first=="Egamma_scale") Egamma_scale_whichSF=x.second;
+    else if (x.first=="Egamma_smear") Egamma_smear_whichSF=x.second;
     else if (x.first=="genMET") genMET_whichSF=x.second;
     else if (x.first=="ISR") ISR_whichSF=x.second;
     else if (x.first=="PUweight") PUweight_whichSF=x.second;
