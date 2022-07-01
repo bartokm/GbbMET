@@ -755,121 +755,6 @@ void Analyzer::Loop()
          cset_pho = CorrectionSet::from_file(sf_pho_fname);
          string sf_btag_fname="correctionlib/POG/BTV/"+to_string(year)+"_UL/btagging.json";
          cset_btag = CorrectionSet::from_file(sf_btag_fname);
-         if (year==2016) {
-           //electron reconstruction efficiency
-           TFile f_eleRecSF_low("input/egamma/electron/2016_Electron_EGM2D_BtoH_low_RecoSF_Legacy2016.root","read");
-           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
-           f_eleRecSF_low.Close();
-           TFile f_eleRecSF_high("input/egamma/electron/2016_Electron_EGM2D_BtoH_GT20GeV_RecoSF_Legacy2016.root","read");
-           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_high.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
-           f_eleRecSF_high.Close();
-           //electron cutbased veto
-           TFile f_eleVetoSF("input/egamma/electron/2016_ElectronWPVeto_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[0]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
-           f_eleVetoSF.Close();
-           //electron cutbased loose
-           TFile f_eleLooseSF("input/egamma/electron/2016LegacyReReco_ElectronLoose_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[1]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
-           f_eleLooseSF.Close();
-           //electron cutbased medium
-           TFile f_eleMediumSF("input/egamma/electron/2016LegacyReReco_ElectronMedium_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[2]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
-           f_eleMediumSF.Close();
-           //electron cutbased tight
-           TFile f_eleTightSF("input/egamma/electron/2016LegacyReReco_ElectronTight_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[3]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
-           f_eleTightSF.Close();
-         }
-         else if (year==2017) {
-           //electron reconstruction efficiency
-           TFile f_eleRecSF_low("input/egamma/electron/2017_Electron_egammaEffi.txt_EGM2D_runBCDEF_passingRECO_lowEt.root","read");
-           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
-           f_eleRecSF_low.Close();
-           TFile f_eleRecSF_high("input/egamma/electron/2017_Electron_egammaEffi.txt_EGM2D_runBCDEF_passingRECO.root","read");
-           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_high.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
-           f_eleRecSF_high.Close();
-           //electron cutbased veto
-           TFile f_eleVetoSF("input/egamma/electron/2017_ElectronWPVeto_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[0]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
-           f_eleVetoSF.Close();
-           //electron cutbased loose
-           TFile f_eleLooseSF("input/egamma/electron/2017_ElectronLoose.root","read");
-           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[1]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
-           f_eleLooseSF.Close();
-           //electron cutbased medium
-           TFile f_eleMediumSF("input/egamma/electron/2017_ElectronMedium.root","read");
-           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[2]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
-           f_eleMediumSF.Close();
-           //electron cutbased tight
-           TFile f_eleTightSF("input/egamma/electron/2017_ElectronTight.root","read");
-           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[3]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
-           f_eleTightSF.Close();
-         }
-         else if (year==2018) {
-           //electron reconstruction efficiency
-           TFile f_eleRecSF_low("input/egamma/electron/2018_Electron_egammaEffi.txt_EGM2D_updatedAll.root","read");
-           h_eleRec_EGamma_SF2D[0] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[0]->SetDirectory(0);
-           h_eleRec_EGamma_SF2D[1] = (TH2F*)f_eleRecSF_low.Get("EGamma_SF2D");
-           h_eleRec_EGamma_SF2D[1]->SetDirectory(0);
-           f_eleRecSF_low.Close();
-           //electron cutbased veto
-           TFile f_eleVetoSF("input/egamma/electron/2018_ElectronWPVeto_Fall17V2.root","read");
-           h_ele_EGamma_SF2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[0]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[0] = (TH2F*)f_eleVetoSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[0]->SetDirectory(0);
-           f_eleVetoSF.Close();
-           //electron cutbased loose
-           TFile f_eleLooseSF("input/egamma/electron/2018_ElectronLoose.root","read");
-           h_ele_EGamma_SF2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[1]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[1] = (TH2F*)f_eleLooseSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[1]->SetDirectory(0);
-           f_eleLooseSF.Close();
-           //electron cutbased medium
-           TFile f_eleMediumSF("input/egamma/electron/2018_ElectronMedium.root","read");
-           h_ele_EGamma_SF2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[2]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[2] = (TH2F*)f_eleMediumSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[2]->SetDirectory(0);
-           f_eleMediumSF.Close();
-           //electron cutbased tight
-           TFile f_eleTightSF("input/egamma/electron/2018_ElectronTight.root","read");
-           h_ele_EGamma_SF2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_SF2D");
-           h_ele_EGamma_SF2D[3]->SetDirectory(0);
-           h_ele_EGamma_EffMC2D[3] = (TH2F*)f_eleTightSF.Get("EGamma_EffMC2D");
-           h_ele_EGamma_EffMC2D[3]->SetDirectory(0);
-           f_eleTightSF.Close();
-         }
          if (year==2016){
            //Muon ID SF
            float lum_ratio_BCDEF = 0.5481;
@@ -1370,14 +1255,6 @@ void Analyzer::Loop()
          rec_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({to_string(year),rec_whichsf,temprec,eta, pt});
          ele_SF[whichElectron]=id_sf*rec_sf;
          if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" finalSF= "<<ele_SF[0]<<endl;
-       }
-       if (nPassEleNO!=0){ //only for loose electrons so far
-         double pt=Electron_pt[passEleNO[0]];//, pt2=Electron_pt[passEleNO[0]];
-         pt=(pt<450) ? pt : 450; pt=(pt>10) ? pt : 10;// pt2=(pt>30) ? pt : 31;
-         double epsilon=h_ele_EGamma_EffMC2D[1]->GetBinContent(h_ele_EGamma_EffMC2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         id_sf=h_ele_EGamma_SF2D[1]->GetBinContent(h_ele_EGamma_SF2D[1]->FindBin(Electron_eta[passEleNO[0]],pt));
-         ele_VETOSF = (epsilon == 1) ? 1 : (1-id_sf*epsilon)/(1-epsilon);
-         if (ele_VETOSF==0 || std::isnan(ele_VETOSF)) cout<<"ele veto id "<<id_sf<<" epsilon "<<epsilon<<" sf "<<ele_VETOSF<<endl;
        }
        if (is_debug) cout<<"Electron SF applied"<<endl;
      }
