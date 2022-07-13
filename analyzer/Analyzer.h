@@ -532,6 +532,8 @@ public :
    Bool_t          Flag_muonBadTrackFilter;
    Bool_t          Flag_BadChargedCandidateFilter;
    Bool_t          Flag_BadPFMuonFilter;
+   Bool_t          Flag_BadPFMuonDzFilter;
+   Bool_t          Flag_hfNoisyHitsFilter;
    Bool_t          Flag_BadChargedCandidateSummer16Filter;
    Bool_t          Flag_BadPFMuonSummer16Filter;
    Bool_t          Flag_trkPOG_manystripclus53X;
@@ -1043,6 +1045,8 @@ public :
    TBranch        *b_Flag_muonBadTrackFilter;   //!
    TBranch        *b_Flag_BadChargedCandidateFilter;   //!
    TBranch        *b_Flag_BadPFMuonFilter;   //!
+   TBranch        *b_Flag_BadPFMuonDzFilter;   //!
+   TBranch        *b_Flag_hfNoisyHitsFilter;   //!
    TBranch        *b_Flag_BadChargedCandidateSummer16Filter;   //!
    TBranch        *b_Flag_BadPFMuonSummer16Filter;   //!
    TBranch        *b_Flag_trkPOG_manystripclus53X;   //!
@@ -1073,8 +1077,8 @@ public :
    TBranch        *b_L1_AlwaysTrue;
 
    //Added
-   double BtagDDBvLWP[3][5]={{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92}};
-   double BtagDeepWP[3][3]={{0.0614,0.3093,0.7221},{0.0521,0.3033,0.7489},{0.0494,0.2770,0.7264}};
+   double BtagDDBvLWP[4][5]={{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92}}; //NO WP for UL! Copied from preUL
+   double BtagDeepWP[4][3]={{0.0508,0.2598,0.6502},{0.0480,0.2489,0.6377},{0.0532,0.3040,0.7476},{0.0490,0.2783,0.7100}};
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
    int _ABCD=0;
@@ -1119,7 +1123,7 @@ public :
    double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
    double ele_VETOSF=1;
    Double_t TotalEvents=0;
-   int year=1;
+   string year="";
    int DDBvL_whichSF=0, Deep_whichSF=0;
    int JES_whichSF=0, JER_whichSF=0, UES_whichSF=0, JMR_whichSF=0, JMS_whichSF=0, ISR_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0, tauTES_whichSF=0;
@@ -1171,7 +1175,7 @@ public :
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, int _year=0, bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0);
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1186,7 +1190,7 @@ public :
    double           deltaPhi(double phi1, double phi2);
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
-   void             CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
+   void             CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
    double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
@@ -1200,7 +1204,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, int _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1248,7 +1252,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   TChain * ch_run = new TChain("Runs","");
   btag_file=btag_fname;
   if (_xsec) xsec=_xsec;
-  if (_year) year=_year;
+  if (_year!="") year=_year;
   if (fastSim) _fastSim=true;
   if (ABCD) _ABCD=ABCD;
   if (fakeRate) _fakeRate=fakeRate;
@@ -1833,6 +1837,8 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("Flag_muonBadTrackFilter", &Flag_muonBadTrackFilter, &b_Flag_muonBadTrackFilter);
    fChain->SetBranchAddress("Flag_BadChargedCandidateFilter", &Flag_BadChargedCandidateFilter, &b_Flag_BadChargedCandidateFilter);
    fChain->SetBranchAddress("Flag_BadPFMuonFilter", &Flag_BadPFMuonFilter, &b_Flag_BadPFMuonFilter);
+   fChain->SetBranchAddress("Flag_BadPFMuonDzFilter", &Flag_BadPFMuonDzFilter, &b_Flag_BadPFMuonDzFilter);
+   fChain->SetBranchAddress("Flag_hfNoisyHitsFilter", &Flag_hfNoisyHitsFilter, &b_Flag_hfNoisyHitsFilter);
    fChain->SetBranchAddress("Flag_BadChargedCandidateSummer16Filter", &Flag_BadChargedCandidateSummer16Filter, &b_Flag_BadChargedCandidateSummer16Filter);
    fChain->SetBranchAddress("Flag_BadPFMuonSummer16Filter", &Flag_BadPFMuonSummer16Filter, &b_Flag_BadPFMuonSummer16Filter);
    fChain->SetBranchAddress("Flag_trkPOG_manystripclus53X", &Flag_trkPOG_manystripclus53X, &b_Flag_trkPOG_manystripclus53X);
@@ -1958,20 +1964,22 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     metFilters += (Flag_HBHENoiseIsoFilter) ? pow(2,3) : 0;
     metFilters += (Flag_EcalDeadCellTriggerPrimitiveFilter) ? pow(2,4) : 0;
     metFilters += (Flag_BadPFMuonFilter) ? pow(2,5) : 0;
-    metFilters += (Flag_BadChargedCandidateFilter) ? pow(2,6) : 0;
-    metFilters += (Flag_eeBadScFilter) ? pow(2,7) : 0;
-    metFilters += (Flag_ecalBadCalibFilter) ? pow(2,8) : 0;
-    //current metfilter recommendations: year/data/mc/fastsim: 2016/191/63/61, 2017/447/319/317, 2018/447/319/317
+    metFilters += (Flag_BadPFMuonDzFilter) ? pow(2,6) : 0;
+    metFilters += (Flag_hfNoisyHitsFilter ) ? pow(2,7) : 0;
+    metFilters += (Flag_BadChargedCandidateFilter) ? pow(2,8) : 0;
+    metFilters += (Flag_eeBadScFilter) ? pow(2,9) : 0;
+    metFilters += (Flag_ecalBadCalibFilter) ? pow(2,10) : 0;
+    //Fastsim UL recommendation not ready, use EOY recommendation instead
+    //2018 data: 11001111111 MC: 11001111111 fastsim: 10001111101
+    //2017 data: 11001111111 MC: 11001111111 fastsim: 10001111101
+    //2016 data: 01001111111 MC: 01001111111 fastsim: 00001111101
+    //2016? Flag_ecalBadCalibFilter is not listed in the table for UL2016?? https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data
     bool metFilters_hardcoded=0; unsigned int filterValue=0;
-    if (year==2016 && isData) filterValue=191;
-    if (year==2016 && !isData && !_fastSim) filterValue=63;
-    if (year==2016 && !isData && _fastSim) filterValue=61;
-    if (year!=2016 && isData) filterValue=447;
-    if (year!=2016 && !isData && !_fastSim) filterValue=319;
-    if (year!=2016 && !isData && _fastSim) filterValue=317;
+    if (year.find("2016")!=std::string::npos) (_fastSim) ? filterValue=125 : filterValue=639;
+    else  (_fastSim) ? filterValue=1149 : filterValue=1663;
     metFilters_hardcoded=(metFilters&filterValue)==filterValue;
     bool HLTPho=0;
-    if (year==2016) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
+    if (year.find("2016")!=std::string::npos) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
     if      (_cut_variable[i]=="HLTPho")    returnvalue=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="isPVGood") returnvalue=Parser(PV_npvsGood,_cut_operator[i],_cut_value[i]);
@@ -2336,8 +2344,6 @@ float Analyzer::Photon_SCEta(const int i){
 double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
   BTEntry::JetFlavor FLAV;
   double mc_eff[3]={0}; char tag='0';
-  //string sf_btag_fname="correctionlib/POG/BTV/"+to_string(year)+"_UL/btagging.json";
-  //auto cset= CorrectionSet::from_file(sf_btag_fname);
   if (btag_discr>WP_M) tag='M';
   else if (btag_discr>WP_L) tag='L';
   if (pt>=1000) pt=999;
@@ -2457,12 +2463,12 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
   return btag_discr;
 }
 
-void Analyzer::CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]){
+void Analyzer::CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]){
   for (unsigned int i=0;i<3;i++) {SF_L[i]=1; SF_M1[i]=1; SF_M2[i]=1; SF_T1[i]=1; SF_T2[i]=1;}
   for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
     double pt=v_pt[it->first];
     //cout<<it->second<<" pt "<<pt<<endl;
-    if (year==2016) {
+    if (year.find("2016")!=std::string::npos) {
       if (pt>350 && pt<850) {
         if (it->second != '0') {SF_L[0] = 0.95; SF_L[1] = SF_L[0]+0.10; SF_L[2] = SF_L[0]-0.04;}
         if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.86; SF_M1[1] = SF_M1[0]+0.11; SF_M1[2] = SF_M1[0]-0.04;}
@@ -2478,7 +2484,7 @@ void Analyzer::CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCu
         if (it->second == 'C') {SF_T2[0] = 0.68; SF_T2[1] = SF_T2[0]+2*0.20; SF_T2[2] = SF_T2[0]-2*0.10;}
       }
     }
-    if (year==2017) {
+    if (year.find("2017")!=std::string::npos) {
       if (pt<350) {
         if (it->second != '0') {SF_L[0] = 0.92; SF_L[1] = SF_L[0]+0.04; SF_L[2] = SF_L[0]-0.04;}
         if (it->second != '0' && it->second != 'L') {SF_M1[1] = 0.82; SF_M1[1] = SF_M1[0]+0.04; SF_M1[2] = SF_M1[0]-0.05;}
@@ -2501,7 +2507,7 @@ void Analyzer::CalcBtagSF_AK8(int year, vector<float> v_pt, map<int,char> passCu
         if (it->second == 'C') {SF_T2[0] = 0.54; SF_T2[1] = SF_T2[0]+2*0.15; SF_T2[2] = SF_T2[0]-2*0.23;}
       }
     }
-    if (year==2018) {
+    if (year.find("2018")!=std::string::npos) {
       if (pt<350) {
         if (it->second != '0') {SF_L[0] = 0.97; SF_L[1] = SF_L[0]+0.04; SF_L[2] = SF_L[0]-0.05;}
         if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.81; SF_M1[1] = SF_M1[0]+0.07; SF_M1[2] = SF_M1[2]-0.05;}

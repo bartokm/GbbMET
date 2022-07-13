@@ -1,7 +1,8 @@
 #ifndef cross_sections_h
 #define cross_sections_h
 
-double get_cross_section(string name, int year, int center_down_up=0) {
+double get_cross_section(string name, string y, int center_down_up=0) {
+  int year=(y.find("2016")!=std::string::npos) ? 2016 : (y.find("2017")!=std::string::npos) ? 2017 : (y.find("2018")!=std::string::npos) ? 2018 : 1;
   if (name.find("DYJetsToLL_Pt-50To100")!=std::string::npos) return (year==2016) ? 354.8 : 407.9;
   else if (name.find("DYJetsToLL_Pt-100To250")!=std::string::npos) return (year==2016) ? 81.22 : 96.8;
   else if (name.find("DYJetsToLL_Pt-250To400")!=std::string::npos) return (year==2016) ? 2.991 : 3.774;
@@ -1411,7 +1412,12 @@ double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0
 }
 
 //Get precalculated total number of events for each grid point
-unsigned long long get_total_events(pair<int,int> input, int year, int SignalScenario) {
+unsigned long long get_total_events(pair<int,int> input, string y, int SignalScenario) {
+  //Since 2016 in UL is split to preVFP and postVFP year is changed to string.
+  //But changing switch(year) - case structure to string would be lot of work, I use the following:
+  //year=2016 for preVFP
+  //year=20160 for postVFP
+  int year=(y.find("2016preVFP")!=std::string::npos) ? 2016 : (y.find("2016postVFP")!=std::string::npos) ? 20160 : (y.find("2017")!=std::string::npos) ? 2017 : (y.find("2018")!=std::string::npos) ? 2018 : 1;
   int a=input.first, b=input.second;
   if (SignalScenario==1 || SignalScenario==4) {
     switch (year) {

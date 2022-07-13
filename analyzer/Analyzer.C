@@ -18,7 +18,8 @@ int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_x=0, is_y=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
   bool is_t=0, is_l=0, is_syst=0, is_debug=0, is_A=0;
   bool inputs=0, cuts=0, syst=0, lept=0;
-  int FR=0, tr=0, year=0, ABCD=0;
+  int FR=0, tr=0, ABCD=0;
+  string year;
   double xsec=0;
   string output, bname;
   vector<string> inputfiles, v_cuts, cut_variable, cut_operator, v_syst, v_lept;
@@ -60,7 +61,7 @@ int main(int argc, char* argv[]){
     if (is_o) {output=argv[i+1]; is_o=0;}
     if (is_b) {bname=argv[i+1]; is_b=0;}
     if (is_x) {xsec=stod(argv[i+1]); is_x=0;}
-    if (is_y) {year=stoi(argv[i+1]); is_y=0;}
+    if (is_y) {year=argv[i+1]; is_y=0;}
     if (is_F) {FR=atoi(argv[i+1]); is_F=0;}
     if (is_t) {(atoi(argv[i+1])==0) ? tr=1000 : tr=atoi(argv[i+1]); is_t=0;}
     if (is_A) {(atoi(argv[i+1])==0) ? ABCD=200 : ABCD=atoi(argv[i+1]); is_A=0;}
@@ -114,7 +115,7 @@ int main(int argc, char* argv[]){
     if (!output.empty()) cout<<"Output name: "<<output<<endl;
     if (!bname.empty()) cout<<"Btag file name: "<<bname<<endl;
     if (xsec) cout<<"Xsec set by hand (pb): "<<xsec<<endl;
-    if (year) cout<<"Year set by hand: "<<year<<endl;
+    if (year.size()>0) cout<<"Year set by hand: "<<year<<endl;
     if (is_f) cout<<"FastSim is true!"<<endl;
     if (tr) cout<<"This is a test run on "<<tr<<" events!"<<endl;
     if (ABCD) cout<<"ABCD distribution histograms turned on. MET cut is="<<ABCD<<" GeV. Attention! MET>"<<ABCD<<" and sth_selected>0 cut is automatically implied!"<<endl;
@@ -181,7 +182,8 @@ void Analyzer::Loop()
    if (!_testRun) nentries = fChain->GetEntries();
    else nentries = _testRun;
    
-   double L_data[3]={35920, 41530, 59740};
+   //2016 pre: 19502, 2016 post: 16812, 2017 41480, 2018 59833
+   double L_data[4]={19502, 16812, 41480, 59833};
    
    //Btag SF
    BTCalibration calib_2016fast, calib_2017fast, calib_2018fast;
@@ -461,17 +463,19 @@ void Analyzer::Loop()
      }
      //Set year from run number in data
      if (isData && (jentry==0 || newfile)) {
-       if (run<=284044) year=2016;
-       else if (run<=307082) year=2017;
-       else if (run<=325273) year=2018;
+       if (run<=278509 || run==278770) year="2016preVFP";
+       else if (run<=284044) year="2016postVFP";
+       else if (run<=307082) year="2017";
+       else if (run<=325273) year="2018";
      }
      if (is_debug && isData) cout<<"Getting year info: year="<<year<<endl;
      //getting cross section & total number of events
      if (!isData && (jentry==0 || newfile)){
        if (year==1) {
-         if (temp_f.find("2016")!=std::string::npos || temp_f.find("UL16")!=std::string::npos) year=2016;
-         else if (temp_f.find("2017")!=std::string::npos || temp_f.find("UL17")!=std::string::npos) year=2017;
-         else if (temp_f.find("2018")!=std::string::npos || temp_f.find("UL18")!=std::string::npos) year=2018;
+         if (temp_f.find("2016APV")!=std::string::npos || temp_f.find("UL16APV")!=std::string::npos) year="2016preVFP";
+         else if (temp_f.find("2016")!=std::string::npos || temp_f.find("UL16")!=std::string::npos) year="2016postVFP";
+         else if (temp_f.find("2017")!=std::string::npos || temp_f.find("UL17")!=std::string::npos) year="2017";
+         else if (temp_f.find("2018")!=std::string::npos || temp_f.find("UL18")!=std::string::npos) year="2018";
        }
        if (is_debug) cout<<"Getting year info: year="<<year<<endl;
        if (!SignalScan && (xsec==1 || newfile)) {
@@ -480,7 +484,7 @@ void Analyzer::Loop()
        }
        if (is_debug) cout<<"Getting xsec info: xsec="<<xsec<<endl;
      }
-     int year_chooser=(year==2016) ? 0 : (year==2017) ? 1 : 2;
+     int year_chooser=(year.find("2016preVFP")!=std::string::npos) ? 0 : (year.find("2016postVFP")!=std::string::npos) ? 1 : (year.find("2017")!=std::string::npos) ? 2 : 3;
      if (is_debug) cout<<"Initializing branches"<<endl;
      if (!isData) {
        if (is_debug) cout<<"Initializing MC only branches"<<endl;
@@ -552,9 +556,9 @@ void Analyzer::Loop()
        b_MET_T1_phi_unclustEnUp->GetEntry(ientry);
        b_MET_T1_phi_unclustEnDown->GetEntry(ientry);
      }
-     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Dn->GetEntry(ientry);
-     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Nom->GetEntry(ientry);
-     if (!_fastSim && !isData && year!=2018) b_L1PreFiringWeight_Up->GetEntry(ientry);
+     if (!_fastSim && !isData && year.find("2018")==std::string::npos) b_L1PreFiringWeight_Dn->GetEntry(ientry);
+     if (!_fastSim && !isData && year.find("2018")==std::string::npos) b_L1PreFiringWeight_Nom->GetEntry(ientry);
+     if (!_fastSim && !isData && year.find("2018")==std::string::npos) b_L1PreFiringWeight_Up->GetEntry(ientry);
      b_luminosityBlock->GetEntry(ientry);
      b_PV_npvsGood->GetEntry(ientry);
      b_PV_npvs->GetEntry(ientry);
@@ -562,7 +566,7 @@ void Analyzer::Loop()
      b_PV_y->GetEntry(ientry);
      b_PV_z->GetEntry(ientry);
      if (!_fastSim) {
-       if (year==2016) {
+       if (year.find("2016")!=std::string::npos) {
          b_HLT_Photon165_HE10->GetEntry(ientry);
          b_HLT_Photon175->GetEntry(ientry);
          b_HLT_Photon250_NoHE->GetEntry(ientry);
@@ -741,21 +745,21 @@ void Analyzer::Loop()
        if (is_debug) cout<<"weight=L_data[year_chooser]*genWeight*xsec/TotalEvents "<<weight<<"="<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<endl;
        if (is_debug) cout<<"w=weight*pu_weight "<<w<<"="<<weight<<"*"<<pu_weight<<endl;
        //trigger efficiency
-       double w_trig[3]={0.9871,0.9913,0.9947};
+       double w_trig[4]={0.9871,0.9871,0.9913,0.9947};//use same trig eff for full 2016 year
        if (_fastSim) w*=w_trig[year_chooser];
        //std::cout<<"event "<<event<<" w=weight*pu_weight = "<<w<<"="<<weight<<"("<<L_data[year_chooser]<<"*"<<genWeight<<"*"<<xsec<<"/"<<TotalEvents<<")"<<"*"<<pu_weight<<std::endl;
        //Scale factors
        if (jentry==0 || newfile) {
          if (is_debug) cout<<"Loading scale factor json files"<<endl;
-         string sf_ele_fname="correctionlib/POG/EGM/"+to_string(year)+"_UL/electron.json";
+         string sf_ele_fname="correctionlib/POG/EGM/"+year+"_UL/electron.json";
          cset_ele = CorrectionSet::from_file(sf_ele_fname);
-         string sf_tau_fname="correctionlib/POG/TAU/"+to_string(year)+"_UL/tau.json";
+         string sf_tau_fname="correctionlib/POG/TAU/"+year+"_UL/tau.json";
          cset_tau = CorrectionSet::from_file(sf_tau_fname);
-         string sf_pho_fname="correctionlib/POG/EGM/"+to_string(year)+"_UL/photon.json";
+         string sf_pho_fname="correctionlib/POG/EGM/"+year+"_UL/photon.json";
          cset_pho = CorrectionSet::from_file(sf_pho_fname);
-         string sf_btag_fname="correctionlib/POG/BTV/"+to_string(year)+"_UL/btagging.json";
+         string sf_btag_fname="correctionlib/POG/BTV/"+year+"_UL/btagging.json";
          cset_btag = CorrectionSet::from_file(sf_btag_fname);
-         if (year==2016){
+         if (year.find("2016")!=std::string::npos){
            //Muon ID SF
            float lum_ratio_BCDEF = 0.5481;
            TH2D *h_temp_BCDEF[3];
@@ -840,7 +844,7 @@ void Analyzer::Loop()
              h_muISO_SF2D[i]->SetDirectory(0);
            }
          }
-         else if (year==2017){
+         else if (year.find("2017")!=std::string::npos){
            // preliminary sys unc. available!
            TFile f_muID("input/muon_SF/2017/RunBCDEF_SF_ID_syst_muon2017_TOBEUPDATED.root","read");
            h_muID_SF2D[0] = (TH2D*)f_muID.Get("NUM_LooseID_DEN_genTracks_pt_abseta");
@@ -858,7 +862,7 @@ void Analyzer::Loop()
            for (auto i : h_muISO_SF2D) i->SetDirectory(0);
            f_muISO.Close();
          }
-         else if (year==2018){
+         else if (year.find("2018")!=std::string::npos){
            //contains stat and sys uncertainty too! 
            TFile f_muID("input/muon_SF/2018/RunABCD_SF_ID_muon2018.root","read");
            h_muID_SF2D[0] = (TH2D*)f_muID.Get("NUM_LooseID_DEN_TrackerMuons_pt_abseta");
@@ -919,9 +923,9 @@ void Analyzer::Loop()
              else if (temp_f.find("ZJetsToQQ")!=std::string::npos) tag+="ZJetsToQQ";
              else if (temp_f.find("ZZ")!=std::string::npos) tag+="ZZ";
              else if (temp_f.find("T5qqqqHg")==std::string::npos && temp_f.find("TChiNG")==std::string::npos) cout<<"No btag eff file found for file "<<temp_f<<endl;;
-             btag_fname=pretag+"hadded/"+to_string(year)+"/"+tag+".root";
-             if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+to_string(year)+"_all_out.root";
-             if (temp_f.find("TChiNG")!=std::string::npos) btag_fname=pretag+"signal/TChiNg_tree_"+to_string(year)+"_all_out.root";
+             btag_fname=pretag+"hadded/"+year+"/"+tag+".root";
+             if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+year+"_all_out.root";
+             if (temp_f.find("TChiNG")!=std::string::npos) btag_fname=pretag+"signal/TChiNg_tree_"+year+"_all_out.root";
              if (!is_quiet) cout<<"btag efficiency file "<<btag_fname<<endl;
            }
            TFile f_btag(btag_fname.c_str(),"read");
@@ -938,7 +942,7 @@ void Analyzer::Loop()
          }
 
          //L1prefire maps
-         if (year==2016) {
+         if (year.find("2016")!=std::string::npos) {
            if (is_debug) cout<<"Loading L1 prefire maps"<<endl;
            TFile f_L1_phomap_2016("input/L1prefiring_photonpt_2016BtoH.root","read");
            h_L1prefire_phoMap = (TH2D*)f_L1_phomap_2016.Get("L1prefiring_photonpt_2016BtoH");
@@ -949,7 +953,7 @@ void Analyzer::Loop()
            h_L1prefire_jetMap->SetDirectory(0);
            f_L1_jetmap_2016.Close();
          }
-         else if (year==2017) {
+         else if (year.find("2017")!=std::string::npos) {
            if (is_debug) cout<<"Loading L1 prefire maps"<<endl;
            TFile f_L1_phomap_2017("input/L1prefiring_photonpt_2017BtoF.root","read");
            h_L1prefire_phoMap = (TH2D*)f_L1_phomap_2017.Get("L1prefiring_photonpt_2017BtoF");
@@ -961,7 +965,7 @@ void Analyzer::Loop()
            f_L1_jetmap_2017.Close();
          }
          //ISR MC
-         if (year==2016) {
+         if (year.find("2016")!=std::string::npos) {
            if (temp_f.find("TTJets")!=std::string::npos) ISR_MC=1;
            else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) ISR_MC=2;
            else if (temp_f.find("TTGJets")!=std::string::npos) ISR_MC=3;
@@ -975,11 +979,11 @@ void Analyzer::Loop()
            if (is_debug) cout<<"Loading ISR reweighting files"<<endl;
            //ISR reweight files
            string isr_file="";
-           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+to_string(year)+"_nophotonmatch.root";
-           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+to_string(year)+"_nophotonmatch.root";
-           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+to_string(year)+"_nophotonmatch.root";
-           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+to_string(year)+"_nophotonmatch.root";
-           if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+to_string(year)+"_ew.root";
+           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+year+"_nophotonmatch.root";
+           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+year+"_nophotonmatch.root";
+           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+year+"_nophotonmatch.root";
+           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+year+"_nophotonmatch.root";
+           if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+year+"_ew.root";
            TFile f_ISR(isr_file.c_str(),"read");
            if (ISR_MC!=4 && ISR_MC!=5) {
              h_ISR_D = (TH1D*)f_ISR.Get("h_Dfactor");
@@ -1087,7 +1091,7 @@ void Analyzer::Loop()
        //ISR reweight
        vector<double> nISRjet2correction;
        vector<double> nISRjet2unceratinty;
-       if (year==2016) {
+       if (year.find("2016")!=std::string::npos) {
          nISRjet2correction = {1.0, 0.920, 0.821, 0.715, 0.662, 0.561, 0.511};
          nISRjet2unceratinty= {0.0, 0.040, 0.090, 0.143, 0.169, 0.219, 0.244};
          if (ISR_MC==5) {
@@ -1158,7 +1162,7 @@ void Analyzer::Loop()
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterDeep,0,sizeof bcounterDeep);
      double nonPrefiringProbability[3]={1,1,1};
-     if (!_fastSim && year!=2018) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
+     if (!_fastSim && year.find("2018")==std::string::npos) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      phoET.clear();
      //muon
      for (unsigned int i=0;i<nMuon;i++) {
@@ -1188,7 +1192,7 @@ void Analyzer::Loop()
        for (int i=0;i<3;i++) {
          if (iter[i]!=-1){
            float pt = ( Muon_pt[iter[i]]< 20)? 20 : (Muon_pt[iter[i]]< 100) ? Muon_pt[iter[i]] : 100 ; //Histo range is: 20-120, highest bin 60-120
-           float eta = (year==2016) ? Muon_eta[iter[i]] : abs(Muon_eta[iter[i]]);
+           float eta = (year.find("2016")!=std::string::npos) ? Muon_eta[iter[i]] : abs(Muon_eta[iter[i]]);
            double id_sf=0, iso_sf=0, syst_id=0, syst_iso=0;
            int sign_id=0, sign_iso=0;
            id_sf=h_muID_SF2D[i]->GetBinContent(h_muID_SF2D[i]->FindBin(pt,eta));
@@ -1250,9 +1254,9 @@ void Analyzer::Loop()
        if (passElectrons.size()!=0){
          double pt=Electron_pt[passElectrons[0]], eta=Electron_eta[passElectrons[0]];
          if (pt<10) pt=10; //There are no SFs below 10 GeV
-         id_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({to_string(year),id_whichsf,which_id,eta, pt});
+         id_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({year,id_whichsf,which_id,eta, pt});
          string temprec = (pt>20) ? "RecoAbove20" : "RecoBelow20";
-         rec_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({to_string(year),rec_whichsf,temprec,eta, pt});
+         rec_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({year,rec_whichsf,temprec,eta, pt});
          ele_SF[whichElectron]=id_sf*rec_sf;
          if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" finalSF= "<<ele_SF[0]<<endl;
        }
@@ -1323,7 +1327,7 @@ void Analyzer::Loop()
 
        phoET.push_back(pt);
        //L1prefire correction
-       if (_fastSim && year!=2018 && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
+       if (_fastSim && year.find("2018")==std::string::npos && Photon_pt[i]>20 && abs(Photon_eta[i])>2 && abs(Photon_eta[i])<3) {
          double max= h_L1prefire_phoMap->GetYaxis()->GetBinLowEdge(h_L1prefire_phoMap->GetNbinsY());
          double pt = (Photon_pt[i]>max) ? max-0.01 : Photon_pt[i];
          double prefireProb = h_L1prefire_phoMap->GetBinContent(h_L1prefire_phoMap->FindBin(Photon_eta[i],pt));
@@ -1392,11 +1396,11 @@ void Analyzer::Loop()
        (phoID_whichSF==1) ? id_whichsf="sfup" : (phoID_whichSF==2) ? id_whichsf="sfdown" : id_whichsf="sf";
        (phoPix_whichSF==1) ? pix_whichsf="sfup" : (phoPix_whichSF==2) ? pix_whichsf="sfdown" : pix_whichsf="sf";
        if (passPhotons.size()!=0){
-         id_sf = cset_pho->at("UL-Photon-ID-SF")->evaluate({to_string(year),id_whichsf,"Loose",Photon_SCEta(nleadPho), phoET[nleadPho]});
+         id_sf = cset_pho->at("UL-Photon-ID-SF")->evaluate({year,id_whichsf,"Loose",Photon_SCEta(nleadPho), phoET[nleadPho]});
          string pixtemp="";
          if (Photon_r9[nleadPho]>0.94) (Photon_isScEtaEB[nleadPho]) ? pixtemp="EBHighR9" : pixtemp="EEHighR9";
          else (Photon_isScEtaEB[nleadPho]) ? pixtemp="EBLowR9" : pixtemp="EELowR9";
-         pix_sf = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({to_string(year),pix_whichsf,"Loose",pixtemp});
+         pix_sf = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,pix_whichsf,"Loose",pixtemp});
          pho_SF[0]=id_sf*pix_sf;
          //cout<<"photon "<<phoET[nleadPho]<<" "<<Photon_eta[nleadPho]<<" UL loose ID sf "<<id_sf<<" pix sf "<<pix_sf<<" total SF "<<pho_SF[0]<<endl;
        }
@@ -1444,7 +1448,7 @@ void Analyzer::Loop()
      bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (unsigned int i=0;i<nJet;i++) {
        //L1prefire correction
-       if (_fastSim && year!=2018 && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
+       if (_fastSim && year.find("2018")==std::string::npos && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
          double nonPrefiringProb_overlapPho[3]={1,1,1};
          for (unsigned int j=0;j<nPhoton;j++) {
            if (!isData && Photon_pt[j]>20 && abs(Photon_eta[j])>2 && abs(Photon_eta[j])<3) {
@@ -1495,22 +1499,12 @@ void Analyzer::Loop()
        HT_before+=jetSmearedPt[i];
        if (abs(Jet_eta[i])>2.4 || !(Jet_jetId[i]>>1&1) || jetSmearedPt[i]<30) passcut=false;
        if (jetSmearedPt[i]<50 && !(Jet_puId[i]&(1<<2))) passcut=false;
-       for (auto j : passPhotons) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {
-         passcut=false;break;
-       }
-       for (auto j : passElectrons) if (deltaR(Jet_phi[i],Electron_phi[j],Jet_eta[i],Electron_eta[j])<0.4) {
-         passcut=false;break;
-       }
-       for (auto j : passMuons) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {
-         passcut=false;break;
-       }
-       for (auto j : passTaus) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.4) {
-         passcut=false;break;
-       }
-       //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {
-       //  passcut=false;break;
-       //}
-       if (_fastSim && year==2016 && passcut && Jet_chHEF[i]<0.1) {
+       for (auto j : passPhotons) if (deltaR(Jet_phi[i],Photon_phi[j],Jet_eta[i],Photon_eta[j])<0.4) {passcut=false;break;}
+       for (auto j : passElectrons) if (deltaR(Jet_phi[i],Electron_phi[j],Jet_eta[i],Electron_eta[j])<0.4) {passcut=false;break;}
+       for (auto j : passMuons) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {passcut=false;break;}
+       for (auto j : passTaus) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.4) {passcut=false;break;}
+       //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {passcut=false;break;}
+       if (_fastSim && year.find("2016")!=std::string::npos && passcut && Jet_chHEF[i]<0.1) {
          bool match=0;
          for (unsigned int j=0;j<nJet;j++){
            if (Jet_genJetIdx[i]==-1) continue;
@@ -1534,9 +1528,9 @@ void Analyzer::Loop()
      for (auto i : passJet) {
        //Updating jet b-tagging status
        if (!isData && btag_file.size()>0) {
-         if (year==2016) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
-         if (year==2017) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
-         if (year==2018) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
+         if (year.find("2016")!=std::string::npos) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
+         if (year.find("2017")!=std::string::npos) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
+         if (year.find("2018")!=std::string::npos) jetbtagDeepFlavB[i]=UpdateBtags(cset_btag, is_debug,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
        }
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
@@ -1548,7 +1542,7 @@ void Analyzer::Loop()
      if (is_debug && !isData && btag_file.size()>0) cout<<"AK4 update b-tagging status done"<<endl;
      bcounterDeep[2] += bcounterDeep[3];
      bcounterDeep[1] += bcounterDeep[2];
-     
+    
      //Sort passJet from highest DeepJet btag to lowest
      for (unsigned int i=0;i<passJet.size();i++){
        int temp;
@@ -1562,7 +1556,7 @@ void Analyzer::Loop()
      }
      EMHT_before+=HT_before;
      EMHT_after+=HT_after;
-
+    
      //AK8Jet ID
      for (unsigned int i=0;i<nFatJet;i++) {
        bool passcut=true;
@@ -1631,7 +1625,7 @@ void Analyzer::Loop()
      AK8EMHT_before+=HT_before;
      AK8EMHT_after+=HT_after;
      OneOr2jet=false; if (passJet.size()>1 || passAK8Jet.size()>0) OneOr2jet=true;
-       
+    
      //MET variables
      if (is_debug) cout<<"Calculating MET variables"<<endl;
      double METPhi=0, METsumEt=0, METSig=0;
@@ -1674,7 +1668,7 @@ void Analyzer::Loop()
        if (abs(dphi)<dphi_pho) dphi_pho=abs(dphi);
      }
      if (dphi_met_jet>dphi_pho) dphi_met_jet=dphi_pho;
-
+    
      if (!isData ){
        mcLeptonFilter=0;
        for (unsigned int i=0; i<nGenPart; i++){
@@ -1684,7 +1678,7 @@ void Analyzer::Loop()
            //cout<<"pid "<<GenPart_pdgId[i]<<" pt "<<GenPart_pt[i]<<" status "<<GenPart_status[i]<<" statusflag "<<GenPart_statusFlags[i]<<" momPID "<<GenPart_pdgId[GenPart_genPartIdxMother[i]]<<endl;
          }
        }
-       //cout<<"lepton "<<mcLeptonFilter<<endl;
+     //cout<<"lepton "<<mcLeptonFilter<<endl;
      }
 
      double dr_pho_parton=999;
@@ -1707,13 +1701,13 @@ void Analyzer::Loop()
          break;
        }
        for (unsigned int i=0; i<nGenJet;i++){
-        if (abs(GenJet_partonFlavour[i])==5) {true_b_jet=1; break;}
+         if (abs(GenJet_partonFlavour[i])==5) {true_b_jet=1; break;}
        }
      }
-       
+     
      //HEM15/16 veto
      bool HEMveto_electron=false, HEMveto_jet=false;
-     if (year==2018) {
+     if (year.find("2018")!=std::string::npos) {
        if ((isData && run>=319077) || (!isData && jentry%100<65)) {
          for (unsigned int i=0;i<nElectron;i++) {
            //Veto events with any electron with pT > 30GeV, -3.0 < eta < -1.4, and -1.57 < phi < -0.87
@@ -2509,7 +2503,7 @@ void Analyzer::Loop()
    if (!is_quiet) std::cout<<"CPU time = "<<time.GetCpuTime("time")<<", Real time = "<<time.GetRealTime("time")<<std::endl;
    if (CountSignal) {
      ofstream counttxt;
-     string temp="CountSignal_"+to_string(year)+".txt";
+     string temp="CountSignal_"+year+".txt";
      counttxt.open (temp);
      if (SignalScenario==1 || SignalScenario==4) {
        bool newg=true;
