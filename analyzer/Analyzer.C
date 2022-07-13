@@ -471,7 +471,7 @@ void Analyzer::Loop()
      if (is_debug && isData) cout<<"Getting year info: year="<<year<<endl;
      //getting cross section & total number of events
      if (!isData && (jentry==0 || newfile)){
-       if (year==1) {
+       if (year.size()==0) {
          if (temp_f.find("2016APV")!=std::string::npos || temp_f.find("UL16APV")!=std::string::npos) year="2016preVFP";
          else if (temp_f.find("2016")!=std::string::npos || temp_f.find("UL16")!=std::string::npos) year="2016postVFP";
          else if (temp_f.find("2017")!=std::string::npos || temp_f.find("UL17")!=std::string::npos) year="2017";
@@ -923,7 +923,8 @@ void Analyzer::Loop()
              else if (temp_f.find("ZJetsToQQ")!=std::string::npos) tag+="ZJetsToQQ";
              else if (temp_f.find("ZZ")!=std::string::npos) tag+="ZZ";
              else if (temp_f.find("T5qqqqHg")==std::string::npos && temp_f.find("TChiNG")==std::string::npos) cout<<"No btag eff file found for file "<<temp_f<<endl;;
-             btag_fname=pretag+"hadded/"+year+"/"+tag+".root";
+             if (year.find("2016")!=std::string::npos) btag_fname=pretag+"hadded/2016/"+tag+".root"; //temporarly added until we have new btag efficiency files for UL16 & APV
+             else btag_fname=pretag+"hadded/"+year+"/"+tag+".root";
              if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+year+"_all_out.root";
              if (temp_f.find("TChiNG")!=std::string::npos) btag_fname=pretag+"signal/TChiNg_tree_"+year+"_all_out.root";
              if (!is_quiet) cout<<"btag efficiency file "<<btag_fname<<endl;
