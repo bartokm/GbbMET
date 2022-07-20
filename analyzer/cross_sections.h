@@ -25,9 +25,8 @@ double get_cross_section(string name, string y, int center_down_up=0) {
   else if (name.find("QCD_HT1000to1500")!=std::string::npos) return (year==2016) ? 1207 : (year==2017) ? 1088 : 1094;
   else if (name.find("QCD_HT1500to2000")!=std::string::npos) return (year==2016) ? 120 : (year==2017) ? 99.11 : 99.38;
   else if (name.find("QCD_HT2000toInf")!=std::string::npos) return (year==2016) ? 25.25 : (year==2017) ? 20.23 : 20.2;
-  else if (name.find("ST_s-channel_4f_hadronicDecays")!=std::string::npos) return (year==2016) ? 1 : 11.24;
-  else if (name.find("ST_s-channel_leptonDecays")!=std::string::npos) return (year==2016) ? 1 : 3.74;
-  else if (name.find("ST_s-channel")!=std::string::npos) return (year==2016) ? 10.12 : 1;
+  else if (name.find("ST_s-channel_4f_hadronicDecays")!=std::string::npos) return (year==2016) ? 11.24 : 11.24;
+  else if (name.find("ST_s-channel_leptonDecays")!=std::string::npos) return (year==2016) ? 3.549 : 3.74;
   else if (name.find("ST_t-channel_antitop")!=std::string::npos) return (year==2016) ? 80.95 : 67.91;
   else if (name.find("ST_t-channel_top")!=std::string::npos) return (year==2016) ? 136.02 : 113.3;
   else if (name.find("ST_tW_antitop")!=std::string::npos) return (year==2016) ? 38.06 : 34.97;

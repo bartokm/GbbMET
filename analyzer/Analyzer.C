@@ -979,12 +979,12 @@ void Analyzer::Loop()
          if (ISR_MC){
            if (is_debug) cout<<"Loading ISR reweighting files"<<endl;
            //ISR reweight files
-           string isr_file="";
-           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+year+"_nophotonmatch.root";
-           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+year+"_nophotonmatch.root";
-           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+year+"_nophotonmatch.root";
-           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+year+"_nophotonmatch.root";
-           if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+year+"_ew.root";
+           string isr_file="", y=(year.find("2016")!=std::string::npos) ? "2016" : year;//temporary needed for 2016, since there's no separate APV/VFP D_factor calculated
+           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+y+"_nophotonmatch.root";
+           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+y+"_nophotonmatch.root";
+           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+y+"_nophotonmatch.root";
+           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_nophotonmatch.root";
+           if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_ew.root";
            TFile f_ISR(isr_file.c_str(),"read");
            if (ISR_MC!=4 && ISR_MC!=5) {
              h_ISR_D = (TH1D*)f_ISR.Get("h_Dfactor");
