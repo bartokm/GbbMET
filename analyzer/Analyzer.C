@@ -585,6 +585,8 @@ void Analyzer::Loop()
      b_Flag_BadChargedCandidateFilter->GetEntry(ientry);
      b_Flag_eeBadScFilter->GetEntry(ientry);
      b_Flag_ecalBadCalibFilter->GetEntry(ientry);
+     b_Flag_BadPFMuonDzFilter->GetEntry(ientry);
+     b_Flag_hfNoisyHitsFilter->GetEntry(ientry);
      b_Flag_METFilters->GetEntry(ientry);
      b_MET_pt->GetEntry(ientry);
      b_MET_T1_pt->GetEntry(ientry);
