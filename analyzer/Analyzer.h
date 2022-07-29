@@ -1270,9 +1270,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
       const char* cstr_i=i.c_str();
       std::string temp=i, temp_run=i;
       if (temp.find("*") != std::string::npos) {
-        if (!is_quiet){
-          std::cout<<"Wildcard found in input argument."<<std::endl;
-        }
+        if (!is_quiet) cout<<"Wildcard found in input argument."<<endl;
         temp+="/Events"; temp_run+="/Runs";
         ch->Add(temp.c_str()); ch_run->Add(temp_run.c_str());
         continue;
@@ -1284,9 +1282,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
       f->Close();
     }
     nFiles=ch->GetNtrees();
-    if (!is_quiet){
-      std::cout<<nFiles<<" trees are read."<<std::endl; 
-    }
+    if (!is_quiet) cout<<nFiles<<" trees are read."<<endl; 
     tree = ch;
   }
   Get_total_sum(ch_run);
@@ -1329,6 +1325,7 @@ void Analyzer::Get_total_sum(TTree *tree){
   Double_t sub_TotalEvents=0;
   string eventsum="genEventSumw";
   if (tree->GetBranch(eventsum.c_str())) {
+    tree->SetBranchAddress(eventsum.c_str(), &sub_TotalEvents, &b_genEventSumw);
     if (is_debug) cout<<"Looping on Runs Tree to get total number of events"<<endl; 
     for (int i=0; i<tree->GetEntries();i++) {
       int ientry = tree->LoadTree(i);
