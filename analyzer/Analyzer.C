@@ -784,8 +784,6 @@ void Analyzer::Loop()
        h2_FR->SetDirectory(0);
        f_FR.Close();
      }
-     //check data if inside Golden json file
-     //if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
 
      //if ((run==315420 && event==670111849) || (run==319337 && event==1340195338) || (run==320038 && event==203417468) || (run==324878 && event==2232253358) || (run==325022 && event==1121034973)) cout<<run<<" "<<event<<" "<<temp_f<<endl;
 
@@ -829,6 +827,9 @@ void Analyzer::Loop()
        EgammaScaling  = EgammaScalingReader(pathTo_photon_Scaling.at(year).at(version), year, version);
        EgammaSmearing = EgammaSmearingReader(pathTo_photon_Smearing.at(year).at(version), year);
      }
+     
+     //check data if inside Golden json file
+     if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
 
      w=1;
      //MC weights and scale factors
@@ -1926,9 +1927,9 @@ void Analyzer::Loop()
      for (auto i : passJet) {
        //Updating jet b-tagging status
        if (!isData && btag_file.size()>0) {
-         if (year==2016) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
-         if (year==2017) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
-         if (year==2018) jetbtagDeepFlavB[i]=UpdateBtags(0,_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
+         if (year==2016) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2016deep, reader_M_2016deep, reader_T_2016deep, reader_L_2016fast, reader_M_2016fast, reader_T_2016fast, gen_btag);
+         if (year==2017) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2017deep, reader_M_2017deep, reader_T_2017deep, reader_L_2017fast, reader_M_2017fast, reader_T_2017fast, gen_btag);
+         if (year==2018) jetbtagDeepFlavB[i]=UpdateBtags(_fastSim, Jet_eta[i], jetSmearedPt[i], Jet_hadronFlavour[i], jetbtagDeepFlavB[i], BtagDeepWP[year_chooser][1], BtagDeepWP[year_chooser][0], eff_b_Deep_L, eff_c_Deep_L, eff_l_Deep_L, eff_b_Deep_M, eff_c_Deep_M, eff_l_Deep_M, eff_b_Deep_T, eff_c_Deep_T, eff_l_Deep_T, reader_L_2018deep, reader_M_2018deep, reader_T_2018deep, reader_L_2018fast, reader_M_2018fast, reader_T_2018fast, gen_btag);
        }
        if (jetSmearedPt[i]>jetSmearedPt[leadpt_ak4]) leadpt_ak4=i;
        HT_after+=jetSmearedPt[i];
