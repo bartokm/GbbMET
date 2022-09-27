@@ -1077,7 +1077,7 @@ public :
    TBranch        *b_L1_AlwaysTrue;
 
    //Added
-   double BtagDDBvLWP[4][5]={{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92},{0.7,0.86,0.89,0.91,0.92}}; //NO WP for UL! Copied from preUL
+   double BtagDDBvLWP[4][5]={{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630}};
    double BtagDeepWP[4][3]={{0.0508,0.2598,0.6502},{0.0480,0.2489,0.6377},{0.0532,0.3040,0.7476},{0.0490,0.2783,0.7100}};
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
@@ -1172,6 +1172,7 @@ public :
    TH2D *h2_FR;
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
+   vector<string> json_2016, json_2017, json_2018;
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
@@ -1293,6 +1294,22 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   else if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
   else if (temp.find("TChiNG_BF50N50G")!=std::string::npos) SignalScenario=5; //EW with all final states
   else if (temp.find("TChiNG")!=std::string::npos) SignalScenario=2;
+  
+  //Load golden json files
+  if (is_debug) cout<<"Loading golden json files"<<endl;
+  string json_fname[3]={"input/Cert_271036-284044_13TeV_Legacy2016_Collisions16_JSON.txt",
+                        "input/Cert_294927-306462_13TeV_UL2017_Collisions17_GoldenJSON.txt",
+                        "input/Cert_314472-325175_13TeV_Legacy2018_Collisions18_JSON.txt"};
+ 
+  for (unsigned int i=0;i<3;i++) {
+    ifstream json (json_fname[i]);
+    if (json.is_open()) {
+      string line;
+      while(getline(json, line) ) (i==0) ? json_2016.push_back(line) : (i==1) ? json_2017.push_back(line) : json_2018.push_back(line);
+      json.close();
+    }
+    else cout<<"Couldn't open golden json file "<<json_fname[i]<<endl;
+  }
 }
 
 Analyzer::~Analyzer()
@@ -1888,31 +1905,32 @@ void Analyzer::Show(Long64_t entry)
 
 Bool_t Analyzer::IsGoldEvent(UInt_t RUN, UInt_t LS){
   //needs input json formatted as each run is a new line
-  string json_2016="input/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt";
-  std::ifstream json (json_2016);
-  if (json.is_open()) {
-    std::string line;
-    while( std::getline(json, line) ) {
-      //check if current line is the proper run
-      size_t t = line.find(to_string(RUN));
-      if (t==std::string::npos) continue;
-      std::size_t pos_begin = 0;
-      std::size_t pos_end = 0;
-      while (pos_begin!=string::npos) {
-        pos_begin = line.find ("[",pos_begin+1);
-        if (pos_begin==std::string::npos) break;
-        if (line[pos_begin+1]=='[') pos_begin+=1;
-        pos_end = line.find (",",pos_begin+1);
-        unsigned int ls_1 = stoi (line.substr (pos_begin+1, pos_end-pos_begin-1));
-        pos_begin = pos_end+1;
-        pos_end = line.find ("]", pos_begin+1);
-        unsigned int ls_2 = stoi (line.substr (pos_begin+1, pos_end-pos_begin-1));
-        if (ls_1 > ls_2) {cout<<"Something is not right... "<<RUN<<" "<<LS<<endl; json.close(); return 0;}
-        if (LS>=ls_1 && LS<=ls_2) {json.close(); return true;}
-      }
+  vector<string> json;
+  if (year.find("2016")!=std::string::npos) json = json_2016;
+  if (year.find("2017")!=std::string::npos) json = json_2017;
+  if (year.find("2018")!=std::string::npos) json = json_2018;
+
+  if (is_debug) cout<<"Checking if event is in golden json. "<<year<<" Run "<<RUN<<" LS "<<LS<<endl;
+  for (auto line : json) {
+    //check if current line is the proper run
+    size_t t = line.find(to_string(RUN));
+    if (t==string::npos) continue;
+    size_t pos_begin = 0;
+    size_t pos_end = 0;
+    while (pos_begin!=string::npos) {
+      pos_begin = line.find ("[",pos_begin+1);
+      if (pos_begin==string::npos) break;
+      if (line[pos_begin+1]=='[') pos_begin+=1;
+      pos_end = line.find (",",pos_begin+1);
+      unsigned int ls_1 = stoi (line.substr (pos_begin+1, pos_end-pos_begin-1));
+      pos_begin = pos_end+1;
+      pos_end = line.find ("]", pos_begin+1);
+      unsigned int ls_2 = stoi (line.substr (pos_begin+1, pos_end-pos_begin-1));
+      if (ls_1 > ls_2) {cout<<"Something is not right... "<<RUN<<" "<<LS<<endl; return 0;}
+      if (LS>=ls_1 && LS<=ls_2) {if (is_debug) cout<<"Event inside LS "<<ls_1<<" and LS "<<ls_2<<endl; return true;}
     }
   }
-  json.close();
+  if (is_debug) cout<<"Event thrown out by golden json filter"<<endl;
   return false;
 }
 

@@ -704,7 +704,7 @@ void Analyzer::Loop()
        f_FR.Close();
      }
      //check data if inside Golden json file
-     //if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
+     if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
 
      if (isData && signalstudy) {cout<<"ERROR! Signalstudy option set, but running on Data..."<<endl; return;}
      //SignalScan variables
