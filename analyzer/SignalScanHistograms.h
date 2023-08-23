@@ -17,6 +17,8 @@
   map< pair<int, int>, TH1D* > m_phoEta;
 
   map< pair<int, int>, TH1D* > m_phoPt;
+  map< pair<int, int>, TH1D* > m_genMET;
+  map< pair<int, int>, TH1D* > m_genMET_goodpair;
   map< pair<int, int>, TH1D* > m_pfMET;
   map< pair<int, int>, TH1D* > m_pfMET_fix;
   map< pair<int, int>, TH1D* > m_pfMET_fix2;
@@ -35,7 +37,6 @@
   map< pair<int, int>, TH1D* > m_EMHT_after;
   map< pair<int, int>, TH2D* > m2_ST_HT;
   map< pair<int, int>, TH2D* > m2_ST_MET;
-  map< pair<int, int>, TH2D* > m2_MT_MET;
   map< pair<int, int>, TH2D* > m2_MET_HT;
   map< pair<int, int>, TH2D* > m2_MET_phoPt;
   map< pair<int, int>, TH2D* > m2_MET_extrajets;
@@ -315,14 +316,10 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000,1500,2000,3000};
       const int nbins_ST=13;
       double xbins_ST[nbins_ST+1]={0, 200, 400, 600, 800, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5500};
-      const int nbins_MT=9;
-      double xbins_MT[nbins_MT+1]={0, 30, 60, 100, 130, 200, 500, 1000, 1500, 2000};
-      const int nbins_photon=15;
-      double xbins_photon[nbins_photon+1]={0,50,120,175,210,260,310,360,410,460,510,650,800,1000,1200,1500};
     
       
-      m_cuts[MassPair] = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,BDSV,Deep1,Deep2",15,0,15);
-      m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts, After cuts, only lumiweight",3,-0.5,2.5);
+      m_cuts[MassPair] = new TH1D("h_cuts","cuts;",15,0,15);
+      m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
       m_nISR_jet[MassPair] = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
       m_SR[MassPair] = new TH1D("h_SR","",16,0.5,16.5);
    
@@ -330,7 +327,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
   
       m_phoEt[MassPair] = new TH1D("h_phoEt",";E_{T}^{#gamma} [GeV]",7,25,1075);
       m_phoEta[MassPair] = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
-      m_phoPt[MassPair] = new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",nbins_photon,xbins_photon);
+      m_phoPt[MassPair] = new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",50,0,500);
   
       m_pfMET[MassPair] = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
       m_pfMET_fix[MassPair]= new TH1D("h_pfMET_fix",";#slash{E}_{T} [GeV]",50,0,500);
@@ -338,19 +335,20 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_pfMETsumEt[MassPair] = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",20,-50,5000);
       m_pfMETPhi[MassPair] = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",20,-4,4);
       m_pfMETSig[MassPair] = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",50,0,2000);
+      m_genMET[MassPair] = new TH1D("h_genMET",";genMET [GeV]",25,0,2500);
+      m_genMET_goodpair[MassPair] = new TH1D("h_genMET_goodpair",";genMET [GeV]",25,0,2500);
 
       m2_higgs_pfMET[MassPair] = new TH2D("h2_higgs_pfMET",";fakeAk4, fakeAK8, 1b, B;#slash{E}_{T} [GeV]",4,0.5,4.5,nbins_pfMET,xbins_pfMET);
 
       m_ST[MassPair] = new TH1D("h_ST",";S_{T} [GeV]",nbins_ST,xbins_ST);
       m_ST_G[MassPair] = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
       m_ST_fix[MassPair]= new TH1D("h_ST_fix",";S_{T} [GeV]",15,0,3000);
-      m_MT[MassPair] = new TH1D("h_MT",";M_{T} [GeV]",nbins_MT,xbins_MT);
+      m_MT[MassPair] = new TH1D("h_MT",";M_{T} [GeV]",50,0,200);
       m_MT_fix[MassPair]= new TH1D("h_MT_fix",";M_{T} [GeV]",10,0,1000);
       m_HT_after[MassPair] = new TH1D("h_HT_after","H_{T} after cuts;H_{T}[GeV]",15,0,3000);
       m_EMHT_after[MassPair] = new TH1D("h_EMHT_after","EMHT after cuts;EMHT",15,0,3000);
       m2_ST_HT[MassPair] = new TH2D("h2_ST_HT",";S_{T} [GeV];H_{T} [GeV]",nbins_ST,xbins_ST,20,0,5000);
       m2_ST_MET[MassPair]= new TH2D("h2_ST_MET",";S_{T} [GeV];MET [GeV]",nbins_ST,xbins_ST,nbins_pfMET,xbins_pfMET);
-      m2_MT_MET[MassPair]= new TH2D("h2_MT_MET",";M_{T} [GeV];MET [GeV]",nbins_MT,xbins_MT,nbins_pfMET,xbins_pfMET);
       m2_MET_HT[MassPair] = new TH2D("h2_MET_HT",";MET [GeV];H_{T} [GeV]",nbins_pfMET,xbins_pfMET,20,0,5000);
       m2_MET_phoPt[MassPair] = new TH2D("h2_MET_phoPt",";MET [GeV];E_{T}^{#gamma} [GeV]",nbins_pfMET,xbins_pfMET,10,25,1525);
       m2_MET_extrajets[MassPair] = new TH2D("h2_MET_extrajets",";MET [GeV];# extra jets",nbins_pfMET,xbins_pfMET,14,-1.5,12.5);

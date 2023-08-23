@@ -5,7 +5,6 @@
 #include "cross_sections.h"
 #include <bitset>
 #include <algorithm>
-#include <TKey.h>
 #include <TH2.h>
 #include <THn.h>
 #include <TStyle.h>
@@ -16,7 +15,7 @@ using namespace correction;
 
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_x=0, is_y=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
-  bool is_t=0, is_l=0, is_syst=0, is_debug=0, is_A=0;
+  bool is_t=0, is_l=0, is_syst=0, is_debug=0, is_A=0, is_signalPointTree=0, is_g=0;
   bool inputs=0, cuts=0, syst=0, lept=0;
   int FR=0, tr=0, ABCD=0;
   string year;
@@ -47,6 +46,8 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='t') is_t=1; 
       else if (arg[1]=='d') is_debug=1; 
       else if (arg[1]=='A') is_A=1; 
+      else if (arg[1]=='g') is_g=1; 
+      else if (arg[1]=='T') is_signalPointTree=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--syst") {is_i=0;is_syst=1;}
@@ -122,6 +123,8 @@ int main(int argc, char* argv[]){
     if (is_signalscan) cout<<"SignalScan is true!"<<endl;
     if (is_signalstudy) cout<<"Signal study histograms will be filled! (works only on MC...)"<<endl;
     if (is_countSignal) cout<<"Signal Count is ON, only works on T5qqqqHg sample."<<endl;
+    if (is_g) cout<<"Running only on good pair of neutralinos"<<endl;
+    if (is_signalPointTree) cout<<"Signal mass point determination is from GenModel Tree variables"<<endl;
     if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
     if (inputfiles.size()) cout<<"Running on the following inputfiles:"<<endl;
     for (unsigned int i=0;i<inputfiles.size();i++) {std::cout<<inputfiles[i]<<std::endl; if (i==30) {cout<<"...More files..."<<endl;break;}}
@@ -145,7 +148,7 @@ int main(int argc, char* argv[]){
     for (auto const& x : systematics) cout<<"Systematics for "<<x.first<<" set to "<<x.second<<endl;
     for (auto const& x : leptonpts) cout<<"Lepton pt for "<<x.first<<" set to "<<x.second<<endl;
   }
-  Analyzer t(inputfiles,output,bname,xsec,year,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_debug,is_signalscan,is_signalstudy,is_countSignal, tr, systematics, leptonpts, ABCD);
+  Analyzer t(inputfiles,output,bname,xsec,year,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_debug,is_signalscan,is_signalstudy,is_countSignal, tr, systematics, leptonpts, ABCD, is_g, is_signalPointTree);
   t.Loop();
   return 1;
 }
@@ -258,13 +261,22 @@ void Analyzer::Loop()
    if (is_debug) cout<<"Defining histograms"<<endl;
 
    //histograms
-   h_cuts = new TH1D("h_cuts","cuts;Higgs,PV,METfilter,Pho,Pho175,Lep0,MT,ST,nonHjet,DDBvL,Deep1,Deep2",15,0,15);
-   TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts, After cuts",3,-0.5,2.5);
+   string cutnames="cuts;";
+   for (auto i : _cut_variable) cutnames+=i+" ";
+   h_cuts = new TH1D("h_cuts",cutnames.c_str(),15,0,15);
+   TH2D *h_mass = new TH2D("h_mass",";GenPart mass [GeV];GenModel mass [GeV]",100,0,3000,100,0,3000);
+   TH3D *h_masses = new TH3D("h_masses",";GenPart mass 1 [GeV];GenPart mass 2 [GeV];GenModel mass [GeV]",100,0,3000,100,0,3000,100,0,3000);
+   TH2D *h_mass_n = new TH2D("h_mass_n",";GenPart mass 1 [GeV];GenPart mass 2 [GeV]",100,0,3000,100,0,3000);
+   TH1D *h_mass_diff = new TH1D("h_mass_diff",";|mass 1 - mass 2|/avg.mass",100,0,2);
+   TH3D *h_mass_points = new TH3D("h_mass_points",";GenModel m_{#chi}[GeV];Average m_{#chi}[GeV];Gluino mass [GeV]",100,0,3000,100,0,3000,100,0,3000);
+   TH2D *h_mass_point_regions = new TH2D("h_mass_point_regions",";Goodpair;Tree==Avg.mass",2,-0.5,1.5,2,-0.5,1.5);
+   TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
    
    TH1D *h_nISR_jet = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
    TH1D *h_SR    = new TH1D("h_SR","",16,0.5,16.5);
    
    TH1D *h_nPV = new TH1D("h_nPV",";number of good vertices",20,0,70);
+   
    
    TH1D *h_puW= new TH1D("h_puW",";trueInt",100,0,100);
    TH1D *h_nTrueInt= new TH1D("h_nTrueInt",";trueInt",100,0,100);
@@ -273,9 +285,7 @@ void Analyzer::Loop()
    TH1D *h_phoEt    = new TH1D("h_phoEt",";E_{T}^{#gamma} [GeV]",7,25,1075);
    TH1D *h_phoEta    = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
 
-   const int nbins_photon=15;
-   double xbins_photon[nbins_photon+1]={0,50,120,175,210,260,310,360,410,460,510,650,800,1000,1200,1500};
-   TH1D *h_phoPt= new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",nbins_photon,xbins_photon);
+   TH1D *h_phoPt= new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",50,0,500);
    const int nbins_pfMET=13;
    double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000,1500,2000,3000};
    TH1D *h_pfMET    = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
@@ -292,15 +302,12 @@ void Analyzer::Loop()
    TH1D *h_ST    = new TH1D("h_ST",";S_{T} [GeV]",nbins_ST,xbins_ST);
    TH1D *h_ST_G    = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
    TH1D *h_ST_fix= new TH1D("h_ST_fix",";S_{T} [GeV]",15,0,3000);
-   const int nbins_MT=9;
-   double xbins_MT[nbins_MT+1]={0, 30, 60, 100, 130, 200, 500, 1000, 1500, 2000};
-   TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",nbins_MT,xbins_MT);
+   TH1D *h_MT    = new TH1D("h_MT",";M_{T} [GeV]",50,0,200);
    TH1D *h_MT_fix= new TH1D("h_MT_fix",";M_{T} [GeV]",10,0,1000);
    TH1D *h_HT_after = new TH1D("h_HT_after","H_{T} after cuts;H_{T}[GeV]",15,0,3000);
    TH1D *h_EMHT_after = new TH1D("h_EMHT_after","EMHT after cuts;EMHT",15,0,3000);
    TH2D *h2_ST_HT = new TH2D("h2_ST_HT",";S_{T} [GeV];H_{T} [GeV]",nbins_ST,xbins_ST,20,0,5000);
    TH2D *h2_ST_MET= new TH2D("h2_ST_MET",";S_{T} [GeV];MET [GeV]",nbins_ST,xbins_ST,nbins_pfMET,xbins_pfMET);
-   TH2D *h2_MT_MET= new TH2D("h2_MT_MET",";M_{T} [GeV];MET [GeV]",nbins_MT,xbins_MT,nbins_pfMET,xbins_pfMET);
    TH2D *h2_MET_HT = new TH2D("h2_MET_HT",";MET [GeV];H_{T} [GeV]",nbins_pfMET,xbins_pfMET,20,0,5000);
    TH2D *h2_MET_phoPt = new TH2D("h2_MET_phoPt",";MET [GeV];E_{T}^{#gamma} [GeV]",nbins_pfMET,xbins_pfMET,10,25,1525);
    TH2D *h2_MET_extrajets = new TH2D("h2_MET_extrajets",";MET [GeV];# extra jets",nbins_pfMET,xbins_pfMET,14,-1.5,12.5);
@@ -446,6 +453,7 @@ void Analyzer::Loop()
    if (CountSignal) signal_events=init_signal_event(SignalScenario);
    int file_counter=-1, temp=-1; std::string temp_f="";
    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+     //if (jentry==100) jentry=780000;
      Long64_t ientry = LoadTree(jentry);
      if (ientry < 0) break;
      if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
@@ -708,25 +716,73 @@ void Analyzer::Loop()
 
      if (isData && signalstudy) {cout<<"ERROR! Signalstudy option set, but running on Data..."<<endl; return;}
      //SignalScan variables
+     bool goodpair = 0;
      pair<int,int> mass_pair; int neutralino=-1, gluino=-1;
+     int MG_tree=0, MN_tree=0;
      if (SignalScan) {
-       bool foundG=0, foundX=0;
-       for (unsigned int i=0;i<nGenPart;i++) {
-         if (!foundX && GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) {neutralino=i; foundX=1;}
-         if (!foundG && GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) {gluino=i; foundG=1;}
-         if (foundX && foundG) break;
+       //Determining mass point by Events tree GenModel variable
+       if (_is_signalPointTree) {
+         if (is_debug) cout<<"Determining mass point from tree GenModel variables"<<endl;
+         bool to_debug=0;
+         string name = GetSignalPoint(ientry, to_debug);
+           //cout<<"starting again "<<temp_f<<" jentry "<<jentry<<" event "<<event<<endl;
+           //cout<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
+         bool strong=0, eweak=0;
+         if (name.find("T5qqqqHg")!=string::npos) strong =1;
+         if (name.find("TChiNG")!=string::npos) eweak =1;
+         if (strong) {
+           int last = name.find_last_of('_');
+           int snd_last = name.find_last_of('_',last-1);
+           MG_tree = atoi(name.substr(snd_last+1,last-snd_last-1).c_str());
+           MN_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+         }
+         else if (eweak) {
+           MN_tree = 1;
+           int last = name.find_last_of('_');
+           MG_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+         }
+         //cout<<event<<" "<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
        }
-       int m_Gluino=1;
-       if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) m_Gluino = GenPart_mass[gluino];
+       //Determining mass point by "hand" looking at GenParticles
+       double m_Gluino=0, m_Neutralino=0;
+       double m_N[2]={0,0};
+       int foundG=0, foundX=0;
+       for (unsigned int i=0;i<nGenPart;i++) {
+         if (GenPart_pdgId[i]==1000021 && GenPart_status[i]==22) {foundG++; m_Gluino+=GenPart_mass[i];}
+         if (GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) {m_N[foundX] = GenPart_mass[i]; foundX++; m_Neutralino+=GenPart_mass[i];}
+       }
+       m_Gluino/=foundG; m_Neutralino/=foundX;
+       //if (abs(m_N[0]-m_N[1])>100) cout<<"# of mG "<<foundG<<" m "<<m_Gluino<<" # mN "<<foundX<<" m1 "<<m_N[0]<<" m2 "<<m_N[1]<<endl;
+       if (SignalScenario==2 || SignalScenario==5) m_Gluino = 1;
        //Neutralino/gluino mass is not exact. Need to find nearest grid point
-       double m_Neutralino=GenPart_mass[neutralino];
        pair<double,double> initial_pair(m_Gluino,m_Neutralino);
-       mass_pair = whichGridpoint(initial_pair, SignalScenario);
-       if (is_debug) cout<<"Determining mass point mg="<<m_Gluino<<" mN="<<m_Neutralino<<endl;
+       if (_is_signalPointTree) mass_pair = pair<int,int>(MG_tree,MN_tree);
+       else mass_pair = whichGridpoint(initial_pair, SignalScenario);
+       //Also need the closest gridpoint for the calculated masses
+       pair<int,int> temp_pair = whichGridpoint(initial_pair,SignalScenario);
+       if (is_debug) cout<<"Determining mass point mg="<<mass_pair.first<<" mN="<<mass_pair.second<<endl;
+       //histograms for signal studying neutralino mass problem
+       h_mass_n->Fill(m_N[0],m_N[1],1.0);
+       double massdiff = abs(m_N[0]-m_N[1])/((m_N[0]+m_N[1])/2);
+       h_mass_diff->Fill(massdiff,1.0);
+       if (abs(m_N[0]-MN_tree)>50 && abs(m_N[1]-MN_tree)>50) {
+         //if (mass_pair.first!=MG_tree) cout<<"haho mg problem tree g "<<MG_tree<<" own g "<<mass_pair.first<<endl;
+         h_mass->Fill(m_Neutralino,MN_tree,1.0);
+         h_masses->Fill(m_N[0],m_N[1],MN_tree,1.0);
+       }
+       //cout<<event<<" lumi "<<luminosityBlock<<" fragment mass "<<MN_tree<<" ";
+       //for (unsigned int i=0;i<nGenPart;i++) if (GenPart_pdgId[i]==1000023 && GenPart_status[i]==22) cout<<" n part "<<i<<" mass "<<GenPart_mass[i]<<" ";
+       //cout<<endl;
+       goodpair = (MG_tree==temp_pair.first) & (MN_tree==temp_pair.second);
+       // cout<<"goodpair "<<goodpair<<" massdiff "<<massdiff<<" MG_tree "<<MG_tree<<" m_Gluino "<<m_Gluino<<" closest "<<temp_pair.first<<" MN_tree "<<MN_tree<<" m_N[0] "<<m_N[0]<<" m_N[1] "<<m_N[1]<<" avg "<<temp_pair.second<<endl;
        if (CountSignal) {
          auto search = signal_events.find(mass_pair);
-         if (search!=signal_events.end()) search->second +=1;
+         if (search!=signal_events.end()) {
+           if (!is_goodpair) search->second +=1;
+           else if (goodpair) search->second +=1;
+         }
        }
+       h_mass_points->Fill(MN_tree,m_Neutralino,m_Gluino,1.0);
      }
 
      w=1;
@@ -735,8 +791,10 @@ void Analyzer::Loop()
      if (!isData){
        if (SignalScan) {
          xsec=get_cross_section(mass_pair.first, SignalScenario);
-         TotalEvents=get_total_events(mass_pair,year,SignalScenario);
-         if (TotalEvents==0) continue;
+         if (!_is_signalPointTree) TotalEvents=get_total_events(mass_pair,year,SignalScenario,is_goodpair);
+         else if (!is_goodpair) TotalEvents=TotalEvents_Signal[mass_pair];
+         else TotalEvents=get_total_events(mass_pair,year,SignalScenario,is_goodpair);
+         if (TotalEvents==0) {cout<<"Couldn't get total number of events, using TotalEvents=1. More info:\n"<<"g"<<mass_pair.first<<"n"<<mass_pair.second<<" jentry "<<jentry<<" event "<<event<<" "<<temp_f<<endl; TotalEvents=1;}
        }
        //weights
        if (is_debug) cout<<"Determining weights"<<endl;
@@ -887,61 +945,78 @@ void Analyzer::Loop()
          if (btag_file.size()>0) {
            if (is_debug) cout<<"Loading btag efficiencies"<<endl;
            string btag_fname=btag_file;
+           string pretag="/data/BTagEff/nanoAODv9/BTagEff_nanoAODv9_results/";
            if (btag_file.compare("hardcoded")==0) {
-             string pretag="/data/BTagEff/nanoAODv5/";
-             string tag="BTagEff_";
-             if (temp_f.find("DYJetsToLL_Pt")!=std::string::npos) tag+="DYJetsToLL_Pt_merged";
+             string tag="";
+             if (year.find("2016APV")!=std::string::npos) pretag+="RunIISummer20UL16APVNanoAODv9/";
+             else if (year.find("2016")!=std::string::npos) pretag+="RunIISummer20UL16NanoAODv9/";
+             else if (year.find("2017")!=std::string::npos) pretag+="RunIISummer20UL17NanoAODv9/";
+             else if (year.find("2018")!=std::string::npos) pretag+="RunIISummer20UL18NanoAODv9/";
+             if (temp_f.find("DYJetsToLL_Pt")!=std::string::npos) tag+="DYJetsToLL_Pt";
              else if (temp_f.find("DYJetsToLL_M-10to50")!=std::string::npos) tag+="DYJetsToLL_M-10to50";
-             else if (temp_f.find("DYJetsToLL")!=std::string::npos) tag+="DYJetsToLL";
+             else if (temp_f.find("DYJetsToLL_M-50")!=std::string::npos) tag+="DYJetsToLL_M-50";
              else if (temp_f.find("WGJets_MonoPhoton_PtG-40to130")!=std::string::npos) tag+="WGJets_MonoPhoton_PtG-40to130";
-             else if (temp_f.find("WGJets")!=std::string::npos) tag+="WGJets";
+             else if (temp_f.find("WGJets_MonoPhoton_PtG-130")!=std::string::npos) tag+="WGJets_MonoPhoton_PtG-130";
+             else if (temp_f.find("WGToLNuG_01J_5f_PtG_130")!=std::string::npos) tag+="WGToLNuG_01J_5f_PtG_130";
+             else if (temp_f.find("WGToLNuG_01J_5f_PtG_300")!=std::string::npos) tag+="WGToLNuG_01J_5f_PtG_300";
+             else if (temp_f.find("WGToLNuG_01J_5f_PtG_500")!=std::string::npos) tag+="WGToLNuG_01J_5f_PtG_500";
+             else if (temp_f.find("WGToLNuG_01J_5f")!=std::string::npos) tag+="WGToLNuG_01J_5f";
              else if (temp_f.find("TTGJets")!=std::string::npos) tag+="TTGJets";
-             else if (temp_f.find("GJets_DR-0p4")!=std::string::npos) tag+="GJets_DR-0p4_HT_merged";
-             else if (temp_f.find("GJets")!=std::string::npos) tag+="GJets_HT_merged";
-             else if (temp_f.find("QCD")!=std::string::npos) tag+="QCD_HT_merged";
-             else if (temp_f.find("ST_s-channel_4f_hadronicDecays")!=std::string::npos) tag+="ST_s-channel_hadronicDecays";
-             else if (temp_f.find("ST_s-channel_leptonDecays")!=std::string::npos) tag+="ST_s-channel_leptonDecays";
-             else if (temp_f.find("ST_s-channel")!=std::string::npos) tag+="ST_s-channel";
-             else if (temp_f.find("ST_t-channel_antitop")!=std::string::npos) tag+="ST_t-channel_antitop";
-             else if (temp_f.find("ST_t-channel_top")!=std::string::npos) tag+="ST_t-channel_top";
-             else if (temp_f.find("ST_tW_antitop")!=std::string::npos) tag+="ST_tW_antitop";
-             else if (temp_f.find("ST_tW_top")!=std::string::npos) tag+="ST_tW_top";
+             else if (temp_f.find("GJets_DR-0p4")!=std::string::npos) tag+="GJets_DR-0p4";
+             else if (temp_f.find("GJets")!=std::string::npos) tag+="GJets";
+             else if (temp_f.find("QCD")!=std::string::npos) tag+="QCD";
+             else if (temp_f.find("ST_s-channel_4f_hadronicDecays")!=std::string::npos) tag+="ST_s-channel_4f_hadronicDecays";
+             else if (temp_f.find("ST_s-channel_4f_leptonDecays")!=std::string::npos) tag+="ST_s-channel_4f_leptonDecays";
+             else if (temp_f.find("ST_t-channel_antitop_4f_InclusiveDecays")!=std::string::npos) tag+="ST_t-channel_antitop_4f_InclusiveDecays";
+             else if (temp_f.find("ST_t-channel_top_4f_InclusiveDecays")!=std::string::npos) tag+="ST_t-channel_top_4f_InclusiveDecays";
+             else if (temp_f.find("ST_tW_antitop_5f_NoFullyHadronicDecays")!=std::string::npos) tag+="ST_tW_antitop_5f_NoFullyHadronicDecays";
+             else if (temp_f.find("ST_tW_antitop_5f_inclusiveDecays")!=std::string::npos) tag+="ST_tW_antitop_5f_inclusiveDecays";
+             else if (temp_f.find("ST_tW_top_5f_NoFullyHadronicDecays")!=std::string::npos) tag+="ST_tW_antitop_5f_NoFullyHadronicDecays";
+             else if (temp_f.find("ST_tW_top_5f_inclusiveDecays")!=std::string::npos) tag+="ST_tW_top_5f_inclusiveDecays";
              else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) tag+="TTGamma_Hadronic";
-             else if (temp_f.find("TTGamma_Dilept")!=std::string::npos) tag+="TTGamma_Dilept_merged";
-             else if (temp_f.find("TTGamma_SingleLept")!=std::string::npos) tag+="TTGamma_SingleLept_merged";
+             else if (temp_f.find("TTGamma_Dilept_ptGamma100-200")!=std::string::npos) tag+="TTGamma_Dilept_ptGamma100-200";
+             else if (temp_f.find("TTGamma_Dilept_ptGamma200inf")!=std::string::npos) tag+="TTGamma_Dilept_ptGamma200inf";
+             else if (temp_f.find("TTGamma_Dilept")!=std::string::npos) tag+="TTGamma_Dilept";
+             else if (temp_f.find("TTGamma_SingleLept_ptGamma100-200")!=std::string::npos) tag+="TTGamma_SingleLept_ptGamma100-200";
+             else if (temp_f.find("TTGamma_SingleLept_ptGamma200inf")!=std::string::npos) tag+="TTGamma_SingleLept_ptGamma200inf";
+             else if (temp_f.find("TTGamma_SingleLept")!=std::string::npos) tag+="TTGamma_SingleLept";
              else if (temp_f.find("TTJets")!=std::string::npos) tag+="TTJets";
              else if (temp_f.find("TTTo2L2Nu")!=std::string::npos) tag+="TTTo2L2Nu";
              else if (temp_f.find("TTToSemiLeptonic")!=std::string::npos) tag+="TTToSemiLeptonic";
-             else if (temp_f.find("WJetsToLNu")!=std::string::npos) tag+="WJetsToLNu_HT_merged";
-             else if (temp_f.find("WJetsToQQ_HT")!=std::string::npos) tag+="WJetsToQQ_HT_merged";
+             else if (temp_f.find("WJetsToLNu")!=std::string::npos) tag+="WJetsToLNu";
              else if (temp_f.find("WJetsToQQ")!=std::string::npos) tag+="WJetsToQQ";
              else if (temp_f.find("WWG")!=std::string::npos) tag+="WWG";
              else if (temp_f.find("WW")!=std::string::npos) tag+="WW";
              else if (temp_f.find("WZ")!=std::string::npos) tag+="WZ";
-             else if (temp_f.find("ZGTo2LG")!=std::string::npos) tag+="ZGTo2LG";
+             else if (temp_f.find("ZGToLLG")!=std::string::npos) tag+="ZGTo2LG";
              else if (temp_f.find("ZGTo2NuG")!=std::string::npos) tag+="ZGTo2NuG";
-             else if (temp_f.find("ZJetsToNuNu")!=std::string::npos) tag+="ZJetsToNuNu_HT_merged";
-             else if (temp_f.find("ZJetsToQQ_HT")!=std::string::npos) tag+="ZJetsToQQ_HT_merged";
+             else if (temp_f.find("ZJetsToNuNu")!=std::string::npos) tag+="ZJetsToNuNu";
              else if (temp_f.find("ZJetsToQQ")!=std::string::npos) tag+="ZJetsToQQ";
              else if (temp_f.find("ZZ")!=std::string::npos) tag+="ZZ";
              else if (temp_f.find("T5qqqqHg")==std::string::npos && temp_f.find("TChiNG")==std::string::npos) cout<<"No btag eff file found for file "<<temp_f<<endl;;
-             if (year.find("2016")!=std::string::npos) btag_fname=pretag+"hadded/2016/"+tag+".root"; //temporarly added until we have new btag efficiency files for UL16 & APV
-             else btag_fname=pretag+"hadded/"+year+"/"+tag+".root";
-             if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname=pretag+"signal/tree_"+year+"_all_out.root";
-             if (temp_f.find("TChiNG")!=std::string::npos) btag_fname=pretag+"signal/TChiNg_tree_"+year+"_all_out.root";
+             btag_fname=pretag+tag+".root";
+             string y=year;
+             if (temp_f.find("T5qqqqHg")!=std::string::npos) btag_fname="/data/BTagEff/nanoAODv5/signal/tree_"+y+"_all_out.root";
+             if (temp_f.find("TChiNG")!=std::string::npos) btag_fname="/data/BTagEff/nanoAODv5/signal/TChiNg_tree_"+y+"_all_out.root";
              if (!is_quiet) cout<<"btag efficiency file "<<btag_fname<<endl;
            }
-           TFile f_btag(btag_fname.c_str(),"read");
-           eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_b_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_b_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_b_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4bjets"));
-           eff_c_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_c_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_c_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_c_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4cjets"));
-           eff_l_Deep_L = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_L"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           eff_l_Deep_M = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_M"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           eff_l_Deep_T = new TEfficiency(*(TH2D*)f_btag.Get("h_l_Deep_T"),*(TH2D*)f_btag.Get("h_allAK4ljets"));
-           f_btag.Close();
+           TFile *f_btag=new TFile(btag_fname.c_str(),"read");
+           if (f_btag->IsZombie()) {
+             cout<<"Btag eff file not found: "<<btag_fname<<endl;
+             btag_fname=pretag+"QCD.root";
+             cout<<"Using default instead: "<<btag_fname<<endl;
+             f_btag = new TFile(btag_fname.c_str(),"read");
+           }
+           eff_b_Deep_L = new TEfficiency(*(TH2D*)f_btag->Get("h_b_Deep_L"),*(TH2D*)f_btag->Get("h_allAK4bjets"));
+           eff_b_Deep_M = new TEfficiency(*(TH2D*)f_btag->Get("h_b_Deep_M"),*(TH2D*)f_btag->Get("h_allAK4bjets"));
+           eff_b_Deep_T = new TEfficiency(*(TH2D*)f_btag->Get("h_b_Deep_T"),*(TH2D*)f_btag->Get("h_allAK4bjets"));
+           eff_c_Deep_L = new TEfficiency(*(TH2D*)f_btag->Get("h_c_Deep_L"),*(TH2D*)f_btag->Get("h_allAK4cjets"));
+           eff_c_Deep_M = new TEfficiency(*(TH2D*)f_btag->Get("h_c_Deep_M"),*(TH2D*)f_btag->Get("h_allAK4cjets"));
+           eff_c_Deep_T = new TEfficiency(*(TH2D*)f_btag->Get("h_c_Deep_T"),*(TH2D*)f_btag->Get("h_allAK4cjets"));
+           eff_l_Deep_L = new TEfficiency(*(TH2D*)f_btag->Get("h_l_Deep_L"),*(TH2D*)f_btag->Get("h_allAK4ljets"));
+           eff_l_Deep_M = new TEfficiency(*(TH2D*)f_btag->Get("h_l_Deep_M"),*(TH2D*)f_btag->Get("h_allAK4ljets"));
+           eff_l_Deep_T = new TEfficiency(*(TH2D*)f_btag->Get("h_l_Deep_T"),*(TH2D*)f_btag->Get("h_allAK4ljets"));
+           f_btag->Close();
          }
 
          //L1prefire maps
@@ -968,25 +1043,16 @@ void Analyzer::Loop()
            f_L1_jetmap_2017.Close();
          }
          //ISR MC
-         if (year.find("2016")!=std::string::npos) {
-           if (temp_f.find("TTJets")!=std::string::npos) ISR_MC=1;
-           else if (temp_f.find("TTGamma_Hadronic")!=std::string::npos) ISR_MC=2;
-           else if (temp_f.find("TTGJets")!=std::string::npos) ISR_MC=3;
-           else if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
-           else if (temp_f.find("TChiNG")!=std::string::npos) ISR_MC=5;
-           else ISR_MC=0;
-         }
+         ISR_MC=0;
+         if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
+         else if (year.find("2016")!=std::string::npos && temp_f.find("TChiNG")!=std::string::npos) ISR_MC=5;
          else if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
-         else ISR_MC=0;
          if (ISR_MC){
-           if (is_debug) cout<<"Loading ISR reweighting files"<<endl;
            //ISR reweight files
            string isr_file="", y=(year.find("2016")!=std::string::npos) ? "2016" : year;//temporary needed for 2016, since there's no separate APV/VFP D_factor calculated
-           if (ISR_MC==1) isr_file="input/ISR_reweight/D_factor_ttjets_"+y+"_nophotonmatch.root";
-           if (ISR_MC==2) isr_file="input/ISR_reweight/D_factor_ttghadronic_"+y+"_nophotonmatch.root";
-           if (ISR_MC==3) isr_file="input/ISR_reweight/D_factor_ttgjets_"+y+"_nophotonmatch.root";
            if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_nophotonmatch.root";
            if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_ew.root";
+           if (is_debug) cout<<"Loading ISR reweighting file "<<isr_file<<endl;
            TFile f_ISR(isr_file.c_str(),"read");
            if (ISR_MC!=4 && ISR_MC!=5) {
              h_ISR_D = (TH1D*)f_ISR.Get("h_Dfactor");
@@ -1131,8 +1197,8 @@ void Analyzer::Loop()
          }
          w_isr=(nISRjet2correction[isr_pt_bin]+sign*nISRjet2unceratinty[isr_pt_bin])*(D-sign*D_err);
        }
-       if (is_debug) cout<<"Applying ISR weights"<<endl;
-       w*=w_isr;
+       if (is_debug) cout<<"NOT Applying ISR weights (not clear if needed in UL)"<<endl;
+       //w*=w_isr; //temporarly commented out
        //cout<<"nisr "<<njets<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[njets]<<" * "<<D<<endl;
        //cout<<"isrpt "<<isr_pt<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[isr_pt_bin]<<" * "<<D<<endl;
      }
@@ -1258,7 +1324,7 @@ void Analyzer::Loop()
          double pt=Electron_pt[passElectrons[0]], eta=Electron_eta[passElectrons[0]];
          if (pt<10) pt=10; //There are no SFs below 10 GeV
          id_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({year,id_whichsf,which_id,eta, pt});
-         string temprec = (pt>20) ? "RecoAbove20" : "RecoBelow20";
+         string temprec = (pt>=20) ? "RecoAbove20" : "RecoBelow20";
          rec_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({year,rec_whichsf,temprec,eta, pt});
          ele_SF[whichElectron]=id_sf*rec_sf;
          if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" finalSF= "<<ele_SF[0]<<endl;
@@ -1448,7 +1514,6 @@ void Analyzer::Loop()
      if (is_debug) cout<<"IsoTrack object done"<<endl;
 
      //jet ID
-     bool vetoFastSim=false; //veto for fastsim unmatched jets https://twiki.cern.ch/twiki/bin/viewauth/CMS/SUSRecommendationsMoriond17#Cleaning_up_of_fastsim_jets_from
      for (unsigned int i=0;i<nJet;i++) {
        //L1prefire correction
        if (_fastSim && year.find("2018")==std::string::npos && Jet_pt[i]>20 && abs(Jet_eta[i])>2 && abs(Jet_eta[i])<3) {
@@ -1507,25 +1572,10 @@ void Analyzer::Loop()
        for (auto j : passMuons) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {passcut=false;break;}
        for (auto j : passTaus) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.4) {passcut=false;break;}
        //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {passcut=false;break;}
-       if (_fastSim && year.find("2016")!=std::string::npos && passcut && Jet_chHEF[i]<0.1) {
-         bool match=0;
-         for (unsigned int j=0;j<nJet;j++){
-           if (Jet_genJetIdx[i]==-1) continue;
-           if (deltaR(Jet_phi[i],GenJet_phi[Jet_genJetIdx[j]],Jet_eta[i],GenJet_phi[Jet_genJetIdx[j]])<0.3) {match=true;break;}
-         }
-         if (!match) vetoFastSim=1;
-       }
        if (passcut) passJet.push_back(i);
      }
      nPassAK4=passJet.size();
      if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
-     if (vetoFastSim) {
-       if (CountSignal) {
-         auto search = signal_events.find(mass_pair);
-         if (search!=signal_events.end()) search->second -=1;
-       }
-       continue;
-     }
      if (is_debug) cout<<"AK4 object done"<<endl;
      //jet pt, btags
      for (auto i : passJet) {
@@ -2010,19 +2060,23 @@ void Analyzer::Loop()
              }
            }
            //Efficiency fill for no cuts bin
-           h_eff->Fill(0.,w); if (SignalScan) m_eff[mass_pair]->Fill(0.,w);
+           h_eff->Fill(0.,1.); h_eff->Fill(1.,weight); h_eff->Fill(2.,w);
+           if (SignalScan) {m_eff[mass_pair]->Fill(0.,1.); m_eff[mass_pair]->Fill(1.,weight); m_eff[mass_pair]->Fill(2.,w);}
            //cuts with command line
            if (is_debug) cout<<"Applying cuts"<<endl;
            if (_cut_variable.size()>0) {if (!(Cut(ientry,mass_pair))) continue;}
            else { //Hardcoded cuts
              if (PV_npvsGood==0) continue;
            }
+           if (is_goodpair && !goodpair) continue;
            
            //Filling histograms
            if (is_debug) cout<<"Event accepted, filling histograms"<<endl;
-                 
+
+           //cout<<temp_f<<" event "<<event<<" lumi_w "<<weight<<" pu_weight "<<pu_weight<<" eleVetoSF "<<ele_VETOSF<<" photon_SF "<<pho_SF[0]<<" full w "<<w<<endl;
+           
            if (h_puW->GetBinContent(h_puW->FindBin(Pileup_nTrueInt))==0) h_puW->SetBinContent(h_puW->FindBin(Pileup_nTrueInt),pu_weight);
-           OverFill(h_eff,1.,w); OverFill(h_eff,2.,weight);
+           OverFill(h_eff,3.,1.); OverFill(h_eff,4.,weight); OverFill(h_eff,5.,w);
            OverFill(h_nISR_jet,n_isr_jets,w);
 
            OverFill(h_nPV,PV_npvsGood,w);
@@ -2051,7 +2105,6 @@ void Analyzer::Loop()
            OverFill(h_EMHT_after,EMHT_after,w);
            OverFill(h2_ST_HT,ST,HT_after,w);
            OverFill(h2_ST_MET,ST,MET,w);
-           OverFill(h2_MT_MET,MT,MET,w);
            OverFill(h2_MET_HT,MET,HT_after,w);
            OverFill(h2_MET_extrajets,MET,nonHiggsJet,w);
            if (nleadPho!=-1) OverFill(h2_MET_phoPt,MET,phoET[nleadPho],w);
@@ -2225,7 +2278,7 @@ void Analyzer::Loop()
     
      if (SignalScan) {
        if (is_debug) cout<<"Filling mass point histograms"<<endl;
-       OverFill(m_eff[mass_pair],1.,w); OverFill(m_eff[mass_pair],2.,weight);
+       OverFill(m_eff[mass_pair],3.,1.); OverFill(m_eff[mass_pair],4.,weight); OverFill(m_eff[mass_pair],5.,w);
 
        OverFill(m_nISR_jet[mass_pair],n_isr_jets,w);
        
@@ -2241,6 +2294,8 @@ void Analyzer::Loop()
        OverFill(m_pfMETsumEt[mass_pair],METsumEt,w);
        OverFill(m_pfMETPhi[mass_pair],METPhi,w);
        OverFill(m_pfMETSig[mass_pair],METSig,w);
+       OverFill(m_genMET[mass_pair],GenMET_pt,w);
+       if (goodpair) OverFill(m_genMET_goodpair[mass_pair],GenMET_pt,w);
 
        OverFill(m2_higgs_pfMET[mass_pair],higgs_category,MET,w);
 
@@ -2253,7 +2308,6 @@ void Analyzer::Loop()
        OverFill(m_EMHT_after[mass_pair],EMHT_after,w);
        OverFill(m2_ST_HT[mass_pair],ST,HT_after,w);
        OverFill(m2_ST_MET[mass_pair],ST,MET,w);
-       OverFill(m2_MT_MET[mass_pair],MT,MET,w);
        OverFill(m2_MET_HT[mass_pair],MET,HT_after,w);
        if (nleadPho!=-1) OverFill(m2_MET_phoPt[mass_pair],MET,phoET[nleadPho],w);
        OverFill(m2_MET_extrajets[mass_pair],MET,nonHiggsJet,w);

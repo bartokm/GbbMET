@@ -33,6 +33,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <TKey.h>
 #include <TH2.h>
 #include <TH3.h>
 #include <TGraph.h>
@@ -1092,6 +1093,8 @@ public :
    bool SignalScan=false;
    bool CountSignal=false;
    int SignalScenario=0;
+   bool is_goodpair=false;
+   bool _is_signalPointTree=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -1173,16 +1176,21 @@ public :
    //hardcoded values for FR
    double _A=0.0308, _B=0.4942, _C=0.615192;
    vector<string> json_2016, json_2017, json_2018;
+   map<pair<int,int>, unsigned long long> TotalEvents_Signal;
+
+   string current_signal_point = "";
+   Bool_t bl_current_signal_point = 0;
+   TBranch* br_current_signal_point;
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0);
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
-   virtual void     Get_total_sum(TTree *tree);
+   virtual void     Get_total_sum(TChain *tree, int SignalScenario=0);
    virtual void     Loop();
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
@@ -1200,12 +1208,13 @@ public :
    void             OverFill(TH1D *h, double x, double w);
    void             OverFill(TH2D *h, double x, double y, double w);
    void             set_ABCD_histo(TH1D *h);
+   string           GetSignalPoint(Long64_t ientry, bool debug=0);
 };
 
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD, bool _goodpair, bool is_signalPointTree) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1256,6 +1265,8 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   if (_year!="") year=_year;
   if (fastSim) _fastSim=true;
   if (ABCD) _ABCD=ABCD;
+  if (_goodpair) is_goodpair=_goodpair;
+  if (is_signalPointTree) _is_signalPointTree=1;
   if (fakeRate) _fakeRate=fakeRate;
   if (testrun) _testRun=testrun;
   if (outname=="" && !is_quiet) std::cout<<"No output filename is defined, using: Analyzer_histos.root"<<std::endl;
@@ -1267,6 +1278,13 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
     tree = ch;
   }
   else {
+    string name=arg.at(0);
+    if (name.find("T5qqqqHg_refPoints")!=std::string::npos) SignalScenario=3;//nanoaodv6 fullsim points
+    else if (name.find("NanoAODv6")!=std::string::npos && name.find("T5qqqqHg")!=std::string::npos) SignalScenario=4;//nanoaodv6 fastsim
+    else if (name.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
+    else if (name.find("TChiNG_BF50N50G")!=std::string::npos) SignalScenario=5; //EW with all final states
+    else if (name.find("TChiNG")!=std::string::npos) SignalScenario=2;
+    if (is_debug && SignalScan) cout<<"SignalScenario "<<SignalScenario<<endl; 
     for (auto i : arg) {
       const char* cstr_i=i.c_str();
       std::string temp=i, temp_run=i;
@@ -1286,14 +1304,8 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
     if (!is_quiet) cout<<nFiles<<" trees are read."<<endl; 
     tree = ch;
   }
-  Get_total_sum(ch_run);
+  Get_total_sum(ch_run,SignalScenario);
   Init(tree);
-  string temp=tree->GetCurrentFile()->GetName();
-  if (temp.find("T5qqqqHg_refPoints")!=std::string::npos) SignalScenario=3;//nanoaodv6 fullsim points
-  else if (temp.find("NanoAODv6")!=std::string::npos && temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=4;//nanoaodv6 fastsim
-  else if (temp.find("T5qqqqHg")!=std::string::npos) SignalScenario=1;
-  else if (temp.find("TChiNG_BF50N50G")!=std::string::npos) SignalScenario=5; //EW with all final states
-  else if (temp.find("TChiNG")!=std::string::npos) SignalScenario=2;
   
   //Load golden json files
   if (is_debug) cout<<"Loading golden json files"<<endl;
@@ -1337,21 +1349,101 @@ Long64_t Analyzer::LoadTree(Long64_t entry)
    return centry;
 }
 
-void Analyzer::Get_total_sum(TTree *tree){
-  TBranch *b_genEventSumw;
-  Double_t sub_TotalEvents=0;
-  string eventsum="genEventSumw";
-  if (tree->GetBranch(eventsum.c_str())) {
-    tree->SetBranchAddress(eventsum.c_str(), &sub_TotalEvents, &b_genEventSumw);
-    if (is_debug) cout<<"Looping on Runs Tree to get total number of events"<<endl; 
-    for (int i=0; i<tree->GetEntries();i++) {
-      int ientry = tree->LoadTree(i);
-      b_genEventSumw->GetEntry(ientry);
-      TotalEvents+=sub_TotalEvents;
-      if (is_debug) cout<<tree->GetCurrentFile()->GetName()<<" "<<i<<" "<<sub_TotalEvents<<endl;
+void Analyzer::Get_total_sum(TChain *tree, int SignalScenario){
+  if (!SignalScenario) {
+    TBranch *b_genEventSumw;
+    Double_t sub_TotalEvents=0;
+    string eventsum="genEventSumw";
+    if (tree->GetBranch(eventsum.c_str())) {
+      tree->SetBranchAddress(eventsum.c_str(), &sub_TotalEvents, &b_genEventSumw);
+      if (is_debug) cout<<"Looping on Runs Tree to get total number of events"<<endl; 
+      for (int i=0; i<tree->GetEntries();i++) {
+        int ientry = tree->LoadTree(i);
+        b_genEventSumw->GetEntry(ientry);
+        TotalEvents+=sub_TotalEvents;
+        if (is_debug) cout<<tree->GetCurrentFile()->GetName()<<" "<<i<<" "<<sub_TotalEvents<<endl;
+      }
+      if (is_debug) cout<<"Total unskimmed Events "<<TotalEvents<<endl;
     }
-    if (is_debug) cout<<"Total unskimmed Events "<<TotalEvents<<endl;
   }
+  else if (_is_signalPointTree) {
+    TObjArray *fileElements=tree->GetListOfFiles();
+    TIter next(fileElements);
+    TChainElement *chEl=0;
+    while (( chEl=(TChainElement*)next() )) {
+      TFile f(chEl->GetTitle());
+      TTree *t = (TTree*)f.Get("Runs");
+      int ientry = t->LoadTree(0);
+      TIter next(t->GetListOfBranches());
+      TKey *key;
+      while ((key = (TKey*)next())) {
+        string name = key->GetName();
+        if (name.find("genEventCount")==string::npos) continue;
+        TBranch *b; Long64_t value=0;
+        t->SetBranchAddress(name.c_str(), &value, &b);
+        int MG_tree=0, MN_tree=0;
+        b->GetEntry(ientry);
+        bool strong=0, eweak=0;
+        if (name.find("T5qqqqHg")!=string::npos) strong =1;
+        if (name.find("TChiNG")!=string::npos) eweak =1;
+        if (strong) {
+          int last = name.find_last_of('_');
+          int snd_last = name.find_last_of('_',last-1);
+          MG_tree = atoi(name.substr(snd_last+1,last-snd_last-1).c_str());
+          MN_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+          pair<int,int> M(MG_tree,MN_tree);
+          TotalEvents_Signal[M] += value;
+          //if (is_debug) cout<<tree->GetCurrentFile()->GetName()<<" "<<i<<" mG "<<MG_tree<<" mN "<<MN_tree<<" events "<<value<<endl;
+        }
+        else if (eweak) {
+          int last = name.find_last_of('_');
+          MN_tree = 1;
+          MG_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+          pair<int,int> M(MG_tree,MN_tree);
+          TotalEvents_Signal[M] += value;
+          //if (is_debug) cout<<tree->GetCurrentFile()->GetName()<<" "<<i<<" mG "<<MG_tree<<" mN "<<MN_tree<<" events "<<value<<endl;
+        }
+      }
+      f.Close();
+    }
+    if (is_debug) {
+      cout<<"Total Events for all mass points:"<<endl;
+      for (auto& [key, value]: TotalEvents_Signal) cout<<"mG "<<key.first<<" mN "<<key.second<<" events "<<value<<endl;
+    }
+  }
+}
+
+string Analyzer::GetSignalPoint(Long64_t ientry, bool debug){
+  string point="";
+  bool recalculate = 1;
+  if (current_signal_point.size()>0) {
+    if (fChain->GetBranch(current_signal_point.c_str())) {
+      fChain->SetBranchAddress(current_signal_point.c_str(), &bl_current_signal_point, &br_current_signal_point);
+      br_current_signal_point->GetEntry(ientry);
+      if (bl_current_signal_point) {
+        recalculate = 0;
+        point = current_signal_point;
+      }
+    }
+  }
+  if (recalculate) {
+    TIter next(fChain->GetListOfBranches());
+    TKey *key;
+    while ((key = (TKey*)next())) {
+      string name = key->GetName();
+      //Example string: GenModel_T5qqqqHg_2200_2190
+      if (name.find("GenModel")==string::npos) continue;
+      TBranch *b; Bool_t value=0;
+      fChain->SetBranchAddress(name.c_str(), &value, &b);
+      b->GetEntry(ientry);
+      if (value) {
+        point = name;
+        current_signal_point = name;
+        break;
+      }
+    }
+  }
+  return point;
 }
 
 void Analyzer::Init(TTree *tree)
@@ -2751,6 +2843,8 @@ void PrintHelp(){
   cout<<"-c \t\t Print out available cut variables"<<endl;
   cout<<"-t x \t\t Test running only on \"x\" number of events. (default is x=1000)"<<endl;
   cout<<"-A met_cut \t\t turns on ABCD distribution histograms, with the MET cut (in GeV) as input. Automatically introduces the MET cut and a \"sth_selected>0\" cut in general."<<endl;
+  cout<<"-g \t\t Turn on neutralino goodpair option only for T5qqqqHg"<<endl;
+  cout<<"-T \t\t Use signal mass point determination from the tree GenModel variables"<<endl;
   cout<<"--lept \t\t set lepton pt cut for e/m/t"<<endl;
   cout<<"FORMAT:\n--lept e 10 m 5 t 20"<<endl;
   cout<<"--syst \t\t run with +- systematics settings"<<endl;
