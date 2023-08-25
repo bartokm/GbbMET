@@ -563,6 +563,8 @@ public :
    Bool_t          HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight;
    Bool_t          L1Reco_step;
    Bool_t          L1_AlwaysTrue;
+   Float_t         Gluino_mass;
+   Float_t         Neutralino_mass;
 
    // List of branches
    TBranch        *b_run;   //!
@@ -1076,6 +1078,8 @@ public :
    TBranch        *b_HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight;
    TBranch        *b_L1Reco_step;
    TBranch        *b_L1_AlwaysTrue;
+   TBranch        *b_Gluino_mass;
+   TBranch        *b_Neutralino_mass;
 
    //Added
    double BtagDDBvLWP[4][5]={{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630}};
@@ -1095,6 +1099,7 @@ public :
    int SignalScenario=0;
    bool is_goodpair=false;
    bool _is_signalPointTree=false;
+   bool is_treemass =false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -1973,6 +1978,8 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight")) fChain->SetBranchAddress("HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight", &HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight, &b_HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight);
    if (fChain->GetBranch("L1Reco_step")) fChain->SetBranchAddress("L1Reco_step", &L1Reco_step, &b_L1Reco_step);
    if (fChain->GetBranch("L1_AlwaysTrue")) fChain->SetBranchAddress("L1_AlwaysTrue", &L1_AlwaysTrue, &b_L1_AlwaysTrue);
+   if (fChain->GetBranch("Gluino_mass")) fChain->SetBranchAddress("Gluino_mass", &Gluino_mass, &b_Gluino_mass);
+   if (fChain->GetBranch("Neutralino_mass")) {is_treemass=1; fChain->SetBranchAddress("Neutralino_mass", &Neutralino_mass, &b_Neutralino_mass);}
    Notify();
 } 
    

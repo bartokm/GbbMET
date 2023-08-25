@@ -269,7 +269,6 @@ void Analyzer::Loop()
    TH2D *h_mass_n = new TH2D("h_mass_n",";GenPart mass 1 [GeV];GenPart mass 2 [GeV]",100,0,3000,100,0,3000);
    TH1D *h_mass_diff = new TH1D("h_mass_diff",";|mass 1 - mass 2|/avg.mass",100,0,2);
    TH3D *h_mass_points = new TH3D("h_mass_points",";GenModel m_{#chi}[GeV];Average m_{#chi}[GeV];Gluino mass [GeV]",100,0,3000,100,0,3000,100,0,3000);
-   TH2D *h_mass_point_regions = new TH2D("h_mass_point_regions",";Goodpair;Tree==Avg.mass",2,-0.5,1.5,2,-0.5,1.5);
    TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
    
    TH1D *h_nISR_jet = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
@@ -691,6 +690,10 @@ void Analyzer::Loop()
      b_IsoTrack_dz->GetEntry(ientry);
      b_IsoTrack_miniPFRelIso_chg->GetEntry(ientry);
      b_IsoTrack_pdgId->GetEntry(ientry);
+     if (is_treemass) {
+       b_Gluino_mass->GetEntry(ientry);
+       b_Neutralino_mass->GetEntry(ientry);
+     }
      //nb = fChain->GetEntry(jentry);   nbytes += nb;
      if (is_debug) cout<<"Branch Initialization complete"<<endl;
 
@@ -717,31 +720,38 @@ void Analyzer::Loop()
      if (isData && signalstudy) {cout<<"ERROR! Signalstudy option set, but running on Data..."<<endl; return;}
      //SignalScan variables
      bool goodpair = 0;
-     pair<int,int> mass_pair; int neutralino=-1, gluino=-1;
+     pair<int,int> mass_pair;
      int MG_tree=0, MN_tree=0;
      if (SignalScan) {
        //Determining mass point by Events tree GenModel variable
        if (_is_signalPointTree) {
          if (is_debug) cout<<"Determining mass point from tree GenModel variables"<<endl;
          bool to_debug=0;
-         string name = GetSignalPoint(ientry, to_debug);
-           //cout<<"starting again "<<temp_f<<" jentry "<<jentry<<" event "<<event<<endl;
-           //cout<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
-         bool strong=0, eweak=0;
-         if (name.find("T5qqqqHg")!=string::npos) strong =1;
-         if (name.find("TChiNG")!=string::npos) eweak =1;
-         if (strong) {
-           int last = name.find_last_of('_');
-           int snd_last = name.find_last_of('_',last-1);
-           MG_tree = atoi(name.substr(snd_last+1,last-snd_last-1).c_str());
-           MN_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+         if (is_treemass) {
+           MG_tree = Gluino_mass;
+           MN_tree = Neutralino_mass;
+           if (SignalScenario==2 || SignalScenario==5) {MG_tree = Neutralino_mass; MN_tree = 1;}
          }
-         else if (eweak) {
-           MN_tree = 1;
-           int last = name.find_last_of('_');
-           MG_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+         else {
+           string name = GetSignalPoint(ientry, to_debug);
+             //cout<<"starting again "<<temp_f<<" jentry "<<jentry<<" event "<<event<<endl;
+             //cout<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
+           bool strong=0, eweak=0;
+           if (name.find("T5qqqqHg")!=string::npos) strong =1;
+           if (name.find("TChiNG")!=string::npos) eweak =1;
+           if (strong) {
+             int last = name.find_last_of('_');
+             int snd_last = name.find_last_of('_',last-1);
+             MG_tree = atoi(name.substr(snd_last+1,last-snd_last-1).c_str());
+             MN_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+           }
+           else if (eweak) {
+             MN_tree = 1;
+             int last = name.find_last_of('_');
+             MG_tree = atoi(name.substr(last+1,name.size()-last-1).c_str());
+           }
+           //cout<<event<<" "<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
          }
-         //cout<<event<<" "<<name<<" "<<MG_tree<<" "<<MN_tree<<endl;
        }
        //Determining mass point by "hand" looking at GenParticles
        double m_Gluino=0, m_Neutralino=0;
