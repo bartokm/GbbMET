@@ -344,7 +344,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_ST_G[MassPair] = new TH1D("h_ST_G",";S_{T}^{#gamma} [GeV]",10,0,2000);
       m_ST_fix[MassPair]= new TH1D("h_ST_fix",";S_{T} [GeV]",15,0,3000);
       m_MT[MassPair] = new TH1D("h_MT",";M_{T} [GeV]",50,0,200);
-      m_MT_fix[MassPair]= new TH1D("h_MT_fix",";M_{T} [GeV]",10,0,1000);
+      m_MT_fix[MassPair]= new TH1D("h_MT_fix",";M_{T} [GeV]",8,0,800);
       m_HT_after[MassPair] = new TH1D("h_HT_after","H_{T} after cuts;H_{T}[GeV]",15,0,3000);
       m_EMHT_after[MassPair] = new TH1D("h_EMHT_after","EMHT after cuts;EMHT",15,0,3000);
       m2_ST_HT[MassPair] = new TH2D("h2_ST_HT",";S_{T} [GeV];H_{T} [GeV]",nbins_ST,xbins_ST,20,0,5000);

@@ -155,6 +155,7 @@ public :
    Float_t         FatJet_msoftdrop_jmsDown[99];   //[nFatJet]
    Float_t         FatJet_n2b1[99];   //[nFatJet]
    Float_t         FatJet_n3b1[99];   //[nFatJet]
+   Float_t         FatJet_particleNetMD_Xbb[99];   //[nFatJet]
    Float_t         FatJet_phi[99];   //[nFatJet]
    Float_t         FatJet_pt[99];   //[nFatJet]
    Float_t         FatJet_pt_nom[99];   //[nJet]
@@ -671,6 +672,7 @@ public :
    TBranch        *b_FatJet_msoftdrop_jmsDown;   //[nFatJet]
    TBranch        *b_FatJet_n2b1;   //!
    TBranch        *b_FatJet_n3b1;   //!
+   TBranch        *b_FatJet_particleNetMD_Xbb;
    TBranch        *b_FatJet_phi;   //!
    TBranch        *b_FatJet_pt;   //!
    TBranch        *b_FatJet_pt_nom;   //[nJet]
@@ -1082,8 +1084,12 @@ public :
    TBranch        *b_Neutralino_mass;
 
    //Added
-   double BtagDDBvLWP[4][5]={{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630}};
+   //double BtagDDBvLWP[4][5]={{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630},{0.004,0.018,0.158,0.282,0.630}};
+   //from v10 version here: https://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2021/005 Table 19, the 2 highest WPs are just arbitrery
+   double BtagDDBvLWP[4][5]={{0.0256,0.118,0.2739,0.282,0.630},{0.027,0.1213,0.2786,0.282,0.630},{0.0404,0.1566,0.3154,0.382,0.630},{0.0399,0.1566,0.314,0.382,0.630}};
    double BtagDeepWP[4][3]={{0.0508,0.2598,0.6502},{0.0480,0.2489,0.6377},{0.0532,0.3040,0.7476},{0.0490,0.2783,0.7100}};
+   //from v10 version here: https://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2021/005 Table 18
+   double BtagParticleNetWP[4][3]={{0.9088,0.9737,0.9883},{0.9137,0.9735,0.9883},{0.9105,0.9714,0.987},{0.9172,0.9734,0.988}};
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
    int _ABCD=0;
@@ -1100,6 +1106,7 @@ public :
    bool is_goodpair=false;
    bool _is_signalPointTree=false;
    bool is_treemass =false;
+   bool isParticleNet=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -1116,8 +1123,8 @@ public :
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
-   int bcounterDDBvL[6]={}, bcounterDeep[4]={};
-   int DDBvL_selected=0, Deep_selected=0, Deep_medium_selected=0;
+   int bcounterDDBvL[6]={}, bcounterParticleNet[6]={}, bcounterDeep[4]={};
+   int AK8Btag_selected=0, Deep_selected=0, Deep_medium_selected=0;
    bool L1prefire=false;
    bool passBtag=false, passHiggsMass=false;
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
@@ -1189,7 +1196,7 @@ public :
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0, bool _isParticleNet=0);
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1219,7 +1226,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD, bool _goodpair, bool is_signalPointTree) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD, bool _goodpair, bool is_signalPointTree, bool _isParticleNet) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1269,6 +1276,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   if (_xsec) xsec=_xsec;
   if (_year!="") year=_year;
   if (fastSim) _fastSim=true;
+  if (_isParticleNet) isParticleNet=true;
   if (ABCD) _ABCD=ABCD;
   if (_goodpair) is_goodpair=_goodpair;
   if (is_signalPointTree) _is_signalPointTree=1;
@@ -1571,6 +1579,7 @@ void Analyzer::Init(TTree *tree)
    if (fChain->GetBranch("FatJet_msoftdrop_jmsDown")) fChain->SetBranchAddress("FatJet_msoftdrop_jmsDown", FatJet_msoftdrop_jmsDown, &b_FatJet_msoftdrop_jmsDown);
    fChain->SetBranchAddress("FatJet_n2b1", FatJet_n2b1, &b_FatJet_n2b1);
    fChain->SetBranchAddress("FatJet_n3b1", FatJet_n3b1, &b_FatJet_n3b1);
+   fChain->SetBranchAddress("FatJet_particleNetMD_Xbb", FatJet_particleNetMD_Xbb, &b_FatJet_particleNetMD_Xbb);
    fChain->SetBranchAddress("FatJet_phi", FatJet_phi, &b_FatJet_phi);
    fChain->SetBranchAddress("FatJet_pt", FatJet_pt, &b_FatJet_pt);
    fChain->SetBranchAddress("FatJet_pt_nom", FatJet_pt_nom, &b_FatJet_pt_nom);
@@ -2292,8 +2301,8 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
     else if (_cut_variable[i]=="bcounterDDBvL_T1") {returnvalue=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T1[DDBvL_whichSF];}
     else if (_cut_variable[i]=="bcounterDDBvL_T2") {returnvalue=Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T2[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="DDBvL_selected") {
-      returnvalue=Parser(DDBvL_selected,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="AK8Btag_selected") {
+      returnvalue=Parser(AK8Btag_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
         if (_cut_value[i]==1) w*=DDBvL_SF_L[DDBvL_whichSF];
         if (_cut_value[i]==2) w*=DDBvL_SF_M1[DDBvL_whichSF];
@@ -2306,7 +2315,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="Deep_medium_selected") returnvalue=Parser(Deep_medium_selected,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="sth_selected") {
       int sth = 0;
-      if (DDBvL_selected>0) sth = 1;
+      if (AK8Btag_selected>0) sth = 1;
       else if (Deep_medium_selected==1) sth = 1;
       returnvalue=Parser(sth,_cut_operator[i],_cut_value[i]);
     }
@@ -2348,7 +2357,7 @@ void Analyzer::set_ABCD_histo(TH1D *h){
 }
 
 void Analyzer::OverFill(TH1D *h, double x, double w){
-  bool h_tag=DDBvL_selected>0 || Deep_medium_selected==1;
+  bool h_tag=AK8Btag_selected>0 || Deep_medium_selected==1;
   bool met = MET>_ABCD;
   double max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
   if (_ABCD) {
@@ -2370,7 +2379,7 @@ void Analyzer::OverFill(TH2D *h, double x, double y, double w){
   double y_max=h->GetYaxis()->GetBinCenter(h->GetNbinsY());
   double fill_x=(x>x_max) ? x_max : x;
   double fill_y=(y>y_max) ? y_max : y;
-  bool h_tag=DDBvL_selected>0 || Deep_medium_selected==1;
+  bool h_tag=AK8Btag_selected>0 || Deep_medium_selected==1;
   bool met = MET>_ABCD;
   if (!_ABCD || (h_tag && met)) h->Fill(fill_x,fill_y,w);
 }
@@ -2796,10 +2805,10 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"bcounterDDBvL_M2","number of medium 2 DDBvL btagged jets"},
   {"bcounterDDBvL_T1","number of tight 1 DDBvL btagged jets"},
   {"bcounterDDBvL_T2","number of tight 2 DDBvL btagged jets"},
-  {"DDBvL_selected","DDBvL btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
+  {"AK8Btag_selected","AK8 btag (0-Nobtag, 1-loose, 2-medium1, ...) of the higgs candidate ak8jet"},
   {"Deep_selected","Deep btag (0-Nobtag, 1-1 loosebtag, 2-2 loose btag) of the higgs candidate ak4jets"},
   {"Deep_medium_selected","Deep btag (0-NoMediumbtag, 1-1 medium btag) of the higgs candidate ak4jets"},
-  {"sth_selected","Deep_selected+DDBvL_selected"},
+  {"sth_selected","Deep_selected+AK8Btag_selected"},
   {"passBtag","Higgs candidate ak8jet passes medium btag"},
   {"passAK4Btag1","Higgs candidate 1st ak4jet passes loose btag"},
   {"passAK4Btag2","Higgs candidate 2nd ak4jet passes loose btag"},
@@ -2852,6 +2861,7 @@ void PrintHelp(){
   cout<<"-A met_cut \t\t turns on ABCD distribution histograms, with the MET cut (in GeV) as input. Automatically introduces the MET cut and a \"sth_selected>0\" cut in general."<<endl;
   cout<<"-g \t\t Turn on neutralino goodpair option only for T5qqqqHg"<<endl;
   cout<<"-T \t\t Use signal mass point determination from the tree GenModel variables"<<endl;
+  cout<<"-p \t\t Use ParticleNet AK8 btagger instead of DDBvL"<<endl;
   cout<<"--lept \t\t set lepton pt cut for e/m/t"<<endl;
   cout<<"FORMAT:\n--lept e 10 m 5 t 20"<<endl;
   cout<<"--syst \t\t run with +- systematics settings"<<endl;
