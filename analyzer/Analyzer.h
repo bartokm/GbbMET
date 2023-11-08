@@ -156,6 +156,16 @@ public :
    Float_t         FatJet_n2b1[99];   //[nFatJet]
    Float_t         FatJet_n3b1[99];   //[nFatJet]
    Float_t         FatJet_particleNetMD_Xbb[99];   //[nFatJet]
+   Float_t         FatJet_particleNetMD_Xcc[99];   //[nFatJet]
+   Float_t         FatJet_particleNetMD_QCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_H4qvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_HbbvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_HccvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_QCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_TvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_WvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_ZvsQCD[99];   //[nFatJet]
+   Float_t         FatJet_particleNet_mass[99];   //[nFatJet]
    Float_t         FatJet_phi[99];   //[nFatJet]
    Float_t         FatJet_pt[99];   //[nFatJet]
    Float_t         FatJet_pt_nom[99];   //[nJet]
@@ -673,6 +683,16 @@ public :
    TBranch        *b_FatJet_n2b1;   //!
    TBranch        *b_FatJet_n3b1;   //!
    TBranch        *b_FatJet_particleNetMD_Xbb;
+   TBranch        *b_FatJet_particleNetMD_Xcc;   //[nFatJet]
+   TBranch        *b_FatJet_particleNetMD_QCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_H4qvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_HbbvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_HccvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_QCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_TvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_WvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_ZvsQCD;   //[nFatJet]
+   TBranch        *b_FatJet_particleNet_mass;
    TBranch        *b_FatJet_phi;   //!
    TBranch        *b_FatJet_pt;   //!
    TBranch        *b_FatJet_pt_nom;   //[nJet]
@@ -1158,6 +1178,7 @@ public :
    //ABCD distribution histograms
    vector<TH3D*> abcd_histos;
    //histograms needed for SFs
+   TH1D *h_ST_SF, *h_AK4_b_discr_SF, *h_AK8_b_discr_SF;
    TH2F *h_pho_EGamma_SF2D[5];
    TH2F *h_ele_EGamma_SF2D[4];
    TH2F *h_ele_EGamma_EffMC2D[4];
@@ -1172,6 +1193,7 @@ public :
    TF1  *tf1_tau_ID_SF[3];
    TH2D *h_L1prefire_phoMap;
    TH2D *h_L1prefire_jetMap;
+   TF1 *muon_parametrization[12];
    TEfficiency* eff_b_Deep_L;
    TEfficiency* eff_b_Deep_M;
    TEfficiency* eff_b_Deep_T;
@@ -1197,7 +1219,7 @@ public :
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
    Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0, bool _isParticleNet=0);
-   virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair);
+   virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair,bool debug);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
@@ -1212,7 +1234,7 @@ public :
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
    void             CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
-   double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen);
+   double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, int i, double pt, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, std::unique_ptr<TRandom3> &gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
    void             FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselected, bool (&MassBtagAK4)[6], int (&true_higgsak4jet)[7]);
@@ -1221,6 +1243,8 @@ public :
    void             OverFill(TH2D *h, double x, double y, double w);
    void             set_ABCD_histo(TH1D *h);
    string           GetSignalPoint(Long64_t ientry, bool debug=0);
+   double           CalcL1PreFire(int syst=0);
+   double           getPrefiringRateMuon(double eta, double phi, double pt, int syst=0);
 };
 
 #endif
@@ -1459,6 +1483,144 @@ string Analyzer::GetSignalPoint(Long64_t ientry, bool debug){
   return point;
 }
 
+double getPrefiringRateEcal(double eta, double pt, TH2D* h_prefmap, int syst=0) {
+  //Check pt is not above map overflow
+  int nbinsy = h_prefmap->GetNbinsY();
+  double maxy = h_prefmap->GetYaxis()->GetBinLowEdge(nbinsy + 1);
+  if (pt >= maxy)
+    pt = maxy - 0.01;
+  int thebin = h_prefmap->FindBin(eta, pt);
+
+  double prefrate = h_prefmap->GetBinContent(thebin);
+
+  double statuncty = h_prefmap->GetBinError(thebin);
+  double systuncty = 0.2 * prefrate;
+
+  if (syst==1)
+    prefrate = std::min(1., prefrate + sqrt(pow(statuncty, 2) + pow(systuncty, 2)));
+  else if (syst==2)
+    prefrate = std::max(0., prefrate - sqrt(pow(statuncty, 2) + pow(systuncty, 2)));
+  return prefrate;
+}
+
+double Analyzer::getPrefiringRateMuon(double eta, double phi, double pt, int syst) {
+  double prefrate=1;
+  double statuncty;
+  if ((year.find("2016") != std::string::npos) && (eta > 1.24 && eta < 1.6) && (phi > 2.44346 && phi < 2.79253)) {
+    prefrate = muon_parametrization[11]->Eval(pt);
+    statuncty = muon_parametrization[11]->GetParError(2);
+  } else if (std::abs(eta) < 0.2) {
+    prefrate = muon_parametrization[0]->Eval(pt);
+    statuncty = muon_parametrization[0]->GetParError(2);
+  } else if (std::abs(eta) < 0.3) {
+    prefrate = muon_parametrization[1]->Eval(pt);
+    statuncty = muon_parametrization[1]->GetParError(2);
+  } else if (std::abs(eta) < 0.55) {
+    prefrate = muon_parametrization[2]->Eval(pt);
+    statuncty = muon_parametrization[2]->GetParError(2);
+  } else if (std::abs(eta) < 0.83) {
+    prefrate = muon_parametrization[3]->Eval(pt);
+    statuncty = muon_parametrization[3]->GetParError(2);
+  } else if (std::abs(eta) < 1.24) {
+    prefrate = muon_parametrization[4]->Eval(pt);
+    statuncty = muon_parametrization[4]->GetParError(2);
+  } else if (std::abs(eta) < 1.4) {
+    prefrate = muon_parametrization[5]->Eval(pt);
+    statuncty = muon_parametrization[5]->GetParError(2);
+  } else if (std::abs(eta) < 1.6) {
+    prefrate = muon_parametrization[6]->Eval(pt);
+    statuncty = muon_parametrization[6]->GetParError(2);
+  } else if (std::abs(eta) < 1.8) {
+    prefrate = muon_parametrization[7]->Eval(pt);
+    statuncty = muon_parametrization[7]->GetParError(2);
+  } else if (std::abs(eta) < 2.1) {
+    prefrate = muon_parametrization[8]->Eval(pt);
+    statuncty = muon_parametrization[8]->GetParError(2);
+  } else if (std::abs(eta) < 2.25) {
+    prefrate = muon_parametrization[9]->Eval(pt);
+    statuncty = muon_parametrization[9]->GetParError(2);
+  } else if (std::abs(eta) < 2.4) {
+    prefrate = muon_parametrization[10]->Eval(pt);
+    statuncty = muon_parametrization[10]->GetParError(2);
+  } 
+  double systuncty = 0.2 * prefrate;
+
+  if (syst == 1) //up
+    prefrate = std::min(1., prefrate + sqrt(pow(statuncty, 2) + pow(systuncty, 2)));
+  else if (syst == 2) //down
+    prefrate = std::max(0., prefrate - sqrt(pow(statuncty, 2) + pow(systuncty, 2)));
+  else if (syst == 3) //upsyst
+    prefrate = std::min(1., prefrate + systuncty);
+  else if (syst == 4) //downsyst
+    prefrate = std::max(0., prefrate - systuncty);
+  else if (syst == 5) //upstat
+    prefrate = std::min(1., prefrate + statuncty);
+  else if (syst == 6) //downstat
+    prefrate = std::max(0., prefrate - statuncty);
+
+  return prefrate;
+}
+
+double Analyzer::CalcL1PreFire(int syst){
+  //Probability for the event NOT to prefire, computed with the prefiring maps per object.
+  //Up and down values correspond to the resulting value when shifting up/down all prefiring rates in prefiring maps.
+  //syst 0: central, 1: up, 2: down
+  //syst muon 0: central, 1: up, 2: down, 3: up stat, 4: down stat, 5: up syst, 6: down syst
+  double nonPrefiringProbaECAL=1, nonPrefiringProbaMuon=1;
+
+  for (unsigned int i=0;i<nPhoton;i++){
+    double pt_gam = Photon_pt[i];
+    double eta_gam = Photon_eta[i];
+    if (pt_gam < 20. || abs(eta_gam) < 2 || abs(eta_gam) >3) continue;
+    double prefiringprob_gam = getPrefiringRateEcal(eta_gam, pt_gam, h_L1prefire_phoMap, syst);
+    nonPrefiringProbaECAL *= (1. - prefiringprob_gam);
+  }
+
+  //Now applying the prefiring maps to jets in the affected regions.
+  for (unsigned int i=0;i<nJet;i++){
+    double pt_jet = Jet_pt[i];
+    double eta_jet = Jet_eta[i];
+    double phi_jet = Jet_phi[i];
+    if (pt_jet < 20. || abs(eta_jet) < 2. || abs(eta_jet) > 3. || Jet_muEF[i] > 0.5) continue;
+    //Loop over photons to remove overlap
+    double nonprefiringprobfromoverlappingphotons = 1.;
+    bool foundOverlappingPhotons = false;
+    for (unsigned int j=0;j<nPhoton;j++){
+      double pt_gam = Photon_pt[j];
+      double eta_gam = Photon_eta[j];
+      double phi_gam = Photon_phi[j];
+      if (pt_gam < 20. || abs(eta_gam) < 2 || abs(eta_gam) >3) continue;
+      if (deltaR(phi_jet,phi_gam,eta_jet,eta_gam)>0.16) continue;
+      double prefiringprob_gam = getPrefiringRateEcal(eta_gam, pt_gam, h_L1prefire_phoMap, syst);
+      nonprefiringprobfromoverlappingphotons *= (1. - prefiringprob_gam);
+      foundOverlappingPhotons = true;
+    }
+    double nonprefiringprobfromoverlappingjet = 1. - getPrefiringRateEcal(eta_jet, pt_jet, h_L1prefire_jetMap, syst);
+
+    if (!foundOverlappingPhotons) nonPrefiringProbaECAL *= nonprefiringprobfromoverlappingjet;
+    //If overlapping photons have a non prefiring rate larger than the jet, then replace these weights by the jet one
+    else if (nonprefiringprobfromoverlappingphotons > nonprefiringprobfromoverlappingjet) {
+      if (nonprefiringprobfromoverlappingphotons > 0.) nonPrefiringProbaECAL *= nonprefiringprobfromoverlappingjet / nonprefiringprobfromoverlappingphotons;
+      else nonPrefiringProbaECAL = 0.;
+    }
+    //Last case: if overlapping photons have a non prefiring rate smaller than the jet, don't consider the jet in the event weight, and do nothing.
+  }
+    
+  //Now calculate prefiring weights for muons
+  for (unsigned int i=0;i<nMuon;i++){
+    double pt = Muon_pt[i];
+    double phi = Muon_phi[i];
+    double eta = Muon_eta[i];
+    // Remove crappy tracker muons which would not have prefired the L1 trigger
+    if (pt < 5 || !Muon_looseId[i]) continue;
+    double prefiringprob_mu = getPrefiringRateMuon(eta, phi, pt, syst);
+    nonPrefiringProbaMuon *= (1. - prefiringprob_mu);
+  }
+
+  // Calculate combined weight as product of the weight for individual objects
+  return nonPrefiringProbaECAL * nonPrefiringProbaMuon;
+}
+
 void Analyzer::Init(TTree *tree)
 {
    // The Init() function is called when the selector needs to initialize
@@ -1580,6 +1742,16 @@ void Analyzer::Init(TTree *tree)
    fChain->SetBranchAddress("FatJet_n2b1", FatJet_n2b1, &b_FatJet_n2b1);
    fChain->SetBranchAddress("FatJet_n3b1", FatJet_n3b1, &b_FatJet_n3b1);
    fChain->SetBranchAddress("FatJet_particleNetMD_Xbb", FatJet_particleNetMD_Xbb, &b_FatJet_particleNetMD_Xbb);
+   fChain->SetBranchAddress("FatJet_particleNetMD_Xcc", FatJet_particleNetMD_Xcc, &b_FatJet_particleNetMD_Xcc);
+   fChain->SetBranchAddress("FatJet_particleNetMD_QCD", FatJet_particleNetMD_QCD, &b_FatJet_particleNetMD_QCD);
+   fChain->SetBranchAddress("FatJet_particleNet_H4qvsQCD", FatJet_particleNet_H4qvsQCD, &b_FatJet_particleNet_H4qvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_HbbvsQCD", FatJet_particleNet_HbbvsQCD, &b_FatJet_particleNet_HbbvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_HccvsQCD", FatJet_particleNet_HccvsQCD, &b_FatJet_particleNet_HccvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_QCD", FatJet_particleNet_QCD, &b_FatJet_particleNet_QCD);
+   fChain->SetBranchAddress("FatJet_particleNet_TvsQCD", FatJet_particleNet_TvsQCD, &b_FatJet_particleNet_TvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_WvsQCD", FatJet_particleNet_WvsQCD, &b_FatJet_particleNet_WvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_ZvsQCD", FatJet_particleNet_ZvsQCD, &b_FatJet_particleNet_ZvsQCD);
+   fChain->SetBranchAddress("FatJet_particleNet_mass", FatJet_particleNet_mass, &b_FatJet_particleNet_mass);
    fChain->SetBranchAddress("FatJet_phi", FatJet_phi, &b_FatJet_phi);
    fChain->SetBranchAddress("FatJet_pt", FatJet_pt, &b_FatJet_pt);
    fChain->SetBranchAddress("FatJet_pt_nom", FatJet_pt_nom, &b_FatJet_pt_nom);
@@ -2072,13 +2244,14 @@ bool Parser_float(double var, string op, double val) {
 }
 
 
-Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
+Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
 {
 // This function may be called from Loop.
 // returns  1 if entry is accepted.
 // returns -1 otherwise.
   bool returnvalue=true;
   for (unsigned int i=0;i<_cut_variable.size();i++){
+    if (debug) cout<<_cut_variable[i]<<" "<<_cut_operator[i]<<" "<<_cut_value[i];
     if (!returnvalue) break;
     unsigned int metFilters=0;
     metFilters += (Flag_goodVertices) ? pow(2,0) : 0;
@@ -2333,6 +2506,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair)
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="1or2jet") returnvalue=Parser(OneOr2jet,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
+    if (debug) cout<<" result "<<returnvalue<<endl;;
     if (returnvalue) {
       if (SignalScan) {h_cuts->Fill(i,w); m_cuts[mass_pair]->Fill(i,w);}
       else h_cuts->Fill(i,w);
@@ -2464,80 +2638,81 @@ float Analyzer::Photon_SCEta(const int i){
   return SCEta;
 }
 
-double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, bool fastsim, double eta, double pt, int had, double btag_discr, double WP_M, double WP_L, TEfficiency *eff_b_L, TEfficiency *eff_c_L, TEfficiency *eff_l_L, TEfficiency *eff_b_M, TEfficiency *eff_c_M, TEfficiency *eff_l_M, TEfficiency *eff_b_T, TEfficiency *eff_c_T, TEfficiency *eff_l_T, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, TRandom3 *gen){
+double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, int i, double pt, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, std::unique_ptr<TRandom3> &gen){
   BTEntry::JetFlavor FLAV;
+  int year_chooser=(year.find("2016preVFP")!=std::string::npos) ? 0 : (year.find("2016postVFP")!=std::string::npos) ? 1 : (year.find("2017")!=std::string::npos) ? 2 : 3;
   double mc_eff[3]={0}; char tag='0';
-  if (btag_discr>WP_M) tag='M';
-  else if (btag_discr>WP_L) tag='L';
+  if (Jet_btagDeepFlavB[i]>BtagDeepWP[year_chooser][1]) tag='M';
+  else if (Jet_btagDeepFlavB[i]>BtagDeepWP[year_chooser][0]) tag='L';
   if (pt>=1000) pt=999;
-  if (had==5) {
+  if (Jet_hadronFlavour[i]==5) {
     FLAV = BTEntry::FLAV_B;
-    mc_eff[0] = eff_b_L->GetEfficiency(eff_b_L->FindFixBin(eta,pt));
-    mc_eff[1] = eff_b_M->GetEfficiency(eff_b_M->FindFixBin(eta,pt));
-    mc_eff[2] = eff_b_T->GetEfficiency(eff_b_T->FindFixBin(eta,pt));
+    mc_eff[0] = eff_b_Deep_L->GetEfficiency(eff_b_Deep_L->FindFixBin(Jet_eta[i],pt));
+    mc_eff[1] = eff_b_Deep_M->GetEfficiency(eff_b_Deep_M->FindFixBin(Jet_eta[i],pt));
+    mc_eff[2] = eff_b_Deep_T->GetEfficiency(eff_b_Deep_T->FindFixBin(Jet_eta[i],pt));
   }
-  else if (had==4) {
+  else if (Jet_hadronFlavour[i]==4) {
     FLAV = BTEntry::FLAV_C;
-    mc_eff[0] = eff_c_L->GetEfficiency(eff_c_L->FindFixBin(eta,pt));
-    mc_eff[1] = eff_c_M->GetEfficiency(eff_c_M->FindFixBin(eta,pt));
-    mc_eff[2] = eff_c_T->GetEfficiency(eff_c_T->FindFixBin(eta,pt));
+    mc_eff[0] = eff_c_Deep_L->GetEfficiency(eff_c_Deep_L->FindFixBin(Jet_eta[i],pt));
+    mc_eff[1] = eff_c_Deep_M->GetEfficiency(eff_c_Deep_M->FindFixBin(Jet_eta[i],pt));
+    mc_eff[2] = eff_c_Deep_T->GetEfficiency(eff_c_Deep_T->FindFixBin(Jet_eta[i],pt));
   }
-  else if (had==0) {
+  else if (Jet_hadronFlavour[i]==0) {
     FLAV = BTEntry::FLAV_UDSG;
-    mc_eff[0] = eff_l_L->GetEfficiency(eff_l_L->FindFixBin(eta,pt));
-    mc_eff[1] = eff_l_M->GetEfficiency(eff_l_M->FindFixBin(eta,pt));
-    mc_eff[2] = eff_l_T->GetEfficiency(eff_l_T->FindFixBin(eta,pt));
+    mc_eff[0] = eff_l_Deep_L->GetEfficiency(eff_l_Deep_L->FindFixBin(Jet_eta[i],pt));
+    mc_eff[1] = eff_l_Deep_M->GetEfficiency(eff_l_Deep_M->FindFixBin(Jet_eta[i],pt));
+    mc_eff[2] = eff_l_Deep_T->GetEfficiency(eff_l_Deep_T->FindFixBin(Jet_eta[i],pt));
   }
   double SF[3]={1,1,1};
   if (Deep_whichSF==0) {
-    if (had==0){
-      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",had,abs(eta),pt});
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
     else {
-      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",had,abs(eta),pt});
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
-    if (fastsim) {
-      SF[0]*=fastreader_L.eval_auto_bounds("central",FLAV,eta,pt);
-      SF[1]*=fastreader_M.eval_auto_bounds("central",FLAV,eta,pt) ;
-      SF[2]*=fastreader_T.eval_auto_bounds("central",FLAV,eta,pt);
+    if (_fastSim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("central",FLAV,Jet_eta[i],pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("central",FLAV,Jet_eta[i],pt) ;
+      SF[2]*=fastreader_T.eval_auto_bounds("central",FLAV,Jet_eta[i],pt);
     }
   }
   else if (Deep_whichSF==1) {
-    if (had==0){
-      SF[0] = cset->at("deepJet_incl")->evaluate({"up","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_incl")->evaluate({"up","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_incl")->evaluate({"up","T",had,abs(eta),pt});
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"up","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"up","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"up","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
     else {
-      SF[0] = cset->at("deepJet_comb")->evaluate({"up","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_comb")->evaluate({"up","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_comb")->evaluate({"up","T",had,abs(eta),pt});
+      SF[0] = cset->at("deepJet_comb")->evaluate({"up","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"up","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"up","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
-    if (fastsim) {
-      SF[0]*=fastreader_L.eval_auto_bounds("up",FLAV,eta,pt);
-      SF[1]*=fastreader_M.eval_auto_bounds("up",FLAV,eta,pt);
-      SF[2]*=fastreader_T.eval_auto_bounds("up",FLAV,eta,pt);
+    if (_fastSim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("up",FLAV,Jet_eta[i],pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("up",FLAV,Jet_eta[i],pt);
+      SF[2]*=fastreader_T.eval_auto_bounds("up",FLAV,Jet_eta[i],pt);
     }
   }
   else if (Deep_whichSF==2) {
-    if (had==0){
-      SF[0] = cset->at("deepJet_incl")->evaluate({"down","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_incl")->evaluate({"down","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_incl")->evaluate({"down","T",had,abs(eta),pt});
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"down","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"down","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"down","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
     else {
-      SF[0] = cset->at("deepJet_comb")->evaluate({"down","L",had,abs(eta),pt});
-      SF[1] = cset->at("deepJet_comb")->evaluate({"down","M",had,abs(eta),pt});
-      SF[2] = cset->at("deepJet_comb")->evaluate({"down","T",had,abs(eta),pt});
+      SF[0] = cset->at("deepJet_comb")->evaluate({"down","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"down","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"down","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
-    if (fastsim) {
-      SF[0]*=fastreader_L.eval_auto_bounds("down",FLAV,eta,pt);
-      SF[1]*=fastreader_M.eval_auto_bounds("down",FLAV,eta,pt);
-      SF[2]*=fastreader_T.eval_auto_bounds("down",FLAV,eta,pt);
+    if (_fastSim) {
+      SF[0]*=fastreader_L.eval_auto_bounds("down",FLAV,Jet_eta[i],pt);
+      SF[1]*=fastreader_M.eval_auto_bounds("down",FLAV,Jet_eta[i],pt);
+      SF[2]*=fastreader_T.eval_auto_bounds("down",FLAV,Jet_eta[i],pt);
     }
   }
 
@@ -2567,23 +2742,23 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
     }
   }
   
-  if (debug) cout<<"pt "<<pt<<" eta "<<eta<<" flav "<<had<<" mc eff loose medium "<<mc_eff[0]<<" "<<mc_eff[1]<<" sf loose medium "<<SF[0]<<" "<<SF[1]<<" rand "<<rand<<" rand2 "<<rand2<<" tag "<<tag<<" newtag "<<newtag<<endl;
+  if (debug) cout<<"pt "<<pt<<" eta "<<Jet_eta[i]<<" flav "<<Jet_hadronFlavour[i]<<" mc eff loose medium "<<mc_eff[0]<<" "<<mc_eff[1]<<" sf loose medium "<<SF[0]<<" "<<SF[1]<<" rand "<<rand<<" rand2 "<<rand2<<" tag "<<tag<<" newtag "<<newtag<<endl;
 
   if (tag!=newtag) {
     //new tag to top
-    //if (newtag =='0') return WP_L-0.0001;
-    //if (newtag =='L') return WP_M-0.0001;
+    //if (newtag =='0') return BtagDeepWP[year_chooser][0]-0.0001;
+    //if (newtag =='L') return BtagDeepWP[year_chooser][1]-0.0001;
     //if (newtag =='M') return 1;
     //new tag to bottom
     //if (newtag =='0') return 0;
-    //if (newtag =='L') return WP_L+0.0001;
-    //if (newtag =='M') return WP_M+0.0001;
+    //if (newtag =='L') return BtagDeepWP[year_chooser][0]+0.0001;
+    //if (newtag =='M') return BtagDeepWP[year_chooser][1]+0.0001;
     //new tag to random
-    if (newtag =='0') return gen->Uniform(0,WP_L);
-    if (newtag =='L') return gen->Uniform(WP_L,WP_M);
-    if (newtag =='M') return gen->Uniform(WP_M,1);
+    if (newtag =='0') return gen->Uniform(0,BtagDeepWP[year_chooser][0]);
+    if (newtag =='L') return gen->Uniform(BtagDeepWP[year_chooser][0],BtagDeepWP[year_chooser][1]);
+    if (newtag =='M') return gen->Uniform(BtagDeepWP[year_chooser][1],1);
   }
-  return btag_discr;
+  return Jet_btagDeepFlavB[i];
 }
 
 void Analyzer::CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]){
