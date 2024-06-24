@@ -3,6 +3,11 @@
 #include <TH3.h>
 #include <THn.h>
 
+  /*
+  map< pair<int, int>, TH2D* > m_allAK4bjets, m_b_Deep_L, m_b_Deep_M, m_b_Deep_T;
+  map< pair<int, int>, TH2D* > m_allAK4cjets, m_c_Deep_L, m_c_Deep_M, m_c_Deep_T;
+  map< pair<int, int>, TH2D* > m_allAK4ljets, m_l_Deep_L, m_l_Deep_M, m_l_Deep_T;
+  */
 
   //map of histos
   map< pair<int, int>, TDirectory* > MassPairToDirectoy;
@@ -95,11 +100,18 @@
   map< pair<int, int>, TH1D* > m_pt_bjets_m;
   map< pair<int, int>, TH1D* > m_pt_AK8bjets_l;
   
+  map< pair<int, int>, TH1D* > m_true_jet;
+  map< pair<int, int>, TH1D* > m_true_bjet;
+  
   map< pair<int, int>, TH1D* > m_mbbjet_select;
   map< pair<int, int>, TH1D* > m_AK8mass_select;
   map< pair<int, int>, TH1D* > m_dphi_met_jet;
   map< pair<int, int>, TH1D* > m_dR_ak4_Hcandidate;
+  map< pair<int, int>, TH1D* > m_deta_ak4_Hcandidate;
+  map< pair<int, int>, TH1D* > m_dphi_ak4_Hcandidate;
   map< pair<int, int>, TH1D* > m_pt_ak4_Hcandidate;
+  map< pair<int, int>, TH1D* > m_ptsum_ak4_Hcandidate;
+  map< pair<int, int>, TH2D* > m2_eta_ak4_Hcandidate;
   map< pair<int, int>, TH2D* > m2_highestAK4_dR_mass;
   map< pair<int, int>, TH2D* > m2_dphi_met_jet_nonHjets;
   map< pair<int, int>, TH2D* > m2_dphi_met_jet_njet;
@@ -166,15 +178,21 @@
   map< pair<int, int>, TH1D* > m_AK4Hmass;
   map< pair<int, int>, TH1D* > m_genAK4Hmass;
   map< pair<int, int>, TH1D* > m_AK4Hpt;
+  map< pair<int, int>, TH1D* > m_AK4Hptsum;
   map< pair<int, int>, TH1D* > m_PhoEt;
   map< pair<int, int>, TH1D* > m_RecoPhoEt;
   map< pair<int, int>, TH2D* > m2_Hpt_PhoEt;
   map< pair<int, int>, TH2D* > m2_reco_AK4pt_PhoEt;
   map< pair<int, int>, TH1D* > m_dphi_photon_higgs;
   map< pair<int, int>, TH1D* > m_dphi_photon_AK4higgs;
+  map< pair<int, int>, TH1D* > m_true_bjets;
   map< pair<int, int>, TH1D* > m_dR_photon_higgs;
   map< pair<int, int>, TH1D* > m_dR_photon_AK4higgs;
   map< pair<int, int>, TH1D* > m_dR_AK4AK4_trueHbb;
+  map< pair<int, int>, TH1D* > m_deta_AK4AK4_trueHbb;
+  map< pair<int, int>, TH1D* > m_dphi_AK4AK4_trueHbb;
+  map< pair<int, int>, TH2D* > m2_true_deta_AK4AK4_mass;
+  map< pair<int, int>, TH2D* > m2_true_eta_AK4AK4_highest;
   map< pair<int, int>, TH2D* > m2_true_eta_AK4AK4;
   map< pair<int, int>, TH2D* > m2_true_dR_AK4AK4_mass;
   map< pair<int, int>, TH2D* > m2_true_dR_AK4AK4_btag1;
@@ -346,7 +364,26 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       double xbins_pfMET[nbins_pfMET+1]={0,20,40,70,100,150,200,300,500,700,1000,1500,2000,3000};
       const int nbins_ST=13;
       double xbins_ST[nbins_ST+1]={0, 200, 400, 600, 800, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5500};
-    
+
+
+
+      /*
+      const int nxbins=8, nybins=10;
+      double Bxbins[nxbins+1]={-3,-2.4,-1.6,-0.8,0,0.8,1.6,2.4,3};
+      double Bybins[nybins+1]={20,30,50,70,100,140,200,300,600,1000,2000};
+      m_allAK4bjets[MassPair] = new TH2D("h_allAK4bjets",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_b_Deep_L[MassPair]= new TH2D("h_b_Deep_L",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_b_Deep_M[MassPair]= new TH2D("h_b_Deep_M",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_b_Deep_T[MassPair]= new TH2D("h_b_Deep_T",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_allAK4cjets[MassPair] = new TH2D("h_allAK4cjets",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_c_Deep_L[MassPair]= new TH2D("h_c_Deep_L",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_c_Deep_M[MassPair]= new TH2D("h_c_Deep_M",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_c_Deep_T[MassPair]= new TH2D("h_c_Deep_T",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_allAK4ljets[MassPair] = new TH2D("h_allAK4ljets",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_l_Deep_L[MassPair]= new TH2D("h_l_Deep_L",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_l_Deep_M[MassPair]= new TH2D("h_l_Deep_M",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      m_l_Deep_T[MassPair]= new TH2D("h_l_Deep_T",";#eta;p_{T}[GeV]",nxbins,Bxbins,nybins,Bybins);
+      */
       
       m_cuts[MassPair] = new TH1D("h_cuts","cuts;",15,0,15);
       m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
@@ -440,11 +477,18 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_pt_bjets_l2[MassPair]  = new TH1D("h_pt_bjets_l2",";p_{T} of loose b-tagged jet (2nd highest discr. valued) [GeV]",10,30,1030);
       m_pt_bjets_m[MassPair]  = new TH1D("h_pt_bjets_m",";p_{T} of medium b-tagged jet (highest discr. valued) [GeV]",10,30,1030);
       m_pt_AK8bjets_l[MassPair]  = new TH1D("h_pt_AK8bjets_l",";p_{T} of loose b-tagged AK8jet (highest discr. valued) [GeV]",10,300,1300);
+   
+      m_true_jet[MassPair] = new TH1D("h_true_jet",";# of GenJet",8,-0.5,7.5);
+      m_true_bjet[MassPair] = new TH1D("h_true_bjet",";# of true b GenJet",6,-0.5,5.5);
       
       m_mbbjet_select[MassPair] = new TH1D("h_mbbjet_select","Invariant mass of selected bjets;M_{bb}[GeV]",13,20,280);
       m_AK8mass_select[MassPair] = new TH1D("h_AK8mass_select","Selected AK8PrunedCorrjetmass;PrunedCorr m_{Higgs btagged AK8jets} [GeV]",13,20,280);
       m_dR_ak4_Hcandidate[MassPair] = new TH1D("h_dR_ak4_Hcandidate","dR between H candidate AK4 jets;dR",20,0,5);
+      m_deta_ak4_Hcandidate[MassPair] = new TH1D("h_deta_ak4_Hcandidate",";|#Delta#eta|",30,0,3);
+      m_dphi_ak4_Hcandidate[MassPair] = new TH1D("h_dphi_ak4_Hcandidate",";|#Delta#phi|",30,0,3);
       m_pt_ak4_Hcandidate[MassPair] = new TH1D("h_pt_ak4_Hcandidate","pt of H candidate AK4 jets;p_T [GeV]",25,0,1000);
+      m_ptsum_ak4_Hcandidate[MassPair] = new TH1D("h_ptsum_ak4_Hcandidate","Lorentz sum pt of H candidate AK4 jets;p_T [GeV]",25,0,1000);
+      m2_eta_ak4_Hcandidate[MassPair] = new TH2D("h2_eta_ak4_Hcandidate",";#eta higher tagged jet;#eta lower jet",30,-3,3,30,-3,3);
       m_dphi_met_jet[MassPair] = new TH1D("h_dphi_met_jet",";|#Delta#phi|(MET,nearest jet)",11,0,3.3);
       m2_highestAK4_dR_mass[MassPair]= new TH2D("h2_highestAK4_dR_mass","Highest discr. AK4 jets;dR;mass [GeV]",20,0,5,20,18,278);
       m2_dphi_met_jet_nonHjets[MassPair]= new TH2D("h2_dphi_met_jet_nonHjets",";|#Delta#phi|(MET,nearest jet);nonHiggsJets",11,0,3.3,14,-1.5,12.5);
@@ -529,19 +573,25 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
          const int nbins_AK4Hpt=30;
          double xbins_AK4Hpt[nbins_AK4Hpt+1]={0,40,45,50,55,60,65,70,75,80,85,90,95,100,120,140,160,180,200,250,300,350,400,450,500,550,600,700,800,900,1000};
          m_AK4Hpt[MassPair] = new TH1D("hs_AK4Hpt","Pt of Higgsmother AK4jets;p_{T}[GeV]",nbins_AK4Hpt,xbins_AK4Hpt);
+         m_AK4Hptsum[MassPair] = new TH1D("hs_AK4Hptsum","Lorentz sum Pt of Higgsmother AK4jets;p_{T}[GeV]",25,0,1000);
          m_PhoEt[MassPair] = new TH1D("hs_PhoEt","Et of Photon from neutralino;E_{T}[GeV]",25,0,1000);
          m_RecoPhoEt[MassPair] = new TH1D("hs_RecoPhoEt","Reconstructed Et of Photon from neutralino;E_{T}[GeV]",25,0,1000);
          m2_Hpt_PhoEt[MassPair] = new TH2D("hs_Hpt_PhoEt","Neutralino mother;Higgs p_{T}[GeV];Photon E_{T}[GeV]",25,0,1000,25,0,1000);
          m2_reco_AK4pt_PhoEt[MassPair] = new TH2D("hs_reco_AK4pt_PhoEt","Neutralino mother, Reco objects;AK4 pair p_{T}[GeV];Photon E_{T}[GeV]",25,0,1000,25,0,1000);
          m_dphi_photon_higgs[MassPair]= new TH1D("hs_dphi_photon_higgs",";|#Delta#phi|(photon,higgs)",11,0,3.3);
          m_dphi_photon_AK4higgs[MassPair]= new TH1D("hs_dphi_photon_AK4higgs",";|#Delta#phi|(photon,higgs mother AK4 jets)",11,0,3.3);
+         m_true_bjets[MassPair] = new TH1D("hs_true_bjets","# of true reco b-jets, when H-mother reco AK4 is found;# of true b-jets",10,0,10);
          m_dR_photon_higgs[MassPair] = new TH1D("hs_dR_photon_higgs","dR between photon and higgs;dR",20,0,5);
          m_dR_photon_AK4higgs[MassPair] = new TH1D("hs_dR_photon_AK4higgs","dR between photon and higgs mother AK4 jets;dR",20,0,5);
          m_dR_AK4AK4_trueHbb[MassPair] = new TH1D("hs_dR_AK4AK4_trueHbb","dR between true Hbb jets ;dR",20,0,5);
+         m_deta_AK4AK4_trueHbb[MassPair] = new TH1D("hs_deta_AK4AK4_trueHbb","#Delta#eta between true Hbb jets ;#Delta#eta",30,0,3);
+         m_dphi_AK4AK4_trueHbb[MassPair] = new TH1D("hs_dphi_AK4AK4_trueHbb","#Delta#phi between true Hbb jets ;#Delta#phi",30,0,3);
          m_dphi_met_trueh_ak4[MassPair]= new TH1D("hs_dphi_met_h_ak4",";|#Delta#phi|(MET,ak4 H true)",11,0,3.3);
          m_dphi_met_truehmin_ak4[MassPair]= new TH1D("hs_dphi_met_hmin_ak4",";|#Delta#phi|(MET,ak4 Hmin true)",11,0,3.3);
          m_dphi_trueh_gravitino[MassPair]= new TH1D("hs_dphi_h_gravitino",";|#Delta#phi|(H,gravitino)",11,0,3.3);
+         m2_true_deta_AK4AK4_mass[MassPair] = new TH2D("hs_true_deta_AK4AK4_mass",";#Delta#eta;m_{bb} [GeV]",30,0,3,20,18,278);
          m2_true_eta_AK4AK4[MassPair] = new TH2D("hs_true_eta_AK4AK4",";#eta b-jet;#eta anti b-jet",30,-3,3,30,-3,3);
+         m2_true_eta_AK4AK4_highest[MassPair] = new TH2D("hs_true_eta_AK4AK4_highest",";#eta higher b-jet;#eta lower b-jet",30,-3,3,30,-3,3);
          m2_true_dR_AK4AK4_Hpt[MassPair] = new TH2D("hs_true_dR_AK4AK4_Hpt",";dR;H p_{T} [GeV]",20,0,5,25,0,1000);
          m2_true_dR_AK4AK4_mass[MassPair] = new TH2D("hs_true_dR_AK4AK4_mass",";dR;m_{bb} [GeV]",20,0,5,20,18,278);
          m2_true_dR_AK4AK4_btag1[MassPair] = new TH2D("hs_true_dR_AK4AK4_btag1",";dR;DeepJet discriminator",20,0,5,10,0,1);
