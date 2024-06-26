@@ -274,7 +274,6 @@ void Analyzer::Loop()
    TH3D *h_mass_points = new TH3D("h_mass_points",";GenModel m_{#chi}[GeV];Average m_{#chi}[GeV];Gluino mass [GeV]",100,0,3000,100,0,3000,100,0,3000);
    TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
    
-   TH1D *h_nISR_jet = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
    TH1D *h_SR    = new TH1D("h_SR","",16,0.5,16.5);
    
    TH1D *h_nPV = new TH1D("h_nPV",";number of good vertices",20,0,70);
@@ -709,7 +708,11 @@ void Analyzer::Loop()
      b_Jet_bRegRes->GetEntry(ientry);
      b_Jet_eta->GetEntry(ientry);
      b_Jet_mass->GetEntry(ientry);
-     //b_Jet_mass_nom->GetEntry(ientry);
+     b_Jet_mass_nom->GetEntry(ientry);
+     b_Jet_mass_jerUp->GetEntry(ientry);
+     b_Jet_mass_jerDown->GetEntry(ientry);
+     b_Jet_mass_jesTotalUp->GetEntry(ientry);
+     b_Jet_mass_jesTotalDown->GetEntry(ientry);
      b_Jet_chHEF->GetEntry(ientry);
      b_Jet_btagDeepFlavB->GetEntry(ientry);
      b_Jet_jetId->GetEntry(ientry);
@@ -870,6 +873,7 @@ void Analyzer::Loop()
        if (is_debug) cout<<"Determining weights"<<endl;
        (PUweight_whichSF==1) ? pu_weight=puWeightUp : (PUweight_whichSF==2) ? pu_weight=puWeightDown : pu_weight=puWeight;
        //(PUweight_whichSF==1) ? pu_weight=puAutoWeightUp : (PUweight_whichSF==2) ? pu_weight=puAutoWeightDown : pu_weight=puAutoWeight;
+       //cout<<"PU w "<<puWeight<<" up "<<puWeightUp<<" down "<<puWeightDown<<endl;
        double data_lumi = L_data[year_chooser];
        if (_fastSim && year.find("2016")!=std::string::npos) data_lumi = L_data[0]+L_data[1];
        if (year.find("2018")!=std::string::npos && HLT_Photon110EB_TightID_TightIso && !HLT_Photon200 && !HLT_Photon300_NoHE) data_lumi = 54670;
@@ -1034,167 +1038,9 @@ void Analyzer::Loop()
          paramName = "L1prefiring_muonparam_HotSpot_" + yera;
          muon_parametrization[11]= f_L1_muon.Get<TF1>(paramName.c_str());
          f_L1_muon.Close();
-
-         //ISR MC
-         ISR_MC=0;
-         if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
-         else if (year.find("2016")!=std::string::npos && temp_f.find("TChiNG")!=std::string::npos) ISR_MC=5;
-         else if (temp_f.find("T5qqqqHg")!=std::string::npos) ISR_MC=4;
-         if (ISR_MC){
-           //ISR reweight files
-           string isr_file="", y=(year.find("2016")!=std::string::npos) ? "2016" : year;//temporary needed for 2016, since there's no separate APV/VFP D_factor calculated
-           if (ISR_MC==4) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_nophotonmatch.root";
-           if (ISR_MC==5) isr_file="input/ISR_reweight/D_factor_signal_"+y+"_ew.root";
-           if (is_debug) cout<<"Loading ISR reweighting file "<<isr_file<<endl;
-           TFile f_ISR(isr_file.c_str(),"read");
-           if (ISR_MC!=4 && ISR_MC!=5) {
-             h_ISR_D = (TH1D*)f_ISR.Get("h_Dfactor");
-             h_ISR_D->SetDirectory(0);
-           }
-           else {
-             TIter next(f_ISR.GetDirectory("singleBin_noPU")->GetListOfKeys());
-             TKey *key;
-             while ((key = (TKey*)next())) {
-               TH1D *h=(TH1D*)key->ReadObj();
-               h->SetDirectory(0);
-               string s =h->GetName(); //h_Dfactor_2800_2550
-               if (ISR_MC==4) {
-                 size_t g_first =  s.find("_",3);
-                 size_t g_last = s.find("_",g_first+1);
-                 string g = s.substr(g_first+1,g_last-g_first-1);
-                 string n = s.substr(g_last+1,n.size()-g_last);
-                 m_ISR_D[pair<int,int> (stoi(g),stoi(n))] = h;
-               }
-               else if (ISR_MC==5) {
-                 string n = s.substr(s.find("_",3)+1);
-                 m_ISR_D[pair<int,int> (stoi(n),1)] = h;
-               }
-             }
-           }
-           f_ISR.Close();
-         }
        }
      }
 
-     //ISR jet counting (https://github.com/manuelfs/babymaker/blob/0136340602ee28caab14e3f6b064d1db81544a0a/bmaker/plugins/bmaker_full.cc#L1268-L1295)
-     int n_isr_jets=0;
-     double w_isr=1;
-     if (!isData && ISR_MC) {
-       if (is_debug) cout<<"Calculating ISR jets"<<endl;
-       for (unsigned int i=0;i<nJet;i++) {
-         if (abs(Jet_eta[i])>2.4 ||  !(Jet_jetId[i]>>1&1) || Jet_pt_nom[i]<30 ) continue;
-         //cleaning jet from electrons, muons  and photons
-         bool lepton_photon_match=false;
-         for (unsigned int j=0;j<nElectron;j++) {
-           if (Electron_pt[j]<20 || abs(Electron_eta[j])>2.5 || Electron_miniPFRelIso_all[j]>0.1) continue;
-           if (deltaR(Electron_phi[j],Jet_phi[i],Electron_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
-         }
-         for (unsigned int j=0;j<nMuon;j++) {
-           if (Muon_pt[j]<20 || abs(Muon_eta[j])>2.4 || Muon_miniPFRelIso_all[j]>0.2) continue;
-           if (deltaR(Muon_phi[j],Jet_phi[i],Muon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
-         }
-         for (unsigned int j=0;j<nPhoton;j++){
-           if (!Photon_isScEtaEB[j] || !Photon_isScEtaEE[j] || Photon_pixelSeed[j]!=0 || Photon_pt[j]<40 || Photon_cutBased[i]>=1) continue;
-           if (deltaR(Photon_phi[j],Jet_phi[i],Photon_eta[j],Jet_eta[i])<0.4) {lepton_photon_match=true; break;}
-         }
-         if (lepton_photon_match) continue;
-         //matching with MC particles
-         bool matched=false;
-         for (unsigned int j=0;j<nGenPart;j++){
-           if (matched) break;
-           if (abs(GenPart_pdgId[j])>5 || GenPart_status[j]!=23) continue;
-           int momid = abs(GenPart_pdgId[GenPart_genPartIdxMother[j]]);
-           if (!(momid==6 || momid==23 || momid==24 || momid==25 || momid>1e6)) continue;
-           for (unsigned int k=0;k<nGenPart;k++){
-             if (GenPart_genPartIdxMother[k] != j) continue;
-             if (deltaR(GenPart_phi[k],Jet_phi[i],GenPart_eta[k],Jet_eta[i])<0.3) {matched=true; 
-               //  printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-9s gmom %-8d\n",k,GenPart_pdgId[k],GenPart_pt[k],GenPart_eta[k],GenPart_phi[k],GenPart_pdgId[GenPart_genPartIdxMother[k]],GenPart_pt[GenPart_genPartIdxMother[k]],GenPart_eta[GenPart_genPartIdxMother[k]],GenPart_phi[GenPart_genPartIdxMother[k]],GenPart_status[k],bitset<9>(GenPart_statusFlags[k]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[k]]]);
-               break;}
-           }
-         }
-         if (!matched) n_isr_jets++;
-       }
-
-       //ISR pt for EW
-       double isr_pt=0;
-       if (ISR_MC==5) {
-         std::vector<unsigned int> neutralino_indexes;
-         for(unsigned int i=0;i<nGenPart;i++){
-           if((abs(GenPart_pdgId[i])==1000023 || (abs(GenPart_pdgId[i])==1000025 )) && GenPart_status[i]==22 ){
-             if (GenPart_genPartIdxMother[i]!=-1 && (abs(GenPart_pdgId[GenPart_genPartIdxMother[i]])!=1000023 || abs(GenPart_pdgId[GenPart_genPartIdxMother[i]])!=1000025)){
-               neutralino_indexes.push_back(i);
-             }
-           }
-         }
-
-         if (neutralino_indexes.size()!=2){
-           std::cout<<"neutralino indexes size incorrect! size="<<neutralino_indexes.size()<<std::endl;
-           for (int i : neutralino_indexes) std::cout<<i<<" "<<GenPart_genPartIdxMother[i]<<" "<<abs(GenPart_pdgId[i])<<" "<<abs(GenPart_pdgId[GenPart_genPartIdxMother[i]])<<std::endl;
-           for(unsigned int i=0;i<nGenPart;i++) std::cout<<i<<" "<<GenPart_genPartIdxMother[i]<<" "<<abs(GenPart_pdgId[i])<<" "<<abs(GenPart_pdgId[GenPart_genPartIdxMother[i]])<<std::endl;
-           std::cout<<"Not correct number of chi! "+std::to_string(neutralino_indexes.size())<<std::endl;
-           break;
-         } 
-
-         int i_chi1 = neutralino_indexes[0];
-         int i_chi2 = neutralino_indexes[1];
-         TLorentzVector chi1, chi2;
-         chi1.SetPtEtaPhiM(	GenPart_pt[i_chi1],
-             GenPart_eta[i_chi1],
-             GenPart_phi[i_chi1],
-             GenPart_mass[i_chi1]   );
-         chi2.SetPtEtaPhiM(	GenPart_pt[i_chi2],
-             GenPart_eta[i_chi2],
-             GenPart_phi[i_chi2],
-             GenPart_mass[i_chi2]   );
-
-         isr_pt = (chi1+chi2).Pt();
-       }
-
-       //ISR reweight
-       vector<double> nISRjet2correction;
-       vector<double> nISRjet2unceratinty;
-       if (year.find("2016")!=std::string::npos) {
-         nISRjet2correction = {1.0, 0.920, 0.821, 0.715, 0.662, 0.561, 0.511};
-         nISRjet2unceratinty= {0.0, 0.040, 0.090, 0.143, 0.169, 0.219, 0.244};
-         if (ISR_MC==5) {
-           nISRjet2correction.clear(); nISRjet2unceratinty.clear();
-           nISRjet2correction = {1.0, 1.052, 1.179, 1.150, 1.057, 1.000, 0.912, 0.783};
-           for (auto i : nISRjet2correction) nISRjet2unceratinty.push_back(i-1);
-         }
-       }
-       else {
-         nISRjet2correction = {1.0, 0.914, 0.796, 0.698, 0.602, 0.579, 0.580};
-         nISRjet2unceratinty= {0.0, 0.043, 0.102, 0.151, 0.199, 0.211, 0.210};
-       }
-       int njets=(n_isr_jets<6) ? n_isr_jets : 6;
-       unsigned int isr_pt_bin=0;
-       double D=1;
-       double D_err=0;
-       if (ISR_MC!=4 && ISR_MC!=5) {
-         D=h_ISR_D->GetBinContent(1);
-         D_err=h_ISR_D->GetBinError(1);
-       }
-       else {
-         D=m_ISR_D[mass_pair]->GetBinContent(1);
-         D_err=m_ISR_D[mass_pair]->GetBinError(1);
-       }
-       int sign=(ISR_whichSF==1) ? 1 : (ISR_whichSF==2) ? -1 : 0;
-       if (ISR_MC!=5) w_isr=(nISRjet2correction[njets]+sign*nISRjet2unceratinty[njets])*(D-sign*D_err);
-       else {
-         vector<double> pt_limits    = {  0,    50,   100,   150,   200,   300,   400,   600};
-         for (unsigned int i=1; i<pt_limits.size(); i++){
-           if (isr_pt<pt_limits[i]){
-             isr_pt_bin = i-1;
-             break;
-           }
-         }
-         w_isr=(nISRjet2correction[isr_pt_bin]+sign*nISRjet2unceratinty[isr_pt_bin])*(D-sign*D_err);
-       }
-       if (is_debug) cout<<"NOT Applying ISR weights (not clear if needed in UL)"<<endl;
-       //w*=w_isr; //temporarly commented out
-       //cout<<"nisr "<<njets<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[njets]<<" * "<<D<<endl;
-       //cout<<"isrpt "<<isr_pt<<" syst "<<ISR_whichSF<<" w_isr "<<w_isr<<" = "<<nISRjet2correction[isr_pt_bin]<<" * "<<D<<endl;
-     }
 
      //object definitions
      if (is_debug) cout<<"Object definitions"<<endl;
@@ -1271,6 +1117,8 @@ void Analyzer::Loop()
          id_sf=cset_muo->at("NUM_"+LMT[i]+"ID_DEN_genTracks")->evaluate({year+"_UL",eta,pt,id_whichsf});
          string extrastring = (i==2) ? "andIPCut" : "";
          iso_sf=cset_muo->at("NUM_LooseRelIso_DEN_"+LMT[i]+"ID"+extrastring)->evaluate({year+"_UL",eta,pt,iso_whichsf});
+         //cout<<"muID "<<id_sf<<" up "<<cset_muo->at("NUM_"+LMT[i]+"ID_DEN_genTracks")->evaluate({year+"_UL",eta,pt,"sfup"})<<" down "<<cset_muo->at("NUM_"+LMT[i]+"ID_DEN_genTracks")->evaluate({year+"_UL",eta,pt,"sfdown"})<<endl;
+         //cout<<"mu iso "<<iso_sf<<" up "<<cset_muo->at("NUM_LooseRelIso_DEN_"+LMT[i]+"ID"+extrastring)->evaluate({year+"_UL",eta,pt,"sfup"})<<" down "<<cset_muo->at("NUM_LooseRelIso_DEN_"+LMT[i]+"ID"+extrastring)->evaluate({year+"_UL",eta,pt,"sfdown"})<<endl;
          mu_SF[i]=id_sf*iso_sf;
          if (id_sf==0 || iso_sf==0) cout<<i<<" id_sf "<<id_sf<<" iso_sf "<<iso_sf<<" mu_SF "<<mu_SF[i]<<endl;
        }
@@ -1327,6 +1175,7 @@ void Analyzer::Loop()
          string temprec = (pt>=20) ? "RecoAbove20" : "RecoBelow20";
          rec_sf = cset_ele->at("UL-Electron-ID-SF")->evaluate({year,rec_whichsf,temprec,eta, pt});
          ele_SF[whichElectron]=id_sf*rec_sf;
+         //cout<<"ele id "<<id_sf<<" up "<<cset_ele->at("UL-Electron-ID-SF")->evaluate({year,"sfup",which_id,eta, pt})<<" down "<<cset_ele->at("UL-Electron-ID-SF")->evaluate({year,"sfdown",which_id,eta, pt})<<endl;
          if (is_debug) cout<<"Electron pt "<<pt<<" eta "<<eta<<" id_sf "<<id_sf<<" rec_sf "<<rec_sf<<" finalSF "<<ele_SF[1]<<endl;
          if (id_sf==0 || rec_sf==0) cout<<"id_sf "<<id_sf<<"*"<<rec_sf<<"="<<id_sf*rec_sf<<" finalSF= "<<ele_SF[whichElectron]<<endl;
        }
@@ -1346,6 +1195,7 @@ void Analyzer::Loop()
          string tes_whichsf="nom";
          (tauTES_whichSF==1) ? tes_whichsf="up" : (tauTES_whichSF==2) ? tes_whichsf="down" : tes_whichsf="nom";
          pt*=cset_tau->at("tau_energy_scale")->evaluate({pt,eta,dm,gen,"DeepTau2017v2p1",tes_whichsf});
+         //cout<<"tau tes "<<cset_tau->at("tau_energy_scale")->evaluate({pt,eta,dm,gen,"DeepTau2017v2p1",tes_whichsf})<<" up "<<cset_tau->at("tau_energy_scale")->evaluate({pt,eta,dm,gen,"DeepTau2017v2p1","up"})<<" down "<<cset_tau->at("tau_energy_scale")->evaluate({pt,eta,dm,gen,"DeepTau2017v2p1","down"})<<endl;
        }
        tauPt.push_back(pt);
        for (auto j : passMuons) if (deltaR(Tau_phi[i],Muon_phi[j],Tau_eta[i],Muon_eta[j])<0.3) {
@@ -1395,8 +1245,10 @@ void Analyzer::Loop()
      for (unsigned int i=0;i<nPhoton;i++){
        //Systematics for Egamma scaling
        double pt = Photon_pt[i];
-       (Egamma_scale_whichSF ==1) ? pt+=Photon_dEscaleUp[i] : (Egamma_scale_whichSF ==2) ? pt+=Photon_dEscaleDown[i] : pt=pt;
-       (Egamma_smear_whichSF ==1) ? pt+=Photon_dEsigmaUp[i] : (Egamma_smear_whichSF ==2) ? pt+=Photon_dEsigmaDown[i] : pt=pt;
+       (Egamma_scale_whichSF ==1) ? pt+=Photon_dEscaleUp[i]/cosh(Photon_SCEta(i)) : (Egamma_scale_whichSF ==2) ? pt+=Photon_dEscaleDown[i]/cosh(Photon_SCEta(i)) : pt=pt;
+       (Egamma_smear_whichSF ==1) ? pt+=Photon_dEsigmaUp[i]/cosh(Photon_SCEta(i)) : (Egamma_smear_whichSF ==2) ? pt+=Photon_dEsigmaDown[i]/cosh(Photon_SCEta(i)) : pt=pt;
+       //cout<<"egamme scale up "<<Photon_dEscaleUp[i]<<" down "<<Photon_dEscaleDown[i]<<endl;
+       //cout<<"egamme smear up "<<Photon_dEsigmaUp[i]<<" down "<<Photon_dEsigmaDown[i]<<endl;
 
        phoET.push_back(pt);
        if (is_debug) cout<<"photon "<<i<<" pt "<<pt<<endl;
@@ -1489,6 +1341,8 @@ void Analyzer::Loop()
          else (Photon_isScEtaEB[nleadPho]) ? pixtemp="EBLowR9" : pixtemp="EELowR9";
          if (whichPhoton>3) phoID="MVA";
          pix_sf = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,pix_whichsf,phoID,pixtemp});
+         //cout<<"photon id "<<id_sf<<" up "<<cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfup",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]})<<" down "<<cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfdown",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]})<<endl;
+         //cout<<"pix sf "<<pix_sf<<" up "<<cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfup",phoID,pixtemp})<<" down "<<cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfdown",phoID,pixtemp})<<endl;
          pho_SF[whichPhoton]=id_sf*pix_sf;
          //cout<<"photon "<<phoET[nleadPho]<<" "<<Photon_eta[nleadPho]<<" whichPhoton ID "<<whichPhoton<<" UL ID sf "<<id_sf<<" pix sf "<<pix_sf<<" total SF "<<pho_SF[whichPhoton]<<endl;
        }
@@ -1535,12 +1389,14 @@ void Analyzer::Loop()
      //jet ID
      for (unsigned int i=0;i<nJet;i++) {
        bool passcut=true;
-       double jetpt=Jet_pt_nom[i], jetmass=Jet_mass[i]; //jetmass=Jet_mass_nom[i];
+       double jetpt=Jet_pt_nom[i], jetmass=Jet_mass_nom[i];
        if (!isData) {
-         if (JER_whichSF==1) {jetpt=Jet_pt_jerUp[i];} //jetmass=Jet_mass_jerUp[i];}
-         else if (JER_whichSF==2) {jetpt=Jet_pt_jerDown[i];} //jetmass=Jet_mass_jerDown[i];}
-         if (JES_whichSF==1) {jetpt=Jet_pt_jesTotalUp[i];} //jetmass=Jet_mass_jesTotalUp[i];}
-         else if (JES_whichSF==2) {jetpt=Jet_pt_jesTotalDown[i];} //jetmass=Jet_mass_jesTotalDown[i];}
+         if (JER_whichSF==1) {jetpt=Jet_pt_jerUp[i]; jetmass=Jet_mass_jerUp[i];}
+         else if (JER_whichSF==2) {jetpt=Jet_pt_jerDown[i]; jetmass=Jet_mass_jerDown[i];}
+         if (JES_whichSF==1) {jetpt=Jet_pt_jesTotalUp[i]; jetmass=Jet_mass_jesTotalUp[i];}
+         else if (JES_whichSF==2) {jetpt=Jet_pt_jesTotalDown[i]; jetmass=Jet_mass_jesTotalDown[i];}
+         //cout<<"jet pt "<<jetpt<<" jerup "<<Jet_pt_jerUp[i]<<" jerdown "<<Jet_pt_jerDown[i]<<" jesup "<<Jet_pt_jesTotalUp[i]<<" jesdown "<<Jet_pt_jesTotalDown[i]<<endl;
+         //cout<<"jet mass "<<jetmass<<" jerup "<<Jet_mass_jerUp[i]<<" jerdown "<<Jet_mass_jerDown[i]<<" jesup "<<Jet_mass_jesTotalUp[i]<<" jesdown "<<Jet_mass_jesTotalDown[i]<<endl;
        }
        jetSmearedPt.push_back(jetpt); jetSmearedMass.push_back(jetmass); jetbtagDeepFlavB.push_back(Jet_btagDeepFlavB[i]);
        HT_before+=jetSmearedPt[i];
@@ -1588,6 +1444,7 @@ void Analyzer::Loop()
      */
 
      if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
+     //cout<<"L1prefire "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      if (is_debug) cout<<"AK4 object done"<<endl;
      //jet pt, btags
      if (is_debug && !isData && btag_file.size()>0) cout<<"AK4 update b-tagging status"<<endl;
@@ -1630,14 +1487,15 @@ void Analyzer::Loop()
        //double jetpt=FatJet_pt_nom[i], jetmass=FatJet_msoftdrop_nom[i];
        double jetpt=FatJet_pt_nom[i], jetmass=FatJet_particleNet_mass[i];
        if (!isData) {
-         if (JER_whichSF==1) {jetpt=FatJet_pt_jerUp[i]; jetmass=FatJet_msoftdrop_jerUp[i];}
-         else if (JER_whichSF==2) {jetpt=FatJet_pt_jerDown[i]; jetmass=FatJet_msoftdrop_jerDown[i];}
-         if (JES_whichSF==1) {jetpt=FatJet_pt_jesTotalUp[i]; jetmass=FatJet_msoftdrop_jesTotalUp[i];}
-         else if (JES_whichSF==2) {jetpt=FatJet_pt_jesTotalDown[i]; jetmass=FatJet_msoftdrop_jesTotalUp[i];}
+         if (JER_whichSF==1) {jetpt=FatJet_pt_jerUp[i];} //jetmass=FatJet_msoftdrop_jerUp[i];}
+         else if (JER_whichSF==2) {jetpt=FatJet_pt_jerDown[i];} //jetmass=FatJet_msoftdrop_jerDown[i];}
+         if (JES_whichSF==1) {jetpt=FatJet_pt_jesTotalUp[i];} //jetmass=FatJet_msoftdrop_jesTotalUp[i];}
+         else if (JES_whichSF==2) {jetpt=FatJet_pt_jesTotalDown[i];} //jetmass=FatJet_msoftdrop_jesTotalUp[i];}
          if (JMR_whichSF==1) jetmass=FatJet_msoftdrop_jmrUp[i];
          else if (JMR_whichSF==2) jetmass=FatJet_msoftdrop_jmrDown[i];
          if (JMS_whichSF==1) jetmass=FatJet_msoftdrop_jmsUp[i];
          else if (JMS_whichSF==2) jetmass=FatJet_msoftdrop_jmsDown[i];
+         //cout<<"fatjet pt "<<jetpt<<" jerup "<<FatJet_pt_jerUp[i]<<" jerdown "<<FatJet_pt_jerDown[i]<<" jesup "<<FatJet_pt_jesTotalUp[i]<<" jesdown "<<FatJet_pt_jesTotalDown[i]<<endl;
        }
        AK8JetSmearedPt.push_back(jetpt); AK8JetSmearedMass.push_back(jetmass);
        AK8HT_before+=AK8JetSmearedPt[i];
@@ -1756,6 +1614,8 @@ void Analyzer::Loop()
      if (UES_whichSF==1) {MET=MET_T1_pt_unclustEnUp; METPhi=MET_T1_phi_unclustEnUp;}
      else if (UES_whichSF==2) {MET=MET_T1_pt_unclustEnDown; METPhi=MET_T1_phi_unclustEnDown;}
      if (!isData && genMET_whichSF==1) {MET=GenMET_pt; METPhi=GenMET_phi;}
+     //cout<<"MET pt "<<MET<<" jerup "<<MET_T1_pt_jerUp<<" jerdown "<<MET_T1_pt_jerDown<<" jesup "<<MET_T1_pt_jesTotalUp<<" jesdown "<<MET_T1_pt_jesTotalDown<<" uesup "<<MET_T1_pt_unclustEnUp<<" uesdown "<<MET_T1_pt_unclustEnDown<<endl;
+     //cout<<"MET phi "<<METPhi<<" jerup "<<MET_T1_phi_jerUp<<" jerdown "<<MET_T1_phi_jerDown<<" jesup "<<MET_T1_phi_jesTotalUp<<" jesdown "<<MET_T1_phi_jesTotalDown<<" uesup "<<MET_T1_phi_unclustEnUp<<" uesdown "<<MET_T1_phi_unclustEnDown<<endl;
      ST+=MET;
      ST_G=ST;
      for (auto i : passJet) ST+=jetSmearedPt[i];
@@ -2256,7 +2116,6 @@ void Analyzer::Loop()
                 
            if (h_puW->GetBinContent(h_puW->FindBin(Pileup_nTrueInt))==0) h_puW->SetBinContent(h_puW->FindBin(Pileup_nTrueInt),pu_weight);
            OverFill(h_eff,3.,1.); OverFill(h_eff,4.,weight); OverFill(h_eff,5.,w);
-           OverFill(h_nISR_jet,n_isr_jets,w);
        
            OverFill(h_nPV,PV_npvsGood,w);
            OverFill(h_nTrueInt,Pileup_nTrueInt,1);
@@ -2499,7 +2358,6 @@ void Analyzer::Loop()
        if (is_debug) cout<<"Filling mass point histograms"<<endl;
        OverFill(m_eff[mass_pair],3.,1.); OverFill(m_eff[mass_pair],4.,weight); OverFill(m_eff[mass_pair],5.,w);
 
-       OverFill(m_nISR_jet[mass_pair],n_isr_jets,w);
        
        OverFill(m_nPV[mass_pair],PV_npvsGood,w);
 

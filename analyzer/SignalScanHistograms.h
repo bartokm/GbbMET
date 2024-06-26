@@ -13,7 +13,6 @@
   map< pair<int, int>, TDirectory* > MassPairToDirectoy;
   
   map< pair<int, int>, TH1D* > m_eff;
-  map< pair<int, int>, TH1D* > m_nISR_jet;
   map< pair<int, int>, TH1D* > m_SR;
   
   map< pair<int, int>, TH1D* > m_nPV;
@@ -387,7 +386,6 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       
       m_cuts[MassPair] = new TH1D("h_cuts","cuts;",15,0,15);
       m_eff[MassPair] = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
-      m_nISR_jet[MassPair] = new TH1D("h_nISR_jet",";number of ISR jets",10,0,10);
       m_SR[MassPair] = new TH1D("h_SR","",16,0.5,16.5);
    
       m_nPV[MassPair] = new TH1D("h_nPV",";number of good vertices",20,0,70);
