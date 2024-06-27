@@ -243,7 +243,7 @@ void Analyzer::Loop()
      reader_T_2018fast.load(calib_2018fast,BTEntry::FLAV_UDSG,"fastsim");
    }
          
-   std::unique_ptr<CorrectionSet> cset_muo, cset_ele, cset_tau, cset_pho, cset_btag;
+   std::unique_ptr<CorrectionSet> cset_muo, cset_ele, cset_tau, cset_pho, cset_EGscale, cset_btag;
 
    std::string temp_fname="histos/Analyzer_histos"; 
    if (output_file != "default") {
@@ -557,10 +557,10 @@ void Analyzer::Loop()
        b_Jet_pt_jesTotalDown->GetEntry(ientry);
        b_Jet_hadronFlavour->GetEntry(ientry);
        b_Jet_partonFlavour->GetEntry(ientry);
-       //b_Jet_mass_jesTotalUp->GetEntry(ientry);
-       //b_Jet_mass_jesTotalDown->GetEntry(ientry);
-       //b_Jet_mass_jerUp->GetEntry(ientry);
-       //b_Jet_mass_jerDown->GetEntry(ientry);
+       b_Jet_mass_jerUp->GetEntry(ientry);
+       b_Jet_mass_jerDown->GetEntry(ientry);
+       b_Jet_mass_jesTotalUp->GetEntry(ientry);
+       b_Jet_mass_jesTotalDown->GetEntry(ientry);
        b_Jet_genJetIdx->GetEntry(ientry);
        b_FatJet_pt_jerUp->GetEntry(ientry);
        b_FatJet_pt_jerDown->GetEntry(ientry);
@@ -678,18 +678,6 @@ void Analyzer::Loop()
      b_Photon_cutBased->GetEntry(ientry);
      b_Photon_mvaID_WP80->GetEntry(ientry);
      b_Photon_mvaID_WP90->GetEntry(ientry);
-     /*
-        b_phoScale_stat_up->GetEntry(ientry);
-        b_phoScale_stat_dn->GetEntry(ientry);
-        b_phoScale_syst_up->GetEntry(ientry);
-        b_phoScale_syst_dn->GetEntry(ientry);
-        b_phoScale_gain_up->GetEntry(ientry);
-        b_phoScale_gain_dn->GetEntry(ientry);
-        b_phoResol_rho_up->GetEntry(ientry);
-        b_phoResol_rho_dn->GetEntry(ientry);
-        b_phoResol_phi_up->GetEntry(ientry);
-        b_phoResol_phi_dn->GetEntry(ientry);
-        */
      b_nTau->GetEntry(ientry);
      b_Tau_pt->GetEntry(ientry);
      b_Tau_eta->GetEntry(ientry);
@@ -709,10 +697,6 @@ void Analyzer::Loop()
      b_Jet_eta->GetEntry(ientry);
      b_Jet_mass->GetEntry(ientry);
      b_Jet_mass_nom->GetEntry(ientry);
-     b_Jet_mass_jerUp->GetEntry(ientry);
-     b_Jet_mass_jerDown->GetEntry(ientry);
-     b_Jet_mass_jesTotalUp->GetEntry(ientry);
-     b_Jet_mass_jesTotalDown->GetEntry(ientry);
      b_Jet_chHEF->GetEntry(ientry);
      b_Jet_btagDeepFlavB->GetEntry(ientry);
      b_Jet_jetId->GetEntry(ientry);
@@ -906,6 +890,8 @@ void Analyzer::Loop()
          cset_tau = CorrectionSet::from_file(sf_tau_fname);
          string sf_pho_fname="correctionlib/POG/EGM/"+year+"_UL/photon.json";
          cset_pho = CorrectionSet::from_file(sf_pho_fname);
+         string sf_EGscale_fname="correctionlib/POG/EGM/"+year+"_UL/EGM_ScaleUnc.json";
+         cset_EGscale = CorrectionSet::from_file(sf_EGscale_fname);
          string sf_btag_fname="correctionlib/POG/BTV/"+year+"_UL/btagging.json";
          cset_btag = CorrectionSet::from_file(sf_btag_fname);
          string sf_muo_fname="correctionlib/POG/MUO/"+year+"_UL/muon_Z.json";
@@ -1247,6 +1233,12 @@ void Analyzer::Loop()
        double pt = Photon_pt[i];
        (Egamma_scale_whichSF ==1) ? pt+=Photon_dEscaleUp[i]/cosh(Photon_SCEta(i)) : (Egamma_scale_whichSF ==2) ? pt+=Photon_dEscaleDown[i]/cosh(Photon_SCEta(i)) : pt=pt;
        (Egamma_smear_whichSF ==1) ? pt+=Photon_dEsigmaUp[i]/cosh(Photon_SCEta(i)) : (Egamma_smear_whichSF ==2) ? pt+=Photon_dEsigmaDown[i]/cosh(Photon_SCEta(i)) : pt=pt;
+       //Egamma scale uncertainty is always 0 in nanov9 MC, due to a bug. Therefor it has to be calculated
+       if (!isData && Egamma_scale_whichSF!=0) {
+         string updown = (Egamma_scale_whichSF==1) ? "scaleup" : "scaledown";
+         double scale = cset_EGscale->at("UL-EGM_ScaleUnc")->evaluate( {year, updown, Photon_SCEta(i), Photon_seedGain[i]} );
+         pt*=scale;
+       }
        //cout<<"egamme scale up "<<Photon_dEscaleUp[i]<<" down "<<Photon_dEscaleDown[i]<<endl;
        //cout<<"egamme smear up "<<Photon_dEsigmaUp[i]<<" down "<<Photon_dEsigmaDown[i]<<endl;
 
