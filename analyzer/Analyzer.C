@@ -1098,8 +1098,8 @@ void Analyzer::Loop()
          float eta = abs(Muon_eta[iter[i]]);
          double id_sf=0, iso_sf=0;
          string id_whichsf="sf", iso_whichsf="sf";
-         (muID_whichSF==1) ? id_whichsf="sfup" : (muID_whichSF==2) ? id_whichsf="sfdown" : id_whichsf="sf";
-         (muISO_whichSF==1) ? iso_whichsf="sfup" : (muISO_whichSF==2) ? iso_whichsf="sfdown" : iso_whichsf="sf";
+         (muID_whichSF==1) ? id_whichsf="systup" : (muID_whichSF==2) ? id_whichsf="systdown" : id_whichsf="sf";
+         (muISO_whichSF==1) ? iso_whichsf="systup" : (muISO_whichSF==2) ? iso_whichsf="systdown" : iso_whichsf="sf";
          id_sf=cset_muo->at("NUM_"+LMT[i]+"ID_DEN_genTracks")->evaluate({year+"_UL",eta,pt,id_whichsf});
          string extrastring = (i==2) ? "andIPCut" : "";
          iso_sf=cset_muo->at("NUM_LooseRelIso_DEN_"+LMT[i]+"ID"+extrastring)->evaluate({year+"_UL",eta,pt,iso_whichsf});
@@ -1314,16 +1314,16 @@ void Analyzer::Loop()
        if (passPhotons.size()!=0){
          string phoID = "Loose";
          switch (whichPhoton) {
-           case 2 :
+           case 1 :
              phoID = "Medium";
              break;
-           case 3 :
+           case 2 :
              phoID = "Tight";
              break;
-           case 4 :
+           case 3 :
              phoID = "wp80";
              break;
-           case 5 :
+           case 4 :
              phoID = "wp90";
              break;
          }
@@ -2097,7 +2097,7 @@ void Analyzer::Loop()
        
            //cout<<std::fixed;
            //cout<<std::setprecision(4);
-           //if (AK8Btag_selected>0) cout<<temp_f<<" event "<<event<<" lumi_w "<<weight<<" pu_weight "<<pu_weight<<" eleVetoSF "<<ele_VETOSF<<" eleLoose "<<ele_SF[1]<<" muoLoose "<<mu_SF[0]<<" tauLoose "<<tau_SF[0]<<" photon_SF "<<pho_SF[0]<<" nonPrefiringProbability "<<nonPrefiringProbability[L1prefire_whichSF]<<" full w "<<w<<endl;
+           //cout<<temp_f<<" event "<<event<<" lumi_w "<<weight<<" pu_weight "<<pu_weight<<" eleLoose "<<ele_SF[1]<<" muoLoose "<<mu_SF[0]<<" tauLoose "<<tau_SF[0]<<" photon_SF "<<pho_SF[4]<<" nonPrefiringProbability "<<nonPrefiringProbability[L1prefire_whichSF]<<" full w "<<w<<endl;
            //double max_pt=0; unsigned int whichLepton=0;
            //if (nPassEleL>0 && Electron_pt[nleadEleL]>max_pt) {max_pt=Electron_pt[nleadEleL]; whichLepton=1;}
            //if (nPassMuL>0 && Muon_pt[nleadMuL]>max_pt) {max_pt=Muon_pt[nleadMuL]; whichLepton=2;}
