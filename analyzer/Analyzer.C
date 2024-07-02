@@ -5,8 +5,6 @@
 #include "cross_sections.h"
 #include <bitset>
 #include <algorithm>
-#include <TH2.h>
-#include <THn.h>
 #include <TStyle.h>
 #include <TCanvas.h>
 #include <cstdlib>
@@ -455,6 +453,11 @@ void Analyzer::Loop()
    TH1D *h_AK8searchBins_noweight= new TH1D("h_AK8searchBins_noweight",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
    TH1D *h_AK8HTsearchBins= new TH1D("h_AK8HTsearchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
 
+   //syst version histos
+   map<string,THnD*> syst_THn_AK4,syst_THn_AK8;
+   map<string,TH1D*> syst_TH1_AK4,syst_TH1_AK8;
+   init_syst_histograms(syst_THn_AK4, syst_TH1_AK4, syst_THn_AK8, syst_TH1_AK8);
+
    //histograms for ABCD prediction
    vector<TH1D*> histos_for_abcd{h_eff,h_nPV,h_phoEt,h_phoEta,h_pfMETPhi,h_MT_fix,h_ST_fix,h_HT_after,h_dphi_met_btags,h_nPho,h_nEle,h_nMu,h_nTau,h_ElePt_fix,h_MuPt_fix,h_TauPt_fix,h_njets,h_jetpt,h_nAK8jets,h_AK8jetpt,h_bjets_l,h_bjets_m,h_bjets_t,h_AK8bjets_l,h_AK8bjets_m,h_disc_bjets_1,h_disc_bjets_2,h_disc_AK8bjets_1,h_pt_bjets_l1,h_pt_bjets_l2,h_pt_bjets_m,h_pt_AK8bjets_l};
    if (_ABCD) for (auto i : histos_for_abcd) set_ABCD_histo(i);
@@ -480,7 +483,7 @@ void Analyzer::Loop()
      if (ientry < 0) break;
      b_event->GetEntry(ientry);
      b_run->GetEntry(ientry);
-     //(event==66343) ? is_debug=1 : is_debug=0;
+     //(event==3705660) ? is_debug=1 : is_debug=0;
      if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
      if (is_debug) cout<<"RUNNING ON ENTRY "<<jentry<<" EVENT "<<event<<endl;
      if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
@@ -855,9 +858,7 @@ void Analyzer::Loop()
        }
        //weights
        if (is_debug) cout<<"Determining weights"<<endl;
-       (PUweight_whichSF==1) ? pu_weight=puWeightUp : (PUweight_whichSF==2) ? pu_weight=puWeightDown : pu_weight=puWeight;
-       //(PUweight_whichSF==1) ? pu_weight=puAutoWeightUp : (PUweight_whichSF==2) ? pu_weight=puAutoWeightDown : pu_weight=puAutoWeight;
-       //cout<<"PU w "<<puWeight<<" up "<<puWeightUp<<" down "<<puWeightDown<<endl;
+       pu_weight=puWeight;
        double data_lumi = L_data[year_chooser];
        if (_fastSim && year.find("2016")!=std::string::npos) data_lumi = L_data[0]+L_data[1];
        if (year.find("2018")!=std::string::npos && HLT_Photon110EB_TightID_TightIso && !HLT_Photon200 && !HLT_Photon300_NoHE) data_lumi = 54670;
@@ -1054,10 +1055,11 @@ void Analyzer::Loop()
      ele_VETOSF=1;
      for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1; tau_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
+     for (int i=0;i<2;i++) {pho_SF_ID[i]=1; pho_SF_pix[i]=1;}
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterParticleNet,0,sizeof bcounterParticleNet);
      memset(bcounterDeep,0,sizeof bcounterDeep);
-     double nonPrefiringProbability[3]={1,1,1};
+     fill(begin(nonPrefiringProbability), end(nonPrefiringProbability), 1.0); // Sets all elements to 1.0
      if (!_fastSim) {nonPrefiringProbability[0]=L1PreFiringWeight_Nom;nonPrefiringProbability[1]=L1PreFiringWeight_Up;nonPrefiringProbability[2]=L1PreFiringWeight_Dn;}
      else {
        nonPrefiringProbability[0]=CalcL1PreFire();
@@ -1307,10 +1309,7 @@ void Analyzer::Loop()
      if (is_debug) cout<<"Photon object done"<<endl;
      //Calculate photon SFs
      if (!isData) {
-       double id_sf=0, pix_sf=0;
-       string id_whichsf="sf", pix_whichsf="sf";
-       (phoID_whichSF==1) ? id_whichsf="sfup" : (phoID_whichSF==2) ? id_whichsf="sfdown" : id_whichsf="sf";
-       (phoPix_whichSF==1) ? pix_whichsf="sfup" : (phoPix_whichSF==2) ? pix_whichsf="sfdown" : pix_whichsf="sf";
+       double id_sf[3]={0,0,0}, pix_sf[3]={0,0,0};
        if (passPhotons.size()!=0){
          string phoID = "Loose";
          switch (whichPhoton) {
@@ -1327,16 +1326,24 @@ void Analyzer::Loop()
              phoID = "wp90";
              break;
          }
-         id_sf = cset_pho->at("UL-Photon-ID-SF")->evaluate({year,id_whichsf,phoID,Photon_SCEta(nleadPho), phoET[nleadPho]});
+         id_sf[0] = cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sf",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]});
+         id_sf[1] = cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfup",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]});
+         id_sf[2] = cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfdown",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]});
          string pixtemp="";
          if (Photon_r9[nleadPho]>0.94) (Photon_isScEtaEB[nleadPho]) ? pixtemp="EBHighR9" : pixtemp="EEHighR9";
          else (Photon_isScEtaEB[nleadPho]) ? pixtemp="EBLowR9" : pixtemp="EELowR9";
          if (whichPhoton>3) phoID="MVA";
-         pix_sf = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,pix_whichsf,phoID,pixtemp});
-         //cout<<"photon id "<<id_sf<<" up "<<cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfup",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]})<<" down "<<cset_pho->at("UL-Photon-ID-SF")->evaluate({year,"sfdown",phoID,Photon_SCEta(nleadPho), phoET[nleadPho]})<<endl;
-         //cout<<"pix sf "<<pix_sf<<" up "<<cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfup",phoID,pixtemp})<<" down "<<cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfdown",phoID,pixtemp})<<endl;
-         pho_SF[whichPhoton]=id_sf*pix_sf;
-         //cout<<"photon "<<phoET[nleadPho]<<" "<<Photon_eta[nleadPho]<<" whichPhoton ID "<<whichPhoton<<" UL ID sf "<<id_sf<<" pix sf "<<pix_sf<<" total SF "<<pho_SF[whichPhoton]<<endl;
+         pix_sf[0] = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sf",phoID,pixtemp});
+         pix_sf[1] = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfup",phoID,pixtemp});
+         pix_sf[2] = cset_pho->at("UL-Photon-PixVeto-SF")->evaluate({year,"sfdown",phoID,pixtemp});
+         //cout<<"photon id "<<id_sf[0]<<" up "<<id_sf[1]<<" down "<<id_sf[2]<<endl;
+         //cout<<"pix sf "<<pix_sf[0]<<" up "<<pix_sf[1]<<" down "<<pix_sf[2]<<endl;
+         pho_SF[whichPhoton]=id_sf[0]*pix_sf[0];
+         pho_SF_ID[0]=id_sf[1]*pix_sf[0];
+         pho_SF_ID[1]=id_sf[2]*pix_sf[0];
+         pho_SF_pix[0]=id_sf[0]*pix_sf[1];
+         pho_SF_pix[1]=id_sf[0]*pix_sf[2];
+         //cout<<"photon "<<phoET[nleadPho]<<" "<<Photon_eta[nleadPho]<<" whichPhoton ID "<<whichPhoton<<" UL ID sf "<<id_sf[0]<<" pix sf "<<pix_sf[0]<<" total SF "<<pho_SF[whichPhoton]<<endl;
        }
        if (is_debug) cout<<"Photon SF applied"<<endl;
      }
@@ -1435,7 +1442,7 @@ void Analyzer::Loop()
      }
      */
 
-     if (!isData) w*=nonPrefiringProbability[L1prefire_whichSF];
+     if (!isData) w*=nonPrefiringProbability[0];
      //cout<<"L1prefire "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      if (is_debug) cout<<"AK4 object done"<<endl;
      //jet pt, btags
@@ -1542,6 +1549,7 @@ void Analyzer::Loop()
        else if (PN_discr_value>BtagParticleNetWP[year_chooser][1]) {passParticleNet.insert(pair<int,char>(i,'M'));bcounterParticleNet[2]++;}
        else if (PN_discr_value>BtagParticleNetWP[year_chooser][0]) {passParticleNet.insert(pair<int,char>(i,'L'));bcounterParticleNet[1]++;}
        else {passParticleNet.insert(pair<int,char>(i,'0'));bcounterParticleNet[0]++;}
+       if (is_debug) cout<<"AK8 index "<<i<<" btag discr "<<PN_discr_value<<endl;
        //getting highest value boson taggers
        if (high_H4q==-1) high_H4q=i;
        else if (FatJet_particleNet_H4qvsQCD[high_H4q]<FatJet_particleNet_H4qvsQCD[i]) high_H4q=i;
@@ -1734,7 +1742,7 @@ void Analyzer::Loop()
          if (passAK8Jet.size()>0){
            SelectedAK8Jet=passAK8Jet[0];
            double PN_discr_value=FatJet_particleNetMD_Xbb[passAK8Jet[0]]/(FatJet_particleNetMD_Xbb[passAK8Jet[0]]+FatJet_particleNetMD_QCD[passAK8Jet[0]]);
-           if (is_debug) cout<<"AK8 mass "<<AK8JetSmearedMass[passAK8Jet[0]]<<" discr "<<PN_discr_value<<endl;
+           if (is_debug) cout<<"AK8 index "<<passAK8Jet[0]<<" AK8 mass "<<AK8JetSmearedMass[passAK8Jet[0]]<<" discr "<<PN_discr_value<<endl;
            if (AK8JetSmearedMass[passAK8Jet[0]]>80 && AK8JetSmearedMass[passAK8Jet[0]]<160) {
              passHiggsMass=true;
              if (PN_discr_value>BtagParticleNetWP[year_chooser][2]) AK8Btag_selected=3;
@@ -2268,12 +2276,14 @@ void Analyzer::Loop()
                hn_AK4searchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
                hn_AK4searchBins_noweight->Fill(sbFill_ak4ak8);
                if (HT_after>1500) hn_AK4HTsearchBins->Fill(sbFill_ak4ak8,w_AK4searchBin);
+               fill_syst_histo_THn(syst_THn_AK4, sbFill_ak4ak8, w_AK4searchBin);
                break;
                }
              case 1 :
                hn_AK8searchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
                hn_AK8searchBins_noweight->Fill(sbFill_ak4ak8);
                if (HT_after>1500) hn_AK8HTsearchBins->Fill(sbFill_ak4ak8,w_AK8searchBin);
+               fill_syst_histo_THn(syst_THn_AK8, sbFill_ak4ak8, w_AK8searchBin);
                break;
            }
        
@@ -2563,11 +2573,13 @@ void Analyzer::Loop()
            mn_AK4searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK4searchBin);
            mn_AK4searchBins_noweight[mass_pair]->Fill(sbFill_ak4ak8);
            if (HT_after>1500) mn_AK4HTsearchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK4searchBin);
+           fill_syst_histo_THn(syst_mn_AK4[mass_pair], sbFill_ak4ak8, w_AK4searchBin);
            break;
          case 1 :
            mn_AK8searchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
            mn_AK8searchBins_noweight[mass_pair]->Fill(sbFill_ak4ak8);
            if (HT_after>1500) mn_AK8HTsearchBins[mass_pair]->Fill(sbFill_ak4ak8,w_AK8searchBin);
+           fill_syst_histo_THn(syst_mn_AK8[mass_pair], sbFill_ak4ak8, w_AK8searchBin);
          break;
        }
        //dphi histogram fills
@@ -2668,6 +2680,9 @@ void Analyzer::Loop()
            h_AK8HTsearchBins->SetBinContent(i,hn_AK8HTsearchBins->GetBinContent(i));
            h_AK8HTsearchBins->SetBinError(i,hn_AK8HTsearchBins->GetBinError(i));
          }
+         fill_syst_histo_TH1(syst_THn_AK4, syst_TH1_AK4);
+         fill_syst_histo_TH1(syst_THn_AK8, syst_TH1_AK8);
+
 
    if (SignalScan) {
      for (auto const&i : grid) {
@@ -2687,6 +2702,8 @@ void Analyzer::Loop()
            m_AK8HTsearchBins[MassPair]->SetBinContent(k,mn_AK8HTsearchBins[MassPair]->GetBinContent(k));
            m_AK8HTsearchBins[MassPair]->SetBinError(k,mn_AK8HTsearchBins[MassPair]->GetBinError(k));
          }
+         fill_syst_histo_TH1(syst_mn_AK4[MassPair], syst_m_AK4[MassPair]);
+         fill_syst_histo_TH1(syst_mn_AK8[MassPair], syst_m_AK8[MassPair]);
        }
      }
    }

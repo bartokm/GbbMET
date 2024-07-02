@@ -167,6 +167,12 @@
   map< pair<int, int>, TH1D* > m_AK8searchBins;
   map< pair<int, int>, TH1D* > m_AK8searchBins_noweight;
   map< pair<int, int>, TH1D* > m_AK8HTsearchBins;
+
+  //syst histos
+  map< pair<int, int>, map<string,THnD*> > syst_mn_AK4;
+  map< pair<int, int>, map<string,THnD*> > syst_mn_AK8;
+  map< pair<int, int>, map<string,TH1D*> > syst_m_AK4;
+  map< pair<int, int>, map<string,TH1D*> > syst_m_AK8;
    
   //signalstudy
   map< pair<int, int>, TH1D* > m_Hpt;
@@ -559,6 +565,10 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_AK8searchBins[MassPair]= new TH1D("h_AK8searchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
       m_AK8searchBins_noweight[MassPair]= new TH1D("h_AK8searchBins_noweight",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
       m_AK8HTsearchBins[MassPair]= new TH1D("h_AK8HTsearchBins",";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
+
+      //syst histos
+      init_syst_histograms(syst_mn_AK4[MassPair], syst_m_AK4[MassPair], syst_mn_AK8[MassPair], syst_m_AK8[MassPair]);
+
       
        if (signalstudy){
          m_Hpt[MassPair] = new TH1D("hs_Hpt","Higgs pt;p_{T}[GeV]",25,0,1000);

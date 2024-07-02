@@ -36,6 +36,7 @@
 #include <TKey.h>
 #include <TH2.h>
 #include <TH3.h>
+#include <THn.h>
 #include <TGraph.h>
 
 using namespace std;
@@ -1162,6 +1163,7 @@ public :
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
    double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
    double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
+   double pho_SF_ID[2]={1,1}, pho_SF_pix[2]={1,1};
    double ele_VETOSF=1;
    Double_t TotalEvents=0;
    string year="";
@@ -1170,6 +1172,7 @@ public :
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0, tauTES_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0, PUweight_whichSF=0;
    int Egamma_scale_whichSF=0, Egamma_smear_whichSF=0;
+   vector<string> evt_wgt_syst;
    unsigned int whichPhoton=0, whichElectron=1, whichMuon=0, whichTau=0;
    unsigned int ISR_MC=0;
    vector<double> phoET;
@@ -1177,6 +1180,7 @@ public :
    double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999;
    double e_pt=10, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
+   double nonPrefiringProbability[3]={1,1,1};
    //histograms
    TH1D *h_cuts;
    map< pair<int, int>, TH1D* > m_cuts;
@@ -1235,6 +1239,9 @@ public :
    virtual Bool_t   Notify();
    virtual void     Show(Long64_t entry = -1);
    void             Systematics(map<string, int> systematics);
+   void             init_syst_histograms(map<string,THnD*>& syst_THn_AK4, map<string,TH1D*>& syst_TH1_AK4, map<string,THnD*>& syst_THn_AK8, map<string,TH1D*>& syst_TH1_AK8);
+   void             fill_syst_histo_THn(map<string,THnD*>& syst_THn, const double* fill, double weight);
+   void             fill_syst_histo_TH1(map<string,THnD*>& syst_THn, map<string,TH1D*>& syst_TH1);
    double           deltaR(double phi1, double phi2, double eta1, double eta2);
    double           deltaPhi(double phi1, double phi2);
    float            Photon_SCEta(const int);
@@ -2887,6 +2894,10 @@ void Analyzer::CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> pas
 }
 
 void Analyzer::Systematics(map<string, int> systematics) {
+  //if a systematics which only modifies the event weight is turned on, extra THN histograms are created
+  //this is for to spare run time since event selection is not affected
+  //So in the actual run nothing is changed in that case (no weight is changed), but only extra histograms are created
+  //For lepton event weight SFs, this feature is not implemented (since only Peter uses those)
   for (auto const& x : systematics) {
     if (x.first=="DDBvL") DDBvL_whichSF=x.second;
     else if (x.first=="Deep") Deep_whichSF=x.second;
@@ -2895,22 +2906,77 @@ void Analyzer::Systematics(map<string, int> systematics) {
     else if (x.first=="UES") UES_whichSF=x.second;
     else if (x.first=="JMS") JMS_whichSF=x.second;
     else if (x.first=="JMR") JMR_whichSF=x.second;
-    else if (x.first=="phoID") phoID_whichSF=x.second;
-    else if (x.first=="phoPix") phoPix_whichSF=x.second;
-    else if (x.first=="eleID") eleID_whichSF=x.second;
-    else if (x.first=="eleRec") eleRec_whichSF=x.second;
-    else if (x.first=="muID") muID_whichSF=x.second;
-    else if (x.first=="muISO") muISO_whichSF=x.second;
-    else if (x.first=="tau") tau_whichSF=x.second;
+    else if (x.first=="phoID") {phoID_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="phoPix") {phoPix_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="eleID") {eleID_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="eleRec") {eleRec_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="muID") {muID_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="muISO") {muISO_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
+    else if (x.first=="tau") {tau_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
     else if (x.first=="tauTES") tauTES_whichSF=x.second;
-    else if (x.first=="L1prefire") L1prefire_whichSF=x.second;
+    else if (x.first=="L1prefire") {L1prefire_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
     else if (x.first=="Egamma_scale") Egamma_scale_whichSF=x.second;
     else if (x.first=="Egamma_smear") Egamma_smear_whichSF=x.second;
     else if (x.first=="genMET") genMET_whichSF=x.second;
     else if (x.first=="ISR") ISR_whichSF=x.second;
-    else if (x.first=="PUweight") PUweight_whichSF=x.second;
+    else if (x.first=="PUweight") {PUweight_whichSF=x.second; evt_wgt_syst.push_back(x.first);}
     else cout<<"ERROR! Unknown systematics variable: "<<x.first<<endl;
   }
+}
+
+void Analyzer::init_syst_histograms(map<string,THnD*>& syst_THn_AK4, map<string,TH1D*>& syst_TH1_AK4, map<string,THnD*>& syst_THn_AK8, map<string,TH1D*>& syst_TH1_AK8){
+  const int dim_ak4=3;
+  int nbins_ak4[dim_ak4]={2,6,2};
+  double xmin_ak4[dim_ak4]={-0.5,0.5,0.5};
+  double xmax_ak4[dim_ak4]={1.5,6.5,2.5};
+  const int dim_ak8=3;
+  int nbins_ak8[dim_ak8]={2,6,2};
+  double xmin_ak8[dim_ak8]={-0.5,0.5,0.5};
+  double xmax_ak8[dim_ak8]={1.5,6.5,2.5};
+  vector<string> updown = {"up","do"};
+  for (auto i : evt_wgt_syst) {
+    for (auto j : updown) {
+      string name = "hn_AK4searchBins_"+i+"_"+j;
+      THnD *hn_ak4 = new THnD(name.c_str(),";AK4;MET;njets",dim_ak4,nbins_ak4,xmin_ak4,xmax_ak4);
+      unsigned int nsbins_ak4=hn_ak4->GetNbins();
+      name = "h_AK4searchBins_"+i+"_"+j;
+      TH1D *h_ak4= new TH1D(name.c_str(),";AK4searchBins",nsbins_ak4,0.5,nsbins_ak4+0.5);
+      hn_ak4->Sumw2();
+      syst_THn_AK4.insert(pair<string,THnD*>(i+"_"+j,hn_ak4));
+      syst_TH1_AK4.insert(pair<string,TH1D*>(i+"_"+j,h_ak4));
+      
+      name = "hn_AK8searchBins_"+i+"_"+j;
+      THnD *hn_ak8 = new THnD(name.c_str(),";AK8;MET;njets",dim_ak8,nbins_ak8,xmin_ak8,xmax_ak8);
+      unsigned int nsbins_ak8=hn_ak8->GetNbins();
+      name = "h_AK8searchBins_"+i+"_"+j;
+      TH1D *h_ak8= new TH1D(name.c_str(),";AK8searchBins",nsbins_ak8,0.5,nsbins_ak8+0.5);
+      hn_ak8->Sumw2();
+      syst_THn_AK8.insert(pair<string,THnD*>(i+"_"+j,hn_ak8));
+      syst_TH1_AK8.insert(pair<string,TH1D*>(i+"_"+j,h_ak8));
+    }
+  }
+}
+
+void Analyzer::fill_syst_histo_THn(map<string,THnD*>& syst_THn, const double* fill, double weight){
+  for (auto const& x : syst_THn) {
+    int updown = (x.first.find("up")!=string::npos) ? 0 : 1;
+    if (x.first.find("phoID")!=string::npos)  x.second->Fill(fill,weight/pho_SF[whichPhoton]*pho_SF_ID[updown]);
+    if (x.first.find("phoPix")!=string::npos) x.second->Fill(fill,weight/pho_SF[whichPhoton]*pho_SF_pix[updown]);
+    if (x.first.find("L1prefire")!=string::npos) x.second->Fill(fill,weight/nonPrefiringProbability[0]*nonPrefiringProbability[updown+1]);
+    if (x.first.find("PUweight")!=string::npos && updown==0) x.second->Fill(fill,weight/puWeight*puWeightUp);
+    if (x.first.find("PUweight")!=string::npos && updown==1) x.second->Fill(fill,weight/puWeight*puWeightDown);
+  }
+}
+
+void Analyzer::fill_syst_histo_TH1(map<string,THnD*>& syst_THn, map<string,TH1D*>& syst_TH1){
+  for (auto const& x : syst_THn) {
+    unsigned int nsbins=x.second->GetNbins();
+    for (unsigned int i=1;i<nsbins+1;i++) {
+      syst_TH1[x.first]->SetBinContent(i,x.second->GetBinContent(i));
+      syst_TH1[x.first]->SetBinError(i,x.second->GetBinError(i));
+    }
+  }
+
 }
 
 void Analyzer::Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation){
