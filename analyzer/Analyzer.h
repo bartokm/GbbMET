@@ -2862,7 +2862,6 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
 }
 
 void Analyzer::CalcBtagSF_AK8(double pt, char tag){
-  std::fill(*std::begin(AK8btag_SF), *std::end(AK8btag_SF), 1);
   if (year.find("2016preVFP")!=std::string::npos) {
     if (pt>=450 && pt<500) {
       if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.032; AK8btag_SF[0][1]=1.128; AK8btag_SF[0][2]=0.942;}
@@ -3005,7 +3004,10 @@ void Analyzer::fill_syst_histo_THn(map<string,THnD*>& syst_THn, const double* fi
     if (x.first.find("L1prefire")!=string::npos) x.second->Fill(fill,weight/nonPrefiringProbability[0]*nonPrefiringProbability[updown+1]);
     if (x.first.find("PUweight")!=string::npos && updown==0) x.second->Fill(fill,weight/puWeight*puWeightUp);
     if (x.first.find("PUweight")!=string::npos && updown==1) x.second->Fill(fill,weight/puWeight*puWeightDown);
-    if (x.first.find("AK8btag")!=string::npos)  x.second->Fill(fill,weight/AK8btag_SF[0][0]*AK8btag_SF[0][updown]);
+    if (x.first.find("AK8btag")!=string::npos) {
+      if (string(x.second->GetName()).find("AK4")==string::npos) x.second->Fill(fill,weight/AK8btag_SF[0][0]*AK8btag_SF[0][updown]);
+      else x.second->Fill(fill,weight);
+    }
   }
 }
 

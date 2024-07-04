@@ -1056,6 +1056,7 @@ void Analyzer::Loop()
      for (int i=0;i<3;i++) {pho_SF[i]=1; mu_SF[i]=1; tau_SF[i]=1;}
      for (int i=0;i<4;i++) ele_SF[i]=1;
      for (int i=0;i<2;i++) {pho_SF_ID[i]=1; pho_SF_pix[i]=1;}
+     std::fill(*std::begin(AK8btag_SF), *std::end(AK8btag_SF), 1);
      memset(bcounterDDBvL,0,sizeof bcounterDDBvL);
      memset(bcounterParticleNet,0,sizeof bcounterParticleNet);
      memset(bcounterDeep,0,sizeof bcounterDeep);
