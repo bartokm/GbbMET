@@ -1602,6 +1602,9 @@ void Analyzer::Loop()
      AK8EMHT_after+=HT_after;
      OneOr2jet=false; if (passJet.size()>1 || passAK8Jet.size()>0) OneOr2jet=true;
 
+     //Calculate AK8 BTag SFs only for signal
+     if (!isData && passAK8Jet.size()>0 && SignalScan) CalcBtagSF_AK8(AK8JetSmearedPt[passAK8Jet[0]],passParticleNet[passAK8Jet[0]]);
+
      //MET variables
      if (is_debug) cout<<"Calculating MET variables"<<endl;
      double METPhi=0, METsumEt=0, METSig=0;
@@ -1827,11 +1830,6 @@ void Analyzer::Loop()
          pt_ak4_Hcandidate1= jetSmearedPt[SelectedAK4Jet1];
          pt_ak4_Hcandidate2= jetSmearedPt[SelectedAK4Jet2];
        }
-
-           //Calculate AK8 BTag SFs
-           if (!isData && btag_file.size()>0 && SignalScan) {
-             CalcBtagSF_AK8(year, AK8JetSmearedPt, passDDBvL, DDBvL_SF_L, DDBvL_SF_M1, DDBvL_SF_M2, DDBvL_SF_T1, DDBvL_SF_T2);
-           }
                
            if (is_debug && !isData) for (unsigned int i=0;i<nGenPart;i++) printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-14s gmom %-8d\n",i,GenPart_pdgId[i],GenPart_pt[i],GenPart_eta[i],GenPart_phi[i],GenPart_pdgId[GenPart_genPartIdxMother[i]],GenPart_pt[GenPart_genPartIdxMother[i]],GenPart_eta[GenPart_genPartIdxMother[i]],GenPart_phi[GenPart_genPartIdxMother[i]],GenPart_status[i],bitset<14>(GenPart_statusFlags[i]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[i]]]);
 
@@ -2267,8 +2265,7 @@ void Analyzer::Loop()
        
            //AK4-AK8 searchbin fills
            double w_AK4searchBin=w, w_AK8searchBin=w;
-           //if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_M1[DDBvL_whichSF];//AK8medium
-           if (boost==1 && AK4AK8==1) w_AK8searchBin*=DDBvL_SF_L[DDBvL_whichSF];
+           if (boost==1 && AK4AK8==1) w_AK8searchBin*=AK8btag_SF[0][0];
            switch (boost) {
              case 0 :
                {
@@ -2294,18 +2291,18 @@ void Analyzer::Loop()
              bool ak8loose_jet = (isParticleNet) ? bcounterParticleNet[1]>0 : bcounterDDBvL[1]>0;
              if (ak8loose_jet) {
                if (!isData || (m<70 || m>200)) {
-                 OverFill(h2_mHAK8,massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-                 OverFill(h_mHAK8,m,w*DDBvL_SF_L[DDBvL_whichSF]);
+                 OverFill(h2_mHAK8,massRegion,m,w*AK8btag_SF[0][0]);
+                 OverFill(h_mHAK8,m,w*AK8btag_SF[0][0]);
                }
-               OverFill(h2_dphi_met_h_ak8,massRegion,dphi_H_ak8,w*DDBvL_SF_L[DDBvL_whichSF]);
-               OverFill(h2_dphi_met_btags_ak8,massRegion,dphi_met_btags,w*DDBvL_SF_L[DDBvL_whichSF]);
+               OverFill(h2_dphi_met_h_ak8,massRegion,dphi_H_ak8,w*AK8btag_SF[0][0]);
+               OverFill(h2_dphi_met_btags_ak8,massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
              }
              else {
-               OverFill(h2_mHAK8_clean_fake,massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-               OverFill(h_mHAK8_clean_fake,m,w*DDBvL_SF_L[DDBvL_whichSF]);
+               OverFill(h2_mHAK8_clean_fake,massRegion,m,w*AK8btag_SF[0][0]);
+               OverFill(h_mHAK8_clean_fake,m,w*AK8btag_SF[0][0]);
                if (AK4AK8==0){
-                 OverFill(h2_mHAK8_fake,massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-                 OverFill(h_mHAK8_fake,m,w*DDBvL_SF_L[DDBvL_whichSF]);
+                 OverFill(h2_mHAK8_fake,massRegion,m,w*AK8btag_SF[0][0]);
+                 OverFill(h_mHAK8_fake,m,w*AK8btag_SF[0][0]);
                }
              }
            }
@@ -2343,7 +2340,7 @@ void Analyzer::Loop()
              OverFill(h2_dphi_met_h_ak4,massRegion,dphi_H_ak4,w);
              OverFill(h2_dphi_met_hmin_ak4,massRegion,dphi_Hmin_ak4,w);
              OverFill(h2_dphi_met_ak4btag,massRegion,dphi_AK4btag,w);
-             OverFill(h2_dphi_met_btags_ak4,massRegion,dphi_met_btags,w*DDBvL_SF_L[DDBvL_whichSF]);
+             OverFill(h2_dphi_met_btags_ak4,massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
            }
      
      //SignalRegion -- not the real SR, but almost
@@ -2612,18 +2609,18 @@ void Analyzer::Loop()
          bool ak8loose_jet = (isParticleNet) ? bcounterParticleNet[1]>0 : bcounterDDBvL[1]>0;
          if (ak8loose_jet) {
            if (!isData || (m<70 || m>200)) {
-             OverFill(m2_mHAK8[mass_pair],massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-             OverFill(m_mHAK8[mass_pair],m,w*DDBvL_SF_L[DDBvL_whichSF]);
+             OverFill(m2_mHAK8[mass_pair],massRegion,m,w*AK8btag_SF[0][0]);
+             OverFill(m_mHAK8[mass_pair],m,w*AK8btag_SF[0][0]);
            }
-           OverFill(m2_dphi_met_h_ak8[mass_pair],massRegion,dphi_H_ak8,w*DDBvL_SF_L[DDBvL_whichSF]);
-           OverFill(m2_dphi_met_btags_ak8[mass_pair],massRegion,dphi_met_btags,w*DDBvL_SF_L[DDBvL_whichSF]);
+           OverFill(m2_dphi_met_h_ak8[mass_pair],massRegion,dphi_H_ak8,w*AK8btag_SF[0][0]);
+           OverFill(m2_dphi_met_btags_ak8[mass_pair],massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
          }
          else {
-           OverFill(m2_mHAK8_clean_fake[mass_pair],massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-           OverFill(m_mHAK8_clean_fake[mass_pair],m,w*DDBvL_SF_L[DDBvL_whichSF]);
+           OverFill(m2_mHAK8_clean_fake[mass_pair],massRegion,m,w*AK8btag_SF[0][0]);
+           OverFill(m_mHAK8_clean_fake[mass_pair],m,w*AK8btag_SF[0][0]);
            if (AK4AK8==0){
-             OverFill(m2_mHAK8_fake[mass_pair],massRegion,m,w*DDBvL_SF_L[DDBvL_whichSF]);
-             OverFill(m_mHAK8_fake[mass_pair],m,w*DDBvL_SF_L[DDBvL_whichSF]);
+             OverFill(m2_mHAK8_fake[mass_pair],massRegion,m,w*AK8btag_SF[0][0]);
+             OverFill(m_mHAK8_fake[mass_pair],m,w*AK8btag_SF[0][0]);
            }
          }
        }
@@ -2661,7 +2658,7 @@ void Analyzer::Loop()
          OverFill(m2_dphi_met_h_ak4[mass_pair],massRegion,dphi_H_ak4,w);
          OverFill(m2_dphi_met_hmin_ak4[mass_pair],massRegion,dphi_Hmin_ak4,w);
          OverFill(m2_dphi_met_ak4btag[mass_pair],massRegion,dphi_AK4btag,w);
-         OverFill(m2_dphi_met_btags_ak4[mass_pair],massRegion,dphi_met_btags,w*DDBvL_SF_L[DDBvL_whichSF]);
+         OverFill(m2_dphi_met_btags_ak4[mass_pair],massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
        }
      }
    }

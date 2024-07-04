@@ -1161,13 +1161,13 @@ public :
    int SignalHiggs=0, SignalZ=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
-   double DDBvL_SF_L[3]={1,1,1}, DDBvL_SF_M1[3]={1,1,1}, DDBvL_SF_M2[3]={1,1,1}, DDBvL_SF_T1[3]={1,1,1}, DDBvL_SF_T2[3]={1,1,1};
+   double AK8btag_SF[3][3]={{1,1,1},{1,1,1},{1,1,1}};
    double pho_SF[5]={1,1,1,1,1}, ele_SF[4]={1,1,1,1}, mu_SF[3]={1,1,1}, tau_SF[3]={1,1,1};
    double pho_SF_ID[2]={1,1}, pho_SF_pix[2]={1,1};
    double ele_VETOSF=1;
    Double_t TotalEvents=0;
    string year="";
-   int DDBvL_whichSF=0, Deep_whichSF=0;
+   int AK8btag_whichSF=0, Deep_whichSF=0;
    int JES_whichSF=0, JER_whichSF=0, UES_whichSF=0, JMR_whichSF=0, JMS_whichSF=0, ISR_whichSF=0;
    int phoID_whichSF=0, phoPix_whichSF=0, eleID_whichSF=0, eleRec_whichSF=0, muID_whichSF=0, muISO_whichSF=0, tau_whichSF=0, tauTES_whichSF=0;
    int L1prefire_whichSF=0, genMET_whichSF=0, PUweight_whichSF=0;
@@ -1246,7 +1246,7 @@ public :
    double           deltaPhi(double phi1, double phi2);
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
-   void             CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]);
+   void             CalcBtagSF_AK8(double pt, char tag);
    double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, int i, double pt, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, std::unique_ptr<TRandom3> &gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
@@ -2517,19 +2517,17 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="bcounterDeep_L") returnvalue=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_M") returnvalue=Parser(bcounterDeep[2],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_T") returnvalue=Parser(bcounterDeep[3],_cut_operator[i],_cut_value[i]);
-    else if (_cut_variable[i]=="bcounterDDBvL_L") {returnvalue=Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_L[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_M1") {returnvalue=Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M1[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_M2") {returnvalue=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_M2[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_T1") {returnvalue=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T1[DDBvL_whichSF];}
-    else if (_cut_variable[i]=="bcounterDDBvL_T2") {returnvalue=Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]); if (!isData) w*=DDBvL_SF_T2[DDBvL_whichSF];}
+    else if (_cut_variable[i]=="bcounterDDBvL_L") returnvalue=Parser(bcounterDDBvL[1],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_M1") returnvalue=Parser(bcounterDDBvL[2],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_M2") returnvalue=Parser(bcounterDDBvL[3],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_T1") returnvalue=Parser(bcounterDDBvL[4],_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="bcounterDDBvL_T2") returnvalue=Parser(bcounterDDBvL[5],_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="AK8Btag_selected") {
       returnvalue=Parser(AK8Btag_selected,_cut_operator[i],_cut_value[i]);
       if (_fastSim) {
-        if (_cut_value[i]==1) w*=DDBvL_SF_L[DDBvL_whichSF];
-        if (_cut_value[i]==2) w*=DDBvL_SF_M1[DDBvL_whichSF];
-        if (_cut_value[i]==3) w*=DDBvL_SF_M2[DDBvL_whichSF];
-        if (_cut_value[i]==4) w*=DDBvL_SF_T1[DDBvL_whichSF];
-        if (_cut_value[i]==5) w*=DDBvL_SF_T2[DDBvL_whichSF];
+        if (_cut_value[i]==1) w*=AK8btag_SF[0][0];
+        if (_cut_value[i]==2) w*=AK8btag_SF[1][0];
+        if (_cut_value[i]==3) w*=AK8btag_SF[2][0];
       }
     }
     else if (_cut_variable[i]=="Deep_selected") returnvalue=Parser(Deep_selected,_cut_operator[i],_cut_value[i]);
@@ -2863,34 +2861,76 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
   return Jet_btagDeepFlavB[i];
 }
 
-void Analyzer::CalcBtagSF_AK8(string year, vector<float> v_pt, map<int,char> passCut, double (&SF_L)[3], double (&SF_M1)[3], double (&SF_M2)[3], double (&SF_T1)[3], double (&SF_T2)[3]){
-  for (unsigned int i=0;i<3;i++) {SF_L[i]=1; SF_M1[i]=1; SF_M2[i]=1; SF_T1[i]=1; SF_T2[i]=1;}
-  for (map<int,char>::iterator it=passCut.begin(); it!=passCut.end(); ++it){
-    double pt=v_pt[it->first];
-    //cout<<it->second<<" pt "<<pt<<endl;
-    if (year.find("2016")!=std::string::npos) {
-      if (pt>350 && pt<850) {
-        if (it->second != '0') {SF_L[0] = 0.95; SF_L[1] = SF_L[0]+0.10; SF_L[2] = SF_L[0]-0.04;}
-        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.86; SF_M1[1] = SF_M1[0]+0.11; SF_M1[2] = SF_M1[0]-0.04;}
-        if (it->second == 'L' || it->second == 'M') {SF_T1[0] = 0.74; SF_T1[1] = SF_T1[0]+0.10; SF_T1[2] = SF_T1[0]-0.08;}
-        if (it->second == 'C') {SF_T2[0] = 0.68; SF_T2[1] = SF_T2[0]+0.20; SF_T2[2] = SF_T2[0]-0.10;}
-      }
-      else {
-        if (it->second != '0') {SF_L[0] = 0.95; SF_L[1] = SF_L[0]+2*0.10; SF_L[2] = SF_L[0]-2*0.04;}
-        if (it->second != '0' && it->second != 'L') {SF_M1[0] = 0.86; SF_M1[1] = SF_M1[0]+2*0.11; SF_M1[2] = SF_M1[0]-2*0.04;}
-        if (it->second == 'H' || it->second == 'T' || it->second == 'C') {SF_M2[0] = 0.77; SF_M2[1] = SF_M2[0]+2*0.11; SF_M2[2] = SF_M2[0]-2*0.04;}
-        if (it->second == 'T' || it->second == 'C') {SF_T1[0] = 0.74; SF_T1[1] = SF_T1[0]+2*0.10; SF_T1[2] = SF_T1[0]-2*0.08;}
-        if (it->second == 'C') {SF_T2[0] = 0.68; SF_T2[1] = SF_T2[0]+2*0.20; SF_T2[2] = SF_T2[0]-2*0.10;}
-      }
+void Analyzer::CalcBtagSF_AK8(double pt, char tag){
+  std::fill(*std::begin(AK8btag_SF), *std::end(AK8btag_SF), 1);
+  if (year.find("2016preVFP")!=std::string::npos) {
+    if (pt>=450 && pt<500) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.032; AK8btag_SF[0][1]=1.128; AK8btag_SF[0][2]=0.942;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.052; AK8btag_SF[1][1]=1.139; AK8btag_SF[1][2]=0.971;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.054; AK8btag_SF[2][1]=1.134; AK8btag_SF[2][2]=0.977;}
+    }
+    if (pt>=500 && pt<600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.062; AK8btag_SF[0][1]=1.154; AK8btag_SF[0][2]=0.980;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.068; AK8btag_SF[1][1]=1.146; AK8btag_SF[1][2]=0.995;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.139; AK8btag_SF[2][1]=1.222; AK8btag_SF[2][2]=1.058;}
+    }
+    if (pt>=600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.002; AK8btag_SF[0][1]=1.108; AK8btag_SF[0][2]=0.901;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.996; AK8btag_SF[1][1]=1.097; AK8btag_SF[1][2]=0.899;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.049; AK8btag_SF[2][1]=1.182; AK8btag_SF[2][2]=0.919;}
     }
   }
-  /*
-  cout<<"SF_L "<<SF_L[0]<<" + "<<SF_L[1]<<" - "<<SF_L[2]<<endl;
-  cout<<"SF_M1 "<<SF_M1[0]<<" + "<<SF_M1[1]<<" - "<<SF_M1[2]<<endl;
-  cout<<"SF_M2 "<<SF_M2[0]<<" + "<<SF_M2[1]<<" - "<<SF_M2[2]<<endl;
-  cout<<"SF_T1 "<<SF_T1[0]<<" + "<<SF_T1[1]<<" - "<<SF_T1[2]<<endl;
-  cout<<"SF_T2 "<<SF_T2[0]<<" + "<<SF_T2[1]<<" - "<<SF_T2[2]<<endl;
-  */
+  if (year.find("2016postVFP")!=std::string::npos) {
+    if (pt>=450 && pt<500) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.031; AK8btag_SF[0][1]=1.089; AK8btag_SF[0][2]=0.981;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.029; AK8btag_SF[1][1]=1.080; AK8btag_SF[1][2]=0.984;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.031; AK8btag_SF[2][1]=1.081; AK8btag_SF[2][2]=0.985;}
+    }
+    if (pt>=500 && pt<600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.089; AK8btag_SF[0][1]=1.165; AK8btag_SF[0][2]=1.021;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.070; AK8btag_SF[1][1]=1.136; AK8btag_SF[1][2]=1.008;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.055; AK8btag_SF[2][1]=1.119; AK8btag_SF[2][2]=0.983;}
+    }
+    if (pt>=600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.057; AK8btag_SF[0][1]=1.134; AK8btag_SF[0][2]=1.001;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.077; AK8btag_SF[1][1]=1.124; AK8btag_SF[1][2]=0.998;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.088; AK8btag_SF[2][1]=1.164; AK8btag_SF[2][2]=1.016;}
+    }
+  }
+  if (year.find("2017")!=std::string::npos) {
+    if (pt>=450 && pt<500) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.966; AK8btag_SF[0][1]=1.021; AK8btag_SF[0][2]=0.909;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.006; AK8btag_SF[1][1]=1.058; AK8btag_SF[1][2]=0.954;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.055; AK8btag_SF[2][1]=1.112; AK8btag_SF[2][2]=1.001;}
+    }
+    if (pt>=500 && pt<600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.021; AK8btag_SF[0][1]=1.074; AK8btag_SF[0][2]=0.969;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.051; AK8btag_SF[1][1]=1.107; AK8btag_SF[1][2]=0.996;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.067; AK8btag_SF[2][1]=1.124; AK8btag_SF[2][2]=1.012;}
+    }
+    if (pt>=600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.979; AK8btag_SF[0][1]=1.014; AK8btag_SF[0][2]=0.941;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.991; AK8btag_SF[1][1]=1.029; AK8btag_SF[1][2]=0.948;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.045; AK8btag_SF[2][1]=1.090; AK8btag_SF[2][2]=0.999;}
+    }
+  }
+  if (year.find("2018")!=std::string::npos) {
+    if (pt>=450 && pt<500) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.921; AK8btag_SF[0][1]=0.992; AK8btag_SF[0][2]=0.844;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.966; AK8btag_SF[1][1]=1.022; AK8btag_SF[1][2]=0.909;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=0.994; AK8btag_SF[2][1]=1.058; AK8btag_SF[2][2]=0.930;}
+    }
+    if (pt>=500 && pt<600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.006; AK8btag_SF[0][1]=1.030; AK8btag_SF[0][2]=0.980;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.033; AK8btag_SF[1][1]=1.063; AK8btag_SF[1][2]=1.008;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.072; AK8btag_SF[2][1]=1.113; AK8btag_SF[2][2]=1.036;}
+    }
+    if (pt>=600) {
+      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.001; AK8btag_SF[0][1]=1.036; AK8btag_SF[0][2]=0.964;}
+      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.010; AK8btag_SF[1][1]=1.040; AK8btag_SF[1][2]=0.975;}
+      if (tag == 'T')                             {AK8btag_SF[2][0]=1.046; AK8btag_SF[2][1]=1.084; AK8btag_SF[2][2]=1.008;}
+    }
+  }
 }
 
 void Analyzer::Systematics(map<string, int> systematics) {
@@ -2899,7 +2939,7 @@ void Analyzer::Systematics(map<string, int> systematics) {
   //So in the actual run nothing is changed in that case (no weight is changed), but only extra histograms are created
   //For lepton event weight SFs, this feature is not implemented (since only Peter uses those)
   for (auto const& x : systematics) {
-    if (x.first=="DDBvL") DDBvL_whichSF=x.second;
+    if (x.first=="AK8btag") {AK8btag_whichSF=x.second; evt_wgt_syst.push_back(x.first);}//CURRENTLY HARDCODED TO LOOSE AK8 BTAG WP
     else if (x.first=="Deep") Deep_whichSF=x.second;
     else if (x.first=="JER") JER_whichSF=x.second;
     else if (x.first=="JES") JES_whichSF=x.second;
@@ -2965,6 +3005,7 @@ void Analyzer::fill_syst_histo_THn(map<string,THnD*>& syst_THn, const double* fi
     if (x.first.find("L1prefire")!=string::npos) x.second->Fill(fill,weight/nonPrefiringProbability[0]*nonPrefiringProbability[updown+1]);
     if (x.first.find("PUweight")!=string::npos && updown==0) x.second->Fill(fill,weight/puWeight*puWeightUp);
     if (x.first.find("PUweight")!=string::npos && updown==1) x.second->Fill(fill,weight/puWeight*puWeightDown);
+    if (x.first.find("AK8btag")!=string::npos)  x.second->Fill(fill,weight/AK8btag_SF[0][0]*AK8btag_SF[0][updown]);
   }
 }
 
