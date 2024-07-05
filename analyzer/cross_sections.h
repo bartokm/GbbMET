@@ -85,6 +85,7 @@ double get_cross_section(std::string name, std::string y, int center_down_up=0) 
 }
 
 //Get gluino-gluino cross section, use input of gluino mass and -1/+1 for lower/upper errors
+//https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVgluglu
 double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0) {
   if (SignalScenario==1 || SignalScenario==3 || SignalScenario==4) {
     switch (m_primary) {
@@ -1099,6 +1100,7 @@ double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0
     double returnvalue=0;
     switch (m_primary) {
       //xsec_wino_n2c1
+      //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVn2x1wino#Envelope_of_CTEQ6_6_and_MSTW2008
       case 100 : returnvalue+= 22670.1+center_down_up*973.967;
         break;
       case 125 : returnvalue+= 10034.8+center_down_up*457.604;
@@ -1257,6 +1259,7 @@ double get_cross_section(int m_primary, int SignalScenario, int center_down_up=0
     }
     switch (m_primary) {
       //xsec_wino_c1c1
+      //https://twiki.cern.ch/twiki/bin/view/LHCPhysics/SUSYCrossSections13TeVx1x1wino
       case 100 :returnvalue+= 11611.9+center_down_up*518.613;
         break;
       case 125 :returnvalue+= 5090.52+center_down_up*249.469;
