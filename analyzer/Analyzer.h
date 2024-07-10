@@ -2815,6 +2815,102 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
       SF[2] = cset->at("deepJet_comb")->evaluate({"down_correlated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
     }
   }
+  else if (Deep_whichSF==7) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"up_uncorrelated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"up_uncorrelated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"up_uncorrelated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==8) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"down_uncorrelated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"down_uncorrelated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"down_uncorrelated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==9) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"up_correlated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"up_correlated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"up_correlated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==10) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"down_correlated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"down_correlated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"down_correlated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==11) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"up_uncorrelated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"up_uncorrelated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"up_uncorrelated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==12) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"down_uncorrelated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"down_uncorrelated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"down_uncorrelated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==13) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"up_correlated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"up_correlated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"up_correlated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
+  else if (Deep_whichSF==14) {
+    if (Jet_hadronFlavour[i]==0){
+      SF[0] = cset->at("deepJet_incl")->evaluate({"central","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_incl")->evaluate({"central","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_incl")->evaluate({"central","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+    else {
+      SF[0] = cset->at("deepJet_comb")->evaluate({"down_correlated","L",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[1] = cset->at("deepJet_comb")->evaluate({"down_correlated","M",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+      SF[2] = cset->at("deepJet_comb")->evaluate({"down_correlated","T",Jet_hadronFlavour[i],abs(Jet_eta[i]),pt});
+    }
+  }
 
   double rand=gen->Uniform(), rand2=gen->Uniform();
   
