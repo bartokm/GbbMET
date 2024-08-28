@@ -270,6 +270,19 @@ void Analyzer::Loop()
    TH2D *h_mass_n_good = new TH2D("h_mass_n_good",";GenPart mass 1 [GeV];GenPart mass 2 [GeV]",100,0,3000,100,0,3000);
    TH1D *h_mass_diff = new TH1D("h_mass_diff",";|mass 1 - mass 2|/avg.mass",100,0,2);
    TH3D *h_mass_points = new TH3D("h_mass_points",";GenModel m_{#chi}[GeV];Average m_{#chi}[GeV];Gluino mass [GeV]",100,0,3000,100,0,3000,100,0,3000);
+   TEfficiency *t_cut_eff, *t_higgs_tagging_eff, *t_AK8higgs_tagging_eff, *t_AK4higgs_tagging_eff;
+   if (SignalScenario == 2 || SignalScenario == 5) {
+     t_cut_eff = new TEfficiency("t_cut_eff","",100,0,2000);
+     t_higgs_tagging_eff = new TEfficiency("t_higgs_tagging_eff","",100,0,2000);
+     t_AK8higgs_tagging_eff = new TEfficiency("t_AK8higgs_tagging_eff","",100,0,2000);
+     t_AK4higgs_tagging_eff = new TEfficiency("t_AK4higgs_tagging_eff","",100,0,2000);
+   }
+   else {
+     t_cut_eff = new TEfficiency("t_cut_eff","",100,0,3000,100,0,3000);
+     t_higgs_tagging_eff = new TEfficiency("t_higgs_tagging_eff","",100,0,3000,100,0,3000);
+     t_AK8higgs_tagging_eff = new TEfficiency("t_AK8higgs_tagging_eff","",100,0,3000,100,0,3000);
+     t_AK4higgs_tagging_eff = new TEfficiency("t_AK4higgs_tagging_eff","",100,0,3000,100,0,3000);
+   }
    TH1D *h_eff    = new TH1D("h_eff","Events;Before cuts no weights, before cuts lumi weight, before cuts all weights, after cuts no weights, after cuts lumi weight, after cuts all weights",6,-0.5,5.5);
    
    TH1D *h_SR    = new TH1D("h_SR","",16,0.5,16.5);
@@ -1066,10 +1079,11 @@ void Analyzer::Loop()
        nonPrefiringProbability[0]=CalcL1PreFire();
        nonPrefiringProbability[1]=CalcL1PreFire(1);
        nonPrefiringProbability[2]=CalcL1PreFire(2);
+       if (nonPrefiringProbability[0]==0) cout<<"nonPrefiringProbability is 0!!!!! in "<<temp_f<<" event "<<event<<endl;
      }
 
      phoET.clear();
-     if (is_debug) cout<<"nonPrefiringProbability "<<nonPrefiringProbability[0]<<" L1PreFiringWeight_Nom "<<L1PreFiringWeight_Nom<<endl;
+     if (is_debug) cout<<"nonPrefiringProbability "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      //muon
      for (unsigned int i=0;i<nMuon;i++) {
        if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_miniPFRelIso_all[i]<0.2) {
@@ -1444,7 +1458,6 @@ void Analyzer::Loop()
      */
 
      if (!isData) w*=nonPrefiringProbability[0];
-     //cout<<"L1prefire "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      if (is_debug) cout<<"AK4 object done"<<endl;
      //jet pt, btags
      if (is_debug && !isData && btag_file.size()>0) cout<<"AK4 update b-tagging status"<<endl;
@@ -2091,6 +2104,11 @@ void Analyzer::Loop()
            //Efficiency fill for no cuts bin
            h_eff->Fill(0.,1.); h_eff->Fill(1.,weight); h_eff->Fill(2.,w);
            if (SignalScan) {m_eff[mass_pair]->Fill(0.,1.); m_eff[mass_pair]->Fill(1.,weight); m_eff[mass_pair]->Fill(2.,w);}
+           if (SignalScan && Hbb) {
+             bool passed = Cut(ientry,mass_pair,is_debug);
+             if (SignalScenario==2 || SignalScenario==5) t_cut_eff->Fill(passed,mass_pair.first);
+             else t_cut_eff->Fill(passed,mass_pair.first,mass_pair.second);
+           }
            //cuts with command line
            if (is_debug) cout<<"Applying cuts"<<endl;
            if (_cut_variable.size()>0) {if (!(Cut(ientry,mass_pair,is_debug))) continue;}
@@ -2115,6 +2133,22 @@ void Analyzer::Loop()
                 
            if (h_puW->GetBinContent(h_puW->FindBin(Pileup_nTrueInt))==0) h_puW->SetBinContent(h_puW->FindBin(Pileup_nTrueInt),pu_weight);
            OverFill(h_eff,3.,1.); OverFill(h_eff,4.,weight); OverFill(h_eff,5.,w);
+             
+           if (SignalScan) {
+             bool passed_AK8 = AK8Btag_selected>0;
+             bool passed_AK4 = Deep_selected>=2 && Deep_medium_selected==1;
+             bool passed = passed_AK8 || passed_AK4;
+             if (SignalScenario==2 || SignalScenario==5) {
+               t_higgs_tagging_eff->Fill(passed,mass_pair.first);
+               t_AK8higgs_tagging_eff->Fill(passed_AK8,mass_pair.first);
+               if (!passed_AK8) t_AK4higgs_tagging_eff->Fill(passed_AK4,mass_pair.first);
+             }
+             else {
+               t_higgs_tagging_eff->Fill(passed,mass_pair.first,mass_pair.second);
+               t_AK8higgs_tagging_eff->Fill(passed_AK8,mass_pair.first,mass_pair.second);
+               if (!passed_AK8) t_AK4higgs_tagging_eff->Fill(passed_AK4,mass_pair.first,mass_pair.second);
+             }
+           }
        
            OverFill(h_nPV,PV_npvsGood,w);
            OverFill(h_nTrueInt,Pileup_nTrueInt,1);
@@ -2291,7 +2325,7 @@ void Analyzer::Loop()
              double m=AK8JetSmearedMass[SelectedAK8Jet];
              bool ak8loose_jet = (isParticleNet) ? bcounterParticleNet[1]>0 : bcounterDDBvL[1]>0;
              if (ak8loose_jet) {
-               if (!isData || (m<70 || m>200)) {
+               if (!isData || (m<80 || m>160)) {
                  OverFill(h2_mHAK8,massRegion,m,w*AK8btag_SF[0][0]);
                  OverFill(h_mHAK8,m,w*AK8btag_SF[0][0]);
                }
@@ -2316,10 +2350,11 @@ void Analyzer::Loop()
              double m2=(bjet1+bjet2).M();
              double dR = deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
              double dR2= deltaR(Jet_phi[passJet.at(0)],Jet_phi[passJet.at(1)],Jet_eta[passJet.at(0)],Jet_eta[passJet.at(1)]);
-             if (bcounterDeep[2]>0) {
-               double mass = (Deep_medium_selected==1) ? m : m2;
-               double delta_r = (Deep_medium_selected==1) ? dR : dR2;
-               if (!isData || (mass<80 || mass>160)) {
+             if (bcounterDeep[2]>0 && bcounterDeep[1]>1) {
+               double mass = (Deep_medium_selected==1 && Deep_selected==2) ? m : m2;
+               double delta_r = (Deep_medium_selected==1 && Deep_selected==2) ? dR : dR2;
+               double pt = (Deep_medium_selected==1 && Deep_selected==2) ? ptsum_ak4_Hcandidate : (bjet1+bjet2).Pt();
+               if (pt>=100 && (!isData || (mass<80 || mass>160))) {
                  OverFill(h2_mHAK4_clean,massRegion,mass,w);
                  OverFill(h_mHAK4_clean,mass,w);
                  if (higgs_category!=4) {
@@ -2330,7 +2365,7 @@ void Analyzer::Loop()
                  h3_mHAK4_dr_Higgs->Fill(massRegion,mass,delta_r,w);
                }
              }
-             if (bcounterDeep[2]==0){
+             if (bcounterDeep[2]==0 || bcounterDeep[1]<2){
                OverFill(h2_mHAK4_clean_fake,massRegion,m,w);
                OverFill(h_mHAK4_clean_fake,m,w);
                if (!boost) {
@@ -2609,7 +2644,7 @@ void Analyzer::Loop()
          double m=AK8JetSmearedMass[SelectedAK8Jet];
          bool ak8loose_jet = (isParticleNet) ? bcounterParticleNet[1]>0 : bcounterDDBvL[1]>0;
          if (ak8loose_jet) {
-           if (!isData || (m<70 || m>200)) {
+           if (!isData || (m<80 || m>160)) {
              OverFill(m2_mHAK8[mass_pair],massRegion,m,w*AK8btag_SF[0][0]);
              OverFill(m_mHAK8[mass_pair],m,w*AK8btag_SF[0][0]);
            }
@@ -2634,10 +2669,11 @@ void Analyzer::Loop()
          double m2=(bjet1+bjet2).M();
          double dR = deltaR(Jet_phi[SelectedAK4Jet1],Jet_phi[SelectedAK4Jet2],Jet_eta[SelectedAK4Jet1],Jet_eta[SelectedAK4Jet2]);
          double dR2= deltaR(Jet_phi[passJet.at(0)],Jet_phi[passJet.at(1)],Jet_eta[passJet.at(0)],Jet_eta[passJet.at(1)]);
-         if (bcounterDeep[2]>0) {
-           double mass = (Deep_medium_selected==1) ? m : m2;
-           double delta_r = (Deep_medium_selected==1) ? dR : dR2;
-           if (!isData || (mass<80 || mass>160)) {
+         if (bcounterDeep[2]>0 && bcounterDeep[1]>1) {
+           double mass = (Deep_medium_selected==1 && Deep_selected==2) ? m : m2;
+           double delta_r = (Deep_medium_selected==1 && Deep_selected==2) ? dR : dR2;
+           double pt = (Deep_medium_selected==1 && Deep_selected==2) ? ptsum_ak4_Hcandidate : (bjet1+bjet2).Pt();
+           if (pt>=100 && (!isData || (mass<80 || mass>160))) {
              OverFill(m2_mHAK4_clean[mass_pair],massRegion,mass,w);
              OverFill(m_mHAK4_clean[mass_pair],mass,w);
              if (higgs_category!=5) {
@@ -2648,7 +2684,7 @@ void Analyzer::Loop()
              m3_mHAK4_dr_Higgs[mass_pair]->Fill(massRegion,mass,delta_r,w);
            }
          }
-         if (bcounterDeep[2]==0){
+         if (bcounterDeep[2]==0 || bcounterDeep[1]<2){
            OverFill(m2_mHAK4_clean_fake[mass_pair],massRegion,m,w);
            OverFill(m_mHAK4_clean_fake[mass_pair],m,w);
            if (!boost) {

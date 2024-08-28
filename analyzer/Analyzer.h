@@ -1256,8 +1256,8 @@ public :
    void             OverFill(TH2D *h, double x, double y, double w);
    void             set_ABCD_histo(TH1D *h);
    string           GetSignalPoint(Long64_t ientry, bool debug=0);
-   double           CalcL1PreFire(int syst=0);
-   double           getPrefiringRateMuon(double eta, double phi, double pt, int syst=0);
+   double           CalcL1PreFire(int syst=0, bool print=0);
+   double           getPrefiringRateMuon(double eta, double phi, double pt, int syst=0, bool print=0);
 };
 
 #endif
@@ -1517,8 +1517,8 @@ double getPrefiringRateEcal(double eta, double pt, TH2D* h_prefmap, int syst=0) 
   return prefrate;
 }
 
-double Analyzer::getPrefiringRateMuon(double eta, double phi, double pt, int syst) {
-  double prefrate=1;
+double Analyzer::getPrefiringRateMuon(double eta, double phi, double pt, int syst, bool print) {
+  double prefrate=0;
   double statuncty;
   if ((year.find("2016") != std::string::npos) && (eta > 1.24 && eta < 1.6) && (phi > 2.44346 && phi < 2.79253)) {
     prefrate = muon_parametrization[11]->Eval(pt);
@@ -1575,7 +1575,7 @@ double Analyzer::getPrefiringRateMuon(double eta, double phi, double pt, int sys
   return prefrate;
 }
 
-double Analyzer::CalcL1PreFire(int syst){
+double Analyzer::CalcL1PreFire(int syst, bool print){
   //Probability for the event NOT to prefire, computed with the prefiring maps per object.
   //Up and down values correspond to the resulting value when shifting up/down all prefiring rates in prefiring maps.
   //syst 0: central, 1: up, 2: down
@@ -1588,8 +1588,10 @@ double Analyzer::CalcL1PreFire(int syst){
       double eta_gam = Photon_eta[i];
       if (pt_gam < 20. || abs(eta_gam) < 2 || abs(eta_gam) >3) continue;
       double prefiringprob_gam = getPrefiringRateEcal(eta_gam, pt_gam, h_L1prefire_phoMap, syst);
+      if (print) cout<<"prefiringprob_gam "<<prefiringprob_gam<<endl;
       nonPrefiringProbaECAL *= (1. - prefiringprob_gam);
     }
+    if (print) cout<<"nonPrefiringProbaECAL after photons only "<<nonPrefiringProbaECAL<<endl;
  
     //Now applying the prefiring maps to jets in the affected regions.
     for (unsigned int i=0;i<nJet;i++){
@@ -1607,6 +1609,7 @@ double Analyzer::CalcL1PreFire(int syst){
         if (pt_gam < 20. || abs(eta_gam) < 2 || abs(eta_gam) >3) continue;
         if (deltaR(phi_jet,phi_gam,eta_jet,eta_gam)>0.16) continue;
         double prefiringprob_gam = getPrefiringRateEcal(eta_gam, pt_gam, h_L1prefire_phoMap, syst);
+        if (print) cout<<"prefiringprob_gam overlapping photon "<<prefiringprob_gam<<endl;
         nonprefiringprobfromoverlappingphotons *= (1. - prefiringprob_gam);
         foundOverlappingPhotons = true;
       }
@@ -1620,6 +1623,7 @@ double Analyzer::CalcL1PreFire(int syst){
       }
       //Last case: if overlapping photons have a non prefiring rate smaller than the jet, don't consider the jet in the event weight, and do nothing.
     }
+    if (print) cout<<"nonPrefiringProbaECAL after jets "<<nonPrefiringProbaECAL<<endl;
   }
     
   //Now calculate prefiring weights for muons
@@ -1629,9 +1633,12 @@ double Analyzer::CalcL1PreFire(int syst){
     double eta = Muon_eta[i];
     // Remove crappy tracker muons which would not have prefired the L1 trigger
     if (pt < 5 || !Muon_looseId[i]) continue;
-    double prefiringprob_mu = getPrefiringRateMuon(eta, phi, pt, syst);
+    if (print) cout<<"mu pt "<<pt<<" eta "<<eta<<" phi "<<phi<<endl;
+    double prefiringprob_mu = getPrefiringRateMuon(eta, phi, pt, syst, print);
+    if (print) cout<<"prefiringprob_mu "<<prefiringprob_mu<<endl;
     nonPrefiringProbaMuon *= (1. - prefiringprob_mu);
   }
+  if (print) cout<<"nonPrefiringProbaMuon after muons "<<nonPrefiringProbaMuon<<endl;
 
   // Calculate combined weight as product of the weight for individual objects
   return nonPrefiringProbaECAL * nonPrefiringProbaMuon;
@@ -2535,7 +2542,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="sth_selected") {
       int sth = 0;
       if (AK8Btag_selected>0) sth = 1;
-      else if (Deep_medium_selected==1) sth = 1;
+      else if (Deep_medium_selected==1 && Deep_selected==2) sth = 1;
       returnvalue=Parser(sth,_cut_operator[i],_cut_value[i]);
     }
     else if (_cut_variable[i]=="passBtag") returnvalue=Parser(passBtag,_cut_operator[i],_cut_value[i]);
@@ -2577,7 +2584,7 @@ void Analyzer::set_ABCD_histo(TH1D *h){
 }
 
 void Analyzer::OverFill(TH1D *h, double x, double w){
-  bool h_tag=AK8Btag_selected>0 || Deep_medium_selected==1;
+  bool h_tag=AK8Btag_selected>0 || (Deep_medium_selected==1 && Deep_selected>=2);
   bool met = MET>_ABCD;
   double max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
   if (_ABCD) {
@@ -3111,6 +3118,7 @@ void Analyzer::fill_syst_histo_TH1(map<string,THnD*>& syst_THn, map<string,TH1D*
   for (auto const& x : syst_THn) {
     unsigned int nsbins=x.second->GetNbins();
     for (unsigned int i=1;i<nsbins+1;i++) {
+      if (isnan(x.second->GetBinContent(i)) || isnan(x.second->GetBinError(i))) continue;
       syst_TH1[x.first]->SetBinContent(i,x.second->GetBinContent(i));
       syst_TH1[x.first]->SetBinError(i,x.second->GetBinError(i));
     }

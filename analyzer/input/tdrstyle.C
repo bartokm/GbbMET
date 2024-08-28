@@ -1,4 +1,7 @@
 #include "TStyle.h"
+  
+vector<int> colors6={2001,2002,2003,2004,2005,2006};
+vector<int> colors10={3001,3002,3003,3004,3005,3006,3007,3008,3009,3010};
 
 // tdrGrid: Turns the grid lines on (true) or off (false)
 
@@ -13,8 +16,34 @@ void fixOverlay() {
   gPad->RedrawAxis();
 }
 
+void hexToRGB(string& hexColor, float& r, float& g, float& b) {
+  unsigned int hexValue;
+  stringstream ss;
+  ss<<hex<<hexColor;
+  ss>>hexValue;
+  r = ((hexValue >> 16) & 0xFF) / 255.0;
+  g = ((hexValue >> 8) & 0xFF) / 255.0;
+  b = (hexValue & 0xFF) / 255.0;
+}
+
 void setTDRStyle() {
   TStyle *tdrStyle = new TStyle("tdrStyle","Style for P-TDR");
+
+  vector<string> colors6={"5790fc", "f89c20", "e42536", "964a8b", "9c9ca1", "7a21dd"};
+  //vector<string> colors8={"1845fb", "ff5e02", "c91f16", "c849a9", "adad7d", "86c8dd", "578dff", "656364"};
+  vector<string> colors10={"3f90da", "ffa90e", "bd1f01", "94a4a2", "832db6", "a96b59", "e76300", "b9ac70", "717581", "92dadd"};
+
+  for (int i=0;i<colors6.size();i++){
+    float r,g,b;
+    hexToRGB(colors6.at(i),r,g,b);
+    new TColor(2001+i, r,g,b);
+  }
+  for (int i=0;i<colors10.size();i++){
+    float r,g,b;
+    hexToRGB(colors10.at(i),r,g,b);
+    new TColor(3001+i, r,g,b);
+  }
+
 
 // For the canvas:
   tdrStyle->SetCanvasBorderMode(0);
@@ -52,7 +81,7 @@ void setTDRStyle() {
   // tdrStyle->SetLegoInnerR(Float_t rad = 0.5);
   // tdrStyle->SetNumberContours(Int_t number = 20);
 
-  tdrStyle->SetEndErrorSize(0);
+  tdrStyle->SetEndErrorSize(2);
   // tdrStyle->SetErrorMarker(20);
   //tdrStyle->SetErrorX(0.);
   
@@ -86,10 +115,10 @@ void setTDRStyle() {
   // tdrStyle->SetStatY(Float_t y = 0);
 
 // Margins:
-  tdrStyle->SetPadTopMargin(0.08); // was 0.05
-  tdrStyle->SetPadBottomMargin(0.12); // was 0.13
-  tdrStyle->SetPadLeftMargin(0.16); // was 0.16
-  tdrStyle->SetPadRightMargin(0.04); // was 0.02
+  tdrStyle->SetPadTopMargin(0.05);
+  tdrStyle->SetPadBottomMargin(0.13);
+  tdrStyle->SetPadLeftMargin(0.16);
+  tdrStyle->SetPadRightMargin(0.02);
 
 // For the Global title:
 
@@ -113,8 +142,8 @@ void setTDRStyle() {
   tdrStyle->SetTitleSize(0.06, "XYZ");
   // tdrStyle->SetTitleXSize(Float_t size = 0.02); // Another way to set the size?
   // tdrStyle->SetTitleYSize(Float_t size = 0.02);
-  tdrStyle->SetTitleXOffset(0.9); // was 0.9
-  tdrStyle->SetTitleYOffset(1.25); // was 1.25
+  tdrStyle->SetTitleXOffset(0.9);
+  tdrStyle->SetTitleYOffset(1.25);
   // tdrStyle->SetTitleOffset(1.1, "Y"); // Another way to set the Offset
 
 // For the axis labels:
@@ -157,5 +186,5 @@ void setTDRStyle() {
 
   tdrStyle->cd();
 
-  cout << "This is TDR style" << endl;
 }
+
