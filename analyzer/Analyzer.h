@@ -2587,6 +2587,7 @@ void Analyzer::OverFill(TH1D *h, double x, double w){
   bool h_tag=AK8Btag_selected>0 || (Deep_medium_selected==1 && Deep_selected>=2);
   bool met = MET>_ABCD;
   double max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
+  if (_ABCD!=0 && MET>_ABCD && MET<300) return; //this is only for ABCD distr. in SR. otherwise need to remove this
   if (_ABCD) {
     for (auto i : abcd_histos) {
       string h_name=h->GetName(); string abcd_name=i->GetName();
@@ -2606,7 +2607,7 @@ void Analyzer::OverFill(TH2D *h, double x, double y, double w){
   double y_max=h->GetYaxis()->GetBinCenter(h->GetNbinsY());
   double fill_x=(x>x_max) ? x_max : x;
   double fill_y=(y>y_max) ? y_max : y;
-  bool h_tag=AK8Btag_selected>0 || Deep_medium_selected==1;
+  bool h_tag=AK8Btag_selected>0 || (Deep_medium_selected==1 && Deep_selected>=2);
   bool met = MET>_ABCD;
   if (!_ABCD || (h_tag && met)) h->Fill(fill_x,fill_y,w);
 }

@@ -19,6 +19,7 @@
  
   map< pair<int, int>, TH1D* > m_phoEt;
   map< pair<int, int>, TH1D* > m_phoEta;
+  map< pair<int, int>, TH1D* > m_phoEta_highR9;
 
   map< pair<int, int>, TH1D* > m_phoPt;
   map< pair<int, int>, TH1D* > m_genMET;
@@ -142,6 +143,7 @@
   map< pair<int, int>, TH1D* > m_mHAK4;
   map< pair<int, int>, TH2D* > m2_mHAK8;
   map< pair<int, int>, TH2D* > m2_mHAK4;
+  map< pair<int, int>, TH2D* > m2_sum_mHAK;
   map< pair<int, int>, TH1D* > m_mHAK8_fake;
   map< pair<int, int>, TH1D* > m_mHAK4_fake;
   map< pair<int, int>, TH2D* > m2_mHAK8_fake;
@@ -398,6 +400,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
   
       m_phoEt[MassPair] = new TH1D("h_phoEt",";E_{T}^{#gamma} [GeV]",7,25,1075);
       m_phoEta[MassPair] = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
+      m_phoEta_highR9[MassPair] = new TH1D("h_phoEta_highR9",";#eta^{#gamma}",30,-3,3);
       m_phoPt[MassPair] = new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",50,0,500);
   
       m_pfMET[MassPair] = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
@@ -525,6 +528,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_mHAK4[MassPair] = new TH1D("h_mHAK4",";M_{bb}[GeV]",30,0,300);
       m2_mHAK8[MassPair] = new TH2D("h2_mHAK8",";Unrolled bins;M_{AK8}[GeV]",12,0.5,12.5,30,0,300);
       m2_mHAK4[MassPair] = new TH2D("h2_mHAK4",";Unrolled bins;M_{bb}[GeV]",12,0.5,12.5,30,0,300);
+      m2_sum_mHAK[MassPair] = new TH2D("h2_sum_mHAK",";Unrolled bins;M[GeV]",12,0.5,12.5,30,0,300);
       m_mHAK8_fake[MassPair]= new TH1D("h_mHAK8_fake",";M_{AK8}[GeV]",20,18,278);
       m_mHAK4_fake[MassPair]= new TH1D("h_mHAK4_fake",";M_{bb}[GeV]",13,20,280);
       m2_mHAK8_fake[MassPair]= new TH2D("h2_mHAK8_fake",";Unrolled bins;M_{AK8}[GeV]",12,0.5,12.5,30,0,300);

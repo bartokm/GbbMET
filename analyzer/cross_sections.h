@@ -3,11 +3,12 @@
 
 double get_cross_section(std::string name, std::string y, int center_down_up=0) {
   int year=(y.find("2016")!=std::string::npos) ? 2016 : (y.find("2017")!=std::string::npos) ? 2017 : (y.find("2018")!=std::string::npos) ? 2018 : 1;
-  if (name.find("DYJetsToLL_Pt-50To100")!=std::string::npos) return 398.8;
-  else if (name.find("DYJetsToLL_Pt-100To250")!=std::string::npos) return 93.61;
-  else if (name.find("DYJetsToLL_Pt-250To400")!=std::string::npos) return 3.67;
-  else if (name.find("DYJetsToLL_Pt-400To650")!=std::string::npos) return 0.5;
-  else if (name.find("DYJetsToLL_Pt-650ToInf")!=std::string::npos) return 0.04704;
+  if (name.find("DYJetsToLL_LHEFilterPtZ-0To50")!=std::string::npos) return 1494;
+  else if (name.find("DYJetsToLL_LHEFilterPtZ-50To100")!=std::string::npos) return 398.8;
+  else if (name.find("DYJetsToLL_LHEFilterPtZ-100To250")!=std::string::npos) return 93.61;
+  else if (name.find("DYJetsToLL_LHEFilterPtZ-250To400")!=std::string::npos) return 3.67;
+  else if (name.find("DYJetsToLL_LHEFilterPtZ-400To650")!=std::string::npos) return 0.5;
+  else if (name.find("DYJetsToLL_LHEFilterPtZ-650ToInf")!=std::string::npos) return 0.04704;
   else if (name.find("DYJetsToLL_M-10to50")!=std::string::npos) return 15890;
   else if (name.find("DYJetsToLL_M-50")!=std::string::npos) return 5398;
   else if (name.find("GJets_DR-0p4_HT-100To200")!=std::string::npos) return 5034;
