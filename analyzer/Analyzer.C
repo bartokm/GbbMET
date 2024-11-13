@@ -1151,7 +1151,7 @@ void Analyzer::Loop()
          passOverlap=false;break;
        }
        //bug details: https://indico.cern.ch/event/1441254/contributions/6089518/attachments/2918380/5121877/oshiro_2024_08_30_2016apvphoton.pdf
-       if (year.find("2016")!=std::string::npos && Electron_r9[i]>0.98 && Electron_eta[i]>1.5 && Electron_eta[i]<2.0) {
+       if (year.find("2016")!=std::string::npos && Electron_r9[i]>0.98 && abs(Electron_eta[i])>1.5 && abs(Electron_eta[i])<2.0) {
          if (_fastSim && jentry%100<54) continue;
          if (!_fastSim && year=="2016preVFP") continue;
        }
