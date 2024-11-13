@@ -485,7 +485,7 @@ void Analyzer::Loop()
    init_syst_histograms(syst_THn_AK4, syst_TH1_AK4, syst_THn_AK8, syst_TH1_AK8);
 
    //histograms for ABCD prediction
-   vector<TH1D*> histos_for_abcd{h_eff,h_nPV,h_phoEt,h_phoEta,h_pfMETPhi,h_MT_fix,h_ST_fix,h_HT_after,h_dphi_met_btags,h_nPho,h_nEle,h_nMu,h_nTau,h_ElePt_fix,h_MuPt_fix,h_TauPt_fix,h_njets,h_jetpt,h_nAK8jets,h_AK8jetpt,h_bjets_l,h_bjets_m,h_bjets_t,h_AK8bjets_l,h_AK8bjets_m,h_disc_bjets_1,h_disc_bjets_2,h_disc_AK8bjets_1,h_pt_bjets_l1,h_pt_bjets_l2,h_pt_bjets_m,h_pt_AK8bjets_l};
+   vector<TH1D*> histos_for_abcd{h_eff,h_nPV,h_phoEt,h_phoEta,h_phoEta_highR9,h_pfMETPhi,h_MT_fix,h_ST_fix,h_HT_after,h_dphi_met_btags,h_nPho,h_nEle,h_nMu,h_nTau,h_ElePt_fix,h_MuPt_fix,h_TauPt_fix,h_njets,h_jetpt,h_nAK8jets,h_AK8jetpt,h_bjets_l,h_bjets_m,h_bjets_t,h_AK8bjets_l,h_AK8bjets_m,h_disc_bjets_1,h_disc_bjets_2,h_disc_AK8bjets_1,h_pt_bjets_l1,h_pt_bjets_l2,h_pt_bjets_m,h_pt_AK8bjets_l};
    if (_ABCD) for (auto i : histos_for_abcd) set_ABCD_histo(i);
   
    //Histograms for signalstudy
@@ -1282,7 +1282,7 @@ void Analyzer::Loop()
        //cout<<"egamme smear up "<<Photon_dEsigmaUp[i]<<" down "<<Photon_dEsigmaDown[i]<<endl;
 
        phoET.push_back(pt);
-       if (is_debug) cout<<"photon "<<i<<" pt "<<pt<<endl;
+       if (is_debug) cout<<"photon "<<i<<" pt "<<pt<<" sceta "<<Photon_SCEta(i)<<" r9 "<<Photon_r9[i]<<" pixelseed "<<Photon_pixelSeed[i]<<endl;
        if (is_debug) cout<<"overlap with muons"<<endl;
        bool passOverlap=true;
        for (auto j : passMuons) if (deltaR(Photon_phi[i],Muon_phi[j],Photon_eta[i],Muon_eta[j])<0.3) {
@@ -1298,9 +1298,9 @@ void Analyzer::Loop()
        }
        if (!passOverlap) continue;
        //bug details: https://indico.cern.ch/event/1441254/contributions/6089518/attachments/2918380/5121877/oshiro_2024_08_30_2016apvphoton.pdf
-       if (year.find("2016")!=std::string::npos && Photon_r9[i]>0.98 && Photon_SCEta(i)>1.5 && Photon_SCEta(i)<2.0) {
-         if (_fastSim && jentry%100<54) continue;
-         if (!_fastSim && year=="2016preVFP") continue;
+       if (year.find("2016")!=std::string::npos && Photon_r9[i]>0.98 && abs(Photon_SCEta(i))>1.5 && abs(Photon_SCEta(i))<2.0) {
+         if (_fastSim && jentry%100<54) {if (is_debug) cout<<"Photon skipped eta "<<Photon_SCEta(i)<<" r9 "<<Photon_r9[i]<<endl; continue;}
+         if (!_fastSim && year=="2016preVFP") {if (is_debug) cout<<"Photon skipped eta "<<Photon_SCEta(i)<<" r9 "<<Photon_r9[i]<<endl; continue;}
        }
        if (is_debug) cout<<"Photon_isScEtaEB "<<Photon_isScEtaEB[i]<<" Photon_isScEtaEE "<<Photon_isScEtaEE[i]<<" pixelseed "<<Photon_pixelSeed[i]<<" ID "<<Photon_cutBased[i]<<endl;
        if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]==0 && phoET[i]>100) {
@@ -1311,7 +1311,7 @@ void Analyzer::Loop()
          if (Photon_mvaID_WP90[i]) passPhoMVA90.push_back(i);
          if (Photon_mvaID_WP80[i] && Photon_isScEtaEB[i]) passPhoMVA80_EB.push_back(i);
        }
-       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0) {
+       if ((Photon_isScEtaEB[i] || Photon_isScEtaEE[i]) && Photon_pixelSeed[i]!=0 && phoET[i]>100) {
          if (Photon_cutBased[i]>=1) passElePhoL.push_back(i);
          if (Photon_cutBased[i]>=2) passElePhoM.push_back(i);
          if (Photon_cutBased[i]>=3) passElePhoT.push_back(i);
@@ -1328,7 +1328,6 @@ void Analyzer::Loop()
        if (phoET[i]>phoET[nleadPho]) nleadPho=i;
        EMHT_before+=phoET[i];
      }
-     if (is_debug) cout<<"leading photon index "<<nleadPho<<" pt "<<phoET[nleadPho]<<" eta "<<Photon_eta[nleadPho]<<" phi "<<Photon_phi[nleadPho]<<endl; 
      nPassElePhoL=passElePhoL.size();
      nPassElePhoM=passElePhoM.size();
      nPassElePhoT=passElePhoT.size();
@@ -1340,11 +1339,13 @@ void Analyzer::Loop()
      nPassPhoMVA80=passPhoMVA80.size();
      nPassPhoMVA90=passPhoMVA90.size();
      for (auto i : passElePhotons) if (phoET[i]>phoET[nleadElePho]) nleadElePho=i;
+     if (is_debug) cout<<"number of fake photons: "<<passElePhotons.size()<<endl; 
      if (_fakeRate==2 && passElePhotons.size() != 0) {
        nleadPho=nleadElePho;
        passPhotons=passElePhotons;
        nPassPhoL=passElePhotons.size();
      }
+     if (is_debug) cout<<"leading photon index "<<nleadPho<<" pt "<<phoET[nleadPho]<<" eta "<<Photon_eta[nleadPho]<<" phi "<<Photon_phi[nleadPho]<<endl; 
      EMHT_after=EMHT_before;
      AK8EMHT_before=EMHT_before;
      AK8EMHT_after=EMHT_before;
@@ -1391,14 +1392,16 @@ void Analyzer::Loop()
      }
      //Applying Fake Rate
      if (_fakeRate) {
+       if (is_debug) cout<<"Applying Fake Rate (w before "<<w<<")"<<endl;
        if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
-       if (_fakeRate==2 && nPassElePhoL != 0) {
+       if (_fakeRate==2 && passElePhotons.size() != 0) {
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePho],Photon_phi[nleadElePho]));
          double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
-         //cout<<"etaphi "<<Photon_eta[nleadElePho]<<" "<<Photon_phi[nleadElePho]<<endl;
-         //cout<<FRvalue<<" = "<<FRetaphi<<" * "<<_C<<" *("<<_A<<" * "<<PV_npvsGood<<" + "<<_B<<")"<<endl;
+         if (is_debug) cout<<"etaphi "<<Photon_eta[nleadElePho]<<" "<<Photon_phi[nleadElePho]<<endl;
+         if (is_debug) cout<<FRvalue<<" = "<<FRetaphi<<" * "<<_C<<" *("<<_A<<" * "<<PV_npvsGood<<" + "<<_B<<")"<<endl;
          w*=FRvalue;
        }
+       if (is_debug) cout<<"w after "<<w<<endl;
      }
 
      //IsoTrack
