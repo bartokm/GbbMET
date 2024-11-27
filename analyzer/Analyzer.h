@@ -1157,7 +1157,7 @@ public :
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true, OneOr2jet=false;
    bool Hbb=false;
-   int mcLeptonFilter=0;
+   int mcLeptonFilter=0, mcNeutrinoFilter=0;
    int SignalHiggs=0, SignalZ=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
@@ -1189,6 +1189,7 @@ public :
    vector<TH3D*> abcd_histos;
    //histograms needed for SFs
    TH1D *h_ST_SF, *h_AK4_b_discr_SF, *h_AK8_b_discr_SF;
+   TH1D *h_trig_SF; TEfficiency *t_trig_eff;
    TH2F *h_pho_EGamma_SF2D[5];
    TH2F *h_ele_EGamma_SF2D[4];
    TH2F *h_ele_EGamma_EffMC2D[4];
@@ -2557,6 +2558,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="truePU") {returnvalue=Parser_float(Pileup_nTrueInt,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="nVtx") {returnvalue=Parser(PV_npvs,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="mcNeutrinoFilter") returnvalue=Parser(mcNeutrinoFilter,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="1or2jet") returnvalue=Parser(OneOr2jet,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (debug) cout<<" result "<<returnvalue<<endl;;
@@ -3260,6 +3262,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"truePU","Cut on number of true pileup."},
   {"nVtx","Cut on number of vertices."},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"},
+  {"mcNeutrinoFilter","True if MC truth neutrino with Z boson mother was present in the event"},
   {"1or2jet","Boolean. Presence of at least 1 AK8 or 2 AK4 jet(s)"}};
 
 bool CompareCuts(vector<string> input_cuts){
