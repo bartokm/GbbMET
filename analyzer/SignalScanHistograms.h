@@ -22,6 +22,13 @@
   map< pair<int, int>, TH1D* > m_phoEta_highR9;
 
   map< pair<int, int>, TH1D* > m_phoPt;
+  /*
+  map< pair<int, int>, TEfficiency* > m2_pho_eff;
+  map< pair<int, int>, TEfficiency* > m_pho_eff_eta0p8;
+  map< pair<int, int>, TEfficiency* > m_pho_eff_eta1p444;
+  map< pair<int, int>, TEfficiency* > m_pho_eff_eta2p0;
+  map< pair<int, int>, TEfficiency* > m_pho_eff_etainf;
+  */
   map< pair<int, int>, TH1D* > m_genMET;
   map< pair<int, int>, TH1D* > m_genMET_goodpair;
   map< pair<int, int>, TH1D* > m_pfMET;
@@ -402,6 +409,22 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m_phoEta[MassPair] = new TH1D("h_phoEta",";#eta^{#gamma}",30,-3,3);
       m_phoEta_highR9[MassPair] = new TH1D("h_phoEta_highR9",";#eta^{#gamma}",30,-3,3);
       m_phoPt[MassPair] = new TH1D("h_phoPt",";#gamma{E}_{T} [GeV]",50,0,500);
+      
+      /*
+      //std::vector<double> xBins = {20, 35, 50, 80, 120, 500,1000};
+      std::vector<double> xBins = {20, 35, 50, 80, 100, 200, 500, 1000};
+      std::vector<double> yBins = {-2.5, -2, -1.566, -1.444, -0.8, 0, 0.8, 1.444, 1.566, 2, 2.5};
+      m2_pho_eff[MassPair] = new TEfficiency("t2_pho_eff",";p_{T} [GeV];#eta;Efficiency",xBins.size()-1,xBins.data(),yBins.size()-1,yBins.data());
+      m_pho_eff_eta0p8[MassPair] = new TEfficiency("t_pho_eff_eta0p8",";p_{T} [GeV];Efficiency",xBins.size()-1,xBins.data());
+      m_pho_eff_eta1p444[MassPair] = new TEfficiency("t_pho_eff_eta1p444",";p_{T} [GeV];Efficiency",xBins.size()-1,xBins.data());
+      m_pho_eff_eta2p0[MassPair] = new TEfficiency("t_pho_eff_eta2p0",";p_{T} [GeV];Efficiency",xBins.size()-1,xBins.data());
+      m_pho_eff_etainf[MassPair] = new TEfficiency("t_pho_eff_etainf",";p_{T} [GeV];Efficiency",xBins.size()-1,xBins.data());
+      m2_pho_eff[MassPair]->SetUseWeightedEvents();
+      m_pho_eff_eta0p8[MassPair]->SetUseWeightedEvents();
+      m_pho_eff_eta1p444[MassPair]->SetUseWeightedEvents();
+      m_pho_eff_eta2p0[MassPair]->SetUseWeightedEvents();
+      m_pho_eff_etainf[MassPair]->SetUseWeightedEvents();
+      */
   
       m_pfMET[MassPair] = new TH1D("h_pfMET",";#slash{E}_{T} [GeV]",nbins_pfMET,xbins_pfMET);
       m_pfMET_fix[MassPair]= new TH1D("h_pfMET_fix",";#slash{E}_{T} [GeV]",50,0,500);

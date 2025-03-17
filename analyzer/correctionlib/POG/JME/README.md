@@ -27,7 +27,11 @@ The SFs are meant for the following campaigns:
 | `2017_UL`| `RunIISummer20UL17MiniAODv2` |`09Aug2019`|
 | `2018_UL`| `RunIISummer20UL18MiniAODv2` |`12Nov2019`|
 | `2022_Prompt` | Winter22 | Prompt RunCDE |
-| `2022_Summer22EE` | Summer22EE | Prompt RunFG, with EE leak region vetoed |
+| `2022_Summer22` | Summer22 | `22Sep2023` (ReReco CD) |
+| `2022_Summer22EE` | Summer22EE | `22Sep2023` (ReReco E + Prompt RunFG, with EE leak region vetoed) |
+| `2023_Summer23` | Summer23 | Prompt23 RunC (divided into Cv123 and Cv4) |
+| `2023_Summer23BPix` | Summer23BPix | Prompt23 RunD |
+| `2024_Winter24` | Summer23BPix (sic!) | Prompt24 RunBCD, RunE, RunF, RunG, RunH, RunI |
 
 
 ## Usage

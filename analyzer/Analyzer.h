@@ -1150,6 +1150,7 @@ public :
    int nleadEleV=-1, nleadEleL=-1, nleadEleM=-1, nleadEleT=-1, nleadEleNO=-1;
    int nleadMuL=-1, nleadMuM=-1, nleadMuT=-1, nleadMuNO=-1;
    int nleadTauL=-1, nleadTauM=-1, nleadTauT=-1, nleadIso=-1;
+   double pt_leadpt_ak4=-1;
    int bcounterDDBvL[6]={}, bcounterParticleNet[6]={}, bcounterDeep[4]={};
    int AK8Btag_selected=0, Deep_selected=0, Deep_medium_selected=0;
    bool L1prefire=false;
@@ -1177,7 +1178,7 @@ public :
    unsigned int ISR_MC=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
-   double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999;
+   double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999, dphi_met_btags_AK8=999;
    double e_pt=10, mu_pt=5, tau_pt=20;
    double w=0, xsec=1;
    double nonPrefiringProbability[3]={1,1,1};
@@ -1202,6 +1203,7 @@ public :
    TH2D *h_muID_SF2D[3];
    TH2D *h_muISO_SF2D[3];
    TF1  *tf1_tau_ID_SF[3];
+   TF1  *tf1_pho_SF[4];
    TH2D *h_L1prefire_phoMap;
    TH2D *h_L1prefire_jetMap;
    TF1 *muon_parametrization[12];
@@ -2301,14 +2303,17 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     if (year.find("2016")!=std::string::npos) (_fastSim) ? filterValue=125 : filterValue=639;
     else  (_fastSim) ? filterValue=1149 : filterValue=1663;
     metFilters_hardcoded=(metFilters&filterValue)==filterValue;
-    bool HLTPho=0, HLTMET=0;
+    bool HLTPho=0, HLTMET=0, HLTJet=0;
     if (year.find("2016")!=std::string::npos) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     //else if (year.find("2018")!=std::string::npos) HLTPho=HLT_Photon110EB_TightID_TightIso || HLT_Photon200 || HLT_Photon300_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
     if (year.find("2016")!=std::string::npos) HLTMET=HLT_PFMET170_HBHE_BeamHaloCleaned;
     else HLTMET=HLT_PFMET200_HBHE_BeamHaloCleaned;
+    if (year.find("2016")!=std::string::npos) HLTJet=HLT_PFJet450 || HLT_PFJet500;
+    else HLTJet=HLT_PFJet500;
     if      (_cut_variable[i]=="HLTPho")    returnvalue=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="HLTMET")    returnvalue=Parser(HLTMET,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="HLTJet")    returnvalue=Parser(HLTJet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="isPVGood") returnvalue=Parser(PV_npvsGood,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassEleL") {returnvalue=Parser(nPassEleL,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[1]; if (!isData && _cut_value[i]==0) w*=ele_VETOSF;}
     else if (_cut_variable[i]=="nPassEleM") {returnvalue=Parser(nPassEleM,_cut_operator[i],_cut_value[i]); if (!isData) w*=ele_SF[2];}
@@ -2511,6 +2516,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="dphi_met_btag_at_high_njet") {if (nonHiggsJet>=4) returnvalue=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_btag_at_low_njet") {if (nonHiggsJet<4) returnvalue=Parser_float(dphi_met_btag,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_btags") returnvalue=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="dphi_met_btags_AK8") returnvalue=Parser_float(dphi_met_btags_AK8,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="dphi_met_btags_at_high_njet") {if (nonHiggsJet>=4) returnvalue=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_btags_at_low_njet") {if (nonHiggsJet<4) returnvalue=Parser_float(dphi_met_btags,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="dphi_met_H_candidate") returnvalue=Parser_float(dphi_met_H_candidate,_cut_operator[i],_cut_value[i]);
@@ -2520,6 +2526,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="L1prefire") returnvalue=Parser(L1prefire,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK4") returnvalue=Parser(nPassAK4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nPassAK8") returnvalue=Parser(nPassAK8,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="AK4Pt") returnvalue=Parser_float(pt_leadpt_ak4,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="nonHiggsJet") returnvalue=Parser(nonHiggsJet,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="noHmass_in_event") returnvalue=Parser(noHmass_in_event,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="bcounterDeep_L") returnvalue=Parser(bcounterDeep[1],_cut_operator[i],_cut_value[i]);
@@ -3176,6 +3183,7 @@ void Analyzer::FillAK4tagging(vector<bool> ak4selected, vector<int> ak4trueselec
 
 map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"HLTMET","HLT_PFMET lowest unprescaled triggers"},
+  {"HLTJet","HLT_PFJet lowest unprescaled triggers"},
   {"isPVGood","Number of good vertices"},
   {"nPassEleL","number of loose electrons, also sets the working point for electrons to LOOSE"},
   {"nPassEleM","number of medium electrons, also sets the working point for electrons to MEDIUM"},
@@ -3227,6 +3235,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"dphi_met_btag_at_high_njet","Dphi of met and highest btagged jet, only if nonHiggsJet>=4"},
   {"dphi_met_btag_at_low_njet","Dphi of met and highest btagged jet, only if nonHiggsJet<4"},
   {"dphi_met_btags","Dphi of met and closest btagged jet"},
+  {"dphi_met_btags_AK8","Dphi of met and closest btagged AK8 jet"},
   {"dphi_met_btags_at_high_njet","Dphi of met and closest btagged jet, only if nonHiggsJet>=4"},
   {"dphi_met_btags_at_low_njet","Dphi of met and closest btagged jet, only if nonHiggsJet<4"},
   {"dphi_met_H_candidate","Dphi of met and Higgs candidate"},
@@ -3236,6 +3245,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"L1prefire","True if event could be affected by L1prefire"},
   {"nPassAK4","number of loose ak4 jets"},
   {"nPassAK8","number of loose ak8 jets"},
+  {"AK4Pt","Leading AK4 jet pt"},
   {"nonHiggsJet","number of loose ak4 jets which are not Higgs candidates"},
   {"noHmass_in_event","Neither AK8 nor AK4 pair with correct mass found in event (when True=1)"},
   {"bcounterDeep_L","number of loose Deep btagged jets"},
