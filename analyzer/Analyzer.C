@@ -243,7 +243,7 @@ void Analyzer::Loop()
      reader_T_2018fast.load(calib_2018fast,BTEntry::FLAV_UDSG,"fastsim");
    }
          
-   std::unique_ptr<CorrectionSet> cset_muo, cset_ele, cset_tau, cset_pho, cset_EGscale, cset_btag;
+   std::unique_ptr<CorrectionSet> cset_muo, cset_ele, cset_tau, cset_pho, cset_EGscale, cset_btag, cset_AK8btag;
 
    std::string temp_fname="histos/Analyzer_histos"; 
    if (output_file != "default") {
@@ -716,6 +716,7 @@ void Analyzer::Loop()
      b_Muon_dz->GetEntry(ientry);
      b_Muon_dxy->GetEntry(ientry);
      b_Muon_miniPFRelIso_all->GetEntry(ientry);
+     b_Muon_pfIsoId->GetEntry(ientry);
      b_Muon_looseId->GetEntry(ientry);
      b_Muon_mediumId->GetEntry(ientry);
      b_Muon_tightId->GetEntry(ientry);
@@ -817,6 +818,17 @@ void Analyzer::Loop()
        h2_FR->SetDirectory(0);
        f_FR.Close();
      }
+
+     //Get ParticleNet btag WP
+     if (jentry==0) {
+       string sf_AK8btag_fname="correctionlib/POG/BTV/"+year+"_UL/ak8_xbbcc_tagging.json";
+       cset_AK8btag = CorrectionSet::from_file(sf_AK8btag_fname);
+       BtagParticleNetWP[0] = cset_AK8btag->at("particleNetMD_XbbvsQCD_wp_values")->evaluate({"L"});
+       BtagParticleNetWP[1] = cset_AK8btag->at("particleNetMD_XbbvsQCD_wp_values")->evaluate({"M"});
+       BtagParticleNetWP[2] = cset_AK8btag->at("particleNetMD_XbbvsQCD_wp_values")->evaluate({"T"});
+       if (is_debug) cout<<"AK8 ParticleNet WP "<<BtagParticleNetWP[0]<<" "<<BtagParticleNetWP[1]<<" "<<BtagParticleNetWP[2]<<endl;
+     }
+
      //check data if inside Golden json file
      if (isData && !IsGoldEvent(run,luminosityBlock)) continue;
 
@@ -1101,6 +1113,7 @@ void Analyzer::Loop()
            eff_l_Deep_T = new TEfficiency(*(TH2D*)f_btag->Get((m_temp+"h_l_Deep_T").c_str()),*(TH2D*)f_btag->Get((m_temp+"h_allAK4ljets").c_str()));
            f_btag->Close();
          }
+         
 
          //L1prefire maps
          if (year.find("2018")==std::string::npos) {
@@ -1191,7 +1204,7 @@ void Analyzer::Loop()
      if (is_debug) cout<<"nonPrefiringProbability "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      //muon
      for (unsigned int i=0;i<nMuon;i++) {
-       if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_miniPFRelIso_all[i]<0.2) {
+       if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_pfIsoId[i]>1) {
          if (Muon_looseId[i]) passMuL.push_back(i);
          if (Muon_mediumId[i]) passMuM.push_back(i);
          if (Muon_tightId[i]) passMuT.push_back(i);
@@ -1697,9 +1710,9 @@ void Analyzer::Loop()
        double i_jetPN=PN_discr_value, h_jetPN;
        if (highparticleNet==-1) h_jetPN=-10; else h_jetPN=FatJet_particleNetMD_Xbb[highparticleNet]/(FatJet_particleNetMD_Xbb[highparticleNet]/FatJet_particleNetMD_QCD[highparticleNet]);
        if (i_jetPN>h_jetPN) highparticleNet=i;
-       if (PN_discr_value>BtagParticleNetWP[year_chooser][2]) {passParticleNet.insert(pair<int,char>(i,'T'));bcounterParticleNet[3]++;}
-       else if (PN_discr_value>BtagParticleNetWP[year_chooser][1]) {passParticleNet.insert(pair<int,char>(i,'M'));bcounterParticleNet[2]++;}
-       else if (PN_discr_value>BtagParticleNetWP[year_chooser][0]) {passParticleNet.insert(pair<int,char>(i,'L'));bcounterParticleNet[1]++;}
+       if (PN_discr_value>BtagParticleNetWP[2]) {passParticleNet.insert(pair<int,char>(i,'T'));bcounterParticleNet[3]++;}
+       else if (PN_discr_value>BtagParticleNetWP[1]) {passParticleNet.insert(pair<int,char>(i,'M'));bcounterParticleNet[2]++;}
+       else if (PN_discr_value>BtagParticleNetWP[0]) {passParticleNet.insert(pair<int,char>(i,'L'));bcounterParticleNet[1]++;}
        else {passParticleNet.insert(pair<int,char>(i,'0'));bcounterParticleNet[0]++;}
        if (is_debug) cout<<"AK8 index "<<i<<" btag discr "<<PN_discr_value<<endl;
        //getting highest value boson taggers
@@ -1755,7 +1768,18 @@ void Analyzer::Loop()
      OneOr2jet=false; if (passJet.size()>1 || passAK8Jet.size()>0) OneOr2jet=true;
 
      //Calculate AK8 BTag SFs only for signal
-     if (!isData && passAK8Jet.size()>0 && SignalScan) CalcBtagSF_AK8(AK8JetSmearedPt[passAK8Jet[0]],passParticleNet[passAK8Jet[0]]);
+     if (!isData && passAK8Jet.size()>0 && SignalScan) {
+       AK8btag_SF[0][0] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"central","L",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[0][1] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"up","L",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[0][2] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"down","L",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[1][0] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"central","M",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[1][1] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"up","M",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[1][2] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"down","M",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[2][0] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"central","T",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[2][1] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"up","T",AK8JetSmearedPt[passAK8Jet[0]]});
+       AK8btag_SF[2][2] = cset_AK8btag->at("particleNetMD_XbbvsQCD_comb")->evaluate({"down","T",AK8JetSmearedPt[passAK8Jet[0]]});
+       if (is_debug) cout<<"AK8btag_SF loose "<<AK8btag_SF[0][0]<<" + "<<AK8btag_SF[0][1]<<" - "<<AK8btag_SF[0][2]<<endl;
+     }
 
      //MET variables
      if (is_debug) cout<<"Calculating MET variables"<<endl;
@@ -1909,11 +1933,11 @@ void Analyzer::Loop()
            //if (AK8JetSmearedMass[passAK8Jet[0]]>0 && AK8JetSmearedMass[passAK8Jet[0]]<80) {
            //if (!(AK8JetSmearedMass[passAK8Jet[0]]>80 && AK8JetSmearedMass[passAK8Jet[0]]<160)) {
              passHiggsMass=true;
-             if (PN_discr_value>BtagParticleNetWP[year_chooser][2]) AK8Btag_selected=3;
-             else if (PN_discr_value>BtagParticleNetWP[year_chooser][1]) AK8Btag_selected=2;
-             else if (PN_discr_value>BtagParticleNetWP[year_chooser][0]) AK8Btag_selected=1;
+             if (PN_discr_value>BtagParticleNetWP[2]) AK8Btag_selected=3;
+             else if (PN_discr_value>BtagParticleNetWP[1]) AK8Btag_selected=2;
+             else if (PN_discr_value>BtagParticleNetWP[0]) AK8Btag_selected=1;
              else AK8Btag_selected=0;
-             if (PN_discr_value>BtagParticleNetWP[year_chooser][0]) passBtag=true;
+             if (PN_discr_value>BtagParticleNetWP[0]) passBtag=true;
            }
          }
        }
@@ -2198,7 +2222,7 @@ void Analyzer::Loop()
              if (isParticleNet) {
                double PN_discr_value=FatJet_particleNetMD_Xbb[i]/(FatJet_particleNetMD_Xbb[i]+FatJet_particleNetMD_QCD[i]);
                if (is_debug) cout<<i<<" discr "<<PN_discr_value<<" dphi "<<deltaPhi(FatJet_phi[i],METPhi)<<endl;
-               if (PN_discr_value<BtagParticleNetWP[year_chooser][0]) continue;
+               if (PN_discr_value<BtagParticleNetWP[0]) continue;
              }
              else {
                if (is_debug) cout<<i<<" discr "<<FatJet_btagDDBvLV2[i]<<" dphi "<<deltaPhi(FatJet_phi[i],METPhi)<<endl;

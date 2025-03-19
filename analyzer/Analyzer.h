@@ -1116,7 +1116,7 @@ public :
    double BtagDDBvLWP[4][5]={{0.0256,0.118,0.2739,0.282,0.630},{0.027,0.1213,0.2786,0.282,0.630},{0.0404,0.1566,0.3154,0.382,0.630},{0.0399,0.1566,0.314,0.382,0.630}};
    double BtagDeepWP[4][3]={{0.0508,0.2598,0.6502},{0.0480,0.2489,0.6377},{0.0532,0.3040,0.7476},{0.0490,0.2783,0.7100}};
    //from v10 version here: https://cms.cern.ch/iCMS/jsp/db_notes/noteInfo.jsp?cmsnoteid=CMS%20AN-2021/005 Table 18
-   double BtagParticleNetWP[4][3]={{0.9088,0.9737,0.9883},{0.9137,0.9735,0.9883},{0.9105,0.9714,0.987},{0.9172,0.9734,0.988}};
+   double BtagParticleNetWP[3];
    std::string output_file="default", btag_file="";
    unsigned int nFiles=0;
    int _ABCD=0;
@@ -1249,7 +1249,6 @@ public :
    double           deltaPhi(double phi1, double phi2);
    float            Photon_SCEta(const int);
    float            Photon_SCEta_Zonly(const int);
-   void             CalcBtagSF_AK8(double pt, char tag);
    double           UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, int i, double pt, BTCalibrationReader fastreader_L, BTCalibrationReader fastreader_M, BTCalibrationReader fastreader_T, std::unique_ptr<TRandom3> &gen);
    void             Sort(vector<pair<int,int>> &v, vector<float> *b, vector<float> *bb, unsigned int operation);
    void             SelectAK4(vector<pair<int,int>> v, vector<float> *eta, vector<float> *phi, vector<float> *b, vector<float> *bb, vector<float> en, vector<float> pt, vector<int> ak4_hjets, vector<bool> &ak4selected, vector<int> &ak4trueselected);
@@ -2972,77 +2971,6 @@ double Analyzer::UpdateBtags(std::unique_ptr<CorrectionSet> & cset, bool debug, 
     if (newtag =='M') return gen->Uniform(BtagDeepWP[year_chooser][1],1);
   }
   return Jet_btagDeepFlavB[i];
-}
-
-void Analyzer::CalcBtagSF_AK8(double pt, char tag){
-  if (year.find("2016preVFP")!=std::string::npos) {
-    if (pt>=450 && pt<500) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.032; AK8btag_SF[0][1]=1.128; AK8btag_SF[0][2]=0.942;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.052; AK8btag_SF[1][1]=1.139; AK8btag_SF[1][2]=0.971;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.054; AK8btag_SF[2][1]=1.134; AK8btag_SF[2][2]=0.977;}
-    }
-    if (pt>=500 && pt<600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.062; AK8btag_SF[0][1]=1.154; AK8btag_SF[0][2]=0.980;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.068; AK8btag_SF[1][1]=1.146; AK8btag_SF[1][2]=0.995;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.139; AK8btag_SF[2][1]=1.222; AK8btag_SF[2][2]=1.058;}
-    }
-    if (pt>=600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.002; AK8btag_SF[0][1]=1.108; AK8btag_SF[0][2]=0.901;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.996; AK8btag_SF[1][1]=1.097; AK8btag_SF[1][2]=0.899;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.049; AK8btag_SF[2][1]=1.182; AK8btag_SF[2][2]=0.919;}
-    }
-  }
-  if (year.find("2016postVFP")!=std::string::npos) {
-    if (pt>=450 && pt<500) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.031; AK8btag_SF[0][1]=1.089; AK8btag_SF[0][2]=0.981;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.029; AK8btag_SF[1][1]=1.080; AK8btag_SF[1][2]=0.984;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.031; AK8btag_SF[2][1]=1.081; AK8btag_SF[2][2]=0.985;}
-    }
-    if (pt>=500 && pt<600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.089; AK8btag_SF[0][1]=1.165; AK8btag_SF[0][2]=1.021;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.070; AK8btag_SF[1][1]=1.136; AK8btag_SF[1][2]=1.008;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.055; AK8btag_SF[2][1]=1.119; AK8btag_SF[2][2]=0.983;}
-    }
-    if (pt>=600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.057; AK8btag_SF[0][1]=1.134; AK8btag_SF[0][2]=1.001;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.077; AK8btag_SF[1][1]=1.124; AK8btag_SF[1][2]=0.998;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.088; AK8btag_SF[2][1]=1.164; AK8btag_SF[2][2]=1.016;}
-    }
-  }
-  if (year.find("2017")!=std::string::npos) {
-    if (pt>=450 && pt<500) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.966; AK8btag_SF[0][1]=1.021; AK8btag_SF[0][2]=0.909;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.006; AK8btag_SF[1][1]=1.058; AK8btag_SF[1][2]=0.954;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.055; AK8btag_SF[2][1]=1.112; AK8btag_SF[2][2]=1.001;}
-    }
-    if (pt>=500 && pt<600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.021; AK8btag_SF[0][1]=1.074; AK8btag_SF[0][2]=0.969;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.051; AK8btag_SF[1][1]=1.107; AK8btag_SF[1][2]=0.996;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.067; AK8btag_SF[2][1]=1.124; AK8btag_SF[2][2]=1.012;}
-    }
-    if (pt>=600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.979; AK8btag_SF[0][1]=1.014; AK8btag_SF[0][2]=0.941;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.991; AK8btag_SF[1][1]=1.029; AK8btag_SF[1][2]=0.948;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.045; AK8btag_SF[2][1]=1.090; AK8btag_SF[2][2]=0.999;}
-    }
-  }
-  if (year.find("2018")!=std::string::npos) {
-    if (pt>=450 && pt<500) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=0.921; AK8btag_SF[0][1]=0.992; AK8btag_SF[0][2]=0.844;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=0.966; AK8btag_SF[1][1]=1.022; AK8btag_SF[1][2]=0.909;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=0.994; AK8btag_SF[2][1]=1.058; AK8btag_SF[2][2]=0.930;}
-    }
-    if (pt>=500 && pt<600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.006; AK8btag_SF[0][1]=1.030; AK8btag_SF[0][2]=0.980;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.033; AK8btag_SF[1][1]=1.063; AK8btag_SF[1][2]=1.008;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.072; AK8btag_SF[2][1]=1.113; AK8btag_SF[2][2]=1.036;}
-    }
-    if (pt>=600) {
-      if (tag == 'T' || tag == 'M' || tag == 'L') {AK8btag_SF[0][0]=1.001; AK8btag_SF[0][1]=1.036; AK8btag_SF[0][2]=0.964;}
-      if (tag == 'T' || tag == 'M')               {AK8btag_SF[1][0]=1.010; AK8btag_SF[1][1]=1.040; AK8btag_SF[1][2]=0.975;}
-      if (tag == 'T')                             {AK8btag_SF[2][0]=1.046; AK8btag_SF[2][1]=1.084; AK8btag_SF[2][2]=1.008;}
-    }
-  }
 }
 
 void Analyzer::Systematics(map<string, int> systematics) {
