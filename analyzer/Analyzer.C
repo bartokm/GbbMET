@@ -15,7 +15,7 @@ using namespace correction;
 
 int main(int argc, char* argv[]){
   bool is_i=0, is_o=0, is_b=0, is_x=0, is_y=0, is_f=0, is_F=0, is_h=0, is_c=0, is_cuts=0, is_quiet=0, is_signalscan=0, is_signalstudy=0, is_countSignal=0;
-  bool is_t=0, is_l=0, is_syst=0, is_debug=0, is_A=0, is_signalPointTree=0, is_g=0, is_p=0;
+  bool is_t=0, is_l=0, is_syst=0, is_debug=0, is_A=0, is_signalPointTree=0, is_g=0, is_p=0, is_m=0;
   bool inputs=0, cuts=0, syst=0, lept=0;
   int FR=0, tr=0, ABCD=0;
   string year;
@@ -49,6 +49,7 @@ int main(int argc, char* argv[]){
       else if (arg[1]=='g') is_g=1; 
       else if (arg[1]=='T') is_signalPointTree=1; 
       else if (arg[1]=='p') is_p=1; 
+      else if (arg[1]=='m') is_m=1; 
       else {cout<<"ERROR! Unknown option '-"<<arg[1]<<"' Exiting..."<<std::endl; return 0;}
     }
     else if (arg=="--syst") {is_i=0;is_syst=1;}
@@ -125,6 +126,7 @@ int main(int argc, char* argv[]){
     if (is_signalstudy) cout<<"Signal study histograms will be filled! (works only on MC...)"<<endl;
     if (is_countSignal) cout<<"Signal Count is ON, only works on T5qqqqHg sample."<<endl;
     if (is_p) cout<<"AK8 b-tagger is set to ParticleNetXbb"<<endl;
+    if (is_m) cout<<"Mass sideband running for higgs tagging"<<endl;
     if (is_g) cout<<"Running only on good pair of neutralinos"<<endl;
     if (is_signalPointTree) cout<<"Signal mass point determination is from GenModel Tree variables"<<endl;
     if (FR) cout<<"EGamma Fake Rate is true!"<<" FR="<<FR<<endl;
@@ -150,9 +152,9 @@ int main(int argc, char* argv[]){
     for (auto const& x : systematics) cout<<"Systematics for "<<x.first<<" set to "<<x.second<<endl;
     for (auto const& x : leptonpts) cout<<"Lepton pt for "<<x.first<<" set to "<<x.second<<endl;
   }
-  Analyzer t(inputfiles,output,bname,xsec,year,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_debug,is_signalscan,is_signalstudy,is_countSignal, tr, systematics, leptonpts, ABCD, is_g, is_signalPointTree, is_p);
+  Analyzer t(inputfiles,output,bname,xsec,year,is_f,FR,cut_variable,cut_operator,cut_value,is_quiet,is_debug,is_signalscan,is_signalstudy,is_countSignal, tr, systematics, leptonpts, ABCD, is_g, is_signalPointTree, is_p, is_m);
   t.Loop();
-  return 1;
+  return 0;
 }
 
 
@@ -320,6 +322,14 @@ void Analyzer::Loop()
    TH1D *h_pfMETsumEt    = new TH1D("h_pfMETsumEt",";#slash{E}_{T} sumEt",20,-50,5000);
    TH1D *h_pfMETPhi    = new TH1D("h_pfMETPhi",";#Phi^{#slash{E}_{T}}",20,-4,4);
    TH1D *h_pfMETSig    = new TH1D("h_pfMETSig",";#slash{E}_{T}Sig",20,0,1500);
+  
+   /*
+   std::vector<double> xBins = {10, 30, 50, 70, 100, 130, 200, 300, 500};
+   TEfficiency *t_met_trigger_H_boosted = new TEfficiency("t_met_trigger_H_boosted",";p_{T}^{miss} [GeV];Efficiency",xBins.size()-1,xBins.data());
+   TEfficiency *t_met_trigger_F_boosted = new TEfficiency("t_met_trigger_F_boosted",";p_{T}^{miss} [GeV];Efficiency",xBins.size()-1,xBins.data());
+   TEfficiency *t_met_trigger_H_resolved = new TEfficiency("t_met_trigger_H_resolved",";p_{T}^{miss} [GeV];Efficiency",xBins.size()-1,xBins.data());
+   TEfficiency *t_met_trigger_F_resolved = new TEfficiency("t_met_trigger_F_resolved",";p_{T}^{miss} [GeV];Efficiency",xBins.size()-1,xBins.data());
+   */
      
    /*
    //std::vector<double> xBins = {20, 35, 50, 80, 120, 500,1000};
@@ -473,6 +483,15 @@ void Analyzer::Loop()
    TH2D *h2_mHAK4_clean_fake= new TH2D("h2_mHAK4_clean_fake",";Unrolled bins;M_{bb}[GeV]",12,0.5,12.5,30,0,300);
    TH2D *h2_dr_SRHiggs = new TH2D("h2_dr_SRHiggs",";Unrolled bins;dR_{bb}",12,0.5,12.5,20,0,3.2);
    TH3D *h3_mHAK4_dr_Higgs = new TH3D("h3_mHAK4_dr_Higgs",";Unrolled bins;M_{bb}[GeV];dR_{bb}",21,0.5,12.5,13,20,280,20,0,3.2);
+   TH1D *h_mHAK4cand = new TH1D("h_mHAK4cand",";M_{bb}[GeV]",40,0,400);
+   TH1D *h_mHAK4cand_noBoost = new TH1D("h_mHAK4cand_noBoost",";M_{bb}[GeV]",40,0,400);
+   TH1D *h_mHAK4cand_nonoBoost = new TH1D("h_mHAK4cand_nonoBoost",";M_{bb}[GeV]",40,0,400);
+   TH1D *h_MET_Hcand_high= new TH1D("h_MET_Hcand_high",";MET[GeV]",60,0,600);
+   TH1D *h_MT_Hcand_high= new TH1D("h_MT_Hcand_high",";MT[GeV]",60,0,1500);
+   TH1D *h_EJ_Hcand_high= new TH1D("h_EJ_Hcand_high",";extra jets",10,-0.5,9.5);
+   TH1D *h_m_bbG_Hcand_high= new TH1D("h_m_bbG_Hcand_high",";m_{bb#gamma}",100,0,2000);
+   //3D histo for ABCD bkg for H candidate mass distribution 
+   TH3D *ABCD_h_mHAK4cand_noBoost = new TH3D("ABCD_h_mHAK4cand_noBoost",";M_{bb}[GeV]; MET; H-tag",40,0,400,2,-0.5,1.5,2,-0.5,1.5);
 
    //AK4 searchbins
    const int dim_ak4=3;
@@ -535,10 +554,27 @@ void Analyzer::Loop()
      //(run==305040 && event==94278334) ? is_debug=1 : is_debug=0;
      //(run==302448 && event==1514134939) ? is_debug=1 : is_debug=0;
      //(event==3705660) ? is_debug=1 : is_debug=0;
-     if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
-     if (is_debug) cout<<"RUNNING ON ENTRY "<<jentry<<" EVENT "<<event<<endl;
-     if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+     //
+     /*
+     //280385 632606677 /mnt/fastdata2/SUSYNANO/postprocess/UL2016_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2016G/SinglePhoton/NanoAODv9/211025_093603/0000/tree_11.root
+     //279767 1198843536 /mnt/fastdata2/SUSYNANO/postprocess/UL2016_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2016G/SinglePhoton/NanoAODv9/211025_093603/0000/tree_15.root
+     //277094 599053273 /mnt/fastdata2/SUSYNANO/postprocess/UL2016_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2016E_APV/SinglePhoton/NanoAODv9/241009_122747/0000/tree_14.root
+     //305406 380787708 /mnt/fastdata1/SUSYNANO/postprocess/UL2017_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2017F/SinglePhoton/NanoAODv9/211025_110458/0000/tree_12.root
+     //305237 1042692091 /mnt/fastdata1/SUSYNANO/postprocess/UL2017_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2017F/SinglePhoton/NanoAODv9/211025_110458/0000/tree_21.root
+     //304797 1098641512 /mnt/fastdata1/SUSYNANO/postprocess/UL2017_MiniAODv2_NanoAODv9/SinglePhoton/SinglePhoton_2017E/SinglePhoton/NanoAODv9/211025_110349/0000/tree_16.root
+     if (jentry>100 && (run!=280385 && run!=279767 && run!=277094 && run!=305406 && run!=305237 && run!=304797 && run!=322617)) continue;
+     ((run==280385 && event==632606677) ||
+     (run==279767 && event==1198843536) ||
+     (run==277094 && event==599053273)  ||
+     (run==305406 && event==380787708)  ||
+     (run==305237 && event==1042692091) ||
+     (run==304797 && event==1098641512) ||
+     (run==322617 && event==245901670)) ? is_debug=1 : is_debug=0;
+     */
 
+     if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
+     if (is_debug) cout<<"RUNNING ON ENTRY "<<jentry<<" RUN "<<run<<" LS "<<luminosityBlock<<" EVENT "<<event<<endl;
+     if (is_debug) cout<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<endl;
      //TRandom3 *gen_btag = new TRandom3(137);
      std::unique_ptr<TRandom3> gen_btag( new TRandom3(event));
 
@@ -549,6 +585,7 @@ void Analyzer::Loop()
        file_counter++;
        //std::cout<<"file "<<file_counter<<" "<<fChain->GetCurrentFile()->GetName()<<std::endl;
        newfile=true;
+       if (!is_quiet) cout<<temp_f<<endl;
      }
      //Set year from run number in data
      if (isData && (jentry==0 || newfile)) {
@@ -660,6 +697,11 @@ void Analyzer::Loop()
      b_PV_y->GetEntry(ientry);
      b_PV_z->GetEntry(ientry);
      if (!_fastSim) {
+       b_HLT_PFMETNoMu120_PFMHTNoMu120_IDTight->GetEntry(ientry);
+       b_HLT_Ele27_WPTight_Gsf->GetEntry(ientry);
+       b_HLT_ECALHT800->GetEntry(ientry);
+       //b_HLT_AK8PFJet500->GetEntry(ientry);
+       //b_HLT_MonoCentralPFJet80_PFMETNoMu120_PFMHTNoMu120_IDTight->GetEntry(ientry);
        if (year.find("2016")!=std::string::npos) {
          b_HLT_Photon165_HE10->GetEntry(ientry);
          b_HLT_Photon175->GetEntry(ientry);
@@ -669,7 +711,7 @@ void Analyzer::Loop()
          //b_HLT_PFMET170_HBHE_BeamHaloCleaned->GetEntry(ientry);
        }
        else if (year.find("2018")!=std::string::npos) {
-         b_HLT_Photon110EB_TightID_TightIso->GetEntry(ientry);
+         //b_HLT_Photon110EB_TightID_TightIso->GetEntry(ientry);
          b_HLT_Photon200->GetEntry(ientry);
          b_HLT_Photon300_NoHE->GetEntry(ientry);
          b_HLT_PFJet500->GetEntry(ientry);
@@ -813,10 +855,26 @@ void Analyzer::Loop()
        }
      }
      if (_fakeRate && jentry==0) {
-       TFile f_FR("input/FakeRate_EGamma.root","read");
+       string temp;
+       if (year.find("preVFP")!=string::npos) temp="2016_data_APV";
+       else if (year.find("postVFP")!=string::npos) temp="2016_data_nonAPV";
+       else temp=year+"_data";
+       TFile f_FR(("FR_results/FakeRate_"+temp+".root").c_str(),"read");
        h2_FR = (TH2D*)f_FR.Get("FR_Data_EtaPhi_50_110");
        h2_FR->SetDirectory(0);
        f_FR.Close();
+       //Getting the fit values for pt and nvtx
+       TFile f_FR_fit("FR_results/fit_save.root","read");
+       if (year.find("preVFP")!=string::npos) temp="2016_APV_nVtx_poly4";
+       else if (year.find("postVFP")!=string::npos) temp="2016_nonAPV_nVtx_poly5";
+       else if (year.find("2017")!=string::npos) temp="2017_nVtx_poly4";
+       else if (year.find("2018")!=string::npos) temp="2018_nVtx_poly2";
+       f_FR_nVtx = (TF1*)f_FR_fit.Get(temp.c_str());
+       if (year.find("preVFP")!=string::npos) temp="2016_APV_pt";
+       else if (year.find("postVFP")!=string::npos) temp="2016_nonAPV_pt";
+       else temp=year+"_pt";
+       f_FR_pt = (TF1*)f_FR_fit.Get(temp.c_str());
+       f_FR_fit.Close();
      }
 
      //Get ParticleNet btag WP
@@ -933,6 +991,7 @@ void Analyzer::Loop()
        pu_weight=puWeight;
        double data_lumi = L_data[year_chooser];
        if (_fastSim && year.find("2016")!=std::string::npos) data_lumi = L_data[0]+L_data[1];
+       if (year.find("2017")!=std::string::npos && use_HLTMET) data_lumi = 40670;
        //if (year.find("2018")!=std::string::npos && HLT_Photon110EB_TightID_TightIso && !HLT_Photon200 && !HLT_Photon300_NoHE) data_lumi = 54670;
        weight=data_lumi*xsec*genWeight/TotalEvents;
        w=weight*pu_weight;
@@ -1204,6 +1263,7 @@ void Analyzer::Loop()
      if (is_debug) cout<<"nonPrefiringProbability "<<nonPrefiringProbability[0]<<" up "<<nonPrefiringProbability[1]<<" down "<<nonPrefiringProbability[2]<<endl;
      //muon
      for (unsigned int i=0;i<nMuon;i++) {
+       if (is_debug) cout<<"mu pt "<<Muon_pt[i]<<" eta "<<Muon_eta[i]<<" phi "<<Muon_phi[i]<<" sip3d "<<Muon_sip3d[i]<<" dz "<<Muon_dz[i]<<" dxy "<<Muon_dxy[i]<<" pfIsoId "<<static_cast<int>(Muon_pfIsoId[i])<<endl;
        if (Muon_pt[i]>mu_pt && abs(Muon_eta[i])<2.4 && Muon_sip3d[i]<4 && Muon_dz[i]<0.1 && Muon_dxy[i]<0.05 && Muon_pfIsoId[i]>1) {
          if (Muon_looseId[i]) passMuL.push_back(i);
          if (Muon_mediumId[i]) passMuM.push_back(i);
@@ -1256,6 +1316,7 @@ void Analyzer::Loop()
          if (_fastSim && jentry%100<54) continue;
          if (!_fastSim && year=="2016preVFP") continue;
        }
+       if (is_debug) cout<<"electron pt "<<Electron_pt[i]<<" eta "<<Electron_eta[i]<<" phi "<<Electron_phi[i]<<" miniPFRelIso_all "<<Electron_miniPFRelIso_all[i]<<endl;
        if (Electron_pt[i]>e_pt && abs(Electron_eta[i])<2.5 && Electron_miniPFRelIso_all[i]<0.2) {
          if (Electron_cutBased[i]>=2) passFREleL.push_back(i);
          if (Electron_cutBased[i]>=3) passFREleM.push_back(i);
@@ -1517,9 +1578,12 @@ void Analyzer::Loop()
        if (_fakeRate==1 && nPassFREleL != 0) w*=h2_FR->GetBinContent(h2_FR->FindBin(Electron_eta[nleadFREleL],Electron_phi[nleadFREleL]));
        if (_fakeRate==2 && passElePhotons.size() != 0) {
          double FRetaphi=h2_FR->GetBinContent(h2_FR->FindBin(Photon_eta[nleadElePho],Photon_phi[nleadElePho]));
-         double FRvalue=FRetaphi*_C*(_A*PV_npvsGood+_B);
-         if (is_debug) cout<<"etaphi "<<Photon_eta[nleadElePho]<<" "<<Photon_phi[nleadElePho]<<endl;
-         if (is_debug) cout<<FRvalue<<" = "<<FRetaphi<<" * "<<_C<<" *("<<_A<<" * "<<PV_npvsGood<<" + "<<_B<<")"<<endl;
+         double FRnVtx=f_FR_nVtx->Eval(PV_npvsGood);
+         double FRpt=f_FR_pt->Eval(100); //this is a constant function, and the range is 60-200
+         double FRvalue = FRetaphi * FRnVtx * FRpt / pow(FR_avg[year_chooser],2);
+         //double FRvalue = FRetaphi * FRpt / FR_avg[year_chooser];
+         if (is_debug) cout<<"etaphi "<<Photon_eta[nleadElePho]<<" "<<Photon_phi[nleadElePho]<<" pt "<<FRpt<<endl;
+         if (is_debug) cout<<FRvalue<<" = "<<FRvalue<<endl;
          w*=FRvalue;
        }
        if (is_debug) cout<<"w after "<<w<<endl;
@@ -1572,6 +1636,7 @@ void Analyzer::Loop()
        for (auto j : passMuons) if (deltaR(Jet_phi[i],Muon_phi[j],Jet_eta[i],Muon_eta[j])<0.4) {passcut=false;break;}
        for (auto j : passTaus) if (deltaR(Jet_phi[i],Tau_phi[j],Jet_eta[i],Tau_eta[j])<0.5) {passcut=false;break;}
        //for (auto j : passIso) if (deltaR(Jet_phi[i],IsoTrack_phi[j],Jet_eta[i],IsoTrack_eta[j])<0.4) {passcut=false;break;}
+       if (is_debug) cout<<i<<" AK4 eta "<<Jet_eta[i]<<" AK4 phi "<<Jet_phi[i]<<" id "<<Jet_jetId[i]<<" pt "<<jetSmearedPt[i]<<" passed cuts? "<<passcut<<endl;
        if (passcut) passJet.push_back(i);
      }
      nPassAK4=passJet.size();
@@ -1626,6 +1691,7 @@ void Analyzer::Loop()
        else if (jetbtagDeepFlavB[i]>BtagDeepWP[year_chooser][1]) {passDeep.insert(pair<int,char>(i,'M'));bcounterDeep[2]++;}
        else if (jetbtagDeepFlavB[i]>BtagDeepWP[year_chooser][0]) {passDeep.insert(pair<int,char>(i,'L'));bcounterDeep[1]++;}
        else {passDeep.insert(pair<int,char>(i,'0'));bcounterDeep[0]++;}
+       if (is_debug) cout<<"AK4 index "<<i<<" btag discr "<<jetbtagDeepFlavB[i]<<" WP L "<<BtagDeepWP[year_chooser][0]<<" WP M "<<BtagDeepWP[year_chooser][1]<<" tag "<<passDeep[i]<<endl;
      }
      if (is_debug && !isData && btag_file.size()>0) cout<<"AK4 update b-tagging status done"<<endl;
      bcounterDeep[2] += bcounterDeep[3];
@@ -1714,7 +1780,7 @@ void Analyzer::Loop()
        else if (PN_discr_value>BtagParticleNetWP[1]) {passParticleNet.insert(pair<int,char>(i,'M'));bcounterParticleNet[2]++;}
        else if (PN_discr_value>BtagParticleNetWP[0]) {passParticleNet.insert(pair<int,char>(i,'L'));bcounterParticleNet[1]++;}
        else {passParticleNet.insert(pair<int,char>(i,'0'));bcounterParticleNet[0]++;}
-       if (is_debug) cout<<"AK8 index "<<i<<" btag discr "<<PN_discr_value<<endl;
+       if (is_debug) cout<<"AK8 index "<<i<<" btag discr "<<PN_discr_value<<" WP "<<BtagParticleNetWP[0]<<" tag "<<passParticleNet[i]<<endl;
        //getting highest value boson taggers
        if (high_H4q==-1) high_H4q=i;
        else if (FatJet_particleNet_H4qvsQCD[high_H4q]<FatJet_particleNet_H4qvsQCD[i]) high_H4q=i;
@@ -1809,6 +1875,7 @@ void Analyzer::Loop()
        }
      }
      if (is_debug && nleadPho!=-1) cout<<"MT = sqrt(2* "<<MET<<" "<<phoET[nleadPho]<<" *(1-cos(abs( "<<deltaPhi(Photon_phi[nleadPho],METPhi)<<" )))) = "<<MT<<endl;
+     if (is_debug) cout<<"MET "<<MET<<" METphi "<<METPhi<<endl;
      dphi_met_jet=999;
      double dphi_met_jet_njet[8]={-1,-1,-1,-1,-1,-1,-1,-1};
      double pt_dphi_jet=-1;
@@ -1839,6 +1906,11 @@ void Analyzer::Loop()
        }
        //cout<<"lepton "<<mcLeptonFilter<<endl;
        //cout<<"neutrino "<<mcNeutrinoFilter<<endl;
+       if (Photon_genPartFlav[nleadPho]==1) mcTruePhoton=1;
+       else if (Photon_genPartFlav[nleadPho]==11) mcTruePhoton=11;
+       else mcTruePhoton=0;
+       if (is_debug && nleadPho!=-1) cout<<"MC true photon info for photon: "<<nleadPho<<" Photon_genPartFlav: "<<static_cast<unsigned>(Photon_genPartFlav[nleadPho])<< "; 1=true photon, 11=true electron, 0=unknown or unmatched"<<endl;
+       if (is_debug && nleadPho!=-1 && Photon_genPartFlav[nleadPho]!=0) cout<<"Matched particle ID: "<<Photon_genPartIdx[nleadPho]<<endl;
      }
 
      double dr_pho_parton=999;
@@ -1929,9 +2001,9 @@ void Analyzer::Loop()
            SelectedAK8Jet=passAK8Jet[0];
            double PN_discr_value=FatJet_particleNetMD_Xbb[passAK8Jet[0]]/(FatJet_particleNetMD_Xbb[passAK8Jet[0]]+FatJet_particleNetMD_QCD[passAK8Jet[0]]);
            if (is_debug) cout<<"AK8 index "<<passAK8Jet[0]<<" AK8 mass "<<AK8JetSmearedMass[passAK8Jet[0]]<<" discr "<<PN_discr_value<<endl;
-           if (AK8JetSmearedMass[passAK8Jet[0]]>80 && AK8JetSmearedMass[passAK8Jet[0]]<160) {
-           //if (AK8JetSmearedMass[passAK8Jet[0]]>0 && AK8JetSmearedMass[passAK8Jet[0]]<80) {
-           //if (!(AK8JetSmearedMass[passAK8Jet[0]]>80 && AK8JetSmearedMass[passAK8Jet[0]]<160)) {
+           bool mass_window = AK8JetSmearedMass[passAK8Jet[0]]>80 && AK8JetSmearedMass[passAK8Jet[0]]<160;
+           if (isMassSideband) mass_window = !mass_window;
+           if (mass_window) {
              passHiggsMass=true;
              if (PN_discr_value>BtagParticleNetWP[2]) AK8Btag_selected=3;
              else if (PN_discr_value>BtagParticleNetWP[1]) AK8Btag_selected=2;
@@ -1965,6 +2037,7 @@ void Analyzer::Loop()
          if (is_debug) cout<<"i "<<i<<" Jet i "<<passJet[i]<<" discr i "<<jetbtagDeepFlavB[passJet.at(i)]<< endl;
        }
        double m_bb_deep=-1, phi_H_candidate=999, pt_H_candidate=-1;
+       double m_bbG=-1;
        bool passAK4DeepHiggsMass=false;
        Deep_selected=0; //Deep btag value of higgs candidate jets. 0-Nobtag, 1-1 loose btag, 2-2 loose btag
        Deep_medium_selected=0;
@@ -1981,8 +2054,8 @@ void Analyzer::Loop()
          //loop on jets
          for (unsigned int i=0;i<passJet.size();i++){
            if (i!=0) continue;
-           for (unsigned int j=i+1;j<passJet.size();j++){
-           //for (unsigned int j=i+1;j<2;j++){
+           //for (unsigned int j=i+1;j<passJet.size();j++){
+           for (unsigned int j=i+1;j<2;j++){
              double dR = deltaR(Jet_phi[passJet.at(i)],Jet_phi[passJet.at(j)],Jet_eta[passJet.at(i)],Jet_eta[passJet.at(j)]);
              double dPhi = deltaPhi(Jet_phi[passJet.at(i)],Jet_phi[passJet.at(j)]);
              //if (dR>1.25) continue;
@@ -1994,14 +2067,19 @@ void Analyzer::Loop()
              bjet1.SetPtEtaPhiM(jetSmearedPt[passJet.at(i)],Jet_eta[passJet.at(i)],Jet_phi[passJet.at(i)],jetSmearedMass[passJet.at(i)]);
              bjet2.SetPtEtaPhiM(jetSmearedPt[passJet.at(j)],Jet_eta[passJet.at(j)],Jet_phi[passJet.at(j)],jetSmearedMass[passJet.at(j)]);
              m_bb_deep=(bjet1+bjet2).M();
+             TLorentzVector photon; 
+             if (nleadPho!=-1) {
+               photon.SetPtEtaPhiM(phoET[nleadPho],Photon_eta[nleadPho],Photon_phi[nleadPho],0);
+               m_bbG = (bjet1+bjet2+photon).M();
+             }
              ptsum_ak4_Hcandidate=(bjet1+bjet2).Pt();
              phi_H_candidate=(bjet1+bjet2).Phi();
              pt_H_candidate=(bjet1+bjet2).Pt();
              if (ptsum_ak4_Hcandidate<100) continue;
-             if (is_debug) cout<<"i "<<i<<" j "<<j<<" m_bb_deep "<<m_bb_deep<<" discr i "<<jetbtagDeepFlavB[passJet.at(i)]<<" j "<<jetbtagDeepFlavB[passJet.at(j)]<<endl;
-             if (m_bb_deep>80 && m_bb_deep<160) {
-             //if (m_bb_deep>0 && m_bb_deep<80) {
-             //if (!(m_bb_deep>80 && m_bb_deep<160)) {
+             if (is_debug) cout<<"i "<<i<<" j "<<j<<" m_bb_deep "<<m_bb_deep<<" m_bbG "<<m_bbG<<" discr i "<<jetbtagDeepFlavB[passJet.at(i)]<<" j "<<jetbtagDeepFlavB[passJet.at(j)]<<endl;
+             bool mass_window = m_bb_deep>80 && m_bb_deep<160;
+             if (isMassSideband) mass_window = !mass_window;
+             if (mass_window) {
                if (jetbtagDeepFlavB[passJet.at(i)]>BtagDeepWP[year_chooser][0]) Deep_selected++;
                if (jetbtagDeepFlavB[passJet.at(j)]>BtagDeepWP[year_chooser][0]) Deep_selected++;
                if (jetbtagDeepFlavB[passJet.at(i)]>BtagDeepWP[year_chooser][1]) Deep_medium_selected++;//medium
@@ -2021,7 +2099,7 @@ void Analyzer::Loop()
            if (is_debug && !isData) for (unsigned int i=0;i<nGenPart;i++) printf("Index %-2i PDGID %-8d mcPt %-12f Eta %-9f Phi %-9f mom %-8d momPt %-9f  momEta %-9f  momPhi %-9f status %-2i flag %-14s gmom %-8d\n",i,GenPart_pdgId[i],GenPart_pt[i],GenPart_eta[i],GenPart_phi[i],GenPart_pdgId[GenPart_genPartIdxMother[i]],GenPart_pt[GenPart_genPartIdxMother[i]],GenPart_eta[GenPart_genPartIdxMother[i]],GenPart_phi[GenPart_genPartIdxMother[i]],GenPart_status[i],bitset<14>(GenPart_statusFlags[i]).to_string().c_str(),GenPart_pdgId[GenPart_genPartIdxMother[GenPart_genPartIdxMother[i]]]);
 
            //SignalStudy
-           bool true_photon = 0;
+           //bool true_photon = 0;
            int Higgs_AK8jet=-1, Higgs_jet_b=-1, Higgs_jet_antib=-1, index_b=-1, index_ab=-1, njet_index=-1, photon_index=-1, photon_reco=-1, Higgs_index=-1;
            int n_true_bjets=0;
            double AK4Hmass=-1, Hbbmass=-1, genAK4Hmass=-1, dR_trueHbb=-1, dphi_trueH_ak4=999, dphi_trueHmin_ak4=999;
@@ -2051,7 +2129,7 @@ void Analyzer::Loop()
              if (signalstudy) {
                
                //photon efficiency of leading photon
-               if (Photon_genPartFlav[nleadPho]==1) true_photon = 1;
+               //if (Photon_genPartFlav[nleadPho]==1) true_photon = 1;
                  //cout<<"lead pho pt "<<Photon_pt[nleadPho]<<" gen pho pt "<<GenPart_pt[Photon_genPartIdx[nleadPho]]<<endl;
                  //for (auto i : passPhotons) if (Photon_genPartFlav[i]==1 && abs(phoET[i]-GenPart_pt[Photon_genPartIdx[i]])>50) cout<<"pho pt "<<phoET[i]<<" gen pho pt "<<GenPart_pt[Photon_genPartIdx[i]]<<endl;
 
@@ -2194,6 +2272,10 @@ void Analyzer::Loop()
            //Region definitions
            if (is_debug) cout<<"Search region definitions"<<endl;
            double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<200) ? 3 : (MET<300) ? 4 : (MET<500) ? 5 : 6;
+           //MET distr run! please remove after!
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<120) ? 3 : (MET<140) ? 4 : (MET<160) ? 5 : 6;
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<200) ? 3 : (MET<250) ? 4 : 5;
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<350) ? 3 : (MET<400) ? 4 : (MET<500) ? 5 : 6;
            double njet;
            //AK4-AK8 searchBins
            int AK4AK8=0, boost=0; noHmass_in_event=0;
@@ -2232,8 +2314,9 @@ void Analyzer::Loop()
            }
            //AK4 AK8 overlap
            if (!boost) {
-             if (!noHmass_in_event) nonHiggsJet=passJet.size()-2;
-             else nonHiggsJet=passJet.size();
+             nonHiggsJet=passJet.size()-2;
+             //if (!noHmass_in_event) nonHiggsJet=passJet.size()-2;
+             //else nonHiggsJet=passJet.size();
            }
            else {
              int overlapped=0;
@@ -2251,6 +2334,7 @@ void Analyzer::Loop()
            if (passJet.size()>2) nonHiggsJet_forAK4=passJet.size()-2;
            int njet_AK8 = (nonHiggsJet_forAK8<4) ? 1 : 2;
            int njet_AK4 = (nonHiggsJet_forAK4<4) ? 1 : 2;
+           if (is_debug) cout<<"noHmass_in_event "<<noHmass_in_event<<"; event considered boosted? "<<boost<<" nonHiggsJet "<<nonHiggsJet<<endl;
        
            //dphi met and selected jet(s)
            double dphi_H_ak8=999, dphi_H_ak4=999, dphi_Hmin_ak4=999, dphi_AK4btag=999;
@@ -2269,6 +2353,9 @@ void Analyzer::Loop()
            if (boost) dphi_met_H_candidate=dphi_H_ak8;
            else {dphi_met_H_candidate=dphi_H_ak4; dphi_met_Hmin_candidate=dphi_Hmin_ak4;}
        
+           //MET distr run! please remove after!
+           //njet=1; 
+
            double sbFill_ak4ak8[dim_ak4]={double(AK4AK8),met,njet};
        
        
@@ -2312,6 +2399,12 @@ void Analyzer::Loop()
              if (PV_npvsGood==0) continue;
            }
            if (is_goodpair && !goodpair) continue;
+           //MET distr run! please remove after!
+           //if (MET>100 && MET<300) continue;
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<120) ? 3 : (MET<140) ? 4 : (MET<160) ? 5 : 6;
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<200) ? 3 : (MET<250) ? 4 : 5;
+           //double met = (MET<70) ? 1 : (MET<100) ? 2 : (MET<350) ? 3 : (MET<400) ? 4 : (MET<500) ? 5 : 6;
+
        
            //Filling histograms
            if (is_debug) cout<<"Event accepted, filling histograms"<<endl;
@@ -2319,13 +2412,14 @@ void Analyzer::Loop()
            //cout<<std::fixed;
            //cout<<std::setprecision(4);
            //cout<<temp_f<<" event "<<event<<" lumi_w "<<weight<<" pu_weight "<<pu_weight<<" eleLoose "<<ele_SF[1]<<" muoLoose "<<mu_SF[0]<<" tauLoose "<<tau_SF[0]<<" photon_SF "<<pho_SF[4]<<" nonPrefiringProbability "<<nonPrefiringProbability[L1prefire_whichSF]<<" full w "<<w<<endl;
+           //cout<<temp_f<<" run "<<run<<" event "<<event<<endl;
            //double max_pt=0; unsigned int whichLepton=0;
            //if (nPassEleL>0 && Electron_pt[nleadEleL]>max_pt) {max_pt=Electron_pt[nleadEleL]; whichLepton=1;}
            //if (nPassMuL>0 && Muon_pt[nleadMuL]>max_pt) {max_pt=Muon_pt[nleadMuL]; whichLepton=2;}
            //if (nPassTauL>0 && Tau_pt[nleadTauL]>max_pt) {max_pt=Tau_pt[nleadTauL]; whichLepton=3;}
            //cout<<std::fixed;
            //cout<<std::setprecision(4);
-           //cout<<"event "<<event<<" emt "<<whichLepton<<" full w "<<w<<endl;
+           //cout<<temp_f<<" event "<<event<<" emt "<<whichLepton<<" full w "<<w<<endl;
                 
            if (h_puW->GetBinContent(h_puW->FindBin(Pileup_nTrueInt))==0) h_puW->SetBinContent(h_puW->FindBin(Pileup_nTrueInt),pu_weight);
            OverFill(h_eff,3.,1.); OverFill(h_eff,4.,weight); OverFill(h_eff,5.,w);
@@ -2368,8 +2462,28 @@ void Analyzer::Loop()
            if (nleadPho!=-1 && Photon_r9[nleadPho]>0.98) OverFill(h_phoEta_highR9,Photon_eta[nleadPho],w);
            if (nleadPho!=-1) OverFill(h2_phoEta_R9,Photon_eta[nleadPho],Photon_r9[nleadPho],w);
            if (nleadPho!=-1) OverFill(h_phoPt,phoET[nleadPho],w);
-        
+       
            /*
+           bool HLTPho, HLTJet;
+           if (year.find("2016")!=std::string::npos) {
+             HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
+             HLTJet=HLT_PFJet450 || HLT_PFJet500;
+           }
+           else {
+             HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
+             HLTJet=HLT_PFJet500;
+           }
+           if (!HLT_PFMETNoMu120_PFMHTNoMu120_IDTight || HLTPho || HLTJet || HLT_Ele27_WPTight_Gsf || HLT_ECALHT800 || HLT_AK8PFJet500) {
+             if (boost) {
+               if (AK4AK8==1) t_met_trigger_H_boosted->FillWeighted(HLT_PFMETNoMu120_PFMHTNoMu120_IDTight,w,MET);
+               else t_met_trigger_F_boosted->FillWeighted(HLT_PFMETNoMu120_PFMHTNoMu120_IDTight,w,MET);
+             }
+             else {
+               if (AK4AK8==1) t_met_trigger_H_resolved->FillWeighted(HLT_PFMETNoMu120_PFMHTNoMu120_IDTight,w,MET);
+               else t_met_trigger_F_resolved->FillWeighted(HLT_PFMETNoMu120_PFMHTNoMu120_IDTight,w,MET);
+             }
+           }
+
            double tempweight = nonPrefiringProbability[0] * pu_weight * pix_sf_for_histo;
            t2_pho_eff->FillWeighted(true_photon,tempweight,phoET[nleadPho],Photon_eta[nleadPho]);
            if (abs(Photon_eta[nleadPho])<0.8) t_pho_eff_eta0p8->FillWeighted(true_photon,tempweight,phoET[nleadPho]);
@@ -2521,6 +2635,10 @@ void Analyzer::Loop()
            //AK4-AK8 searchbin fills
            double w_AK4searchBin=w, w_AK8searchBin=w;
            if (boost==1 && AK4AK8==1) w_AK8searchBin*=AK8btag_SF[0][0];
+
+           //MET distr run! please remove after!
+           //boost=1;
+
            switch (boost) {
              case 0 :
                {
@@ -2599,6 +2717,32 @@ void Analyzer::Loop()
              OverFill(h2_dphi_met_btags_ak4,massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
            }
            h2_sum_mHAK->Add(h2_mHAK4,h2_mHAK8);
+
+
+           //investigate the peak at 200GeV
+           if (pt_H_candidate>100 && bcounterDeep[2]>0 && bcounterDeep[1]>1) {
+             if (MET>300) {
+               if (!isData || (m_bb_deep<80 || m_bb_deep>160)) OverFill(h_mHAK4cand,m_bb_deep,w);
+               //if ((!isData || (m_bb_deep<80 || m_bb_deep>160)) && higgs_category!=4) OverFill(h_mHAK4cand_noBoost,m_bb_deep,w);
+               if ((!isData || (m_bb_deep<80 || m_bb_deep>160)) && higgs_category!=4 && higgs_category!=2) OverFill(h_mHAK4cand_nonoBoost,m_bb_deep,w);
+               //if (m_bb_deep>210 && m_bb_deep<220) cout<<run<<" "<<event<<" "<<temp_f<<endl;
+             }
+             if (m_bb_deep>160 && m_bb_deep<300) {
+               OverFill(h_MET_Hcand_high,MET,w);
+               OverFill(h_MT_Hcand_high,MT,w);
+               OverFill(h_EJ_Hcand_high,nonHiggsJet,w);
+               OverFill(h_m_bbG_Hcand_high,m_bbG,w);
+             }
+           }
+           //Filling ABCD histogram for AK4 Higgs candidate mass distribution
+           if (AK8Btag_selected==0 && pt_H_candidate>100 && (MET<100 || MET>300)) {
+             bool h_tag=bcounterDeep[2]>0 && bcounterDeep[1]>1;
+             bool met = MET>300;
+             double max=ABCD_h_mHAK4cand_noBoost->GetXaxis()->GetBinCenter(h_mHAK4cand_noBoost->GetNbinsX());
+             double x=m_bb_deep; if (x>max) x=max;
+             if (!isData || (m_bb_deep<80 || m_bb_deep>160) || !met || !h_tag) ABCD_h_mHAK4cand_noBoost->Fill(x,met,h_tag,w);
+             //if (MET>300) cout<<"Filling mass distr. b-tag "<<h_tag<<" event "<<event<<" file "<<temp_f<<endl; 
+           }
 
      
      //SignalRegion -- not the real SR, but almost
@@ -2930,6 +3074,15 @@ void Analyzer::Loop()
          OverFill(m2_dphi_met_btags_ak4[mass_pair],massRegion,dphi_met_btags,w*AK8btag_SF[0][0]);
        }
        m2_sum_mHAK[mass_pair]->Add(m2_mHAK4[mass_pair],m2_mHAK8[mass_pair]);
+       
+       //Filling histogram for AK4 Higgs candidate mass distribution
+       if (AK8Btag_selected==0 && pt_H_candidate>100 && (MET<100 || MET>300)) {
+         bool h_tag=bcounterDeep[2]>0 && bcounterDeep[1]>1;
+         bool met = MET>300;
+         double max=m_mHAK4cand_noBoost[mass_pair]->GetXaxis()->GetBinCenter(m_mHAK4cand_noBoost[mass_pair]->GetNbinsX());
+         double x=m_bb_deep; if (x>max) x=max;
+         if (h_tag && met) m_mHAK4cand_noBoost[mass_pair]->Fill(x,w);
+       }
      }
    }
 

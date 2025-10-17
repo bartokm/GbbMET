@@ -1134,6 +1134,7 @@ public :
    bool _is_signalPointTree=false;
    bool is_treemass =false;
    bool isParticleNet=false;
+   bool isMassSideband=false;
    vector<string> _cut_variable, _cut_operator;
    vector<double> _cut_value;
    //For cuts
@@ -1158,7 +1159,7 @@ public :
    bool passAK4Btag1=false, passAK4Btag2=false, passAK4HiggsMass=false;
    bool notAK4=true, OneOr2jet=false;
    bool Hbb=false;
-   int mcLeptonFilter=0, mcNeutrinoFilter=0;
+   int mcLeptonFilter=0, mcNeutrinoFilter=0, mcTruePhoton=0;
    int SignalHiggs=0, SignalZ=0;
    double HT_before=0, EMHT_before=0, HT_after=0, EMHT_after=0;
    double AK8HT_before=0, AK8EMHT_before=0, AK8HT_after=0, AK8EMHT_after=0;
@@ -1176,6 +1177,7 @@ public :
    vector<string> evt_wgt_syst;
    unsigned int whichPhoton=0, whichElectron=1, whichMuon=0, whichTau=0;
    unsigned int ISR_MC=0;
+   bool use_HLTMET=0;
    vector<double> phoET;
    double MET=0, ST=0, ST_G=0, MT=0;
    double dphi_met_jet=999, dphi_met_H_candidate=999, dphi_met_Hmin_candidate=999, dphi_met_btag=999, dphi_met_btags=999, dphi_met_btags_AK8=999;
@@ -1219,9 +1221,9 @@ public :
    TH1D *h_ISR_D;
    map< pair<int, int>, TH1D* > m_ISR_D;
    //histogram for Fake Rate
-   TH2D *h2_FR;
+   TH2D *h2_FR; TF1 *f_FR_nVtx, *f_FR_pt;
    //hardcoded values for FR
-   double _A=0.0308, _B=0.4942, _C=0.615192;
+   double FR_avg[4]={0.040757617,0.045644359,0.052256798,0.049872721};
    vector<string> json_2016, json_2017, json_2018;
    map<pair<int,int>, unsigned long long> TotalEvents_Signal;
 
@@ -1231,7 +1233,7 @@ public :
 
    Analyzer(TTree *tree=0);
    virtual ~Analyzer();
-   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0, bool _isParticleNet=0);
+   Analyzer(vector<string> arg={"default"}, string outname={"default"}, string btag_fname={""}, double _xsec=0, string _year="", bool fastSim=false, int fakeRate=0, vector<string> cut_variable={}, vector<string> cut_operator={}, vector<double> cut_value={}, bool is_q=0, bool is_d=0, bool is_signalscan=0, bool is_signalstudy=0, bool is_countSignal=0, int testrun=0, map<string,int> systematics={}, map<string,double> leptonpts={}, int ABCD=0, bool _goodpair=0, bool is_signalPointTree=0, bool _isParticleNet=0, bool _isMassSideband=0);
    virtual Int_t    Cut(Long64_t entry,pair<int,int> mass_pair,bool debug);
    map<int,vector<int>> init_scan_histos(TFile *outFile, bool signalstudy, int SignalScenario);
    virtual Int_t    GetEntry(Long64_t entry);
@@ -1265,7 +1267,7 @@ public :
 #endif
 
 #ifdef Analyzer_cxx
-Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD, bool _goodpair, bool is_signalPointTree, bool _isParticleNet) : fChain(0) 
+Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double _xsec, string _year, bool fastSim, int fakeRate, vector<string> cut_variable, vector<string> cut_operator, vector<double> cut_value, bool is_q, bool is_d, bool is_signalscan, bool is_signalstudy, bool is_countSignal, int testrun, map<string,int> systematics, map<string,double> leptonpts, int ABCD, bool _goodpair, bool is_signalPointTree, bool _isParticleNet, bool _isMassSideband) : fChain(0) 
 {
   // if parameter tree is not specified (or zero), connect the file
   // used to generate this class and read the Tree.
@@ -1273,6 +1275,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   _cut_variable=cut_variable;
   //determine which WP photons are cut on
   for (auto i : _cut_variable) {
+    if (i=="HLTMET") use_HLTMET=1;
     if (i=="nPassPhoM" || i=="nPassElePhoM") whichPhoton=1;
     if (i=="nPassPhoT" || i=="nPassElePhoT") whichPhoton=2;
     if (i=="nPassPhoMVA80" || i=="nPassElePhoMVA80") whichPhoton=3;
@@ -1317,6 +1320,7 @@ Analyzer::Analyzer(vector<string> arg, string outname, string btag_fname, double
   if (_year!="") year=_year;
   if (fastSim) _fastSim=true;
   if (_isParticleNet) isParticleNet=true;
+  if (_isMassSideband) isMassSideband=true;
   if (ABCD) _ABCD=ABCD;
   if (_goodpair) is_goodpair=_goodpair;
   if (is_signalPointTree) _is_signalPointTree=1;
@@ -2306,8 +2310,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     if (year.find("2016")!=std::string::npos) HLTPho=HLT_Photon165_HE10 || HLT_Photon175 || HLT_Photon250_NoHE;
     //else if (year.find("2018")!=std::string::npos) HLTPho=HLT_Photon110EB_TightID_TightIso || HLT_Photon200 || HLT_Photon300_NoHE;
     else HLTPho=HLT_Photon200 || HLT_Photon300_NoHE;
-    if (year.find("2016")!=std::string::npos) HLTMET=HLT_PFMET170_HBHE_BeamHaloCleaned;
-    else HLTMET=HLT_PFMET200_HBHE_BeamHaloCleaned;
+    HLTMET=HLT_PFMETNoMu120_PFMHTNoMu120_IDTight;
     if (year.find("2016")!=std::string::npos) HLTJet=HLT_PFJet450 || HLT_PFJet500;
     else HLTJet=HLT_PFJet500;
     if      (_cut_variable[i]=="HLTPho")    returnvalue=Parser(HLTPho,_cut_operator[i],_cut_value[i]);
@@ -2565,6 +2568,7 @@ Int_t Analyzer::Cut(Long64_t entry,pair<int,int> mass_pair, bool debug=0)
     else if (_cut_variable[i]=="nVtx") {returnvalue=Parser(PV_npvs,_cut_operator[i],_cut_value[i]);}
     else if (_cut_variable[i]=="mcLeptonFilter") returnvalue=Parser(mcLeptonFilter,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="mcNeutrinoFilter") returnvalue=Parser(mcNeutrinoFilter,_cut_operator[i],_cut_value[i]);
+    else if (_cut_variable[i]=="mcTruePhoton") returnvalue=Parser(mcTruePhoton,_cut_operator[i],_cut_value[i]);
     else if (_cut_variable[i]=="1or2jet") returnvalue=Parser(OneOr2jet,_cut_operator[i],_cut_value[i]);
     else {cout<<"ERROR! Unknown cut variable: "<<_cut_variable[i]<<endl; returnvalue=false;}
     if (debug) cout<<" result "<<returnvalue<<endl;;
@@ -2595,7 +2599,7 @@ void Analyzer::OverFill(TH1D *h, double x, double w){
   bool h_tag=AK8Btag_selected>0 || (Deep_medium_selected==1 && Deep_selected>=2);
   bool met = MET>_ABCD;
   double max=h->GetXaxis()->GetBinCenter(h->GetNbinsX());
-  if (_ABCD!=0 && MET>_ABCD && MET<300) return; //this is only for ABCD distr. in SR. otherwise need to remove this
+  //if (_ABCD!=0 && MET>_ABCD && MET<300) return; //this is only for ABCD distr. in SR. otherwise need to remove this
   if (_ABCD) {
     for (auto i : abcd_histos) {
       string h_name=h->GetName(); string abcd_name=i->GetName();
@@ -3201,6 +3205,7 @@ map<string,string> _cut_list = {{"HLTPho","photon triggers"},
   {"nVtx","Cut on number of vertices."},
   {"mcLeptonFilter","True if MC truth lepton was present in the event"},
   {"mcNeutrinoFilter","True if MC truth neutrino with Z boson mother was present in the event"},
+  {"mcTruePhoton","1 if leading photon is truth photon, 11 if truth electron, 0 otherwise"},
   {"1or2jet","Boolean. Presence of at least 1 AK8 or 2 AK4 jet(s)"}};
 
 bool CompareCuts(vector<string> input_cuts){

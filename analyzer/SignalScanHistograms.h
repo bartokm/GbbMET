@@ -163,6 +163,7 @@
   map< pair<int, int>, TH2D* > m2_mHAK4_clean_fake;
   map< pair<int, int>, TH2D* > m2_dr_SRHiggs;
   map< pair<int, int>, TH3D* > m3_mHAK4_dr_Higgs;
+  map< pair<int, int>, TH1D* > m_mHAK4cand_noBoost;
   
   map< pair<int, int>, THnD* > mn_AK4searchBins;
   map< pair<int, int>, THnD* > mn_AK4searchBins_noweight;
@@ -564,6 +565,7 @@ map<int,vector<int>> Analyzer::init_scan_histos(TFile *outFile, bool signalstudy
       m2_mHAK4_clean_fake[MassPair]= new TH2D("h2_mHAK4_clean_fake",";Unrolled bins;M_{bb}[GeV]",12,0.5,12.5,30,0,300);
       m2_dr_SRHiggs[MassPair] = new TH2D("h2_dr_SRHiggs",";Unrolled bins;dR_{bb}",12,0.5,12.5,20,0,3.2);
       m3_mHAK4_dr_Higgs[MassPair] = new TH3D("h3_mHAK4_dr_Higgs",";Unrolled bins;M_{bb}[GeV];dR_{bb}",12,0.5,12.5,13,20,280,20,0,3.2);
+      m_mHAK4cand_noBoost[MassPair] = new TH1D("h_mHAK4cand_noBoost",";M_{bb}[GeV]",40,0,400);
       
       //AK4 searchbins
       const int dim_ak4=3;
